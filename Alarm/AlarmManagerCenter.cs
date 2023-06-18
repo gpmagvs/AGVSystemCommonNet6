@@ -91,12 +91,24 @@ namespace AGVSystemCommonNet6.Alarm
 
             try
             {
-                clsAlarmCode alarmCodeData = AlarmCodes[alarm];
+
+                clsAlarmCode alarmCodeData;
+                string description_zh = "";
+                string description_En = "";
+                if(!AlarmCodes.TryGetValue(alarm, out alarmCodeData))
+                {
+                    description_zh = description_En = alarm.ToString();
+                }
+                else
+                {
+                    description_zh = alarmCodeData.Description_Zh;
+                    description_En = alarmCodeData.Description_En;
+                }
                 clsAlarmDto alarmDto = new clsAlarmDto()
                 {
                     Equipment_Name = Equipment_Name,
-                    Description_Zh = alarmCodeData.Description_Zh,
-                    Description_En = alarmCodeData.Description_En,
+                    Description_Zh = description_zh,
+                    Description_En = description_En,
                     Level = level,
                     AlarmCode = (int)alarm,
                     OccurLocation = location == null ? "" : location,

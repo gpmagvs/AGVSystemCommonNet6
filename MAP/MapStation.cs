@@ -15,10 +15,45 @@ namespace AGVSystemCommonNet6.MAP
         public string? Name { get; set; }
         public int TagNumber { get; set; }
         public int Direction { get; set; }
-        public bool Enable { get; set; }
         public bool AGV_Alarm { get; set; }
+        /// <summary>
+        /// 是否啟用
+        /// </summary>
+        public bool Enable { get; set; }
+        /// <summary>
+        /// 是否可停駐
+        /// </summary>
         public bool IsStandbyPoint { get; set; }
+
+        /// <summary>
+        /// 是否為二次定位點
+        /// </summary>
         public bool IsSegment { get; set; }
+        public bool IsOverlap { get; set; }
+        /// <summary>
+        /// 是否可停車
+        /// </summary>
+        public bool IsParking { get; set; }
+        /// <summary>
+        /// 是否可避車
+        /// </summary>
+        public bool IsAvoid { get; set; }
+        /// <summary>
+        /// 是否為虛擬點
+        /// </summary>
+        public bool IsVirtualPoint { get; set; }
+        /// <summary>
+        /// 是否為自動門
+        /// </summary>
+        public bool IsAutoDoor { get; set; }
+        /// <summary>
+        /// 是否為消防設備
+        /// </summary>
+        public bool IsExtinguishing { get; set; }
+        /// <summary>
+        /// 註冊點(,逗點分隔)
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? InvolvePoint { get; set; }
         public STATION_TYPE StationType { get; set; }
         public int LsrMode { get; set; }
@@ -26,7 +61,6 @@ namespace AGVSystemCommonNet6.MAP
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Bay { get; set; }
-        public bool IsOverlap { get; set; }
         public Graph Graph { get; set; }
         /// <summary>
         /// Key Point Index, value:權重
@@ -37,9 +71,12 @@ namespace AGVSystemCommonNet6.MAP
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? SpinMode { get; set; }
         public string? SubMap { get; set; }
-        public string? IsParking { get; set; }
-        public bool IsAvoid { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public AutoDoor? AutoDoor { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public MotionInfo? MotionInfo { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+
+        public string? Region { get; set; }
     }
 }

@@ -163,8 +163,8 @@ namespace AGVSystemCommonNet6.MAP
                         Y = stations[i].Y,
                         Auto_Door = new clsAutoDoor
                         {
-                            Key_Name = stations[i].AutoDoor.KeyName,
-                            Key_Password = stations[i].AutoDoor.KeyPassword,
+                            Key_Name = stations[i].AutoDoor?.KeyName,
+                            Key_Password = stations[i].AutoDoor?.KeyPassword,
                         },
                         Control_Mode = new clsControlMode
                         {
