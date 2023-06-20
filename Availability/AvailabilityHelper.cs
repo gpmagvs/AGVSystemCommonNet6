@@ -24,7 +24,7 @@ namespace AGVSystemCommonNet6.Availability
             { MAIN_STATUS.Unknown,new Stopwatch() },
         };
         private MAIN_STATUS previousMainState;
-        private RTAvailabilityDto currentAvailability;
+        private RTAvailabilityDto currentAvailability = new RTAvailabilityDto();
 
         private MAIN_STATUS MainState
         {
@@ -51,6 +51,8 @@ namespace AGVSystemCommonNet6.Availability
                 }
             }
         }
+
+        public double IDLING_TIME => currentAvailability.Idle_duraction;
 
         public AvailabilityHelper(string agv_name)
         {
@@ -186,6 +188,20 @@ namespace AGVSystemCommonNet6.Availability
             foreach (var watch in StateWatchers)
             {
                 watch.Value.Stop();
+            }
+        }
+
+        public void ResetIDLEStartTime()
+        {
+            if (currentAvailability.Main_Status == MAIN_STATUS.IDLE)
+            {
+                var Y = currentAvailability.EndTime.Year;
+                var M = currentAvailability.EndTime.Month;
+                var D = currentAvailability.EndTime.Day;
+                var h = currentAvailability.EndTime.Hour;
+                var mm = currentAvailability.EndTime.Minute;
+                var ss = currentAvailability.EndTime.Second;
+                currentAvailability.StartTime = new DateTime(Y, M, D, h, mm, ss);
             }
         }
     }

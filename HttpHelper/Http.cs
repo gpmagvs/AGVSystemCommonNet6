@@ -1,4 +1,5 @@
-﻿using AGVSystemCommonNet6.TASK;
+﻿using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.TASK;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -19,8 +20,10 @@ namespace AGVSystemCommonNet6.HttpHelper
 
         public static async Task<Tout> PostAsync<Tin, Tout>(string url, Tin data)
         {
-            var json = JsonConvert.SerializeObject(data);
-            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            string contentDataJson = string.Empty;
+            if (data != null)
+                contentDataJson = JsonConvert.SerializeObject(data);
+            var content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -38,14 +41,17 @@ namespace AGVSystemCommonNet6.HttpHelper
                     }
                     else
                     {
-                        throw new HttpRequestException($"Failed to POST to {url}. Response status code: {response.StatusCode}");
+                        var errmsg = $"Failed to POST to {url}. Response status code: {response.StatusCode}";
+                        Console.WriteLine(errmsg);
+                        throw new HttpRequestException(errmsg);
                     }
                 }
 
             }
             catch (Exception ex)
             {
-                throw new HttpRequestException($"Failed to POST to {url}. {ex.Message}");
+                Console.WriteLine(ex.Message);
+                throw ex;
             }
 
         }

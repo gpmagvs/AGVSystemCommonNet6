@@ -9,11 +9,11 @@ namespace AGVSystemCommonNet6.Microservices
 {
     public class MapSync
     {
-        public static async Task<(bool,string)> SendReloadRequest()
+        public static async Task<(bool,string)> SendReloadRequest(string map_file_path)
         {
             try
             {
-                bool alive = await Http.GetAsync<bool>(string.Format("{0}/{1}",Configs.VMSHost,"api/Map/Reload"));
+                bool alive = await Http.GetAsync<bool>(string.Format("{0}/{1}",Configs.VMSHost,$"api/Map/Reload?map_file={map_file_path}"));
                 return (alive, "");
             }
             catch (Exception ex)

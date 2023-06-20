@@ -7,8 +7,12 @@ namespace AGVSystemCommonNet6.Log
 {
     public class LOG
     {
-        internal static string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "VMS LOG");
-
+        internal static string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), _LogFolderName);
+        private static string _LogFolderName = "VMS LOG";
+        public static void SetLogFolderName(string logFolderName)
+        {
+            _LogFolderName = logFolderName;
+        }
         private static Task WriteLogToFileTask;
         private static ConcurrentQueue<LogItem> logItemQueue = new ConcurrentQueue<LogItem>();
 
@@ -46,7 +50,7 @@ namespace AGVSystemCommonNet6.Log
 
         public static void ERROR(Exception ex)
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; 
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             string msg = string.Format("Message:{0}。StackTrace:{1}", ex.Message, ex.StackTrace);
             TRACE(msg, caller_class_name);
             Log(new LogItem(LogLevel.Error, msg) { exception = ex }, caller_class_name);

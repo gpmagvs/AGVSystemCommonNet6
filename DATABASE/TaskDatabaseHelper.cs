@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +24,6 @@ namespace AGVSystemCommonNet6.DATABASE
         public List<clsTaskDto> GetALL()
         {
             var alltasks = dbhelper._context.Tasks.ToList();
-            var finishone = alltasks.First(tsk => tsk.State == TASK_RUN_STATUS.ACTION_FINISH);
             return alltasks;
         }
 
@@ -72,55 +72,41 @@ namespace AGVSystemCommonNet6.DATABASE
             }
         }
 
-        public bool ModifyState(clsTaskDto executingTask, TASK_RUN_STATUS state)
+        public bool Update(clsTaskDto taskState)
         {
             try
             {
-                clsTaskDto? taskExist = dbhelper._context.Set<clsTaskDto>().FirstOrDefault(tsk => tsk.TaskName == executingTask.TaskName);
-                if (taskExist != null)
-                {
-                    if (state == TASK_RUN_STATUS.FAILURE | state == TASK_RUN_STATUS.ACTION_FINISH)
-                        taskExist.FinishTime = DateTime.Now;
-                    taskExist.State = state;
-                    int ret = dbhelper._context.SaveChanges();
-                    return true;
-                }
-                else
-                {
+                var task = GetALL().FirstOrDefault(task => task.TaskName == taskState.TaskName);
+                if (task == null)
                     return false;
+                var typeA = typeof(clsTaskDto);
+                var typeB = typeof(clsTaskDto);
+                var propertiesB = typeB.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                foreach (var propertyB in propertiesB)
+                {
+
+                    if (propertyB.Name != "TaskName")
+                    {
+                        var valueB = propertyB.GetValue(taskState, null);
+                        try
+                        {
+                            propertyB.SetValue(task, valueB, null);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
                 }
+                dbhelper._context.SaveChanges();
+                return true;
             }
             catch (Exception ex)
             {
-                int ret = dbhelper._context.SaveChanges();
                 return false;
             }
         }
 
-        public bool ModifyFromToStation(clsTaskDto executingTask, int from_station, int to_station)
-        {
-            try
-            {
-                clsTaskDto? taskExist = dbhelper._context.Set<clsTaskDto>().FirstOrDefault(tsk => tsk.TaskName == executingTask.TaskName);
-                if (taskExist != null)
-                {
-                    taskExist.From_Station = from_station.ToString();
-                    taskExist.To_Station = to_station.ToString();
-                    int ret = dbhelper._context.SaveChanges();
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                int ret = dbhelper._context.SaveChanges();
-                return false;
-            }
-        }
-
+       
         public bool DeleteTask(string task_name)
         {
             try
@@ -163,6 +149,11 @@ namespace AGVSystemCommonNet6.DATABASE
             // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        public void SaveChanges()
+        {
+            dbhelper._context.SaveChanges();
         }
     }
 }

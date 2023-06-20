@@ -15,5 +15,14 @@ namespace AGVSystemCommonNet6.Availability
         public string AGVName { get; set; } = "";
         public DateTime EndTime { get; set; }
         public MAIN_STATUS Main_Status { get; set; }
+        internal double Idle_duraction
+        {
+            get
+            {
+                if (Main_Status != MAIN_STATUS.IDLE)
+                    return 0;
+                return (EndTime - StartTime).TotalSeconds;
+            }
+        }
     }
 }

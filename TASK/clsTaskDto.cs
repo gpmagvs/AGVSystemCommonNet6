@@ -17,7 +17,7 @@ namespace AGVSystemCommonNet6.TASK
         public string TaskName { get; set; } = string.Empty;
 
         [Required]
-        public TASK_RUN_STATUS State { get; set; }
+        public TASK_RUN_STATUS State { get; set; } = TASK_RUN_STATUS.WAIT;
         public string StateName
         {
             get
