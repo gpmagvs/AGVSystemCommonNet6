@@ -85,6 +85,9 @@ namespace AGVSystemCommonNet6.DATABASE
                     clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
                     if (agvState != null)
                     {
+                        if (JsonConvert.SerializeObject(agvState) == JsonConvert.SerializeObject(AGVStateDto))
+                            return true;
+
                         agvState.AGV_Description = AGVStateDto.AGV_Description;
                         agvState.Model = AGVStateDto.Model;
                         agvState.MainStatus = AGVStateDto.MainStatus;
@@ -123,5 +126,14 @@ namespace AGVSystemCommonNet6.DATABASE
             }
         }
 
+        public void UpdateConnected(string name, bool value)
+        {
+            using (var dbhelper = new DbContextHelper(connection_str))
+            {
+                clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == name);
+                agvState.Connected = value;
+                dbhelper._context.SaveChanges();
+            }
+        }
     }
 }
