@@ -17,6 +17,7 @@ namespace AGVSystemCommonNet6.Configuration
             }
             else
             {
+                Directory.CreateDirectory(Path.GetDirectoryName(configFilePath));
                 File.WriteAllText(configFilePath, JsonConvert.SerializeObject(new SystemConfigs(), Formatting.Indented));
                 return new SystemConfigs();
             }

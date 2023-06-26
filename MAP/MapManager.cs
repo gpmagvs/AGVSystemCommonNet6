@@ -11,6 +11,14 @@ namespace AGVSystemCommonNet6.MAP
     {
         public static Map LoadMapFromFile()
         {
+            if (!File.Exists(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName))
+                return new Map()
+                {
+                    Points = new Dictionary<int, MapPoint>(),
+                    Bays = new Dictionary<string, Bay>(),
+                    Name = "empty",
+                    Note = "empty"
+                };
             var json = System.IO.File.ReadAllText(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName);
             if (json == null)
                 return null;
