@@ -14,7 +14,7 @@ namespace AGVSystemCommonNet6.Alarm
 {
     public class AlarmManagerCenter
     {
-        public static string ALARM_CODE_FILE_PATH = @"D:\param\AGVS_AlarmCodes.json";
+        public static string ALARM_CODE_FILE_PATH = @"C:\AGVS\AGVS_AlarmCodes.json";
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
         public static List<clsAlarmDto> uncheckedAlarms
         {
