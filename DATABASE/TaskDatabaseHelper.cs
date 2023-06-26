@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.TASK;
 using Newtonsoft.Json;
 using System;
@@ -17,7 +18,7 @@ namespace AGVSystemCommonNet6.DATABASE
         private bool disposedValue;
         public TaskDatabaseHelper()
         {
-            this.connection_str = Configs.DBConnection;
+            this.connection_str = AGVSConfigulator.SysConfigs.DBConnection;
             dbhelper = new DbContextHelper(connection_str);
         }
 

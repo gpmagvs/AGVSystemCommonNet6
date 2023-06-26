@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AGVSystemCommonNet6.Alarm;
+using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.HttpHelper;
 
 namespace AGVSystemCommonNet6.Microservices
@@ -30,12 +31,11 @@ namespace AGVSystemCommonNet6.Microservices
                     Source = ALARM_SOURCE.AGVS,
 
                 };
+
                 while (true)
                 {
                     try
                     {
-
-
                         bool hasVmsDisconnectAlarm = alarm != null;
                         (bool alive, string message) response = await VMSAliveCheck();
 
@@ -52,6 +52,9 @@ namespace AGVSystemCommonNet6.Microservices
                         if (!response.alive)
                         {
                             disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
+
+                            AGVStatusDBHelper agv_status_db = new AGVStatusDBHelper();
+                            agv_status_db.ChangeAllOffline();
                             AlarmManagerCenter.UpdateAlarm(disconnectAlarm);
                         }
                         else

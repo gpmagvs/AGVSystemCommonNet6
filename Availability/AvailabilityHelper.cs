@@ -1,5 +1,4 @@
 ﻿using AGVSystemCommonNet6.DATABASE;
-using AGVSystemCommonNet6;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static AGVSystemCommonNet6.clsEnums;
+using AGVSystemCommonNet6.Configuration;
 
 namespace AGVSystemCommonNet6.Availability
 {
@@ -98,7 +98,7 @@ namespace AGVSystemCommonNet6.Availability
         }
         private void RestoreDataFromDatabase()
         {
-            using (DbContextHelper aGVSDbContext = new DbContextHelper(Configs.DBConnection))
+            using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
                 if (avaExist != null)
@@ -114,7 +114,7 @@ namespace AGVSystemCommonNet6.Availability
 
         private void UpdateRealTimeAvailbilityToDataBase(RTAvailabilityDto currentAvailability)
         {
-            using (DbContextHelper aGVSDbContext = new DbContextHelper(Configs.DBConnection))
+            using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 var currentData = aGVSDbContext._context.RealTimeAvailabilitys.FirstOrDefault(data => data.AGVName == currentAvailability.AGVName && data.StartTime == currentAvailability.StartTime);
                 if (currentData == null)
@@ -131,7 +131,7 @@ namespace AGVSystemCommonNet6.Availability
 
         private void SaveRealTimeAvailbilityToDatabase(RTAvailabilityDto currentAvailability)
         {
-            using (DbContextHelper aGVSDbContext = new DbContextHelper(Configs.DBConnection))
+            using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 try
                 {
@@ -151,7 +151,7 @@ namespace AGVSystemCommonNet6.Availability
         /// </summary>
         private void SaveDayAvailbilityToDatabase()
         {
-            using (DbContextHelper aGVSDbContext = new DbContextHelper(Configs.DBConnection))
+            using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
 
                 var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
