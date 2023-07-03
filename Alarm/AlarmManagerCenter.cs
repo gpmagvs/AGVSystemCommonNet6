@@ -208,6 +208,36 @@ namespace AGVSystemCommonNet6.Alarm
                 throw ex;
             }
         }
+        public static void SqlSelect(clsAlarmDto alarmquery)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                  dbhelper._context.Set<clsAlarmDto>().ToList();
+            }
+        }
 
+        public static List<clsAlarmDto> Query(DateTime startTime, DateTime endTime, string AGV_Name)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                if (AGV_Name == "ALL")
+                {
+                    List<clsAlarmDto> alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime ).ToList();
+                    return alarms;
+                }
+                else
+                {
+                    List<clsAlarmDto> alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime && alarm.Equipment_Name == AGV_Name).ToList();
+                    return alarms;
+                }
+            }
+        }
+        public static List<clsAlarmDto> QueryAll()
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                return dbhelper._context.Set<clsAlarmDto>().Skip(0).Take(10).ToList(); 
+            }
+        }
     }
 }
