@@ -20,8 +20,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
             TaskSequence=feedbackData.TaskSequence;
             PointIndex = feedbackData.PointIndex;
             TaskStatus = feedbackData.TaskStatus;
-            Last_Visited_Node = feedbackData.Last_Visited_Node;
-            Coordination = feedbackData.Coordination;
         }
 
         public virtual string TimeStamp { get; set; }
