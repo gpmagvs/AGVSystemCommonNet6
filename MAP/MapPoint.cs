@@ -95,7 +95,16 @@ namespace AGVSystemCommonNet6.MAP
         {
             get
             {
-                return StationType == STATION_TYPE.EQ | StationType == STATION_TYPE.EQ_LD | StationType == STATION_TYPE.EQ_ULD;
+                return StationType == STATION_TYPE.STK | StationType == STATION_TYPE.EQ | StationType == STATION_TYPE.EQ_LD | StationType == STATION_TYPE.EQ_ULD;
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsSTK
+        {
+            get
+            {
+                return StationType == STATION_TYPE.STK | StationType == STATION_TYPE.STK_LD | StationType == STATION_TYPE.STK_ULD | StationType == STATION_TYPE.Charge_STK;
             }
         }
         /// <summary>

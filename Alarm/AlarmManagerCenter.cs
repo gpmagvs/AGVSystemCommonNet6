@@ -31,7 +31,6 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static void Initialize()
         {
-            var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection);
             LoadAlarmCodes();
             Initialized = true;
         }
@@ -39,7 +38,6 @@ namespace AGVSystemCommonNet6.Alarm
         {
             try
             {
-
                 var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection);
                 var alarmExist = dbhelper._context.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
                 if (alarmExist != null)

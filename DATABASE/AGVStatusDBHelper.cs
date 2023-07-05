@@ -13,13 +13,17 @@ namespace AGVSystemCommonNet6.DATABASE
 {
     public class AGVStatusDBHelper : TaskDatabaseHelper
     {
-        public new List<clsAGVStateDto> GetALL()
+        public new List<clsAGVStateDto> GetALL(bool enabled_agv_only = true)
         {
             using (var dbhelper = new DbContextHelper(connection_str))
             {
-                return dbhelper._context.Set<clsAGVStateDto>().ToList();
+                if (enabled_agv_only)
+                    return dbhelper._context.AgvStates.Where(agv => agv.Enabled).ToList();
+                else
+                    return dbhelper._context.AgvStates.ToList();
             }
         }
+
 
         /// <summary>
         /// 新增一筆AGV狀態資料

@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Exceptions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace AGVSystemCommonNet6.MAP
 
         public class clsPathInfo
         {
-            public List<MapPoint> waitPoints = new List<MapPoint>();
+            public ConcurrentQueue<MapPoint> waitPoints = new ConcurrentQueue<MapPoint>();
 
             public List<MapPoint> stations { get; set; } = new List<MapPoint>();
             public List<int> tags => stations.Select(s => s.TagNumber).ToList();
@@ -61,10 +62,10 @@ namespace AGVSystemCommonNet6.MAP
                 if (startIndex == endIndex)
                     return new clsPathInfo
                     {
-                        stations = new List<MapPoint>(),
+                        stations = new List<MapPoint>() { stations[startIndex] },
                     };
 
-                var pathinfo=FindShortestPath(stations, startIndex, endIndex, options);
+                var pathinfo = FindShortestPath(stations, startIndex, endIndex, options);
                 if (pathinfo.stations.Count == 0)
                     throw new NoPathForNavigatorException();
                 return pathinfo;
@@ -170,7 +171,7 @@ namespace AGVSystemCommonNet6.MAP
             }
         }
 
-        public clsMapPoint[] GetTrajectory(string MapName, List<MapPoint> stations)
+        public static clsMapPoint[] GetTrajectory(string MapName, List<MapPoint> stations)
         {
             List<clsMapPoint> trajectoryPoints = new List<clsMapPoint>();
             for (int i = 0; i < stations.Count; i++)

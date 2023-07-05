@@ -47,5 +47,11 @@ namespace AGVSystemCommonNet6
             Unknown
         }
 
+        public enum VMS_GROUP
+        {
+            GPM_FORK,
+            GPM_SUBMARINE_SHIELD,
+            YUNTECH_FORK
+        }
     }
 }

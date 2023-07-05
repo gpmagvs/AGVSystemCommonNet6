@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static AGVSystemCommonNet6.clsEnums;
 using AGVSystemCommonNet6.Configuration;
+using SQLite;
 
 namespace AGVSystemCommonNet6.Availability
 {
@@ -98,17 +99,24 @@ namespace AGVSystemCommonNet6.Availability
         }
         private void RestoreDataFromDatabase()
         {
-            using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            try
             {
-                var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
-                if (avaExist != null)
+
+                using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
-                    availability.IDLE_TIME = avaExist.IDLE_TIME;
-                    availability.DOWN_TIME = avaExist.DOWN_TIME;
-                    availability.RUN_TIME = avaExist.RUN_TIME;
-                    availability.CHARGE_TIME = avaExist.CHARGE_TIME;
-                    availability.UNKNOWN_TIME = avaExist.UNKNOWN_TIME;
+                    var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
+                    if (avaExist != null)
+                    {
+                        availability.IDLE_TIME = avaExist.IDLE_TIME;
+                        availability.DOWN_TIME = avaExist.DOWN_TIME;
+                        availability.RUN_TIME = avaExist.RUN_TIME;
+                        availability.CHARGE_TIME = avaExist.CHARGE_TIME;
+                        availability.UNKNOWN_TIME = avaExist.UNKNOWN_TIME;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
             }
         }
 
@@ -153,7 +161,6 @@ namespace AGVSystemCommonNet6.Availability
         {
             using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-
                 var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
                 if (avaExist == null)
                 {

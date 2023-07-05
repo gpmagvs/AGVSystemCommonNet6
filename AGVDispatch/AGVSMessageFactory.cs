@@ -153,8 +153,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
                                PointIndex = PointIndex,
                                 TaskStatus = task_status,
                                  TimeStamp = DateTime.Now.ToAGVSTimeFormat(),
-                                  Last_Visited_Node = runningData.Last_Visited_Node,
-                                   Coordination = runningData.Coordination,
                         }
                     }
                    }
