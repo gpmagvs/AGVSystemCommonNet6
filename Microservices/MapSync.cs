@@ -1,4 +1,5 @@
-﻿using AGVSystemCommonNet6.HttpHelper;
+﻿using AGVSystemCommonNet6.Configuration;
+using AGVSystemCommonNet6.HttpHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace AGVSystemCommonNet6.Microservices
         {
             try
             {
-                bool alive = await Http.GetAsync<bool>(string.Format("{0}/{1}",Configs.VMSHost,$"api/Map/Reload?map_file={map_file_path}"));
+                bool alive = await Http.GetAsync<bool>(string.Format("{0}/{1}",AGVSConfigulator.SysConfigs.VMSHost,$"api/Map/Reload?map_file={map_file_path}"));
                 return (alive, "");
             }
             catch (Exception ex)

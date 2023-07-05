@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AGVSystemCommonNet6.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +9,22 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class MapManager
     {
-        public static Map LoadMapFromFile(string local_map_file_path = @"D:\param\Map_UMTC_5F_SMK_OVEN.json")
+        public static Map LoadMapFromFile()
         {
-            var json = System.IO.File.ReadAllText(local_map_file_path);
+            var json = System.IO.File.ReadAllText(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName);
             if (json == null)
                 return null;
-            var data_obj = JsonConvert.DeserializeObject<Dictionary<string, Map>>(json);
-            return data_obj["Map"];
+            try
+            {
+
+                var data_obj = JsonConvert.DeserializeObject<Dictionary<string, Map>>(json);
+                return data_obj["Map"];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("LoadMapFromFile Error  : " + ex.Message);
+                return new Map();
+            }
         }
 
         public static bool SaveMapToFile(Map map_modified, string local_map_file_path)

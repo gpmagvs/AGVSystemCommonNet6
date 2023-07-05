@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,13 +19,15 @@ namespace AGVSystemCommonNet6.MAP
             /// <summary>
             /// 要避開的TAG點位
             /// </summary>
-            public List<int> AvoidTagNumbers { get; set; } = new List<int>();
+            public List<int> ConstrainTags { get; set; } = new List<int>();
 
         }
 
         public class clsPathInfo
         {
-            public List<MapStation> stations { get; set; } = new List<MapStation>();
+            public List<MapPoint> waitPoints = new List<MapPoint>();
+
+            public List<MapPoint> stations { get; set; } = new List<MapPoint>();
             public List<int> tags => stations.Select(s => s.TagNumber).ToList();
             public double total_travel_distance
             {
@@ -35,8 +38,8 @@ namespace AGVSystemCommonNet6.MAP
                     for (int i = 0; i < stations.Count - 1; i++)
                     {
                         // 取得當前座標和下一個座標
-                        MapStation currentStation = stations[i];
-                        MapStation nextStation = stations[i + 1];
+                        MapPoint currentStation = stations[i];
+                        MapPoint nextStation = stations[i + 1];
 
                         // 計算兩點之間的距離
                         double distance = Math.Sqrt(Math.Pow(nextStation.X - currentStation.X, 2) + Math.Pow(nextStation.Y - currentStation.Y, 2));
@@ -48,58 +51,73 @@ namespace AGVSystemCommonNet6.MAP
                 }
             }
         }
-        public clsPathInfo FindShortestPathByTagNumber(Dictionary<int, MapStation> stations, int startTag, int endTag, PathFinderOption options = null)
+        public clsPathInfo FindShortestPathByTagNumber(Dictionary<int, MapPoint> stations, int startTag, int endTag, PathFinderOption options = null)
         {
-            int startIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == startTag).Key;
-            int endIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == endTag).Key;
+            try
+            {
+                int startIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == startTag).Key;
+                int endIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == endTag).Key;
 
-            if (startIndex == endIndex)
-                return new clsPathInfo
-                {
-                    stations = new List<MapStation>(),
-                };
+                if (startIndex == endIndex)
+                    return new clsPathInfo
+                    {
+                        stations = new List<MapPoint>(),
+                    };
 
-            return FindShortestPath(stations, startIndex, endIndex, options);
+                var pathinfo=FindShortestPath(stations, startIndex, endIndex, options);
+                if (pathinfo.stations.Count == 0)
+                    throw new NoPathForNavigatorException();
+                return pathinfo;
+            }
+            catch (NoPathForNavigatorException ex)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
-        public clsPathInfo FindShortestPath(Dictionary<int, MapStation> stations, MapStation startStation, MapStation endStation, PathFinderOption options = null)
+        public clsPathInfo FindShortestPath(Dictionary<int, MapPoint> stations, MapPoint startStation, MapPoint endStation, PathFinderOption options = null)
         {
             int startIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == startStation.TagNumber).Key;
             int endIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == endStation.TagNumber).Key;
 
             return FindShortestPath(stations, startIndex, endIndex, options);
         }
-        public clsPathInfo FindShortestPath(Dictionary<int, MapStation> stations, int startPtIndex, int endPtIndex, PathFinderOption options = null)
+        public clsPathInfo FindShortestPath(Dictionary<int, MapPoint> stations, int startPtIndex, int endPtIndex, PathFinderOption options = null)
         {
+            stations = stations.ToList().FindAll(st => st.Value.Enable).ToDictionary(pt => pt.Key, pt => pt.Value);
             try
             {
 
                 //Tag 73->9
-                List<KeyValuePair<int, MapStation>> staions_ordered = new List<KeyValuePair<int, MapStation>>();
+                List<KeyValuePair<int, MapPoint>> staions_ordered = new List<KeyValuePair<int, MapPoint>>();
 
                 if (options != null)
                 {
                     if (options.OnlyNormalPoint)
                     {
-                        List<KeyValuePair<int, MapStation>> normal_pts = stations.ToList().FindAll(kp => kp.Value.StationType == 0);
+                        List<KeyValuePair<int, MapPoint>> normal_pts = stations.ToList().FindAll(kp => kp.Value.StationType == 0);
                         staions_ordered = normal_pts.OrderBy(k => k.Key).ToList();
                     }
                     else
                     {
-                        List<KeyValuePair<int, MapStation>> normal_pts = stations.ToList();
+                        List<KeyValuePair<int, MapPoint>> normal_pts = stations.ToList();
                         staions_ordered = normal_pts.OrderBy(k => k.Key).ToList();
                     }
 
-                    if (options.AvoidTagNumbers.Count != 0)
+                    if (options.ConstrainTags.Count != 0)
                     {
 
-                        staions_ordered = staions_ordered.FindAll(s => !options.AvoidTagNumbers.Contains(s.Value.TagNumber));
+                        staions_ordered = staions_ordered.FindAll(s => !options.ConstrainTags.Contains(s.Value.TagNumber));
                     }
 
                 }
                 else
                 {
 
-                    List<KeyValuePair<int, MapStation>> normal_pts = stations.ToList();
+                    List<KeyValuePair<int, MapPoint>> normal_pts = stations.ToList();
                     staions_ordered = normal_pts.OrderBy(k => k.Key).ToList();
                 }
 
@@ -123,16 +141,19 @@ namespace AGVSystemCommonNet6.MAP
                 Console.Write($"{_startStation.TagNumber}\t{_endStation.TagNumber}\t{distance[finalIndex]}\t");
 
                 var dist = distance[finalIndex];
+                if (dist < 0)
+                {
+
+                }
                 clsPathInfo pathinfo = new clsPathInfo();
 
                 int node = finalIndex;
                 while (node != source)
                 {
                     if (node == -1)
-                        return new clsPathInfo
-                        {
-
-                        };
+                    {
+                        throw new NoPathForNavigatorException();
+                    }
                     pathinfo.stations.Insert(0, staions_ordered[node].Value);
 
                     node = parent[node];
@@ -149,58 +170,70 @@ namespace AGVSystemCommonNet6.MAP
             }
         }
 
-        public clsMapPoint[] GetTrajectory(string MapName, List<MapStation> stations)
+        public clsMapPoint[] GetTrajectory(string MapName, List<MapPoint> stations)
         {
             List<clsMapPoint> trajectoryPoints = new List<clsMapPoint>();
             for (int i = 0; i < stations.Count; i++)
             {
-                try
+                clsMapPoint createNewPoint(MapPoint mapStation)
                 {
-                    trajectoryPoints.Add(new clsMapPoint()
+                    try
                     {
-                        index = i,
-                        X = stations[i].X,
-                        Y = stations[i].Y,
-                        Auto_Door = new clsAutoDoor
+                        var Auto_Door = new clsAutoDoor
                         {
-                            Key_Name = stations[i].AutoDoor?.KeyName,
-                            Key_Password = stations[i].AutoDoor?.KeyPassword,
-                        },
-                        Control_Mode = new clsControlMode
-                        {
-                            Dodge = int.Parse(stations[i].DodgeMode == null ? "0" : stations[i].DodgeMode),
-                            Spin = int.Parse(stations[i].SpinMode == null ? "0" : stations[i].SpinMode),
-                        },
-                        Laser = stations[i].LsrMode,
-                        Map_Name = MapName,
-                        Point_ID = stations[i].TagNumber,
-                        Speed = stations[i].Speed,
-                        Theta = stations[i].Direction,
-                    });
-                }
-                catch (Exception ex)
-                {
+                            Key_Name = mapStation.AutoDoor?.KeyName,
+                            Key_Password = mapStation.AutoDoor?.KeyPassword,
+                        };
 
-                    throw ex;
+                        int.TryParse(mapStation.DodgeMode, out int DogeMode);
+                        int.TryParse(mapStation.SpinMode, out int SpinMode);
+
+                        var Control_Mode = new clsControlMode
+                        {
+                            Dodge = DogeMode,
+                            Spin = SpinMode
+                        };
+
+                        return new clsMapPoint()
+                        {
+                            index = i,
+                            X = mapStation.X,
+                            Y = mapStation.Y,
+                            Auto_Door = Auto_Door,
+                            Control_Mode = Control_Mode,
+                            Laser = mapStation.LsrMode,
+                            Map_Name = MapName,
+                            Point_ID = mapStation.TagNumber,
+                            Speed = mapStation.Speed,
+                            Theta = mapStation.Direction,
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+
                 }
+                trajectoryPoints.Add(createNewPoint(stations[i]));
+
 
             }
             return trajectoryPoints.ToArray();
         }
 
-        private int[,] CreateDistanceMatrix(List<KeyValuePair<int, MapStation>> stations)
+        private int[,] CreateDistanceMatrix(List<KeyValuePair<int, MapPoint>> stations)
         {
             var totalNormalStationNum = stations.Count;
             int[,] graph = new int[totalNormalStationNum, totalNormalStationNum];
             for (int row = 0; row < totalNormalStationNum; row++)
             {
-                KeyValuePair<int, MapStation> start_station = stations[row];
+                KeyValuePair<int, MapPoint> start_station = stations[row];
                 int start_station_index = start_station.Key;
-                List<int> near_stationIndexs = start_station.Value.Target.Select(t => int.Parse(t.Key)).ToList();
+                List<int> near_stationIndexs = start_station.Value.Target.Select(t => t.Key).ToList();
 
                 for (int col = 0; col < totalNormalStationNum; col++)
                 {
-                    KeyValuePair<int, MapStation> ele_station = stations[col];
+                    KeyValuePair<int, MapPoint> ele_station = stations[col];
                     int ele_station_index = ele_station.Key;
                     int weight = 0;
                     if (near_stationIndexs.Contains(ele_station_index))
@@ -217,7 +250,7 @@ namespace AGVSystemCommonNet6.MAP
             return graph;
         }
 
-        private int CalculationDistance(MapStation value1, MapStation value2)
+        private int CalculationDistance(MapPoint value1, MapPoint value2)
         {
             double distance = Math.Sqrt(Math.Pow(value1.X - value2.X, 2) + Math.Pow(value1.Y - value2.Y, 2));
             return int.Parse(Math.Round(distance * 10000, 0).ToString());

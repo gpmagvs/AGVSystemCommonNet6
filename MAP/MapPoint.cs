@@ -3,12 +3,13 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.MAP
 {
-    public class MapStation
+    public class MapPoint
     {
         public double X { get; set; }
         public double Y { get; set; }
@@ -65,7 +66,7 @@ namespace AGVSystemCommonNet6.MAP
         /// <summary>
         /// Key Point Index, value:權重
         /// </summary>
-        public Dictionary<string, int>? Target { get; set; }
+        public Dictionary<int, double>? Target { get; set; }
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? DodgeMode { get; set; }
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -78,5 +79,47 @@ namespace AGVSystemCommonNet6.MAP
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 
         public string? Region { get; set; }
+
+
+        [JsonIgnore]
+        public bool IsCharge
+        {
+            get
+            {
+                return StationType == STATION_TYPE.Charge | StationType == STATION_TYPE.Charge_STK | StationType == STATION_TYPE.Charge_Buffer;
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsEquipment
+        {
+            get
+            {
+                return StationType == STATION_TYPE.EQ | StationType == STATION_TYPE.EQ_LD | StationType == STATION_TYPE.EQ_ULD;
+            }
+        }
+        /// <summary>
+        /// 是否為EQLINK=>表示需要走磁導引
+        /// </summary>
+        [JsonIgnore]
+        public bool IsEQLink
+        {
+            get
+            {
+                return StationType == STATION_TYPE.EQ |
+                   StationType == STATION_TYPE.EQ_ULD |
+                   StationType == STATION_TYPE.Charge_Buffer |
+                   StationType == STATION_TYPE.EQ_LD |
+                   StationType == STATION_TYPE.Charge_STK |
+                   StationType == STATION_TYPE.Charge |
+                   StationType == STATION_TYPE.STK |
+                   StationType == STATION_TYPE.STK_LD |
+                   StationType == STATION_TYPE.STK_ULD |
+                   StationType == STATION_TYPE.Elevator |
+                   StationType == STATION_TYPE.Elevator_LD |
+                   StationType == STATION_TYPE.Elevator_ULD;
+            }
+        }
+
     }
 }

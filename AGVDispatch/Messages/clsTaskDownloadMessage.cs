@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using RosSharp.RosBridgeClient.Actionlib;
 using RosSharp.RosBridgeClient.MessageTypes.Geometry;
 using static AGVSystemCommonNet6.GPMRosMessageNet.Actions.TaskCommandGoal;
+using static AGVSystemCommonNet6.MAP.PathFinder;
 
 namespace AGVSystemCommonNet6.AGVDispatch.Messages
 {
@@ -25,7 +26,13 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public string Task_Name { get; set; }
 
         [JsonProperty("Task Simplex")]
-        public string Task_Simplex { get; set; }
+        public string Task_Simplex
+        {
+            get
+            {
+                return $"{Task_Name}-{Task_Sequence}";
+            }
+        }
 
         [JsonProperty("Task Sequence")]
         public int Task_Sequence { get; set; }
@@ -158,10 +165,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             var taskData = JsonConvert.DeserializeObject<clsTaskDownloadData>(this.ToJson());
             taskData.IsAfterLoadingAction = true;
             taskData.Destination = Homing_Trajectory.First().Point_ID;
-           // taskData.Homing_Trajectory = taskData.Homing_Trajectory.Reverse().ToArray();
+            // taskData.Homing_Trajectory = taskData.Homing_Trajectory.Reverse().ToArray();
             return taskData;
         }
-
+        [JsonIgnore]
+        public clsPathInfo TrafficInfo { get; set; } = new clsPathInfo();
     }
 
 

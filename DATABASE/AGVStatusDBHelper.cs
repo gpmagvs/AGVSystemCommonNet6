@@ -1,4 +1,5 @@
-﻿using AGVSystemCommonNet6.TASK;
+﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.TASK;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -48,7 +49,7 @@ namespace AGVSystemCommonNet6.DATABASE
             }
         }
 
-        public bool UpdateBatteryLevel(string agv_name,double batteryLevel, out string errorMesg)
+        public bool UpdateBatteryLevel(string agv_name, double batteryLevel, out string errorMesg)
         {
             errorMesg = string.Empty;
             try
@@ -84,6 +85,9 @@ namespace AGVSystemCommonNet6.DATABASE
                     clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
                     if (agvState != null)
                     {
+                        if (JsonConvert.SerializeObject(agvState) == JsonConvert.SerializeObject(AGVStateDto))
+                            return true;
+
                         agvState.AGV_Description = AGVStateDto.AGV_Description;
                         agvState.Model = AGVStateDto.Model;
                         agvState.MainStatus = AGVStateDto.MainStatus;
@@ -110,6 +114,38 @@ namespace AGVSystemCommonNet6.DATABASE
             {
                 errorMesg = ex.Message;
                 return false;
+            }
+        }
+
+        public bool IsExist(string AGVName)
+        {
+            using (var dbhelper = new DbContextHelper(connection_str))
+            {
+                clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == AGVName);
+                return agvState != null;
+            }
+        }
+
+        public void UpdateConnected(string name, bool value)
+        {
+            using (var dbhelper = new DbContextHelper(connection_str))
+            {
+                clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == name);
+                agvState.Connected = value;
+                dbhelper._context.SaveChanges();
+            }
+        }
+
+        internal void ChangeAllOffline()
+        {
+            using (var dbhepler = new DbContextHelper(connection_str))
+            {
+                foreach (var agv_status in dbhelper._context.AgvStates)
+                {
+                    agv_status.OnlineStatus = clsEnums.ONLINE_STATE.OFFLINE;
+                    agv_status.Connected = false;
+                }
+                dbhelper._context.SaveChanges();
             }
         }
     }

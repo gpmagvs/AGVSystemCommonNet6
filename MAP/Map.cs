@@ -12,8 +12,25 @@ namespace AGVSystemCommonNet6.MAP
         public string Name { get; set; }
         public string Note { get; set; }
         public int PointIndex { get; set; }
-        public Dictionary<int, MapStation> Points { get; set; }
-        [JsonProperty( DefaultValueHandling = DefaultValueHandling.Ignore )]
+        public Dictionary<int, MapPoint> Points { get; set; }
+
+        [JsonIgnore]
+        public MapPath[] Pathes
+        {
+            get
+            {
+                List<MapPath> GetMapPathes(MapPoint point)
+                {
+                    return point.Target.Select(kp => new MapPath() { StartPoint= point, EndPoint = Points[kp.Key] } ).ToList();
+                }
+                MapPath[] pathes =Points.ToList().FindAll(point => point.Value.Target.Count != 0).SelectMany(point => GetMapPathes(point.Value)).ToArray();
+                return pathes;
+            }
+        }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<string, Bay> Bays { get; set; }
+
+
     }
 }

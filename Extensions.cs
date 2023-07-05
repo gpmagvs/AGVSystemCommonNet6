@@ -86,7 +86,7 @@ namespace AGVSystemCommonNet6
         /// </summary>
         /// <param name="map_station"></param>
         /// <returns></returns>
-        public static bool IsChargeAble(this MapStation map_station)
+        public static bool IsChargeAble(this MapPoint map_station)
         {
             STATION_TYPE station_type = map_station.StationType;
             return station_type == STATION_TYPE.Charge | station_type == STATION_TYPE.Charge_Buffer | station_type == STATION_TYPE.Charge_STK;
@@ -97,7 +97,7 @@ namespace AGVSystemCommonNet6
         /// </summary>
         /// <param name="map_station"></param>
         /// <returns></returns>
-        public static bool IsLoadAble(this MapStation map_station)
+        public static bool IsLoadAble(this MapPoint map_station)
         {
             STATION_TYPE station_type = map_station.StationType;
             return station_type == STATION_TYPE.EQ | station_type == STATION_TYPE.EQ_LD
@@ -109,7 +109,7 @@ namespace AGVSystemCommonNet6
         /// </summary>
         /// <param name="map_station"></param>
         /// <returns></returns>
-        public static bool IsUnloadAble(this MapStation map_station)
+        public static bool IsUnloadAble(this MapPoint map_station)
         {
             STATION_TYPE station_type = map_station.StationType;
             return station_type == STATION_TYPE.EQ | station_type == STATION_TYPE.EQ_ULD
@@ -123,7 +123,7 @@ namespace AGVSystemCommonNet6
         /// <param name="from_loc_x"></param>
         /// <param name="from_loc_y"></param>
         /// <returns></returns>
-        public static double CalculateDistance(this MapStation map_station, double from_loc_x, double from_loc_y)
+        public static double CalculateDistance(this MapPoint map_station, double from_loc_x, double from_loc_y)
         {
             return Math.Sqrt(Math.Pow(map_station.X - from_loc_x, 2) + Math.Pow(map_station.Y - from_loc_y, 2));
         }
@@ -136,7 +136,7 @@ namespace AGVSystemCommonNet6
         /// <param name="from_loc_x"></param>
         /// <param name="from_loc_y"></param>
         /// <returns></returns>
-        public static double CalculateDistance(this MapStation map_station, MapStation from_station)
+        public static double CalculateDistance(this MapPoint map_station, MapPoint from_station)
         {
             return map_station.CalculateDistance(from_station.X, from_station.Y);
         }

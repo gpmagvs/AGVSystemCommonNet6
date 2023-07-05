@@ -27,7 +27,8 @@ namespace AGVSystemCommonNet6
         public enum AGV_MODEL
         {
             FORK_AGV,
-            YUNTECH_FORK_AGV
+            YUNTECH_FORK_AGV,
+            UNKNOWN=999
         }
 
         public enum ONLINE_STATE

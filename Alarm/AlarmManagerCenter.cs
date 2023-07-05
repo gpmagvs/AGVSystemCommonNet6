@@ -1,4 +1,5 @@
-﻿using AGVSystemCommonNet6.DATABASE;
+﻿using AGVSystemCommonNet6.Configuration;
+using AGVSystemCommonNet6.DATABASE;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -19,7 +20,7 @@ namespace AGVSystemCommonNet6.Alarm
         {
             get
             {
-                using (var dbhelper = new DbContextHelper(Configs.DBConnection))
+                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     return dbhelper._context.Set<clsAlarmDto>().Where(al => !al.Checked).ToList();
                 }
@@ -30,7 +31,7 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static void Initialize()
         {
-            var dbhelper = new DbContextHelper(Configs.DBConnection);
+            var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection);
             LoadAlarmCodes();
             Initialized = true;
         }
@@ -39,7 +40,7 @@ namespace AGVSystemCommonNet6.Alarm
             try
             {
 
-                var dbhelper = new DbContextHelper(Configs.DBConnection);
+                var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection);
                 var alarmExist = dbhelper._context.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
                 if (alarmExist != null)
                 {
@@ -71,8 +72,8 @@ namespace AGVSystemCommonNet6.Alarm
                 Initialize();
 
             try
-            {
-                var dbhelper = new DbContextHelper(Configs.DBConnection);
+            {   
+                var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection);
                 dbhelper._context.SystemAlarms.Add(alarmDto);
                 dbhelper._context.SaveChangesAsync();
             }
@@ -167,7 +168,7 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static void ResetAlarm(clsAlarmDto alarm, bool resetAllSameCode = false)
         {
-            using (var dbhelper = new DbContextHelper(Configs.DBConnection))
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 if (resetAllSameCode)
                 {
@@ -196,7 +197,7 @@ namespace AGVSystemCommonNet6.Alarm
         {
             try
             {
-                using (var dbhelper = new DbContextHelper(Configs.DBConnection))
+                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     dbhelper._context.Set<clsAlarmDto>().Remove(alarmDto);
                     dbhelper._context.SaveChanges();
