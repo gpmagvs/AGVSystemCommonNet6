@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AGVSystemCommonNet6.AGVDispatch.Model;
+using Newtonsoft.Json;
 using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.AGVDispatch.Messages
@@ -8,15 +9,15 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public Dictionary<string, RunningStatus> Header { get; set; } = new Dictionary<string, RunningStatus>();
     }
 
-    public class RunningStatus
+    public class RunningStatus:Model.clsRunningStatus
     {
         [JsonProperty("Time Stamp")]
-        public string Time_Stamp { get; set; } = DateTime.Now.ToAGVSTimeFormat();
+        public  override  string Time_Stamp { get; set; } = DateTime.Now.ToAGVSTimeFormat();
 
         [JsonProperty("Coordination")]
-        public clsCoordination Coordination { get; set; } = new clsCoordination();
+        public override clsCoordination Coordination { get; set; } = new clsCoordination();
         [JsonProperty("Last Visited Node")]
-        public int Last_Visited_Node { get; set; } = 0;
+        public override int Last_Visited_Node { get; set; } = 0;
         /// <summary>
         /// 1. IDLE: active but no mission
         /// 2. RUN: executing mission
@@ -25,12 +26,12 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// 
         /// </summary>
         [JsonProperty("AGV Status")]
-        public MAIN_STATUS AGV_Status { get; set; } 
+        public override MAIN_STATUS AGV_Status { get; set; } 
         [JsonProperty("Escape Flag")]
-        public bool Escape_Flag { get; set; } = false;
+        public override bool Escape_Flag { get; set; } = false;
         [JsonProperty("Sensor Status")]
 
-        public Dictionary<string, int> Sensor_Status { get; set; } = new Dictionary<string, int>
+        public override Dictionary<string, int> Sensor_Status { get; set; } = new Dictionary<string, int>
         {
             {"Barcode Reader" ,0 },
             {"Guide Sensor" ,0 },
@@ -41,55 +42,51 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         };
 
         [JsonProperty("CPU Usage Percent")]
-        public double CPU_Usage_Percent { get; set; } = 0;
+        public override double CPU_Usage_Percent { get; set; } = 0;
 
         [JsonProperty("RAM Usage Percent")]
-        public double RAM_Usage_Percent { get; set; } = 0;
+        public override double RAM_Usage_Percent { get; set; } = 0;
 
         [JsonProperty("AGV Reset Flag")]
-        public bool AGV_Reset_Flag { get; set; }
+        public override bool AGV_Reset_Flag { get; set; }
         [JsonProperty("Signal Strength")]
-        public double Signal_Strength { get; set; } = 0;
+        public override double Signal_Strength { get; set; } = 0;
 
         [JsonProperty("Cargo Status")]
-        public int Cargo_Status { get; set; } = 0;
+        public override int Cargo_Status { get; set; } = 0;
 
-        public string[] CSTID { get; set; } = new string[0];
-        public double Odometry { get; set; } = 0;
+        public override string[] CSTID { get; set; } = new string[0];
+        public override double Odometry { get; set; } = 0;
 
 
         [JsonProperty("Electric Volume")]
-        public double[] Electric_Volume { get; set; } = new double[2] { 0, 0 };
+        public override double[] Electric_Volume { get; set; } = new double[2] { 0, 0 };
 
         [JsonProperty("Alarm Code")]
-        public clsAlarmCode[] Alarm_Code { get; set; } = new clsAlarmCode[0];
-        [JsonProperty("Fork Height")]
-        public double Fork_Height { get; set; }
+        public new clsAlarmCode[] Alarm_Code { get; set; } = new clsAlarmCode[0];
 
-        public class clsCoordination
-        {
-            public double X { get; set; }
-            public double Y { get; set; }
-            public double Theta { get; set; }
-        }
-        public class clsAlarmCode
+        [JsonProperty("Fork Height")]
+        public override double Fork_Height { get; set; }
+
+   
+        public class clsAlarmCode : Model.clsAlarmCode
         {
             [JsonProperty("Alarm ID")]
-            public int Alarm_ID { get; set; }
+            public override int Alarm_ID { get; set; }
 
             /// <summary>
             ///  1: Serious, 0: Light
             /// </summary>
             [JsonProperty("Alarm Level")]
-            public int Alarm_Level { get; set; }
+            public override int Alarm_Level { get; set; }
 
             /// <summary>
             /// 0: Task Recoverable, other: Unrecoverable
             /// </summary>
             [JsonProperty("Alarm Category")]
-            public int Alarm_Category { get; set; }
+            public override int Alarm_Category { get; set; }
             [JsonProperty("Alarm Description")]
-            public string Alarm_Description { get; set; } = "";
+            public override string Alarm_Description { get; set; } = "";
         }
     }
     public class clsRunningStatusReportResponseMessage : MessageBase

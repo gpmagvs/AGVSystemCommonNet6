@@ -25,6 +25,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public taskResetReqDelegate OnTaskResetReq;
         private clsRunningStatusReportMessage lastRunningStatusDataReport = new clsRunningStatusReportMessage();
         private ManualResetEvent RunningStatusRptPause = new ManualResetEvent(true);
+        public bool UseWebAPI = false;
         public enum MESSAGE_TYPE
         {
             REQ_0101 = 0101,
@@ -245,6 +246,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public override bool IsConnected()
         {
+            if (UseWebAPI)
+                return true;
             return tcpClient != null && tcpClient.Connected;
         }
 
