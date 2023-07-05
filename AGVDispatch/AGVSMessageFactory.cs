@@ -118,7 +118,29 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             return Encoding.ASCII.GetBytes(FormatSendOutString(mesg.ToJson()));
         }
-
+        internal static Model.clsRunningStatus CreateRunningStateReportQueryData()
+        {
+            RunningStatus? runningData = OnVCSRunningDataRequest?.Invoke();
+            return new Model.clsRunningStatus
+            {
+                AGV_Reset_Flag = runningData.AGV_Reset_Flag,
+                AGV_Status = runningData.AGV_Status,
+                Alarm_Code = runningData.Alarm_Code,
+                Cargo_Status = runningData.Cargo_Status,
+                Coordination = runningData.Coordination,
+                CPU_Usage_Percent = runningData.CPU_Usage_Percent,
+                CSTID = runningData.CSTID,
+                Electric_Volume = runningData.Electric_Volume,
+                Escape_Flag = runningData.Escape_Flag,
+                Fork_Height = runningData.Fork_Height,
+                Last_Visited_Node = runningData.Last_Visited_Node,
+                Odometry = runningData.Odometry,
+                RAM_Usage_Percent = runningData.RAM_Usage_Percent,
+                Sensor_Status = runningData.Sensor_Status,
+                Signal_Strength = runningData.Signal_Strength,
+                Time_Stamp = runningData.Time_Stamp
+            };
+        }
         internal static byte[] CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg, bool getPoseOfLastPtOfTrajectory = false)
         {
             RunningStatus? runningData = OnVCSRunningDataRequest?.Invoke(getPoseOfLastPtOfTrajectory);

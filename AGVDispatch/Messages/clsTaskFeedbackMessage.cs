@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AGVSystemCommonNet6.AGVDispatch.Model;
+using Newtonsoft.Json;
 using static AGVSystemCommonNet6.AGVDispatch.Messages.RunningStatus;
 
 namespace AGVSystemCommonNet6.AGVDispatch.Messages
@@ -8,31 +9,31 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public Dictionary<string, FeedbackData> Header { get; set; } = new Dictionary<string, FeedbackData>();
     }
 
-    public class FeedbackData
+    public class FeedbackData: clsFeedbackData
     {
         [JsonProperty("Time Stamp")]
-        public string TimeStamp { get; set; }
+        public override string TimeStamp { get; set; }
 
         [JsonProperty("Task Name")]
-        public string TaskName { get; set; }
+        public override string TaskName { get; set; }
         [JsonProperty("Task Simplex")]
-        public string TaskSimplex { get; set; }
+        public override string TaskSimplex { get; set; }
 
         [JsonProperty("Task Sequence")]
-        public int TaskSequence { get; set; }
+        public override int TaskSequence { get; set; }
 
 
         [JsonProperty("Point Index")]
-        public int PointIndex { get; set; }
+        public override int PointIndex { get; set; }
 
         [JsonProperty("Task Status")]
-        public TASK_RUN_STATUS TaskStatus { get; set; }
+        public override TASK_RUN_STATUS TaskStatus { get; set; }
 
         [JsonProperty("Last Visited Node")]
-        public int Last_Visited_Node { get; set; } = 0;
+        public override int Last_Visited_Node { get; set; } = 0;
 
 
         [JsonProperty("Coordination")]
-        public clsCoordination Coordination { get; set; } = new clsCoordination();
+        public override clsCoordination Coordination { get; set; } = new clsCoordination();
     }
 }

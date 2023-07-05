@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Log;
 using System;
 using System.Collections.Generic;
@@ -31,41 +32,37 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 // PauseRunningStatusReport();
                 await Task.Delay(100);
 
-                //if (task_status == TASK_RUN_STATUS.ACTION_FINISH)
-                //{
-                //    await TryRnningStateReportWithActionFinishAtLastPtAsync();
-                //}
-                //else
-                //{
-               // await TryRnningStateReportAsync();
-                //}
-
-                //LOG.WARN($"Try Task Feedback to AGVS: Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index} | Status : {task_status.ToString()}");
-
                 while (true)
                 {
-                    byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, out clsTaskFeedbackMessage msg);
-                    bool success = await WriteDataOut(data, msg.SystemBytes);
-                    if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase _retMsg))
+                    try
                     {
-                        try
+                        byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, out clsTaskFeedbackMessage msg);
+                        if (UseWebAPI)
                         {
-                            clsSimpleReturnMessage msg_return = (clsSimpleReturnMessage)_retMsg;
-                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {msg_return.ReturnData.ReturnCode}");
+                            SimpleRequestResponse response = await PostTaskFeedback( new clsFeedbackData (msg.Header.Values.First()));
+                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
+                            return;
                         }
-                        catch (Exception ex)
+                        else
                         {
+                            bool success = await WriteDataOut(data, msg.SystemBytes);
+                            if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase _retMsg))
+                            {
+                                clsSimpleReturnMessage msg_return = (clsSimpleReturnMessage)_retMsg;
+                                LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {msg_return.ReturnData.ReturnCode}");
+                                break;
+                            }
+                            else
+                            {
+                                LOG.ERROR($"TryTaskFeedBackAsync FAIL>.>>");
+                            }
                         }
-                        break;
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        LOG.ERROR($"TryTaskFeedBackAsync FAIL>.>>");
+                        LOG.ERROR($"TryTaskFeedBackAsync FAIL>>>{ex.Message}");
                     }
                 }
-
-                // ResumeRunningStatusReport();
-
             });
 
         }
@@ -98,19 +95,34 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             try
             {
-                byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg);
-                await WriteDataOut(data, msg.SystemBytes);
-                lastRunningStatusDataReport = msg;
-                if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
+                if (UseWebAPI)
                 {
-                    clsRunningStatusReportResponseMessage QueryResponseMessage = mesg as clsRunningStatusReportResponseMessage;
-                    if (QueryResponseMessage != null)
-                        return (true, QueryResponseMessage.RuningStateReportAck);
+                    var runnginStatus = AGVSMessageFactory.CreateRunningStateReportQueryData();
+                    SimpleRequestResponse response = await PostRunningStatus(runnginStatus);
+                    return (response.ReturnCode == RETURN_CODE.OK, new SimpleRequestResponseWithTimeStamp
+                    {
+                        ReturnCode = response.ReturnCode,
+                        TimeStamp = DateTime.Now.ToString()
+                    });
+                }
+                else
+                {
+                    byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg);
+                    await WriteDataOut(data, msg.SystemBytes);
+                    lastRunningStatusDataReport = msg;
+                    if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
+                    {
+                        clsRunningStatusReportResponseMessage QueryResponseMessage = mesg as clsRunningStatusReportResponseMessage;
+                        if (QueryResponseMessage != null)
+                            return (true, QueryResponseMessage.RuningStateReportAck);
+                        else
+                            return (false, null);
+                    }
                     else
                         return (false, null);
                 }
-                else
-                    return (false, null);
+
+
             }
             catch (Exception)
             {
@@ -153,6 +165,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             try
             {
+                if (UseWebAPI)
+                {
+                    var response = await GetOnlineMode();
+                    return (true, response);
+                }
+
                 byte[] data = AGVSMessageFactory.CreateOnlineModeQueryData(out clsOnlineModeQueryMessage msg);
                 await WriteDataOut(data, msg.SystemBytes);
 
