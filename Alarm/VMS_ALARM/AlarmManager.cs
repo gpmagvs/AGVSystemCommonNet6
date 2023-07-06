@@ -100,7 +100,10 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             alarm_save.ELevel = clsAlarmCode.LEVEL.Alarm;
             alarm_save.IsRecoverable = IsRecoverable;
             if (CurrentAlarms.TryAdd(alarm_save.Time, alarm_save))
-                DBhelper.InsertAlarm(alarm_save);
+            {
+                if (Alarm_code != AlarmCodes.None)
+                    DBhelper.InsertAlarm(alarm_save);
+            }
 
             if (!IsRecoverable)
                 OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, EventArgs.Empty);

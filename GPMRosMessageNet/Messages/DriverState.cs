@@ -22,8 +22,8 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
         public DriverState()
         {
             this.name = "";
-            this.state = 0;
-            this.errorCode = 0;
+            this.state = -1;
+            this.errorCode = 40;
             this.speed = 0.0f;
             this.position = 0.0f;
             this.voltage = 0;
