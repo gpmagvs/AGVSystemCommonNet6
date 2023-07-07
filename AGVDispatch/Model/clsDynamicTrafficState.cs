@@ -1,4 +1,5 @@
-﻿using AGVSystemCommonNet6.MAP;
+﻿using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.MAP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,41 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
     /// <summary>
     /// 交通動態資訊
     /// </summary>
-    public class clsTrafficState
+    public class clsDynamicTrafficState
     {
+        public enum TRAFFIC_ACTION
+        {
+            PASS,
+            WAIT,
+            WAIT_TRAFFIC_STATE_NOT_UPDATE_YET,
+        }
         public Dictionary<string, clsAGVTrafficState> AGVTrafficStates { get; set; } = new Dictionary<string, clsAGVTrafficState>();
+
+        public TRAFFIC_ACTION GetTrafficStatusByTag(string name, int tagNumber)
+        {
+            if (!AGVTrafficStates.TryGetValue(name, out clsAGVTrafficState agv_state))
+                return TRAFFIC_ACTION.WAIT;
+
+            MapPoint? toPoint = agv_state.PlanningNavTrajectory.FirstOrDefault(pt => pt.TagNumber == tagNumber);
+            if (toPoint == null)
+            {
+                LOG.Critical($"{name} _ traffic info no updated");
+                return TRAFFIC_ACTION.WAIT_TRAFFIC_STATE_NOT_UPDATE_YET; //等待動態交管訊息更新
+            }
+
+            if (toPoint.IsRegisted)
+            {
+                if (toPoint.RegistInfo.RegisterAGVName != name)
+                {
+                    LOG.Critical($"{name} _ {toPoint.Name} is registed, wait a moment ..");
+                    return TRAFFIC_ACTION.WAIT;
+                }
+                else
+                    return TRAFFIC_ACTION.PASS;
+            }
+            else
+                return TRAFFIC_ACTION.PASS;
+        }
     }
 
     /// <summary>
