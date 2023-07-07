@@ -130,5 +130,16 @@ namespace AGVSystemCommonNet6.MAP
             }
         }
 
+        /// <summary>
+        /// 是否為十字路口或T字路口
+        /// </summary>
+        [JsonIgnore]
+        public bool IsCross
+        {
+            get
+            {
+                return Target == null ? false : Target.Count != 0;
+            }
+        }
     }
 }
