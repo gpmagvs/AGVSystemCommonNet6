@@ -148,7 +148,7 @@ namespace AGVSystemCommonNet6.MAP
             get => _registInfo != null;
         }
         [JsonIgnore]
-        public clsMapPoiintRegist RegistInfo
+        public clsMapPoiintRegist? RegistInfo
         {
             get
             {
