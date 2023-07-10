@@ -148,7 +148,7 @@ namespace AGVSystemCommonNet6.MAP
             get => _registInfo != null;
         }
         [JsonIgnore]
-        public clsMapPoiintRegist RegistInfo
+        public clsMapPoiintRegist? RegistInfo
         {
             get
             {
@@ -164,7 +164,7 @@ namespace AGVSystemCommonNet6.MAP
         public bool TryRegistPoint(string AGVName, out clsMapPoiintRegist registInfo)
         {
             registInfo = null;
-            if (IsRegisted)
+            if (IsRegisted && AGVName != "System")
                 return false;
             _registInfo = new clsMapPoiintRegist()
             {
@@ -180,7 +180,7 @@ namespace AGVSystemCommonNet6.MAP
             errMsg = "";
             if (!IsRegisted)
                 return true;
-            if (_registInfo.RegisterAGVName == name)
+            if (name == "System" | _registInfo.RegisterAGVName == name)
             {
                 _registInfo = null;
                 return true;

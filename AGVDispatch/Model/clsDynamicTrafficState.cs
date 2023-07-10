@@ -21,7 +21,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
             WAIT_TRAFFIC_STATE_NOT_UPDATE_YET,
         }
         public Dictionary<string, clsAGVTrafficState> AGVTrafficStates { get; set; } = new Dictionary<string, clsAGVTrafficState>();
-
+        public List<MapPoint> RegistedPoints { get; set; } = new List<MapPoint>();
         public TRAFFIC_ACTION GetTrafficStatusByTag(string name, int tagNumber)
         {
             if (!AGVTrafficStates.TryGetValue(name, out clsAGVTrafficState agv_state))
@@ -76,6 +76,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         public MAIN_STATUS AGVStatus { get; set; } = MAIN_STATUS.DOWN;
 
         public MapPoint CurrentPosition { get; set; } = new MapPoint();
+
+        public bool IsOnline { get; set; } = false;
+
         /// <summary>
         /// 剩餘的導航路徑
         /// </summary>
