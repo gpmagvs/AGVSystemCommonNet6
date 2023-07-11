@@ -31,7 +31,7 @@ namespace AGVSystemCommonNet6.Tools.Database
 
         public static void InsertAlarm(clsAlarmCode alarm)
         {
-            db.Insert(alarm);
+            db?.Insert(alarm);
         }
 
 
