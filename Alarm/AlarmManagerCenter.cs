@@ -72,7 +72,7 @@ namespace AGVSystemCommonNet6.Alarm
                 Initialize();
 
             try
-            {   
+            {
                 var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection);
                 dbhelper._context.SystemAlarms.Add(alarmDto);
                 dbhelper._context.SaveChangesAsync();
@@ -96,7 +96,7 @@ namespace AGVSystemCommonNet6.Alarm
                 clsAlarmCode alarmCodeData;
                 string description_zh = "";
                 string description_En = "";
-                if(!AlarmCodes.TryGetValue(alarm, out alarmCodeData))
+                if (!AlarmCodes.TryGetValue(alarm, out alarmCodeData))
                 {
                     description_zh = description_En = alarm.ToString();
                 }
@@ -212,32 +212,44 @@ namespace AGVSystemCommonNet6.Alarm
         {
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                  dbhelper._context.Set<clsAlarmDto>().ToList();
+                dbhelper._context.Set<clsAlarmDto>().ToList();
             }
         }
 
-        public static List<clsAlarmDto> Query(DateTime startTime, DateTime endTime, string AGV_Name)
+        public static void  Query(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsAlarmDto> alarms)
         {
+
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
+                alarms= new List<clsAlarmDto>();
                 if (AGV_Name == "ALL")
                 {
-                    List<clsAlarmDto> alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime ).ToList();
-                    return alarms;
+                    count = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime).Count();
+                    int skipindex = (currentpage - 1) * 10;
+                    alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime).Skip(skipindex).Take(10).ToList();
+                    
                 }
                 else
                 {
-                    List<clsAlarmDto> alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime && alarm.Equipment_Name == AGV_Name).ToList();
-                    return alarms;
+                    count = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime).Count();
+                    int skipindex = (currentpage - 1) * 10;
+                    alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime && alarm.Equipment_Name == AGV_Name).Skip(skipindex).Take(10).ToList();
+                    
                 }
             }
         }
-        public static List<clsAlarmDto> QueryAll()
+        
+        public static void QueryAlarm(out int count,  int currentpage, out List<clsAlarmDto> firstPageAlarms)
         {
+            
+            firstPageAlarms = new List<clsAlarmDto>();
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                return dbhelper._context.Set<clsAlarmDto>().Skip(0).Take(10).ToList(); 
+                 count = dbhelper._context.Set<clsAlarmDto>().Count();
+                int skipindex = (currentpage - 1) * 10;
+                firstPageAlarms = dbhelper._context.Set<clsAlarmDto>().Skip(skipindex).Take(10).ToList();
             }
         }
+
     }
 }
