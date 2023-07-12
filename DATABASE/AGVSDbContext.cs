@@ -19,6 +19,5 @@ namespace AGVSystemCommonNet6.DATABASE
             : base(options)
         {
         }
-
     }
 }

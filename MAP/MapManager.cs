@@ -9,6 +9,28 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class MapManager
     {
+        public static Map LoadMapFromFile(string mapfile)
+        {
+            if (!File.Exists(mapfile))
+                return new Map()
+                {
+                     Points =new Dictionary<int, MapPoint>()
+                };
+            var json = System.IO.File.ReadAllText(mapfile);
+            if (json == null)
+                return null;
+            try
+            {
+
+                var data_obj = JsonConvert.DeserializeObject<Dictionary<string, Map>>(json);
+                return data_obj["Map"];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("LoadMapFromFile Error  : " + ex.Message);
+                return new Map();
+            }
+        }
         public static Map LoadMapFromFile()
         {
             if (!File.Exists(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName))

@@ -11,6 +11,7 @@ namespace AGVSystemCommonNet6.DATABASE
 
         public DbContextHelper(string connectionString)
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(connectionString.Split('=')[1]));
             _connectionString = connectionString;
             CreateDbContext();
         }

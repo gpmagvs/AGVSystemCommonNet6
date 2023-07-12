@@ -368,5 +368,6 @@
         Cant_TransferTask_TO_AGVC = 860014,
         Handshake_Fail_EQ_BUSY_ON = 860015,
         Handshake_Fail_EQ_BUSY_OFF = 860016,
+        Handshake_Fail_AGV_DOWN = 860017,
     }
 }

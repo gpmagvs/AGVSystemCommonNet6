@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6
 {
@@ -14,10 +15,15 @@ namespace AGVSystemCommonNet6
     {
         [Key]
         public string AGV_Name { get; set; }
+        public bool Enabled { get; set; }
         public string AGV_Description { get; set; } = "";
-        public clsEnums.AGV_MODEL Model { get; set; }
-        public clsEnums.MAIN_STATUS MainStatus { get; set; }
-        public clsEnums.ONLINE_STATE OnlineStatus { get; set; }
+        /// <summary>
+        /// 所屬車隊
+        /// </summary>
+        public VMS_GROUP Group { get; set; }
+        public AGV_MODEL Model { get; set; }
+        public MAIN_STATUS MainStatus { get; set; }
+        public ONLINE_STATE OnlineStatus { get; set; }
         public string CurrentLocation { get; set; } = "";
         public string CurrentCarrierID { get; set; } = "";
         public double BatteryLevel { get; set; }

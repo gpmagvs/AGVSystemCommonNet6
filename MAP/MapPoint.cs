@@ -95,7 +95,16 @@ namespace AGVSystemCommonNet6.MAP
         {
             get
             {
-                return StationType == STATION_TYPE.EQ | StationType == STATION_TYPE.EQ_LD | StationType == STATION_TYPE.EQ_ULD;
+                return StationType == STATION_TYPE.STK | StationType == STATION_TYPE.EQ | StationType == STATION_TYPE.EQ_LD | StationType == STATION_TYPE.EQ_ULD;
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsSTK
+        {
+            get
+            {
+                return StationType == STATION_TYPE.STK | StationType == STATION_TYPE.STK_LD | StationType == STATION_TYPE.STK_ULD | StationType == STATION_TYPE.Charge_STK;
             }
         }
         /// <summary>
@@ -121,5 +130,66 @@ namespace AGVSystemCommonNet6.MAP
             }
         }
 
+        /// <summary>
+        /// 是否為十字路口或T字路口
+        /// </summary>
+        [JsonIgnore]
+        public bool IsCross
+        {
+            get
+            {
+                return Target == null ? false : Target.Count != 0;
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsRegisted
+        {
+            get => _registInfo != null;
+        }
+        [JsonIgnore]
+        public clsMapPoiintRegist? RegistInfo
+        {
+            get
+            {
+                return _registInfo;
+            }
+        }
+
+        [JsonIgnore]
+        private clsMapPoiintRegist _registInfo = null;
+        /// <summary>
+        /// 註冊這個站點
+        /// </summary>
+        public bool TryRegistPoint(string AGVName, out clsMapPoiintRegist registInfo)
+        {
+            registInfo = null;
+            if (IsRegisted && AGVName != "System")
+                return false;
+            _registInfo = new clsMapPoiintRegist()
+            {
+                RegistTime = DateTime.Now,
+                RegisterAGVName = AGVName
+            };
+            registInfo = _registInfo;
+            return true;
+        }
+
+        public bool TryUnRegistPoint(string name, out string errMsg)
+        {
+            errMsg = "";
+            if (!IsRegisted)
+                return true;
+            if (name == "System" | _registInfo.RegisterAGVName == name)
+            {
+                _registInfo = null;
+                return true;
+            }
+            else
+            {
+                errMsg = "非註冊該點位之AGV無法解除註冊";
+                return false;
+            }
+        }
     }
 }

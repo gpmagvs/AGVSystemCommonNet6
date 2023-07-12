@@ -18,7 +18,8 @@ namespace AGVSystemCommonNet6.Abstracts
             WARNING,
             ABNORMAL
         }
-        private Message _StateData; 
+        private Message _StateData;
+        public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
 
         public object Data { get; }
@@ -34,6 +35,7 @@ namespace AGVSystemCommonNet6.Abstracts
             {
                 _StateData = value;
                 CheckStateDataContent();
+                lastUpdateTime = DateTime.Now;
             }
         }
         protected void AddAlarm(AlarmCodes alarm)
@@ -48,7 +50,7 @@ namespace AGVSystemCommonNet6.Abstracts
             bool removed = ErrorCodes.Remove(alarm);
             if (removed)
             {
-               // Console.WriteLine($"[{alarm}] 已排除");
+                // Console.WriteLine($"[{alarm}] 已排除");
             }
         }
         public STATE State => CheckStateDataContent();

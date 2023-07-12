@@ -109,11 +109,17 @@ namespace AGVSystemCommonNet6.Log
 
                     string fileName = Path.Combine(subFolder, $"{logItem.level.ToString()}.log");
 
-                    using (StreamWriter writer = new StreamWriter(fileName, true))
+                    try
                     {
-                        writer.WriteLine(string.Format("{0} {1}", logItem.Time, logItem.logFullLine));
+                        using (StreamWriter writer = new StreamWriter(fileName, true))
+                        {
+                            writer.WriteLine(string.Format("{0} {1}", logItem.Time, logItem.logFullLine));
+                        }
                     }
-
+                    catch (Exception)
+                    {
+                        continue;
+                    }
 
                     ConsoleColor foreColor = ConsoleColor.White;
                     ConsoleColor backColor = ConsoleColor.Black;

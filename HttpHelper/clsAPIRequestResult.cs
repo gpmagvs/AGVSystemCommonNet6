@@ -8,8 +8,8 @@ namespace AGVSystemCommonNet6.HttpHelper
 {
     public class clsAPIRequestResult
     {
-        public bool Success { get; set; }
+        public bool Success => ReturnCode == 0;
         public string Message { get; set; }
-        public int ErrorCode { get; set; } = -1;
+        public int ReturnCode { get; set; } = -1;
     }
 }

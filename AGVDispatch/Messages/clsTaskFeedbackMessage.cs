@@ -27,12 +27,5 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         [JsonProperty("Task Status")]
         public TASK_RUN_STATUS TaskStatus { get; set; }
-
-        [JsonProperty("Last Visited Node")]
-        public int Last_Visited_Node { get; set; } = 0;
-
-
-        [JsonProperty("Coordination")]
-        public clsCoordination Coordination { get; set; } = new clsCoordination();
     }
 }
