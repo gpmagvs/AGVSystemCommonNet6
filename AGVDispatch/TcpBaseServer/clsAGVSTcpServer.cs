@@ -13,7 +13,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
     public partial class clsAGVSTcpServer : Connection
     {
         public Socket SocketServer;
-        public event EventHandler<clsAGVSTcpIPClient> OnClientConnected;
+        public event EventHandler<clsAGVSTcpClientHandler> OnClientConnected;
         public override bool Connect()
         {
             try
@@ -43,7 +43,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 AcceptListen();
             });
-            OnClientConnected?.Invoke(this, new clsAGVSTcpIPClient { SocketClient = client });
+            OnClientConnected?.Invoke(this, new clsAGVSTcpClientHandler { SocketClient = client });
         }
 
 

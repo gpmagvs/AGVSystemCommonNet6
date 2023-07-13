@@ -8,7 +8,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSTcpServer
     {
-        public class clsAGVSTcpIPClient
+        public class clsAGVSTcpClientHandler
         {
             public class clsMsgSendEventArg : EventArgs
             {
