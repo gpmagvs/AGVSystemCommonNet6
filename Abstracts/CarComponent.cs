@@ -45,6 +45,10 @@ namespace AGVSystemCommonNet6.Abstracts
             else
                 ErrorCodes.Add(alarm, DateTime.Now);
         }
+        public void ClearAlarms()
+        {
+            ErrorCodes.Clear();
+        }
         protected void RemoveAlarm(AlarmCodes alarm)
         {
             bool removed = ErrorCodes.Remove(alarm);
