@@ -5,6 +5,18 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Services
 {
     public class VerticalCommandRequest : Message
     {
+        public enum COMMANDS
+        {
+            init,
+            orig,
+            pose,
+            up,
+            down,
+            stop,
+            resum,
+            up_search,
+            down_search
+        }
         public const string RosMessageName = "gpm_msgs/VerticalCommand";
 
         public string model { get; set; }

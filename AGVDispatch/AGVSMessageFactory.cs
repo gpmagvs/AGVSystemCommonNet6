@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using Newtonsoft.Json;
 using System.Text;
 
 namespace AGVSystemCommonNet6.AGVDispatch
@@ -48,6 +49,28 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return Encoding.ASCII.GetBytes(FormatSendOutString(ackMesg.ToJson()));
 
         }
+
+
+        public static string CreateSimpleReturnMessageData(MessageBase TIn, string headerKey, RETURN_CODE ReturnCode)
+        {
+            var ackMesg = new clsSimpleReturnWithTimestampMessage()
+            {
+                EQName = TIn.EQName,
+                SID = TIn.SID,
+                SystemBytes = TIn.SystemBytes,
+                Header = new Dictionary<string, SimpleRequestResponseWithTimeStamp>()
+                    {
+                        {headerKey, new SimpleRequestResponseWithTimeStamp()
+                        {
+                             ReturnCode = ReturnCode,
+                              TimeStamp = DateTime.Now.ToAGVSTimeFormat()
+                        }}
+                    }
+            };
+            return JsonConvert.SerializeObject(ackMesg);
+
+        }
+
         internal static byte[] CreateTaskDownloadReqAckData(bool accept_task, int system_byte, out clsSimpleReturnMessage ackMesg)
         {
             ackMesg = new clsSimpleReturnMessage()
@@ -97,6 +120,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         }
 
+        public static string createOnlineModeAckData(clsOnlineModeQueryMessage queryDto, REMOTE_MODE remote_mode)
+        {
+            clsOnlineModeQueryResponseMessage response = new clsOnlineModeQueryResponseMessage();
+            response.SID = queryDto.SID;
+            response.EQName = queryDto.EQName;
+            response.SystemBytes = queryDto.SystemBytes;
+            response.Header.Add("0102", new OnlineModeQueryResponse
+            {
+                RemoteMode = remote_mode,
+                TimeStamp = DateTime.Now.ToAGVSTimeFormat()
+            });
+            return JsonConvert.SerializeObject(response);
+        }
         public static byte[] CreateOnlineModeQueryData()
         {
             return CreateOnlineModeQueryData(out clsOnlineModeQueryMessage mesg);
@@ -206,5 +242,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return Encoding.ASCII.GetBytes(FormatSendOutString(carrierRemovedMessage.ToJson()));
 
         }
+
     }
 }

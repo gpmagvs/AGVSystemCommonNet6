@@ -1,4 +1,5 @@
-﻿using AGVSystemCommonNet6.Log;
+﻿using AGVSystemCommonNet6.GPMRosMessageNet.Messages;
+using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Tools.Database;
 using Newtonsoft.Json;
 using SQLite;
@@ -108,6 +109,40 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             if (!IsRecoverable)
                 OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, EventArgs.Empty);
         }
+        public static AlarmCodes ConvertAGVCAlarmCode(AlarmCodeMsg alarm_code, out clsAlarmCode.LEVEL Level)
+        {
+            int code = alarm_code.AlarmCode;
+            int level = alarm_code.Level;
+            Level = level == 1 ? clsAlarmCode.LEVEL.Warning : clsAlarmCode.LEVEL.Alarm;
 
+            if (code == 1)
+                return AlarmCodes.Motion_control_Wrong_Received_Msg;
+            else if (code == 2)
+                return AlarmCodes.Motion_control_Wrong_Extend_Path;
+            else if (code == 3)
+                return AlarmCodes.Motion_control_Out_Of_Line_While_Forwarding_End;
+            else if (code == 4)
+                return AlarmCodes.Motion_control_Out_Of_Line_While_Tracking_End_Point;
+            else if (code == 5)
+                return AlarmCodes.Motion_control_Out_Of_Line_While_Moving;
+            else if (code == 6)
+                return AlarmCodes.Motion_control_Out_Of_Line_While_Secondary;
+            else if (code == 7)
+                return AlarmCodes.Motion_control_Missing_Tag_On_End_Point;
+            else if (code == 8)
+                return AlarmCodes.Motion_control_Missing_Tag_While_Moving;
+            else if (code == 9)
+                return AlarmCodes.Motion_control_Missing_Tag_While_Secondary;
+            else if (code == 10)
+                return AlarmCodes.Motion_control_Wrong_Initial_Position_In_Secondary;
+            else if (code == 11)
+                return AlarmCodes.Motion_control_Wrong_Initial_Angle_In_Secondary;
+            else if (code == 12)
+                return AlarmCodes.Motion_control_Wrong_Unknown_Code;
+            else if (code == 13)
+                return AlarmCodes.Map_Recognition_Rate_Too_Low;
+            else
+                return AlarmCodes.Motion_control_Wrong_Unknown_Code;
+        }
     }
 }

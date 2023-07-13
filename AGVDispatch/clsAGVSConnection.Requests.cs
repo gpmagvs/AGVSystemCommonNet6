@@ -143,6 +143,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             Console.WriteLine($"[Online Mode Change] 車載請求 {mode} , Tag {currentTag}");
             try
             {
+                AGVOnlineReturnCode = RETURN_CODE.No_Response;
                 WaitAGVSAcceptOnline = new ManualResetEvent(false);
                 byte[] data = AGVSMessageFactory.CreateOnlineModeChangeRequesData(currentTag, mode, out clsOnlineModeRequestMessage msg);
                 await WriteDataOut(data, msg.SystemBytes);
