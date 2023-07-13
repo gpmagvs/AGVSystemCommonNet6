@@ -25,6 +25,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public taskResetReqDelegate OnTaskResetReq;
         private clsRunningStatusReportMessage lastRunningStatusDataReport = new clsRunningStatusReportMessage();
         private ManualResetEvent RunningStatusRptPause = new ManualResetEvent(true);
+        public event EventHandler OnDisconnected;
         public bool UseWebAPI = false;
         public enum MESSAGE_TYPE
         {
@@ -83,6 +84,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
+                OnDisconnected?.Invoke(this, EventArgs.Empty);
                 LOG.ERROR($"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{Port})..Will Retry it after 3 secoond...");
                 tcpClient = null;
                 Thread.Sleep(3000);
