@@ -369,5 +369,6 @@
         Handshake_Fail_EQ_BUSY_ON = 860015,
         Handshake_Fail_EQ_BUSY_OFF = 860016,
         Handshake_Fail_AGV_DOWN = 860017,
+        Motion_control_Wrong_Unknown_Code = 860018,
     }
 }
