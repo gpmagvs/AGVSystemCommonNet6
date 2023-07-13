@@ -34,6 +34,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
                 while (true)
                 {
+                    await Task.Delay(1000);
                     try
                     {
                         byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, out clsTaskFeedbackMessage msg);
