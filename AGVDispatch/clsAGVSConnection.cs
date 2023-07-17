@@ -84,7 +84,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                OnDisconnected?.Invoke(this, EventArgs.Empty);
                 LOG.ERROR($"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{Port})..Will Retry it after 3 secoond...");
                 tcpClient = null;
                 Thread.Sleep(3000);
@@ -96,6 +95,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             Thread thread = new Thread(() =>
             {
+                int disconnect_cnt = 0;
                 while (true)
                 {
                     Thread.Sleep(1000);
@@ -108,10 +108,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     if (!result.Item1)
                     {
                         LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
+                        disconnect_cnt += 1;
+                        if (disconnect_cnt > 10)
+                        {
+                            Disconnect();
+                            disconnect_cnt = 0;
+                            OnDisconnected?.Invoke(this, EventArgs.Empty);
+                        }
                         continue;
                     }
                     else
                     {
+                        disconnect_cnt = 0;
                         // LOG.TRACE($" OnlineMode Query Done=>Remote Mode : {result.onlineModeQuAck.RemoteMode}");
                     }
                     Task.Factory.StartNew(() =>
@@ -179,13 +187,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
                 catch (Exception ex)
                 {
-                    tcpClient.Dispose();
+                    tcpClient?.Dispose();
                     tcpClient = null;
                 }
             }
             catch (Exception)
             {
-                tcpClient.Dispose();
+                tcpClient?.Dispose();
                 tcpClient = null;
             }
 
@@ -244,13 +252,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public override void Disconnect()
         {
             tcpClient?.Dispose();
+            tcpClient = null;
         }
 
         public override bool IsConnected()
         {
             if (UseWebAPI)
                 return true;
-            return tcpClient != null && tcpClient.Connected;
+            if (tcpClient == null)
+                return false;
+            return tcpClient.Connected;
         }
 
 
