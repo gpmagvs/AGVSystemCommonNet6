@@ -141,23 +141,9 @@ namespace AGVSystemCommonNet6.MAP
                 return Target == null ? false : Target.Count != 0;
             }
         }
+        public bool IsRegisted { get; set; } = false;
+        public clsMapPoiintRegist? RegistInfo { get; set; } = null;
 
-        [JsonIgnore]
-        public bool IsRegisted
-        {
-            get => _registInfo != null;
-        }
-        [JsonIgnore]
-        public clsMapPoiintRegist? RegistInfo
-        {
-            get
-            {
-                return _registInfo;
-            }
-        }
-
-        [JsonIgnore]
-        private clsMapPoiintRegist _registInfo = null;
         /// <summary>
         /// 註冊這個站點
         /// </summary>
@@ -165,13 +151,16 @@ namespace AGVSystemCommonNet6.MAP
         {
             registInfo = null;
             if (IsRegisted && AGVName != "System")
+            {
                 return false;
-            _registInfo = new clsMapPoiintRegist()
+            }
+            RegistInfo = new clsMapPoiintRegist()
             {
                 RegistTime = DateTime.Now,
                 RegisterAGVName = AGVName
             };
-            registInfo = _registInfo;
+            registInfo = RegistInfo;
+            IsRegisted = true;
             return true;
         }
 
@@ -180,9 +169,10 @@ namespace AGVSystemCommonNet6.MAP
             errMsg = "";
             if (!IsRegisted)
                 return true;
-            if (name == "System" | _registInfo.RegisterAGVName == name)
+            if (name == "System" | RegistInfo.RegisterAGVName == name)
             {
-                _registInfo = null;
+                IsRegisted = false;
+                RegistInfo = null;
                 return true;
             }
             else

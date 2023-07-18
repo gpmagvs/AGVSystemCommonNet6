@@ -28,16 +28,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public bool UseWebAPI = false;
         public enum MESSAGE_TYPE
         {
-            REQ_0101 = 0101,
+            REQ_0101_ONLINE_MODE_QUERY = 0101,
             ACK_0102 = 0102,
-            REQ_0103 = 0103,
+            REQ_0103_ONLINE_MODE_REQUEST = 0103,
             ACK_0104 = 0104,
-            REQ_0105 = 0105,
+            REQ_0105_RUNNING_STATUS_REPORT = 0105,
             ACK_0106 = 0106,
-            REQ_0301 = 0301,
-            ACK_0302 = 0302,
-            REQ_0303 = 0303,
-            ACK_0304 = 0304,
+            REQ_0301_TASK_DOWNLOAD = 0301,
+            ACK_0302_TASK_DOWNLOADED_ACK = 0302,
+            REQ_0303_TASK_FEEDBACK_REPORT = 0303,
+            ACK_0304_TASK_FEEDBACK_REPORT_ACK = 0304,
             REQ_0305 = 0305,
             ACK_0306 = 0306,
             ACK_0322 = 0322,
@@ -196,7 +196,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             throw new NotImplementedException();
         }
 
-        public MESSAGE_TYPE GetMESSAGE_TYPE(string message_json)
+        public static MESSAGE_TYPE GetMESSAGE_TYPE(string message_json)
         {
 
             var _Message = JsonConvert.DeserializeObject<Dictionary<string, object>>(message_json);
@@ -207,27 +207,27 @@ namespace AGVSystemCommonNet6.AGVDispatch
             var firstHeaderKey = headers.Keys.First();
 
             if (firstHeaderKey.Contains("0101"))
-                return MESSAGE_TYPE.REQ_0101;
+                return MESSAGE_TYPE.REQ_0101_ONLINE_MODE_QUERY;
             if (firstHeaderKey.Contains("0102"))
                 return MESSAGE_TYPE.ACK_0102;
             if (firstHeaderKey.Contains("0103"))
-                return MESSAGE_TYPE.REQ_0103;
+                return MESSAGE_TYPE.REQ_0103_ONLINE_MODE_REQUEST;
             if (firstHeaderKey.Contains("0104"))
                 return MESSAGE_TYPE.ACK_0104;
             if (firstHeaderKey.Contains("0105"))
-                return MESSAGE_TYPE.REQ_0105;
+                return MESSAGE_TYPE.REQ_0105_RUNNING_STATUS_REPORT;
             if (firstHeaderKey.Contains("0106"))
                 return MESSAGE_TYPE.ACK_0106;
             if (firstHeaderKey.Contains("0301"))
-                return MESSAGE_TYPE.REQ_0301;
+                return MESSAGE_TYPE.REQ_0301_TASK_DOWNLOAD;
             if (firstHeaderKey.Contains("0302"))
-                return MESSAGE_TYPE.ACK_0302;
+                return MESSAGE_TYPE.ACK_0302_TASK_DOWNLOADED_ACK;
 
             if (firstHeaderKey.Contains("0303"))
-                return MESSAGE_TYPE.REQ_0303;
+                return MESSAGE_TYPE.REQ_0303_TASK_FEEDBACK_REPORT;
 
             if (firstHeaderKey.Contains("0304"))
-                return MESSAGE_TYPE.ACK_0304;
+                return MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK;
 
             if (firstHeaderKey.Contains("0305"))
                 return MESSAGE_TYPE.REQ_0305;

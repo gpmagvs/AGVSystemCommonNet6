@@ -12,6 +12,10 @@ namespace AGVSystemCommonNet6.Configuration
         public string DBConnection = "Data Source=D://param//Database//AGVSWebSystem.db";
         public string VMSHost = "http://localhost:5036";
         public string AGVSHost = "http://localhost:5216";
+
+        public string VMSTcpServerIP = "127.0.0.1";
+        public int VMSTcpServerPort = 5500;
+
         public clsMapConfigs MapConfigs { get; set; } = new clsMapConfigs();
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
     }
@@ -22,7 +26,7 @@ namespace AGVSystemCommonNet6.Configuration
         public string MapRegionConfigFile { get; set; } = "C://AGVS//Map//MapRegions.json";
 
         [JsonIgnore]
-        public string MapFileFullName=>Path.Combine(MapFolder, CurrentMapFileName);
+        public string MapFileFullName => Path.Combine(MapFolder, CurrentMapFileName);
 
     }
     public class clsEquipmentManagementConfigs

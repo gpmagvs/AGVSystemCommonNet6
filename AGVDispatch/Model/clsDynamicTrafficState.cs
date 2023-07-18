@@ -27,11 +27,10 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
             if (!AGVTrafficStates.TryGetValue(name, out clsAGVTrafficState agv_state))
                 return TRAFFIC_ACTION.WAIT;
 
-            MapPoint? toPoint = agv_state.PlanningNavTrajectory.FirstOrDefault(pt => pt.TagNumber == tagNumber);
+            MapPoint? toPoint = RegistedPoints.FirstOrDefault(pt => pt.TagNumber == tagNumber);
             if (toPoint == null)
             {
-                LOG.Critical($"{name} _ traffic info no updated");
-                return TRAFFIC_ACTION.WAIT_TRAFFIC_STATE_NOT_UPDATE_YET; //等待動態交管訊息更新
+                return TRAFFIC_ACTION.PASS;
             }
 
             if (toPoint.IsRegisted)

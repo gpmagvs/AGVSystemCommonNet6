@@ -40,7 +40,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 					MSG = runningStateReportAck;
 					AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
 				}
-				else if (msgType == MESSAGE_TYPE.REQ_0301)  //TASK DOWNLOAD
+				else if (msgType == MESSAGE_TYPE.REQ_0301_TASK_DOWNLOAD)  //TASK DOWNLOAD
 				{
 					clsTaskDownloadMessage? taskDownloadReq = JsonConvert.DeserializeObject<clsTaskDownloadMessage>(_json);
 					MSG = taskDownloadReq;
@@ -52,7 +52,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 						OnTaskDownloadFeekbackDone?.Invoke(this, taskDownloadReq.TaskDownload);
 					}
 				}
-				else if (msgType == MESSAGE_TYPE.ACK_0304)  //TASK Feedback的回傳
+				else if (msgType == MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK)  //TASK Feedback的回傳
 				{
 					clsSimpleReturnMessage? taskFeedbackAck = JsonConvert.DeserializeObject<clsSimpleReturnMessage>(_json);
 					MSG = taskFeedbackAck;

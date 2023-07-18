@@ -8,7 +8,7 @@ namespace AGVSystemCommonNet6
     {
         public enum AGV_TYPE
         {
-            FORK, SUBMERGED_SHIELD
+            FORK, SUBMERGED_SHIELD,INSPECTION_AGV
         }
         public enum OPERATOR_MODE
         {
