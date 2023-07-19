@@ -17,16 +17,21 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
 
         internal static event EventHandler OnAllAlarmClear;
         public static event EventHandler OnUnRecoverableAlarmOccur;
-        public static void LoadAlarmList(string alarm_JsonFile)
+        public static bool LoadAlarmList(string alarm_JsonFile, out string message)
         {
-
+            message = string.Empty;
             if (File.Exists(alarm_JsonFile))
             {
                 AlarmList = JsonConvert.DeserializeObject<List<clsAlarmCode>>(File.ReadAllText(alarm_JsonFile));
                 LOG.INFO("Alarm List Loaded.");
+                return true;
             }
             else
-                LOG.WARN("Alarm list not Loaded yet...Please confirm your file path setting(VCS:AlarmList_json_Path)");
+            {
+                message = "Alarm list not Loaded yet...Please confirm your file path setting(VCS:AlarmList_json_Path)";
+                LOG.WARN(message);
+                return false;
+            }
         }
         public static void ClearAlarm(AlarmCodes Alarm_code)
         {
@@ -34,11 +39,6 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             if (exist_al.Value != null)
             {
                 CurrentAlarms.TryRemove(exist_al);
-            }
-
-            if (CurrentAlarms.Count == 0)
-            {
-                OnAllAlarmClear?.Invoke("AlarmManager", EventArgs.Empty);
             }
         }
 
@@ -71,18 +71,9 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             warning_save.IsRecoverable = true;
             var existAlar = (CurrentAlarms.FirstOrDefault(al => al.Value.EAlarmCode == Alarm_code));
             if (existAlar.Value != null)
-            {
                 CurrentAlarms.TryRemove(existAlar.Key, out _);
-                CurrentAlarms.TryAdd(warning_save.Time, warning_save);
-            }
-            else
-            {
-
-                if (CurrentAlarms.TryAdd(warning_save.Time, warning_save))
-                {
-                    DBhelper.InsertAlarm(warning_save);
-                }
-            }
+            CurrentAlarms.TryAdd(warning_save.Time, warning_save);
+            DBhelper.InsertAlarm(warning_save);
         }
         public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
         {
