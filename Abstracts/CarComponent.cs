@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Alarm.VMS_ALARM;
+using AGVSystemCommonNet6.Log;
 using RosSharp.RosBridgeClient;
 
 namespace AGVSystemCommonNet6.Abstracts
@@ -22,6 +23,27 @@ namespace AGVSystemCommonNet6.Abstracts
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
 
+        private AlarmCodes _current_alarm_code = AlarmCodes.None;
+        public AlarmCodes current_alarm_code
+        {
+            set
+            {
+                if (_current_alarm_code != value)
+                {
+                    _current_alarm_code = value;
+                    if (value != AlarmCodes.None)
+                    {
+                        State = STATE.ABNORMAL;
+                        AlarmManager.AddWarning(value);
+                        LOG.WARN($"{component_name} Alarm: {current_alarm_code}");
+                    }
+                    else
+                        State = STATE.NORMAL;
+                }
+            }
+            get => _current_alarm_code;
+        }
+
         public object Data { get; }
 
         /// <summary>
@@ -38,27 +60,9 @@ namespace AGVSystemCommonNet6.Abstracts
                 lastUpdateTime = DateTime.Now;
             }
         }
-        protected void AddAlarm(AlarmCodes alarm)
-        {
-            if (ErrorCodes.ContainsKey(alarm))
-                ErrorCodes[alarm] = DateTime.Now;
-            else
-                ErrorCodes.Add(alarm, DateTime.Now);
-        }
-        public void ClearAlarms()
-        {
-            ErrorCodes.Clear();
-        }
-        protected void RemoveAlarm(AlarmCodes alarm)
-        {
-            bool removed = ErrorCodes.Remove(alarm);
-            if (removed)
-            {
-                // Console.WriteLine($"[{alarm}] 已排除");
-            }
-        }
-        public STATE State => CheckStateDataContent();
+       
+        public STATE State { get; private set; }
 
-        public abstract STATE CheckStateDataContent();
+        public abstract void CheckStateDataContent();
     }
 }
