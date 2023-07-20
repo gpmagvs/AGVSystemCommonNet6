@@ -23,8 +23,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public taskDonwloadExecuteDelage OnTaskDownload;
         public onlineModeChangeDelelage OnRemoteModeChanged;
         public taskResetReqDelegate OnTaskResetReq;
-        private clsRunningStatusReportMessage lastRunningStatusDataReport = new clsRunningStatusReportMessage();
-        private ManualResetEvent RunningStatusRptPause = new ManualResetEvent(true);
         public event EventHandler OnDisconnected;
         public bool UseWebAPI = false;
         public enum MESSAGE_TYPE
@@ -93,66 +91,44 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task<bool> Start()
         {
-            await Task.Delay(1).ContinueWith(t =>
+            _ = Task.Run(async () =>
             {
-                Thread thread = new Thread(() =>
+                int disconnect_cnt = 0;
+                while (true)
                 {
-                    int disconnect_cnt = 0;
-                    while (true)
+                    await Task.Delay(10);
+                    if (!IsConnected())
                     {
-                        Thread.Sleep(1000);
-                        if (!IsConnected())
-                        {
-                            Connect();
-                            continue;
-                        }
-                        (bool, OnlineModeQueryResponse onlineModeQuAck) result = TryOnlineModeQueryAsync().Result;
-                        if (!result.Item1)
-                        {
-                            LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
-                            disconnect_cnt += 1;
-                            if (disconnect_cnt > 10)
-                            {
-                                Disconnect();
-                                disconnect_cnt = 0;
-                                OnDisconnected?.Invoke(this, EventArgs.Empty);
-                            }
-                            continue;
-                        }
-                        else
-                        {
-                            disconnect_cnt = 0;
-                            // LOG.TRACE($" OnlineMode Query Done=>Remote Mode : {result.onlineModeQuAck.RemoteMode}");
-                        }
-                        Task.Factory.StartNew(() =>
-                        {
-                            RunningStatusRptPause.WaitOne();
-                            (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
-                            if (!runningStateReport_result.Item1)
-                                LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
-                            else
-                            {
-                                // LOG.TRACE($" RunningState Report Done=> ReturnCode: {runningStateReport_result.runningStateReportAck.ReturnCode}");
-                            }
-                        });
-
+                        Connect();
+                        continue;
                     }
-                });
-                thread.IsBackground = false;
-                thread.Start();
+                    (bool, OnlineModeQueryResponse onlineModeQuAck) result = TryOnlineModeQueryAsync().Result;
+                    if (!result.Item1)
+                    {
+                        LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
+                        disconnect_cnt += 1;
+                        if (disconnect_cnt > 50)
+                        {
+                            Disconnect();
+                            disconnect_cnt = 0;
+                            OnDisconnected?.Invoke(this, EventArgs.Empty);
+                        }
+                        continue;
+                    }
+                    else
+                    {
+                        disconnect_cnt = 0;
+                    }
+
+                    (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
+                    if (!runningStateReport_result.Item1)
+                        LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+
+                }
             });
             return true;
         }
 
-        public void PauseRunningStatusReport()
-        {
-            RunningStatusRptPause.Reset();
-        }
-
-        public void ResumeRunningStatusReport()
-        {
-            RunningStatusRptPause.Set();
-        }
         void ReceieveCallbaak(IAsyncResult ar)
         {
             clsSocketState _socketState = (clsSocketState)ar.AsyncState;

@@ -29,18 +29,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             _ = Task.Run(async () =>
             {
-                // PauseRunningStatusReport();
-                await Task.Delay(100);
-
                 while (true)
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(1);
                     try
                     {
                         byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, out clsTaskFeedbackMessage msg);
                         if (UseWebAPI)
                         {
-                            SimpleRequestResponse response = await PostTaskFeedback( new clsFeedbackData (msg.Header.Values.First()));
+                            SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(msg.Header.Values.First()));
                             LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
                             return;
                         }
@@ -61,7 +58,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     }
                     catch (Exception ex)
                     {
-                        LOG.ERROR($"TryTaskFeedBackAsync FAIL>>>{ex.Message}");
+                        LOG.ERROR($"TryTaskFeedBackAsync FAIL>.>>{ex.Message}", ex);
+                        return;
                     }
                 }
             });
@@ -74,7 +72,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg, true);
                 await WriteDataOut(data, msg.SystemBytes);
-                lastRunningStatusDataReport = msg;
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                 {
                     clsRunningStatusReportResponseMessage QueryResponseMessage = mesg as clsRunningStatusReportResponseMessage;
@@ -110,7 +107,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg);
                     await WriteDataOut(data, msg.SystemBytes);
-                    lastRunningStatusDataReport = msg;
                     if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                     {
                         clsRunningStatusReportResponseMessage QueryResponseMessage = mesg as clsRunningStatusReportResponseMessage;
