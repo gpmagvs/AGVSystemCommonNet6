@@ -11,7 +11,8 @@ namespace AGVSystemCommonNet6.Abstracts
         {
             BATTERY, DRIVER, IMU, BARCODE_READER, GUID_SENSOR, CST_READER,
             NAVIGATION,
-            SICK
+            SICK,
+            FORK
         }
         public enum STATE
         {
@@ -19,6 +20,12 @@ namespace AGVSystemCommonNet6.Abstracts
             WARNING,
             ABNORMAL
         }
+
+        public CarComponent()
+        {
+
+        }
+
         private Message _StateData;
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
