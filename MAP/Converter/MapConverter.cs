@@ -10,6 +10,7 @@ namespace AGVSystemCommonNet6.MAP.Converter
 {
     public class MapConverter
     {
+
         public Dictionary<string, Dictionary<string, Map>> YuntechMapToGPMMapFromFile(string fileMap, out Dictionary<string, Dictionary<string, clsYuntechSubMap>> yunTecMap)
         {
             yunTecMap = YunTechMapManager.LoadMapFromFile(fileMap);
@@ -101,5 +102,8 @@ namespace AGVSystemCommonNet6.MAP.Converter
             int[] indexes = paths.Select(p => mapRef.Mapsub.ToList().IndexOf(mapRef.Mapsub.First(pt => pt.x == p.p1x && pt.y == p.p1y))).ToArray();
             return indexes;
         }
+
+
+
     }
 }

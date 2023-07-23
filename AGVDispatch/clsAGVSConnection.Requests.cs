@@ -97,7 +97,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     var runnginStatus = AGVSMessageFactory.CreateRunningStateReportQueryData();
                     SimpleRequestResponse response = await PostRunningStatus(runnginStatus);
-                    return (response.ReturnCode == RETURN_CODE.OK, new SimpleRequestResponseWithTimeStamp
+                    return (response.ReturnCode == RETURN_CODE.OK | response.ReturnCode == RETURN_CODE.NG, new SimpleRequestResponseWithTimeStamp
                     {
                         ReturnCode = response.ReturnCode,
                         TimeStamp = DateTime.Now.ToString()
