@@ -5,7 +5,7 @@ using RosSharp.RosBridgeClient;
 
 namespace AGVSystemCommonNet6.Abstracts
 {
-    public abstract class CarComponent
+    public abstract class CarComponent: AGVAlarmReportable
     {
         public enum COMPOENT_NAME
         {
@@ -30,27 +30,6 @@ namespace AGVSystemCommonNet6.Abstracts
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
 
-        private AlarmCodes _current_alarm_code = AlarmCodes.None;
-        public AlarmCodes current_alarm_code
-        {
-            set
-            {
-                if (_current_alarm_code != value)
-                {
-                    _current_alarm_code = value;
-                    if (value != AlarmCodes.None)
-                    {
-                        State = STATE.ABNORMAL;
-                        AlarmManager.AddWarning(value);
-                        LOG.WARN($"{component_name} Alarm: {current_alarm_code}");
-                    }
-                    else
-                        State = STATE.NORMAL;
-                }
-            }
-            get => _current_alarm_code;
-        }
-
         public object Data { get; }
 
         /// <summary>
@@ -68,7 +47,6 @@ namespace AGVSystemCommonNet6.Abstracts
             }
         }
        
-        public STATE State { get; private set; }
 
         public abstract void CheckStateDataContent();
     }

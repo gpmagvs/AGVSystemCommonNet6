@@ -21,7 +21,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         public static event EventHandler OnUnRecoverableAlarmOccur;
         public static bool LoadAlarmList(string alarm_JsonFile, out string message)
         {
-            LOG.INFO("Alarm List File to load :"+alarm_JsonFile);
+            LOG.INFO("Alarm List File to load :" + alarm_JsonFile);
             message = string.Empty;
             if (File.Exists(alarm_JsonFile))
             {
@@ -77,6 +77,15 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                 CurrentAlarms.TryRemove(existAlar.Key, out _);
             CurrentAlarms.TryAdd(warning_save.Time, warning_save);
             DBhelper.InsertAlarm(warning_save);
+        }
+
+        /// <summary>
+        /// 新增一筆Alarm (可復歸)
+        /// </summary>
+        /// <param name="Alarm_code"></param>
+        public static void AddAlarm(AlarmCodes Alarm_code)
+        {
+            AddAlarm(Alarm_code, true);
         }
         public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
         {

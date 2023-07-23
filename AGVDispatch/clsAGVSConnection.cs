@@ -12,6 +12,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSConnection : Connection
     {
+        public override string alarm_locate_in_name => "TCP AGVSConnection";
+
         TcpClient tcpClient;
         clsSocketState socketState = new clsSocketState();
         ConcurrentDictionary<int, ManualResetEvent> WaitAGVSReplyMREDictionary = new ConcurrentDictionary<int, ManualResetEvent>();
@@ -97,33 +99,42 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 while (true)
                 {
                     await Task.Delay(10);
-                    if (!IsConnected())
+                    try
                     {
-                        Connect();
-                        continue;
-                    }
-                    (bool, OnlineModeQueryResponse onlineModeQuAck) result = TryOnlineModeQueryAsync().Result;
-                    if (!result.Item1)
-                    {
-                        LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
-                        disconnect_cnt += 1;
-                        if (disconnect_cnt > 50)
+
+                        if (!IsConnected())
                         {
-                            Disconnect();
-                            disconnect_cnt = 0;
-                            OnDisconnected?.Invoke(this, EventArgs.Empty);
+                            Connect();
+                            continue;
                         }
-                        continue;
+                        (bool, OnlineModeQueryResponse onlineModeQuAck) result = TryOnlineModeQueryAsync().Result;
+                        if (!result.Item1)
+                        {
+                            LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
+                            disconnect_cnt += 1;
+                            if (disconnect_cnt > (Debugger.IsAttached ? 5 : 50))
+                            {
+                                Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.None;
+                                Disconnect();
+                                disconnect_cnt = 0;
+                                Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_Disconnect;
+                            }
+                            continue;
+                        }
+                        else
+                        {
+                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.None;
+                            disconnect_cnt = 0;
+                        }
+
+                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
+                        if (!runningStateReport_result.Item1)
+                            LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        disconnect_cnt = 0;
                     }
-
-                    (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
-                    if (!runningStateReport_result.Item1)
-                        LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
-
                 }
             });
             return true;
