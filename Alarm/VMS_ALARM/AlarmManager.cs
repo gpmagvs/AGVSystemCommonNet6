@@ -12,18 +12,21 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
     {
 
         public static List<clsAlarmCode> AlarmList { get; private set; } = new List<clsAlarmCode>();
-        public static ConcurrentDictionary<DateTime, clsAlarmCode> CurrentAlarms = new ConcurrentDictionary<DateTime, clsAlarmCode>();
+        public static ConcurrentDictionary<DateTime, clsAlarmCode> CurrentAlarms = new ConcurrentDictionary<DateTime, clsAlarmCode>()
+        {
+        };
         private static SQLiteConnection db;
 
         internal static event EventHandler OnAllAlarmClear;
         public static event EventHandler OnUnRecoverableAlarmOccur;
         public static bool LoadAlarmList(string alarm_JsonFile, out string message)
         {
+            LOG.INFO("Alarm List File to load :"+alarm_JsonFile);
             message = string.Empty;
             if (File.Exists(alarm_JsonFile))
             {
                 AlarmList = JsonConvert.DeserializeObject<List<clsAlarmCode>>(File.ReadAllText(alarm_JsonFile));
-                LOG.INFO("Alarm List Loaded.");
+                LOG.INFO($"Alarm List Loaded !.{AlarmList.Count}");
                 return true;
             }
             else
@@ -77,6 +80,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         }
         public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
         {
+            LOG.WARN($"Add Alarm_{Alarm_code}");
             clsAlarmCode alarm = AlarmList.FirstOrDefault(a => a.EAlarmCode == Alarm_code);
             if (alarm == null)
             {
