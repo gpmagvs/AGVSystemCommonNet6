@@ -25,6 +25,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public taskResetReqDelegate OnTaskResetReq;
         private clsRunningStatusReportMessage lastRunningStatusDataReport = new clsRunningStatusReportMessage();
         private ManualResetEvent RunningStatusRptPause = new ManualResetEvent(true);
+        public event EventHandler OnDisconnected;
         public bool UseWebAPI = false;
         public enum MESSAGE_TYPE
         {
@@ -90,44 +91,57 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-        public void Start()
+        public async Task<bool> Start()
         {
-            Thread thread = new Thread(() =>
+            await Task.Delay(1).ContinueWith(t =>
             {
-                while (true)
+                Thread thread = new Thread(() =>
                 {
-                    Thread.Sleep(1000);
-                    if (!IsConnected())
+                    int disconnect_cnt = 0;
+                    while (true)
                     {
-                        Connect();
-                        continue;
-                    }
-                    (bool, OnlineModeQueryResponse onlineModeQuAck) result = TryOnlineModeQueryAsync().Result;
-                    if (!result.Item1)
-                    {
-                        LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
-                        continue;
-                    }
-                    else
-                    {
-                        // LOG.TRACE($" OnlineMode Query Done=>Remote Mode : {result.onlineModeQuAck.RemoteMode}");
-                    }
-                    Task.Factory.StartNew(() =>
-                    {
-                        RunningStatusRptPause.WaitOne();
-                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
-                        if (!runningStateReport_result.Item1)
-                            LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                        Thread.Sleep(1000);
+                        if (!IsConnected())
+                        {
+                            Connect();
+                            continue;
+                        }
+                        (bool, OnlineModeQueryResponse onlineModeQuAck) result = TryOnlineModeQueryAsync().Result;
+                        if (!result.Item1)
+                        {
+                            LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
+                            disconnect_cnt += 1;
+                            if (disconnect_cnt > 10)
+                            {
+                                Disconnect();
+                                disconnect_cnt = 0;
+                                OnDisconnected?.Invoke(this, EventArgs.Empty);
+                            }
+                            continue;
+                        }
                         else
                         {
-                            // LOG.TRACE($" RunningState Report Done=> ReturnCode: {runningStateReport_result.runningStateReportAck.ReturnCode}");
+                            disconnect_cnt = 0;
+                            // LOG.TRACE($" OnlineMode Query Done=>Remote Mode : {result.onlineModeQuAck.RemoteMode}");
                         }
-                    });
+                        Task.Factory.StartNew(() =>
+                        {
+                            RunningStatusRptPause.WaitOne();
+                            (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
+                            if (!runningStateReport_result.Item1)
+                                LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                            else
+                            {
+                                // LOG.TRACE($" RunningState Report Done=> ReturnCode: {runningStateReport_result.runningStateReportAck.ReturnCode}");
+                            }
+                        });
 
-                }
+                    }
+                });
+                thread.IsBackground = false;
+                thread.Start();
             });
-            thread.IsBackground = false;
-            thread.Start();
+            return true;
         }
 
         public void PauseRunningStatusReport()
@@ -177,13 +191,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
                 catch (Exception ex)
                 {
-                    tcpClient.Dispose();
+                    tcpClient?.Dispose();
                     tcpClient = null;
                 }
             }
             catch (Exception)
             {
-                tcpClient.Dispose();
+                tcpClient?.Dispose();
                 tcpClient = null;
             }
 
@@ -242,13 +256,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public override void Disconnect()
         {
             tcpClient?.Dispose();
+            tcpClient = null;
         }
 
         public override bool IsConnected()
         {
             if (UseWebAPI)
                 return true;
-            return tcpClient != null && tcpClient.Connected;
+            if (tcpClient == null)
+                return false;
+            return tcpClient.Connected;
         }
 
 

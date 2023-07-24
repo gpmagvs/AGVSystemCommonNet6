@@ -101,6 +101,12 @@ namespace AGVSystemCommonNet6.Tools.Database
             });
             InsertUser(new UserEntity
             {
+                Role = ERole.Developer,
+                UserName = "DEV",
+                Password = "12345678"
+            });
+            InsertUser(new UserEntity
+            {
                 Role = ERole.GOD,
                 UserName = "GOD",
                 Password = "66669999"

@@ -37,12 +37,13 @@ namespace AGVSystemCommonNet6.MAP.Converter
                     Enable = true,
                     Name = sub.Name,
                     SubMap = subMap.MapName,
-                    StationType = STATION_TYPE.Normal,
-                    TagNumber = subMap.Mapsub.ToList().IndexOf(sub) + 1,
-                    X = sub.x * subMap.MapScale,
-                    Y = sub.y * subMap.MapScale,
+                    StationType = STATION_TYPE.Normal,                    
+                    //TagNumber = subMap.Mapsub.ToList().IndexOf(sub) + 1,
+                    TagNumber = Convert.ToInt32(sub.Name),
+                    X = sub.x,
+                    Y = sub.y,
                     Direction = (int)sub.theta,
-                    Target = FindIndexOfTargetPoints(subMap, sub).ToDictionary(index => index , index => 1.0),
+                    Target = FindIndexOfTargetPoints(subMap, sub).ToDictionary(index => index, index => 1.0),
                     Graph = new Graph() { X = (int)sub.x, Y = (int)sub.y, Display = sub.Name },
                     AutoDoor = new AutoDoor()
                     {
