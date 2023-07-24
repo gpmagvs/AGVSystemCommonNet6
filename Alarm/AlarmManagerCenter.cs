@@ -232,22 +232,11 @@ namespace AGVSystemCommonNet6.Alarm
                     count = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime).Count();
                     int skipindex = (currentpage - 1) * 10;
                     alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime && alarm.Equipment_Name == AGV_Name).Skip(skipindex).Take(10).ToList();
-                    
                 }
             }
         }
         
-        public static void QueryAlarm(out int count,  int currentpage, out List<clsAlarmDto> firstPageAlarms)
-        {
-            
-            firstPageAlarms = new List<clsAlarmDto>();
-            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
-            {
-                 count = dbhelper._context.Set<clsAlarmDto>().Count();
-                int skipindex = (currentpage - 1) * 10;
-                firstPageAlarms = dbhelper._context.Set<clsAlarmDto>().Skip(skipindex).Take(10).ToList();
-            }
-        }
+        
 
     }
 }
