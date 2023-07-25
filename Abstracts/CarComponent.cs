@@ -5,14 +5,17 @@ using RosSharp.RosBridgeClient;
 
 namespace AGVSystemCommonNet6.Abstracts
 {
-    public abstract class CarComponent: AGVAlarmReportable
+    /// <summary>
+    /// 車控發佈的 module_information 各元件狀態
+    /// </summary>
+    public abstract class CarComponent : AGVAlarmReportable
     {
         public enum COMPOENT_NAME
         {
             BATTERY, DRIVER, IMU, BARCODE_READER, GUID_SENSOR, CST_READER,
             NAVIGATION,
-            SICK,
-            FORK
+            VERTIVAL_DRIVER,
+            SICK
         }
         public enum STATE
         {
@@ -23,9 +26,17 @@ namespace AGVSystemCommonNet6.Abstracts
 
         public CarComponent()
         {
-
+            AGVAlarmReportable.OnAlarmResetAsNoneRequest += AGVAlarmReportable_OnAlarmResetAsNoneRequest;
         }
 
+        private void AGVAlarmReportable_OnAlarmResetAsNoneRequest(object? sender, EventArgs e)
+        {
+            OnAlarmResetHandle();
+        }
+        public virtual  void OnAlarmResetHandle()
+        {
+
+        }
         private Message _StateData;
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
@@ -46,7 +57,7 @@ namespace AGVSystemCommonNet6.Abstracts
                 lastUpdateTime = DateTime.Now;
             }
         }
-       
+
 
         public abstract void CheckStateDataContent();
     }
