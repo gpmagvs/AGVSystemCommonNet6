@@ -10,6 +10,30 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
 {
     public abstract class AGVAlarmReportable
     {
+        public static event EventHandler OnAlarmResetAsNoneRequest;
+        public AGVAlarmReportable()
+        {
+            OnAlarmResetAsNoneRequest += AGVAlarmReportable_OnAlarmResetAsNoneRequest;
+        }
+
+        private void AGVAlarmReportable_OnAlarmResetAsNoneRequest(object? sender, EventArgs e)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                if (_current_alarm_code != AlarmCodes.None)
+                    AlarmManager.ClearAlarm(_current_alarm_code);
+                if (_current_warning_code != AlarmCodes.None)
+                    AlarmManager.ClearAlarm(_current_warning_code);
+                _current_alarm_code = AlarmCodes.None;
+                _current_warning_code = AlarmCodes.None;
+            });
+        }
+
+        public static void ResetAlarmCodes()
+        {
+            OnAlarmResetAsNoneRequest?.Invoke("", EventArgs.Empty);
+        }
+
         public STATE CurrentAlarmState { get; private set; }
         public abstract string alarm_locate_in_name { get; }
 

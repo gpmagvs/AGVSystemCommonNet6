@@ -31,7 +31,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             }
             else
             {
-                message = "Alarm list not Loaded yet...Please confirm your file path setting(VCS:AlarmList_json_Path)";
+                message = $"Alarm List Load Fail ,File isn't exist {alarm_JsonFile}";
                 LOG.WARN(message);
                 return false;
             }

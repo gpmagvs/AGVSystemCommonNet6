@@ -20,8 +20,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
     public class clsTaskDownloadData
     {
-        public delegate (int tag, double locx, double locy, double theta) OnCurrentPoseReqDelegate();
-        public static OnCurrentPoseReqDelegate OnCurrentPoseReq;
         [JsonProperty("Task Name")]
         public string Task_Name { get; set; }
 
@@ -86,13 +84,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         {
             try
             {
-                if (OnCurrentPoseReq != null)
-                {
-                    (int tag, double locx, double locy, double theta) currentPos = OnCurrentPoseReq();
-                    //LOG.INFO($"[RosTaskCommandGoal] Gen RosTaskCommandGoal,Current Pose=>Tag:{currentPos.tag}," +
-                    //$"X:{currentPos.locx},Y:{currentPos.locy},Theta:{currentPos.theta}");
-                }
-
                 clsMapPoint[] _ExecutingTrajecory = new clsMapPoint[0];
                 _ExecutingTrajecory = taskData.ExecutingTrajecory;
                 if (taskData.ExecutingTrajecory.Length == 0)
