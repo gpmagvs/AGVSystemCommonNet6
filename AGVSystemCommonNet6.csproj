@@ -24,4 +24,8 @@
     <ProjectReference Include="..\RosBridgeClient\RosBridgeClient.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="GPMRosMessageNet\Sick_Safetyscanners\" />
+  </ItemGroup>
+
 </Project>
