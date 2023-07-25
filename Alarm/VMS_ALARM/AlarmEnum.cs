@@ -369,5 +369,6 @@
         Handshake_Fail_AGV_DOWN = 860017,
         Motion_control_Wrong_Unknown_Code = 860018,
         UserAbort_Initialize_Process = 860019,
+        Sick_Lidar_Communication_Error = 860020,
     }
 }
