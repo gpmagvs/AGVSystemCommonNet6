@@ -8,7 +8,10 @@ namespace AGVSystemCommonNet6
     {
         public enum AGV_TYPE
         {
-            FORK, SUBMERGED_SHIELD,INSPECTION_AGV
+            FORK,
+            SUBMERGED_SHIELD,
+            INSPECTION_AGV,
+            UNKNOWN
         }
         public enum OPERATOR_MODE
         {
@@ -28,7 +31,7 @@ namespace AGVSystemCommonNet6
         {
             FORK_AGV,
             YUNTECH_FORK_AGV,
-            UNKNOWN=999
+            UNKNOWN = 999
         }
 
         public enum ONLINE_STATE

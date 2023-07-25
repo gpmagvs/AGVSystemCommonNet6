@@ -30,7 +30,7 @@ namespace AGVSystemCommonNet6.DATABASE
         /// </summary>
         /// <param name="AGVStateDto"></param>
         /// <returns></returns>
-        public int Add(clsAGVStateDto AGVStateDto)
+        public async Task<int> Add(clsAGVStateDto AGVStateDto)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace AGVSystemCommonNet6.DATABASE
                 {
                     Console.WriteLine($"{JsonConvert.SerializeObject(AGVStateDto, Formatting.Indented)}");
                     dbhelper._context.Set<clsAGVStateDto>().Add(AGVStateDto);
-                    int ret = dbhelper._context.SaveChanges();
+                    int ret = await dbhelper._context.SaveChangesAsync();
                     return ret;
                 }
             }
@@ -53,9 +53,9 @@ namespace AGVSystemCommonNet6.DATABASE
             }
         }
 
-        public bool UpdateBatteryLevel(string agv_name, double batteryLevel, out string errorMesg)
+        public async Task<(bool confirm, string errorMesg)> UpdateBatteryLevel(string agv_name, double batteryLevel)
         {
-            errorMesg = string.Empty;
+            string errorMesg = string.Empty;
             try
             {
                 using (var dbhelper = new DbContextHelper(connection_str))
@@ -64,24 +64,23 @@ namespace AGVSystemCommonNet6.DATABASE
                     if (agvState != null)
                     {
                         agvState.BatteryLevel = batteryLevel;
-                        int ret = dbhelper._context.SaveChanges();
+                        int ret = await dbhelper._context.SaveChangesAsync();
 
-                        return true;
+                        return (true, "");
                     }
                     else
-                        return false;
+                        return (false, "Can't Get AGV Data");
                 }
             }
             catch (Exception ex)
             {
-                errorMesg = ex.Message;
-                return false;
+                return (false, ex.Message);
             }
         }
 
-        public bool Update(clsAGVStateDto AGVStateDto, out string errorMesg)
+        public async Task<(bool confirm, string errorMesg)> Update(clsAGVStateDto AGVStateDto)
         {
-            errorMesg = string.Empty;
+
             try
             {
                 using (var dbhelper = new DbContextHelper(connection_str))
@@ -90,7 +89,7 @@ namespace AGVSystemCommonNet6.DATABASE
                     if (agvState != null)
                     {
                         if (JsonConvert.SerializeObject(agvState) == JsonConvert.SerializeObject(AGVStateDto))
-                            return true;
+                            return (true, "");
 
                         agvState.AGV_Description = AGVStateDto.AGV_Description;
                         agvState.Model = AGVStateDto.Model;
@@ -104,20 +103,18 @@ namespace AGVSystemCommonNet6.DATABASE
                         agvState.TaskRunAction = AGVStateDto.TaskRunAction;
                         agvState.Theta = AGVStateDto.Theta;
                         agvState.Connected = AGVStateDto.Connected;
-
                     }
                     else
                     {
                         Add(AGVStateDto);
                     }
-                    int ret = dbhelper._context.SaveChanges();
+                    int ret = await dbhelper._context.SaveChangesAsync();
                 }
-                return true;
+                return (true, "");
             }
             catch (Exception ex)
             {
-                errorMesg = ex.Message;
-                return false;
+                return (false, ex.Message);
             }
         }
 
@@ -136,7 +133,7 @@ namespace AGVSystemCommonNet6.DATABASE
             {
                 clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == name);
                 agvState.Connected = value;
-                dbhelper._context.SaveChanges();
+                dbhelper._context.SaveChangesAsync();
             }
         }
 
@@ -149,7 +146,7 @@ namespace AGVSystemCommonNet6.DATABASE
                     agv_status.OnlineStatus = clsEnums.ONLINE_STATE.OFFLINE;
                     agv_status.Connected = false;
                 }
-                dbhelper._context.SaveChanges();
+                dbhelper._context.SaveChangesAsync();
             }
         }
     }

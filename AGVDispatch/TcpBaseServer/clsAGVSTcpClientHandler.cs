@@ -8,6 +8,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSTcpServer
     {
+        public override string alarm_locate_in_name => "AGVS_TCP_Serverb";
+
         public class clsAGVSTcpClientHandler
         {
             public class clsMsgSendEventArg : EventArgs
