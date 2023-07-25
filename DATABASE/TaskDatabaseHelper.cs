@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.TASK;
 using Newtonsoft.Json;
@@ -155,6 +156,26 @@ namespace AGVSystemCommonNet6.DATABASE
         public void SaveChanges()
         {
             dbhelper._context.SaveChanges();
+        }
+        public static void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsTaskDto> Task)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                Task = new List<clsTaskDto>();
+                if (AGV_Name == "ALL")
+                {
+                    count = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Count();
+                    int skipindex = (currentpage - 1) * 10;
+                    Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Skip(skipindex).Take(10).ToList();
+
+                }
+                else
+                {
+                    count = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Count();
+                    int skipindex = (currentpage - 1) * 10;
+                    Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime && Task.DesignatedAGVName == AGV_Name).Skip(skipindex).Take(10).ToList();
+                }
+            }
         }
     }
 }
