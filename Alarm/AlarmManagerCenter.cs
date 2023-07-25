@@ -186,7 +186,6 @@ namespace AGVSystemCommonNet6.Alarm
                         UpdateAlarm(alarm);
                     }
                 }
-
             }
 
         }
