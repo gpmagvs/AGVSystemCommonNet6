@@ -106,6 +106,7 @@ namespace AGVSystemCommonNet6.DATABASE
                     }
                     else
                     {
+                        AGVStateDto.Enabled = true;
                         Add(AGVStateDto);
                     }
                     int ret = await dbhelper._context.SaveChangesAsync();

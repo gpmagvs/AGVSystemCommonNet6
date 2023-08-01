@@ -30,7 +30,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         ACTION_START = 3,
         ACTION_FINISH = 4,
         WAIT,
-        FAILURE
+        FAILURE,
+        CANCEL
     }
 
     public enum ACTION_TYPE
