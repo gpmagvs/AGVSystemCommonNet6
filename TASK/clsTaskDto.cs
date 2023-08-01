@@ -32,6 +32,9 @@ namespace AGVSystemCommonNet6.TASK
                         return "完成";
                     case TASK_RUN_STATUS.FAILURE:
                         return "失敗";
+
+                    case TASK_RUN_STATUS.CANCEL:
+                        return "取消";
                     default:
                         return "等待";
                 }

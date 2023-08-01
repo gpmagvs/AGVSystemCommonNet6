@@ -42,11 +42,12 @@ namespace AGVSystemCommonNet6.DATABASE
             }
         }
 
-        public List<clsTaskDto> GetALLCompletedTask()
+        public List<clsTaskDto> GetALLCompletedTask(int num = 20)
         {
             using (var dbhelper = new DbContextHelper(connection_str))
             {
-                var incompleteds = dbhelper._context.Set<clsTaskDto>().Where(tsk => tsk.State == TASK_RUN_STATUS.ACTION_FINISH | tsk.State == TASK_RUN_STATUS.FAILURE).OrderByDescending(t => t.RecieveTime).ToList();
+                TASK_RUN_STATUS[] endTaskSTatus = new TASK_RUN_STATUS[] { TASK_RUN_STATUS.FAILURE, TASK_RUN_STATUS.CANCEL, TASK_RUN_STATUS.ACTION_FINISH, TASK_RUN_STATUS.NO_MISSION };
+                var incompleteds = dbhelper._context.Set<clsTaskDto>().Where(tsk => endTaskSTatus.Contains(tsk.State)).OrderByDescending(t => t.RecieveTime).Take(num).ToList();
                 return incompleteds;
             }
         }
@@ -108,7 +109,7 @@ namespace AGVSystemCommonNet6.DATABASE
             }
         }
 
-       
+
         public bool DeleteTask(string task_name)
         {
             try
@@ -116,7 +117,10 @@ namespace AGVSystemCommonNet6.DATABASE
                 clsTaskDto? taskExist = dbhelper._context.Set<clsTaskDto>().FirstOrDefault(tsk => tsk.TaskName == task_name);
                 if (taskExist != null)
                 {
-                    dbhelper._context.Set<clsTaskDto>().Remove(taskExist);
+                    taskExist.State = TASK_RUN_STATUS.CANCEL;
+                    taskExist.RecieveTime = DateTime.Now;
+                    taskExist.FinishTime = DateTime.Now;
+                    taskExist.FailureReason = "User Canceled";
                     dbhelper._context.SaveChanges();
                 }
                 return true;
@@ -175,6 +179,25 @@ namespace AGVSystemCommonNet6.DATABASE
                     int skipindex = (currentpage - 1) * 10;
                     Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime && Task.DesignatedAGVName == AGV_Name).Skip(skipindex).Take(10).ToList();
                 }
+            }
+        }
+
+        public TASK_RUN_STATUS GetTaskStateByID(string taskName)
+        {
+            try
+            {
+                using (var dbhelper = new DbContextHelper(connection_str))
+                {
+                    var taskDto = dbhelper._context.Set<clsTaskDto>().FirstOrDefault(tk => tk.TaskName == taskName);
+                    if (taskDto != null)
+                        return taskDto.State;
+                    else
+                        return TASK_RUN_STATUS.CANCEL;
+                }
+            }
+            catch (Exception ex)
+            {
+                return TASK_RUN_STATUS.CANCEL;
             }
         }
     }
