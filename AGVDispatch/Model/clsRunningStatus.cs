@@ -8,27 +8,6 @@ using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.AGVDispatch.Model
 {
-    public class clsCoordination
-    {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Theta { get; set; }
-    }
-    public class clsAlarmCode
-    {
-        public virtual int Alarm_ID { get; set; }
-
-        /// <summary>
-        ///  1: Serious, 0: Light
-        /// </summary>
-        public virtual int Alarm_Level { get; set; }
-
-        /// <summary>
-        /// 0: Task Recoverable, other: Unrecoverable
-        /// </summary>
-        public virtual int Alarm_Category { get; set; }
-        public virtual string Alarm_Description { get; set; } = "";
-    }
 
     public class clsRunningStatus
     {
@@ -71,5 +50,45 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
 
         public virtual clsAlarmCode[] Alarm_Code { get; set; } = new clsAlarmCode[0];
         public virtual double Fork_Height { get; set; }
+
+        public clsDriverStates[] DriversStatus { get; set; } = new clsDriverStates[0];
+        public clsForkStates ForkStatus { get; set; } = new clsForkStates();
     }
+
+    public class clsDriverStates
+    {
+        public double Speed { get; set; } = 0;
+        public int Status { get; set; } = 0;
+        public int ErrorCode { get; set; } = 0;
+    }
+    public class clsForkStates
+    {
+        public double VerticalPose { get; set; } = 0;
+        public double HorizonPose { get; set; } = 0;
+        public double Tile { get; set; } = 0;
+    }
+
+    public class clsCoordination
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Theta { get; set; }
+    }
+    public class clsAlarmCode
+    {
+        public virtual int Alarm_ID { get; set; }
+
+        /// <summary>
+        ///  1: Serious, 0: Light
+        /// </summary>
+        public virtual int Alarm_Level { get; set; }
+
+        /// <summary>
+        /// 0: Task Recoverable, other: Unrecoverable
+        /// </summary>
+        public virtual int Alarm_Category { get; set; }
+        public virtual string Alarm_Description { get; set; } = "";
+    }
+
+
 }

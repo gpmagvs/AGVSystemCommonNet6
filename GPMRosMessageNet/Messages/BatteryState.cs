@@ -9,7 +9,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
     {
         public const string RosMessageName = "gpm_msgs/BatteryState";
 
-        public ushort batteryID { get; set; }
+        public ushort batteryID { get; set; } = 1;
         public sbyte state { get; set; }
         public byte errorCode { get; set; }
         public ushort Voltage { get; set; }

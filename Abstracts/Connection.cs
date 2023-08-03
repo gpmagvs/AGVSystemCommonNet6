@@ -1,6 +1,8 @@
-﻿namespace AGVSystemCommonNet6.Abstracts
+﻿using AGVSystemCommonNet6.Alarm.VMS_ALARM;
+
+namespace AGVSystemCommonNet6.Abstracts
 {
-    public abstract class Connection
+    public abstract class Connection:AGVAlarmReportable
     {
         public string IP;
         public int Port;

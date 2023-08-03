@@ -12,23 +12,26 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
     {
 
         public static List<clsAlarmCode> AlarmList { get; private set; } = new List<clsAlarmCode>();
-        public static ConcurrentDictionary<DateTime, clsAlarmCode> CurrentAlarms = new ConcurrentDictionary<DateTime, clsAlarmCode>();
+        public static ConcurrentDictionary<DateTime, clsAlarmCode> CurrentAlarms = new ConcurrentDictionary<DateTime, clsAlarmCode>()
+        {
+        };
         private static SQLiteConnection db;
 
         internal static event EventHandler OnAllAlarmClear;
         public static event EventHandler OnUnRecoverableAlarmOccur;
         public static bool LoadAlarmList(string alarm_JsonFile, out string message)
         {
+            LOG.INFO("Alarm List File to load :" + alarm_JsonFile);
             message = string.Empty;
             if (File.Exists(alarm_JsonFile))
             {
                 AlarmList = JsonConvert.DeserializeObject<List<clsAlarmCode>>(File.ReadAllText(alarm_JsonFile));
-                LOG.INFO("Alarm List Loaded.");
+                LOG.INFO($"Alarm List Loaded !.{AlarmList.Count}");
                 return true;
             }
             else
             {
-                message = "Alarm list not Loaded yet...Please confirm your file path setting(VCS:AlarmList_json_Path)";
+                message = $"Alarm List Load Fail ,File isn't exist {alarm_JsonFile}";
                 LOG.WARN(message);
                 return false;
             }
@@ -75,8 +78,18 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             CurrentAlarms.TryAdd(warning_save.Time, warning_save);
             DBhelper.InsertAlarm(warning_save);
         }
+
+        /// <summary>
+        /// 新增一筆Alarm (可復歸)
+        /// </summary>
+        /// <param name="Alarm_code"></param>
+        public static void AddAlarm(AlarmCodes Alarm_code)
+        {
+            AddAlarm(Alarm_code, true);
+        }
         public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
         {
+            LOG.WARN($"Add Alarm_{Alarm_code}");
             clsAlarmCode alarm = AlarmList.FirstOrDefault(a => a.EAlarmCode == Alarm_code);
             if (alarm == null)
             {

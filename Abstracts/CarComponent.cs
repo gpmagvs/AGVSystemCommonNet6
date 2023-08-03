@@ -1,15 +1,20 @@
 ﻿using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Alarm.VMS_ALARM;
+using AGVSystemCommonNet6.Log;
 using RosSharp.RosBridgeClient;
 
 namespace AGVSystemCommonNet6.Abstracts
 {
-    public abstract class CarComponent
+    /// <summary>
+    /// 車控發佈的 module_information 各元件狀態
+    /// </summary>
+    public abstract class CarComponent : AGVAlarmReportable
     {
         public enum COMPOENT_NAME
         {
             BATTERY, DRIVER, IMU, BARCODE_READER, GUID_SENSOR, CST_READER,
             NAVIGATION,
+            VERTIVAL_DRIVER,
             SICK
         }
         public enum STATE
@@ -17,6 +22,20 @@ namespace AGVSystemCommonNet6.Abstracts
             NORMAL,
             WARNING,
             ABNORMAL
+        }
+
+        public CarComponent()
+        {
+            AGVAlarmReportable.OnAlarmResetAsNoneRequest += AGVAlarmReportable_OnAlarmResetAsNoneRequest;
+        }
+
+        private void AGVAlarmReportable_OnAlarmResetAsNoneRequest(object? sender, EventArgs e)
+        {
+            OnAlarmResetHandle();
+        }
+        public virtual  void OnAlarmResetHandle()
+        {
+
         }
         private Message _StateData;
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
@@ -38,27 +57,8 @@ namespace AGVSystemCommonNet6.Abstracts
                 lastUpdateTime = DateTime.Now;
             }
         }
-        protected void AddAlarm(AlarmCodes alarm)
-        {
-            if (ErrorCodes.ContainsKey(alarm))
-                ErrorCodes[alarm] = DateTime.Now;
-            else
-                ErrorCodes.Add(alarm, DateTime.Now);
-        }
-        public void ClearAlarms()
-        {
-            ErrorCodes.Clear();
-        }
-        protected void RemoveAlarm(AlarmCodes alarm)
-        {
-            bool removed = ErrorCodes.Remove(alarm);
-            if (removed)
-            {
-                // Console.WriteLine($"[{alarm}] 已排除");
-            }
-        }
-        public STATE State => CheckStateDataContent();
 
-        public abstract STATE CheckStateDataContent();
+
+        public abstract void CheckStateDataContent();
     }
 }

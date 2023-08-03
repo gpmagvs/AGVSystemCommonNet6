@@ -34,11 +34,11 @@ namespace AGVSystemCommonNet6.Microservices
 
                 while (true)
                 {
+                    Thread.Sleep(1000);
                     try
                     {
                         bool hasVmsDisconnectAlarm = alarm != null;
                         (bool alive, string message) response = await VMSAliveCheck();
-
                         if (previous_alive_state != response.alive)
                         {
                             if (!response.alive)
@@ -48,7 +48,6 @@ namespace AGVSystemCommonNet6.Microservices
                                 disconnectAlarm.ResetAalrmMemberName = "";
                             }
                         }
-
                         if (!response.alive)
                         {
                             disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
@@ -64,7 +63,6 @@ namespace AGVSystemCommonNet6.Microservices
                             AlarmManagerCenter.ResetAlarm(disconnectAlarm, true);
                         }
                         previous_alive_state = response.alive;
-                        Thread.Sleep(1000);
                     }
                     catch (Exception ex)
                     {
