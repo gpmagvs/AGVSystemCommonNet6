@@ -73,7 +73,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         Auto_Door = 33,
         Elevator = 100,
         Elevator_LD = 201,
-        Elevator_ULD = 221,
+        TrayEQ= 201,
+        TrayEQ_LD = 211,
+        TrayEQ_ULD = 221,
         Unknown = 9999
     }
     public abstract class MessageBase

@@ -95,7 +95,18 @@ namespace AGVSystemCommonNet6.MAP
         {
             get
             {
-                return StationType == STATION_TYPE.STK | StationType == STATION_TYPE.EQ | StationType == STATION_TYPE.EQ_LD | StationType == STATION_TYPE.EQ_ULD;
+                return StationType == STATION_TYPE.STK |
+                    StationType == STATION_TYPE.EQ |
+                    StationType == STATION_TYPE.EQ_LD |
+                    StationType == STATION_TYPE.EQ_ULD |
+                    StationType == STATION_TYPE.STK_LD |
+                    StationType == STATION_TYPE.STK_ULD |
+                    StationType == STATION_TYPE.Fire_EQ |
+                    StationType == STATION_TYPE.Elevator |
+                    StationType == STATION_TYPE.Elevator_LD |
+                    StationType == STATION_TYPE.TrayEQ|
+                    StationType == STATION_TYPE.TrayEQ_LD |
+                    StationType == STATION_TYPE.TrayEQ_ULD ;
             }
         }
 
@@ -126,7 +137,10 @@ namespace AGVSystemCommonNet6.MAP
                    StationType == STATION_TYPE.STK_ULD |
                    StationType == STATION_TYPE.Elevator |
                    StationType == STATION_TYPE.Elevator_LD |
-                   StationType == STATION_TYPE.Elevator_ULD;
+                   StationType == STATION_TYPE.TrayEQ|
+                   StationType == STATION_TYPE.TrayEQ_LD|
+                   StationType == STATION_TYPE.TrayEQ_ULD
+                   ;
             }
         }
 
