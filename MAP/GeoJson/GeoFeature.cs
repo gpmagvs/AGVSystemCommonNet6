@@ -67,8 +67,6 @@ namespace AGVSystemCommonNet6.MAP.GeoJson
                         break;
                     case STATION_TYPE.Elevator_LD:
                         break;
-                    case STATION_TYPE.Elevator_ULD:
-                        break;
                     case STATION_TYPE.Unknown:
                         break;
                     default:
