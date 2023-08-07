@@ -21,7 +21,9 @@ namespace AGVSystemCommonNet6.MAP
             {
                 List<MapPath> GetMapPathes(MapPoint point)
                 {
-                    return point.Target.Select(kp => new MapPath() { StartPoint= point, EndPoint = Points[kp.Key] } ).ToList();
+
+                    Dictionary<int, double> targets= point.Target.ToList().FindAll(kp => Points.ContainsKey(kp.Key)).ToDictionary(kp=>kp.Key,kp=>kp.Value);
+                    return targets.Select(kp => new MapPath() { StartPoint= point, EndPoint = Points[kp.Key] } ).ToList();
                 }
                 MapPath[] pathes =Points.ToList().FindAll(point => point.Value.Target.Count != 0).SelectMany(point => GetMapPathes(point.Value)).ToArray();
                 return pathes;
