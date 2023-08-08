@@ -64,7 +64,7 @@ namespace AGVSystemCommonNet6.DATABASE
                 using (var dbhelper = new DbContextHelper(connection_str))
                 {
                     Console.WriteLine($"{JsonConvert.SerializeObject(taskState, Formatting.Indented)}");
-                    dbhelper._context.Set<clsTaskDto>().Add(taskState);
+                    dbhelper._context.Tasks.Add(taskState);
                     int ret = dbhelper._context.SaveChanges();
                     return ret;
                 }
