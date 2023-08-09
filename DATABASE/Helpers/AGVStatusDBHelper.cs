@@ -133,8 +133,12 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             using (var dbhelper = new DbContextHelper(connection_str))
             {
                 clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == name);
-                agvState.Connected = value;
-                dbhelper._context.SaveChangesAsync();
+                if (agvState != null)
+                {
+
+                    agvState.Connected = value;
+                    dbhelper._context.SaveChangesAsync();
+                }
             }
         }
 
