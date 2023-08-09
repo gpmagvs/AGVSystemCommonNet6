@@ -10,22 +10,15 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGVSystemCommonNet6.DATABASE
+namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
-    public class TaskDatabaseHelper : IDisposable
+    public class TaskDatabaseHelper : DBHelperAbstract, IDisposable
     {
-        protected readonly string connection_str;
-        protected DbContextHelper dbhelper;
         private bool disposedValue;
-        public TaskDatabaseHelper()
-        {
-            this.connection_str = AGVSConfigulator.SysConfigs.DBConnection;
-            dbhelper = new DbContextHelper(connection_str);
-        }
 
         public List<clsTaskDto> GetALL()
         {
-            var alltasks = dbhelper._context.Tasks.ToList();
+            var alltasks = dbContext.Tasks.ToList();
             return alltasks;
         }
 
@@ -100,7 +93,7 @@ namespace AGVSystemCommonNet6.DATABASE
                         }
                     }
                 }
-                dbhelper._context.SaveChanges();
+               dbContext.SaveChanges();
                 return true;
             }
             catch (Exception ex)
@@ -114,14 +107,14 @@ namespace AGVSystemCommonNet6.DATABASE
         {
             try
             {
-                clsTaskDto? taskExist = dbhelper._context.Set<clsTaskDto>().FirstOrDefault(tsk => tsk.TaskName == task_name);
+                clsTaskDto? taskExist = dbContext.Tasks.FirstOrDefault(tsk => tsk.TaskName == task_name);
                 if (taskExist != null)
                 {
                     taskExist.State = TASK_RUN_STATUS.CANCEL;
                     taskExist.RecieveTime = DateTime.Now;
                     taskExist.FinishTime = DateTime.Now;
                     taskExist.FailureReason = "User Canceled";
-                    dbhelper._context.SaveChanges();
+                    dbContext.SaveChanges();
                 }
                 return true;
             }
@@ -159,7 +152,7 @@ namespace AGVSystemCommonNet6.DATABASE
 
         public void SaveChanges()
         {
-            dbhelper._context.SaveChanges();
+            dbContext.SaveChanges();
         }
         public static void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsTaskDto> Task)
         {
@@ -199,6 +192,11 @@ namespace AGVSystemCommonNet6.DATABASE
             {
                 return TASK_RUN_STATUS.CANCEL;
             }
+        }
+
+        public List<clsTaskDto> GetTasksByTimeInterval(DateTime start, DateTime end)
+        {
+            return dbContext.Tasks.Where(tk=>tk.RecieveTime>=start && tk.FinishTime<=end).ToList();
         }
     }
 }

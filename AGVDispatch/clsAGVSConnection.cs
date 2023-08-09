@@ -18,6 +18,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         clsSocketState socketState = new clsSocketState();
         ConcurrentDictionary<int, ManualResetEvent> WaitAGVSReplyMREDictionary = new ConcurrentDictionary<int, ManualResetEvent>();
         ConcurrentDictionary<int, MessageBase> AGVSMessageStoreDictionary = new ConcurrentDictionary<int, MessageBase>();
+        bool VMS_API_Call_Fail_Flag = true;
         public delegate bool taskDonwloadExecuteDelage(clsTaskDownloadData taskDownloadData);
         public delegate bool onlineModeChangeDelelage(REMOTE_MODE mode);
         public delegate bool taskResetReqDelegate(RESET_MODE reset_data);
@@ -64,6 +65,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             try
             {
+
+
+                if (UseWebAPI)
+                    return true;
+
                 if (LocalIP != null)
                 {
                     IPEndPoint ipEndpoint = new IPEndPoint(IPAddress.Parse(LocalIP), 0);
@@ -104,10 +110,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
                         if (!IsConnected())
                         {
-                            Connect();
-                            continue;
+                            if (!UseWebAPI)
+                            {
+                                Connect();
+                                continue;
+                            }
                         }
                         (bool, OnlineModeQueryResponse onlineModeQuAck) result = TryOnlineModeQueryAsync().Result;
+
                         if (!result.Item1)
                         {
                             LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
@@ -123,6 +133,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                         else
                         {
+                            if (UseWebAPI)
+                                VMS_API_Call_Fail_Flag = false;
                             Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.None;
                             disconnect_cnt = 0;
                         }
@@ -249,7 +261,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public override bool IsConnected()
         {
             if (UseWebAPI)
-                return true;
+                return !VMS_API_Call_Fail_Flag;
             if (tcpClient == null)
                 return false;
             return tcpClient.Connected;

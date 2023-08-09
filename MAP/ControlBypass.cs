@@ -8,8 +8,8 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class ControlBypass
     {
-        public string GroundHoleCCD { get; set; }
-        public string GroundHoleSensor { get; set; }
-        public string UltrasonicSensor { get; set; }
+        public string GroundHoleCCD { get; set; } = "";
+        public string GroundHoleSensor { get; set; } = "";
+        public string UltrasonicSensor { get; set; } = "";
     }
 }

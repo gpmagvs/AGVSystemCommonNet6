@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AGVSystemCommonNet6.TASK;
 
-namespace AGVSystemCommonNet6.DATABASE
+namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
     public class DbContextHelper : IDisposable
     {

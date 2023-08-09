@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
+using AGVSystemCommonNet6.DATABASE.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;

@@ -8,7 +8,7 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class AutoDoor
     {
-        public string KeyName { get; set; }
-        public string KeyPassword { get; set; }
+        public string KeyName { get; set; } = "";
+        public string KeyPassword { get; set; } = "";
     }
 }

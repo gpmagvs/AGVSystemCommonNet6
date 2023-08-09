@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGVSystemCommonNet6.DATABASE
+namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
     public class AGVStatusDBHelper : TaskDatabaseHelper
     {
@@ -140,15 +140,12 @@ namespace AGVSystemCommonNet6.DATABASE
 
         internal void ChangeAllOffline()
         {
-            using (var dbhepler = new DbContextHelper(connection_str))
+            foreach (var agv_status in dbContext.AgvStates)
             {
-                foreach (var agv_status in dbhelper._context.AgvStates)
-                {
-                    agv_status.OnlineStatus = clsEnums.ONLINE_STATE.OFFLINE;
-                    agv_status.Connected = false;
-                }
-                dbhelper._context.SaveChangesAsync();
+                agv_status.OnlineStatus = clsEnums.ONLINE_STATE.OFFLINE;
+                agv_status.Connected = false;
             }
+            dbContext.SaveChangesAsync();
         }
     }
 }

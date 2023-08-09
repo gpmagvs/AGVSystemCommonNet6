@@ -13,7 +13,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
     {
         public string WebAPIHost => $"http://{IP}:{Port}";
 
-
         public async Task<OnlineModeQueryResponse> GetOnlineMode()
         {
             var response = await Http.GetAsync<Dictionary<string, object>>($"{WebAPIHost}/api/AGV/OnlineMode?AGVName={AGVSMessageFactory.EQName}&Model=0");
@@ -25,6 +24,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
             };
         }
 
+        public async Task<SimpleRequestResponse> PostOnlineModeChangeRequset(int currentTag, REMOTE_MODE mode)
+        {
+            string url = mode== REMOTE_MODE.ONLINE? $"{WebAPIHost}/api/AGV/OnlineReq?tag={currentTag}": $"{WebAPIHost}/api/AGV/OfflineReq";
+            var response = await Http.PostAsync<object, SimpleRequestResponse>(url, null);
+            return response;
+        }
         public async Task<SimpleRequestResponse> PostRunningStatus(clsRunningStatus status)
         {
             var response = await Http.PostAsync<clsRunningStatus, Dictionary<string, object>>($"{WebAPIHost}/api/AGV/AGVStatus?AGVName={AGVSMessageFactory.EQName}&Model=0", status);

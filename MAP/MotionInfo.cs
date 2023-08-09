@@ -8,7 +8,7 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class MotionInfo
     {
-        public ControlBypass ControlBypass { get; set; }
+        public ControlBypass ControlBypass { get; set; } = new ControlBypass();
 
     }
 }

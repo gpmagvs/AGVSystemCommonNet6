@@ -142,6 +142,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 AGVOnlineReturnCode = RETURN_CODE.No_Response;
                 WaitAGVSAcceptOnline = new ManualResetEvent(false);
+                if (UseWebAPI)
+                {
+                  
+                    SimpleRequestResponse response = await PostOnlineModeChangeRequset(currentTag, mode);
+                    return (response.ReturnCode == RETURN_CODE.OK | response.ReturnCode == RETURN_CODE.NG, response.ReturnCode);
+                }
                 byte[] data = AGVSMessageFactory.CreateOnlineModeChangeRequesData(currentTag, mode, out clsOnlineModeRequestMessage msg);
                 await WriteDataOut(data, msg.SystemBytes);
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
@@ -166,6 +172,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 if (UseWebAPI)
                 {
                     var response = await GetOnlineMode();
+                    VMS_API_Call_Fail_Flag = false;
                     return (true, response);
                 }
 
@@ -182,6 +189,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception)
             {
+                VMS_API_Call_Fail_Flag = true;
                 return (false, null);
             }
         }

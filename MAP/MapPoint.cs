@@ -13,7 +13,7 @@ namespace AGVSystemCommonNet6.MAP
     {
         public double X { get; set; }
         public double Y { get; set; }
-        public string? Name { get; set; }
+        public string? Name { get; set; } = "";
         public int TagNumber { get; set; }
         public int Direction { get; set; }
         public bool AGV_Alarm { get; set; }
@@ -55,30 +55,30 @@ namespace AGVSystemCommonNet6.MAP
         /// 註冊點(,逗點分隔)
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? InvolvePoint { get; set; }
+        public string? InvolvePoint { get; set; } = "";
         public STATION_TYPE StationType { get; set; }
         public int LsrMode { get; set; }
         public double Speed { get; set; }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? Bay { get; set; }
-        public Graph Graph { get; set; }
+        public string? Bay { get; set; } = "";
+        public Graph Graph { get; set; } = new Graph();
         /// <summary>
         /// Key Point Index, value:權重
         /// </summary>
-        public Dictionary<int, double>? Target { get; set; }
+        public Dictionary<int, double>? Target { get; set; } = new Dictionary<int, double>();
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? DodgeMode { get; set; }
+        public string? DodgeMode { get; set; } = "";
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? SpinMode { get; set; }
-        public string? SubMap { get; set; }
+        public string? SpinMode { get; set; } = "";
+        public string? SubMap { get; set; } = "";
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public AutoDoor? AutoDoor { get; set; }
+        public AutoDoor? AutoDoor { get; set; }=new AutoDoor();
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public MotionInfo? MotionInfo { get; set; }
+        public MotionInfo? MotionInfo { get; set; } = new MotionInfo();
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 
-        public string? Region { get; set; }
+        public string? Region { get; set; } = "";
 
 
         [JsonIgnore]
