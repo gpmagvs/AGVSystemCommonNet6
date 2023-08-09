@@ -157,6 +157,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         internal static Model.clsRunningStatus CreateRunningStateReportQueryData()
         {
             RunningStatus? runningData = OnVCSRunningDataRequest?.Invoke();
+
             return new Model.clsRunningStatus
             {
                 AGV_Reset_Flag = runningData.AGV_Reset_Flag,

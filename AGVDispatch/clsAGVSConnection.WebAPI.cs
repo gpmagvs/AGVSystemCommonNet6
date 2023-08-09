@@ -26,7 +26,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task<SimpleRequestResponse> PostOnlineModeChangeRequset(int currentTag, REMOTE_MODE mode)
         {
-            string url = mode== REMOTE_MODE.ONLINE? $"{WebAPIHost}/api/AGV/OnlineReq?tag={currentTag}": $"{WebAPIHost}/api/AGV/OfflineReq";
+            string url = mode== REMOTE_MODE.ONLINE? $"{WebAPIHost}/api/AGV/OnlineReq?AGVName={AGVSMessageFactory.EQName}&tag={currentTag}": $"{WebAPIHost}/api/AGV/OfflineReq?AGVName={AGVSMessageFactory.EQName}&";
             var response = await Http.PostAsync<object, SimpleRequestResponse>(url, null);
             return response;
         }

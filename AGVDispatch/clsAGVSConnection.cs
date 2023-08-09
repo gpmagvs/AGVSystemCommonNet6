@@ -66,7 +66,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
 
-
                 if (UseWebAPI)
                     return true;
 
@@ -124,9 +123,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             disconnect_cnt += 1;
                             if (disconnect_cnt > (Debugger.IsAttached ? 5 : 50))
                             {
-                                Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.None;
-                                Disconnect();
-                                disconnect_cnt = 0;
+                                if (!UseWebAPI)
+                                    Disconnect();
                                 Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_Disconnect;
                             }
                             continue;

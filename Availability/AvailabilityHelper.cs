@@ -41,7 +41,6 @@ namespace AGVSystemCommonNet6.Availability
                     }
                     AllWatchStop();
                     StateWatchers[value].Start();
-                    previousMainState = value;
                     currentAvailability.StartTime = DateTime.Now;
                     currentAvailability.Main_Status = value;
                 }
@@ -50,6 +49,7 @@ namespace AGVSystemCommonNet6.Availability
                     currentAvailability.EndTime = DateTime.Now;
                     UpdateRealTimeAvailbilityToDataBase(currentAvailability);
                 }
+                previousMainState = value;
             }
         }
 
@@ -117,23 +117,32 @@ namespace AGVSystemCommonNet6.Availability
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"{typeof(AGVStatusDBHelper).Name}" + ex.Message);
+
             }
         }
 
-        private void UpdateRealTimeAvailbilityToDataBase(RTAvailabilityDto currentAvailability)
+        private async void UpdateRealTimeAvailbilityToDataBase(RTAvailabilityDto currentAvailability)
         {
-            using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            try
             {
-                var currentData = aGVSDbContext._context.RealTimeAvailabilitys.FirstOrDefault(data => data.AGVName == currentAvailability.AGVName && data.StartTime == currentAvailability.StartTime);
-                if (currentData == null)
+                using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
-                    aGVSDbContext._context.RealTimeAvailabilitys.Add(currentAvailability);
+                    var currentData = aGVSDbContext._context.RealTimeAvailabilitys.FirstOrDefault(data => data.AGVName == currentAvailability.AGVName && data.StartTime == currentAvailability.StartTime);
+                    if (currentData == null)
+                    {
+                        aGVSDbContext._context.RealTimeAvailabilitys.Add(currentAvailability);
+                    }
+                    else
+                    {
+                        currentData.EndTime = currentAvailability.EndTime;
+                    }
+                    var ret = aGVSDbContext._context.SaveChanges();
                 }
-                else
-                {
-                    currentData.EndTime = currentAvailability.EndTime;
-                }
-                var ret = aGVSDbContext._context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} "+ex.Message);
             }
         }
 
@@ -149,7 +158,8 @@ namespace AGVSystemCommonNet6.Availability
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} " + ex.Message);
+
                 }
             }
         }
