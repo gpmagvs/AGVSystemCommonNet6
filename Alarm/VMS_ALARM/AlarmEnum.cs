@@ -370,5 +370,7 @@
         Motion_control_Wrong_Unknown_Code = 860018,
         UserAbort_Initialize_Process = 860019,
         Sick_Lidar_Communication_Error = 860020,
+        Fork_WorkStation_Teach_Data_Not_Found_Tag = 860021,
+        Fork_WorkStation_Teach_Data_Not_Found_layer = 860022,
     }
 }
