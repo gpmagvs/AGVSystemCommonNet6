@@ -372,5 +372,6 @@
         Sick_Lidar_Communication_Error = 860020,
         Fork_WorkStation_Teach_Data_Not_Found_Tag = 860021,
         Fork_WorkStation_Teach_Data_Not_Found_layer = 860022,
+        Fork_Arm_Pose_Error = 860023,
     }
 }
