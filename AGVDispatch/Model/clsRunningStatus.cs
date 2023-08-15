@@ -51,6 +51,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         public virtual clsAlarmCode[] Alarm_Code { get; set; } = new clsAlarmCode[0];
         public virtual double Fork_Height { get; set; }
 
+        public int CargoType { get; set; } = 0; // 0:tray, 1:rack
+
         public clsDriverStates[] DriversStatus { get; set; } = new clsDriverStates[0];
         public clsForkStates ForkStatus { get; set; } = new clsForkStates();
     }

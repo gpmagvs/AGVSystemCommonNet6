@@ -24,6 +24,14 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
         }
 
+        public clsAGVStateDto GetAGVStateByName(string agv_name)
+        {
+
+            using (var dbhelper = new DbContextHelper(connection_str))
+            {
+                return dbhelper._context.AgvStates.Where(agv => agv.AGV_Name == agv_name).First();
+            }
+        }
 
         /// <summary>
         /// 新增一筆AGV狀態資料
