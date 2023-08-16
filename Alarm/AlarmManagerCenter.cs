@@ -214,29 +214,24 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        public static void  Query(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsAlarmDto> alarms)
+        public static void AlarmQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, out List<clsAlarmDto> alarms)
         {
-
+            count = 0;
+            alarms = new List<clsAlarmDto>();
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                alarms= new List<clsAlarmDto>();
-                if (AGV_Name == "ALL")
-                {
-                    count = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime).Count();
-                    int skipindex = (currentpage - 1) * 10;
-                    alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime).Skip(skipindex).Take(10).ToList();
-                    
-                }
-                else
-                {
-                    count = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime).Count();
-                    int skipindex = (currentpage - 1) * 10;
-                    alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime && alarm.Equipment_Name == AGV_Name).Skip(skipindex).Take(10).ToList();
-                }
-            }
-        }
-        
-        
+                var _alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
+                                    && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name)) && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
+                );
+                count = _alarms.Count();
+                alarms = _alarms.Skip((currentpage - 1) * 15).Take(15).ToList();
 
+                //var folder = Path.Combine(Environment.CurrentDirectory, "wwwroot/images");
+                //List<string> list = _alarms.Select(alarm => $"{alarm.Time},{alarm.Task_Name}").ToList();
+                //File.WriteAllLines(Path.Combine(folder, "test.csv"), list, Encoding.UTF8);
+            };
+
+        }
     }
+
 }
