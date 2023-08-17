@@ -20,7 +20,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         ConcurrentDictionary<int, MessageBase> AGVSMessageStoreDictionary = new ConcurrentDictionary<int, MessageBase>();
         bool VMS_API_Call_Fail_Flag = true;
         public delegate bool taskDonwloadExecuteDelage(clsTaskDownloadData taskDownloadData);
-        public delegate bool onlineModeChangeDelelage(REMOTE_MODE mode);
+        public delegate bool onlineModeChangeDelelage(REMOTE_MODE mode, bool isAGVSRequest);
         public delegate bool taskResetReqDelegate(RESET_MODE reset_data);
         public event EventHandler<clsTaskDownloadData> OnTaskDownloadFeekbackDone;
         public taskDonwloadExecuteDelage OnTaskDownload;

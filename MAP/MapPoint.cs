@@ -73,7 +73,7 @@ namespace AGVSystemCommonNet6.MAP
         public string? SpinMode { get; set; } = "";
         public string? SubMap { get; set; } = "";
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public AutoDoor? AutoDoor { get; set; }=new AutoDoor();
+        public AutoDoor? AutoDoor { get; set; } = new AutoDoor();
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public MotionInfo? MotionInfo { get; set; } = new MotionInfo();
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -104,9 +104,9 @@ namespace AGVSystemCommonNet6.MAP
                     StationType == STATION_TYPE.Fire_EQ |
                     StationType == STATION_TYPE.Elevator |
                     StationType == STATION_TYPE.Elevator_LD |
-                    StationType == STATION_TYPE.TrayEQ|
+                    StationType == STATION_TYPE.TrayEQ |
                     StationType == STATION_TYPE.TrayEQ_LD |
-                    StationType == STATION_TYPE.TrayEQ_ULD ;
+                    StationType == STATION_TYPE.TrayEQ_ULD;
             }
         }
 
@@ -137,8 +137,8 @@ namespace AGVSystemCommonNet6.MAP
                    StationType == STATION_TYPE.STK_ULD |
                    StationType == STATION_TYPE.Elevator |
                    StationType == STATION_TYPE.Elevator_LD |
-                   StationType == STATION_TYPE.TrayEQ|
-                   StationType == STATION_TYPE.TrayEQ_LD|
+                   StationType == STATION_TYPE.TrayEQ |
+                   StationType == STATION_TYPE.TrayEQ_LD |
                    StationType == STATION_TYPE.TrayEQ_ULD
                    ;
             }
@@ -175,6 +175,7 @@ namespace AGVSystemCommonNet6.MAP
             };
             registInfo = RegistInfo;
             IsRegisted = true;
+            Console.WriteLine($"{AGVName} Regist Tag_{TagNumber}");
             return true;
         }
 

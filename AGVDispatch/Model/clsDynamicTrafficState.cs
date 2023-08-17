@@ -22,9 +22,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         }
         public Dictionary<string, clsAGVTrafficState> AGVTrafficStates { get; set; } = new Dictionary<string, clsAGVTrafficState>();
         public List<MapPoint> RegistedPoints { get; set; } = new List<MapPoint>();
-        public TRAFFIC_ACTION GetTrafficStatusByTag(string name, int tagNumber)
+        public TRAFFIC_ACTION GetTrafficStatusByTag(string agv_name, int tagNumber)
         {
-            if (!AGVTrafficStates.TryGetValue(name, out clsAGVTrafficState agv_state))
+            if (!AGVTrafficStates.TryGetValue(agv_name, out clsAGVTrafficState agv_state))
                 return TRAFFIC_ACTION.WAIT;
 
             MapPoint? toPoint = RegistedPoints.FirstOrDefault(pt => pt.TagNumber == tagNumber);
@@ -35,9 +35,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
 
             if (toPoint.IsRegisted)
             {
-                if (toPoint.RegistInfo.RegisterAGVName != name)
+                if (toPoint.RegistInfo.RegisterAGVName != agv_name)
                 {
-                    LOG.Critical($"{name} _ {toPoint.Name} is registed, wait a moment ..");
                     return TRAFFIC_ACTION.WAIT;
                 }
                 else
