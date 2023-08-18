@@ -21,7 +21,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         bool VMS_API_Call_Fail_Flag = true;
         public delegate bool taskDonwloadExecuteDelage(clsTaskDownloadData taskDownloadData);
         public delegate bool onlineModeChangeDelelage(REMOTE_MODE mode, bool isAGVSRequest);
-        public delegate bool taskResetReqDelegate(RESET_MODE reset_data);
+        public delegate bool taskResetReqDelegate(RESET_MODE reset_data, bool isNormal);
         public event EventHandler<clsTaskDownloadData> OnTaskDownloadFeekbackDone;
         public taskDonwloadExecuteDelage OnTaskDownload;
         public onlineModeChangeDelelage OnRemoteModeChanged;
