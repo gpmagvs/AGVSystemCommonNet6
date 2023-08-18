@@ -56,6 +56,10 @@ namespace AGVSystemCommonNet6.MAP
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? InvolvePoint { get; set; } = "";
+        /// <summary>
+        /// 新版的註冊點屬性
+        /// </summary>
+        public int[] RegistsPointIndexs { get; set; } = new int[0];
         public STATION_TYPE StationType { get; set; }
         public int LsrMode { get; set; }
         public double Speed { get; set; }
