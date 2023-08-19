@@ -190,6 +190,8 @@ namespace AGVSystemCommonNet6.MAP
                 return true;
             if (name == "System" | RegistInfo.RegisterAGVName == name)
             {
+                Console.WriteLine($"{name} UnRegist Tag_{TagNumber}");
+
                 IsRegisted = false;
                 RegistInfo = null;
                 return true;
