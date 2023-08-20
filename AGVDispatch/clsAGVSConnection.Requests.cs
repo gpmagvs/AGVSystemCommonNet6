@@ -38,7 +38,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         if (UseWebAPI)
                         {
                             SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(msg.Header.Values.First()));
-                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
+                            //LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
                             return;
                         }
                         else
@@ -47,7 +47,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase _retMsg))
                             {
                                 clsSimpleReturnMessage msg_return = (clsSimpleReturnMessage)_retMsg;
-                                LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {msg_return.ReturnData.ReturnCode}");
+                                LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {msg_return.ReturnData.ReturnCode}", false);
                                 break;
                             }
                             else
@@ -144,7 +144,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 WaitAGVSAcceptOnline = new ManualResetEvent(false);
                 if (UseWebAPI)
                 {
-                  
+
                     SimpleRequestResponse response = await PostOnlineModeChangeRequset(currentTag, mode);
                     return (response.ReturnCode == RETURN_CODE.OK | response.ReturnCode == RETURN_CODE.NG, response.ReturnCode);
                 }

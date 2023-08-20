@@ -53,7 +53,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         ExchangeBattery,
         Hold,
         Break,
-
+        Unknown,
     }
     public enum STATION_TYPE : int
     {

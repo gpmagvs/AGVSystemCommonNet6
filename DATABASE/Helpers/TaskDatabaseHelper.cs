@@ -185,12 +185,12 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     if (taskDto != null)
                         return taskDto.State;
                     else
-                        return TASK_RUN_STATUS.CANCEL;
+                        return TASK_RUN_STATUS.WAIT;
                 }
             }
             catch (Exception ex)
             {
-                return TASK_RUN_STATUS.CANCEL;
+                return TASK_RUN_STATUS.WAIT;
             }
         }
 
