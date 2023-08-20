@@ -142,7 +142,7 @@ namespace AGVSystemCommonNet6.Availability
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} "+ex.Message);
+                Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} " + ex.Message);
             }
         }
 
@@ -152,8 +152,16 @@ namespace AGVSystemCommonNet6.Availability
             {
                 try
                 {
+                    var exist_data = aGVSDbContext._context.RealTimeAvailabilitys.FirstOrDefault(ad => ad.AGVName == currentAvailability.AGVName && ad.StartTime == currentAvailability.StartTime);
+                    if (exist_data == null)
+                    {
 
-                    aGVSDbContext._context.RealTimeAvailabilitys.Add(currentAvailability);
+                        aGVSDbContext._context.RealTimeAvailabilitys.Add(currentAvailability);
+                    }
+                    else
+                    {
+                        exist_data.EndTime = currentAvailability.EndTime;
+                    }
                     aGVSDbContext._context.SaveChanges();
                 }
                 catch (Exception ex)

@@ -32,6 +32,10 @@ namespace AGVSystemCommonNet6
 
         public TASK_RUN_STATUS TaskRunStatus { get; set; }
         public ACTION_TYPE TaskRunAction { get; set; }
+        /// <summary>
+        /// 當前執行的任務動作
+        /// </summary>
+        public ACTION_TYPE CurrentAction { get; set; }
 
         public double Theta { get; set; }
     }
