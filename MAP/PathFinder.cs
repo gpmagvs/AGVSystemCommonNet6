@@ -138,8 +138,6 @@ namespace AGVSystemCommonNet6.MAP
 
                 var source = startIndex;
                 DijkstraAlgorithm(graph, source, out int[] distance, out int[] parent);
-                Console.WriteLine("From Tag\tTo Tag\tDistance from Source\tPath(Tag)");
-                Console.Write($"{_startStation.TagNumber}\t{_endStation.TagNumber}\t{distance[finalIndex]}\t");
 
                 var dist = distance[finalIndex];
                 if (dist < 0)
@@ -160,8 +158,6 @@ namespace AGVSystemCommonNet6.MAP
                     node = parent[node];
                 }
                 pathinfo.stations.Insert(0, staions_ordered[source].Value);
-                Console.WriteLine(string.Join(" -> ", pathinfo.tags));
-
                 return pathinfo;
             }
             catch (Exception ex)
