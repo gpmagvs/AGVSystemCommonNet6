@@ -374,5 +374,6 @@
         Fork_WorkStation_Teach_Data_Not_Found_layer = 860022,
         Fork_Arm_Pose_Error = 860023,
         Destine_Point_Is_Virtual_Point = 860024,
+        Fork_Frontend_has_Obstacle= 860025,
     }
 }

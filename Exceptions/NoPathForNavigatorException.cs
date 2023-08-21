@@ -12,6 +12,6 @@ namespace AGVSystemCommonNet6.Exceptions
         {
         }
 
-        public override ALARMS Alarm_Code => ALARMS.TRAFFIC_BLOCKED_NO_PATH_FOR_NAVIGATOR;
+        public override ALARMS Alarm_Code { get; set; } = ALARMS.TRAFFIC_BLOCKED_NO_PATH_FOR_NAVIGATOR;
     }
 }

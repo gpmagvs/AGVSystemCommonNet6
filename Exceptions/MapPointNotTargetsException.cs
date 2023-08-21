@@ -14,6 +14,7 @@ namespace AGVSystemCommonNet6.Exceptions
         {
         }
 
-        public override ALARMS Alarm_Code => ALARMS.MAP_POINT_NO_TARGETS;
+        public override ALARMS Alarm_Code { get; set; }= ALARMS.MAP_POINT_NO_TARGETS;
+
     }
 }

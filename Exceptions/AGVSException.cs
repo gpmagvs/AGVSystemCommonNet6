@@ -12,6 +12,6 @@ namespace AGVSystemCommonNet6.Exceptions
         {
             Message = message;
         }
-        public abstract ALARMS Alarm_Code { get; }
+        public abstract ALARMS Alarm_Code { get;  set; }
     }
 }

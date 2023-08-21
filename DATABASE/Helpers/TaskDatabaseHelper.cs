@@ -198,5 +198,15 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             return dbContext.Tasks.Where(tk=>tk.RecieveTime>=start && tk.FinishTime<=end).ToList();
         }
+
+        public void SetRunningTaskWait()
+        {
+            foreach (var task in dbContext.Tasks.Where(tsk=>tsk.State== TASK_RUN_STATUS.NAVIGATING))
+            {
+                task.State = TASK_RUN_STATUS.WAIT;
+            }
+            dbContext.SaveChanges();
+
+        }
     }
 }
