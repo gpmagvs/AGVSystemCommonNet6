@@ -10,6 +10,8 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
 {
     public abstract class AGVAlarmReportable
     {
+
+        public static Action<AlarmCodes> onAlarmOccur;
         public static event EventHandler OnAlarmResetAsNoneRequest;
         public AGVAlarmReportable()
         {
@@ -39,6 +41,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
 
         private AlarmCodes _current_alarm_code = AlarmCodes.None;
         private AlarmCodes _current_warning_code = AlarmCodes.None;
+
         public AlarmCodes Current_Warning_Code
         {
             set
@@ -72,7 +75,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                     if (value != AlarmCodes.None)
                     {
                         CurrentAlarmState = STATE.ABNORMAL;
-                        AlarmManager.AddAlarm(value);
+                        AlarmManager.AddAlarm(value, false);
                         LOG.ERROR($"{alarm_locate_in_name} Alarm: {value}");
                     }
                     else

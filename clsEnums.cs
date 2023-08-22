@@ -21,7 +21,10 @@ namespace AGVSystemCommonNet6
 
         public enum SUB_STATUS
         {
-            IDLE = 1, RUN = 2, DOWN = 3, Charging = 4,
+            IDLE = 1,
+            RUN = 2,
+            DOWN = 3,
+            Charging = 4,
             Initializing = 5,
             ALARM = 6,
             WARNING = 7,

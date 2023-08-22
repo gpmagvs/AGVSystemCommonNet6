@@ -7,7 +7,6 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
 {
     public class TaskCommandActionClient : ActionClient<TaskCommandAction, TaskCommandActionGoal, TaskCommandActionResult, TaskCommandActionFeedback, TaskCommandGoal, TaskCommandResult, TaskCommandFeedback>, IDisposable
     {
-        public Action<ActionStatus> OnTaskCommandActionDone;
         public Action<ActionStatus> OnActionStatusChanged;
         public TaskCommandGoal goal;
         private bool disposedValue;
@@ -52,10 +51,6 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
                 return;
             TaskCommandActionResult result = action.action_result;
             ActionStatus status = (ActionStatus)(result.status.status);
-            if (OnTaskCommandActionDone != null)
-            {
-                OnTaskCommandActionDone(status);
-            }
         }
         private ActionStatus previousActionStatus = ActionStatus.NO_GOAL;
         protected override void OnStatusUpdated()
@@ -69,7 +64,6 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
                     {
                         OnActionStatusChanged(_actionStatus);
                     }
-                    Console.WriteLine("[TaskCommandActionClient] OnStatusUpdated : Status : " + _actionStatus);
                 }
                 previousActionStatus = _actionStatus;
             }
@@ -84,7 +78,6 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
                 {
                 }
 
-                OnTaskCommandActionDone = null;
                 goalStatus = null;
                 action = null;
                 disposedValue = true;

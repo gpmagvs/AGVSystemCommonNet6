@@ -29,6 +29,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             _ = Task.Run(async () =>
             {
+                await Task.Delay(1000);
                 while (true)
                 {
                     await Task.Delay(1);
@@ -38,7 +39,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         if (UseWebAPI)
                         {
                             SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(msg.Header.Values.First()));
-                            //LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
+                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
                             return;
                         }
                         else

@@ -40,9 +40,17 @@ namespace AGVSystemCommonNet6.Availability
                         SaveRealTimeAvailbilityToDatabase(currentAvailability);
                     }
                     AllWatchStop();
-                    StateWatchers[value].Start();
-                    currentAvailability.StartTime = DateTime.Now;
-                    currentAvailability.Main_Status = value;
+                    try
+                    {
+
+                        StateWatchers[value].Start();
+                        currentAvailability.StartTime = DateTime.Now;
+                        currentAvailability.Main_Status = value;
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
                 else
                 {

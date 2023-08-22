@@ -52,7 +52,8 @@ namespace AGVSystemCommonNet6.Alarm
         CANNOT_DISPATCH_UNLOAD_TASK_WHEN_AGV_HAS_CARGO = 33,
         CANNOT_DISPATCH_UNLOAD_TASK_TO_NOT_EQ_STATION = 34,
         CANNOT_DISPATCH_CHARGE_TASK_TO_NOT_CHARGABLE_STATION = 35,
-        AGV_Task_Feedback_But_Task_Name_Not_Match = 36
+        AGV_Task_Feedback_But_Task_Name_Not_Match = 36,
+        SYSTEM_ERROR = 37
     }
 
 }

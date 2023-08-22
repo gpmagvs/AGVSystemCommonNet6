@@ -21,7 +21,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
     public class clsTaskDownloadData
     {
         [JsonProperty("Task Name")]
-        public string Task_Name { get; set; }
+        public string Task_Name { get; set; } = "";
 
         [JsonProperty("Task Simplex")]
         public string Task_Simplex
