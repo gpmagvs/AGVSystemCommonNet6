@@ -113,7 +113,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                         orientation = point.Theta.ToQuaternion()
                     }
                 }).ToArray();
-
                 var pathInfo = _ExecutingTrajecory.Select(point => new PathInfo()
                 {
                     tagid = (ushort)point.Point_ID,

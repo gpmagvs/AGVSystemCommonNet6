@@ -89,29 +89,37 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         }
         public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
         {
-            LOG.WARN($"Add Alarm_{Alarm_code}");
-            clsAlarmCode alarm = AlarmList.FirstOrDefault(a => a.EAlarmCode == Alarm_code);
-            if (alarm == null)
+            try
             {
-                alarm = new clsAlarmCode
+                clsAlarmCode alarm = AlarmList.FirstOrDefault(a => a.EAlarmCode == Alarm_code);
+                if (alarm == null)
                 {
-                    Code = (int)Alarm_code,
-                    Description = Alarm_code.ToString(),
-                    CN = Alarm_code.ToString(),
-                };
+                    alarm = new clsAlarmCode
+                    {
+                        Code = (int)Alarm_code,
+                        Description = Alarm_code.ToString(),
+                        CN = Alarm_code.ToString(),
+                    };
+                }
+                LOG.Critical($"Add Alarm_{alarm.Code}:{alarm.CN}({alarm.Description})");
+                clsAlarmCode alarm_save = alarm.Clone();
+                alarm_save.Time = DateTime.Now;
+                alarm_save.ELevel = clsAlarmCode.LEVEL.Alarm;
+                alarm_save.IsRecoverable = IsRecoverable;
+                if (CurrentAlarms.TryAdd(alarm_save.Time, alarm_save))
+                {
+                    if (Alarm_code != AlarmCodes.None)
+                        DBhelper.InsertAlarm(alarm_save);
+                }
+
+                if (!IsRecoverable)
+                    OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, EventArgs.Empty);
             }
-            clsAlarmCode alarm_save = alarm.Clone();
-            alarm_save.Time = DateTime.Now;
-            alarm_save.ELevel = clsAlarmCode.LEVEL.Alarm;
-            alarm_save.IsRecoverable = IsRecoverable;
-            if (CurrentAlarms.TryAdd(alarm_save.Time, alarm_save))
+            catch (Exception ex)
             {
-                if (Alarm_code != AlarmCodes.None)
-                    DBhelper.InsertAlarm(alarm_save);
+                LOG.ERROR(ex);
             }
 
-            if (!IsRecoverable)
-                OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, EventArgs.Empty);
         }
         public static AlarmCodes ConvertAGVCAlarmCode(AlarmCodeMsg alarm_code, out clsAlarmCode.LEVEL Level)
         {

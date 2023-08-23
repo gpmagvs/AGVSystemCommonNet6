@@ -8,6 +8,8 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class clsMapPoiintRegist
     {
+        public bool IsRegisted { get; set; } = false;
+
         public DateTime RegistTime { get; set; } = DateTime.MinValue;
         public string RegisterAGVName { get; set; } = "";
 

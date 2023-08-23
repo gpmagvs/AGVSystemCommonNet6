@@ -16,6 +16,11 @@ namespace AGVSystemCommonNet6.MAP
         public string? Name { get; set; } = "";
         public int TagNumber { get; set; }
         public int Direction { get; set; }
+        /// <summary>
+        /// 
+        /// 二次定位點的停車角度
+        /// </summary>
+        public int Direction_Secondary_Point { get; set; }
         public bool AGV_Alarm { get; set; }
         /// <summary>
         /// 是否啟用
@@ -159,8 +164,7 @@ namespace AGVSystemCommonNet6.MAP
                 return Target == null ? false : Target.Count != 0;
             }
         }
-        public bool IsRegisted { get; set; } = false;
-        public clsMapPoiintRegist? RegistInfo { get; set; } = null;
+        public clsMapPoiintRegist? RegistInfo { get; set; } = new clsMapPoiintRegist();
 
         /// <summary>
         /// 註冊這個站點
@@ -168,7 +172,10 @@ namespace AGVSystemCommonNet6.MAP
         public bool TryRegistPoint(string AGVName, out clsMapPoiintRegist registInfo)
         {
             registInfo = null;
-            if (IsRegisted && AGVName != "System")
+            if (RegistInfo == null)
+                RegistInfo = new clsMapPoiintRegist();
+
+            if (RegistInfo.IsRegisted && AGVName != "System")
             {
                 return false;
             }
@@ -178,7 +185,7 @@ namespace AGVSystemCommonNet6.MAP
                 RegisterAGVName = AGVName
             };
             registInfo = RegistInfo;
-            IsRegisted = true;
+            RegistInfo.IsRegisted = true;
             Console.WriteLine($"{AGVName} Regist Tag_{TagNumber}");
             return true;
         }
@@ -186,14 +193,16 @@ namespace AGVSystemCommonNet6.MAP
         public bool TryUnRegistPoint(string name, out string errMsg)
         {
             errMsg = "";
-            if (!IsRegisted)
+
+            if (RegistInfo == null)
+                RegistInfo = new clsMapPoiintRegist();
+            if (!RegistInfo.IsRegisted)
                 return true;
             if (name == "System" | RegistInfo.RegisterAGVName == name)
             {
                 Console.WriteLine($"{name} UnRegist Tag_{TagNumber}");
-
-                IsRegisted = false;
-                RegistInfo = null;
+                RegistInfo.RegisterAGVName = "";
+                RegistInfo.IsRegisted = false;
                 return true;
             }
             else

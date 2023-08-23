@@ -33,7 +33,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
                 return TRAFFIC_ACTION.PASS;
             }
 
-            if (toPoint.IsRegisted)
+            if (toPoint.RegistInfo.IsRegisted)
             {
                 if (toPoint.RegistInfo.RegisterAGVName != agv_name)
                 {
