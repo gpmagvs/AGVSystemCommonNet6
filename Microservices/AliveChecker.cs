@@ -34,7 +34,7 @@ namespace AGVSystemCommonNet6.Microservices
 
                 while (true)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1);
                     try
                     {
                         bool hasVmsDisconnectAlarm = alarm != null;
@@ -77,7 +77,7 @@ namespace AGVSystemCommonNet6.Microservices
             Console.WriteLine($"[{typeof(AliveChecker).Name}] {ex.Message} ");
         }
 
-        public static async Task<(bool alive, string message)> VMSAliveCheck(string url = "http://127.0.0.1:5036/ws/VMSAliveCheck")
+        public static async Task<(bool alive, string message)> VMSAliveCheck(string url = "http://127.0.0.1:5036/api/System/VMSAliveCheck")
         {
             try
             {
