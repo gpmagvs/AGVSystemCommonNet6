@@ -90,6 +90,7 @@ namespace AGVSystemCommonNet6.MAP
         public string? Region { get; set; } = "";
 
 
+
         [JsonIgnore]
         public bool IsCharge
         {
