@@ -18,7 +18,7 @@ namespace AGVSystemCommonNet6.HttpHelper
             public string ErrorMessage { get; set; } = string.Empty;
         }
 
-        public static async Task<Tout> PostAsync<Tin, Tout>(string url, Tin data)
+        public static async Task<Tin> PostAsync<Tin, Tout>(string url, Tout data)
         {
             string contentDataJson = string.Empty;
             if (data != null)
@@ -36,7 +36,7 @@ namespace AGVSystemCommonNet6.HttpHelper
                     if (response.IsSuccessStatusCode)
                     {
                         var responseJson = await response.Content.ReadAsStringAsync();
-                        var result = JsonConvert.DeserializeObject<Tout>(responseJson);
+                        var result = JsonConvert.DeserializeObject<Tin>(responseJson);
                         return result;
                     }
                     else

@@ -27,12 +27,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public async Task<SimpleRequestResponse> PostOnlineModeChangeRequset(int currentTag, REMOTE_MODE mode)
         {
             string url = mode== REMOTE_MODE.ONLINE? $"{WebAPIHost}/api/AGV/OnlineReq?AGVName={AGVSMessageFactory.EQName}&tag={currentTag}": $"{WebAPIHost}/api/AGV/OfflineReq?AGVName={AGVSMessageFactory.EQName}&";
-            var response = await Http.PostAsync<object, SimpleRequestResponse>(url, null);
+            var response = await Http.PostAsync<SimpleRequestResponse, object>(url, null);
             return response;
         }
         public async Task<SimpleRequestResponse> PostRunningStatus(clsRunningStatus status)
         {
-            var response = await Http.PostAsync<clsRunningStatus, Dictionary<string, object>>($"{WebAPIHost}/api/AGV/AGVStatus?AGVName={AGVSMessageFactory.EQName}&Model=0", status);
+            var response = await Http.PostAsync< Dictionary<string, object>, clsRunningStatus>($"{WebAPIHost}/api/AGV/AGVStatus?AGVName={AGVSMessageFactory.EQName}&Model=0", status);
             var returnCode = int.Parse(response["ReturnCode"].ToString());
             return new SimpleRequestResponse
             {
@@ -45,7 +45,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
-                var response = await Http.PostAsync<clsFeedbackData, Dictionary<string, object>>($"{WebAPIHost}/api/AGV/TaskFeedback?AGVName={AGVSMessageFactory.EQName}&Model=0", feedback);
+                var response = await Http.PostAsync<  Dictionary<object, string>,clsFeedbackData > ($"{WebAPIHost}/api/AGV/TaskFeedback?AGVName={AGVSMessageFactory.EQName}&Model=0", feedback);
                 var returnCode = int.Parse(response["ReturnCode"].ToString());
                 return new SimpleRequestResponse
                 {
