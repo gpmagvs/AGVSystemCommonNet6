@@ -12,11 +12,14 @@ namespace AGVSystemCommonNet6.Log
 
         public DateTime Time { get; internal set; }
 
-        public LogItem(LogLevel level, string logMsg, bool show_console = true)
+        public ConsoleColor Color { get; set; } = ConsoleColor.White;
+
+        public LogItem(LogLevel level, string logMsg, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {
             this.level = level;
             this.logMsg = logMsg;
             this.show_console = show_console;
+            this.Color = color;
         }
         public LogItem(string logMsg)
         {
