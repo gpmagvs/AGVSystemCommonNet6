@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,26 @@ namespace AGVSystemCommonNet6.MAP
             {
                 List<MapPath> GetMapPathes(MapPoint point)
                 {
+                    int index = Points.FirstOrDefault(pt => pt.Value == point).Key;
 
+                    bool isBezierendpoint = point.Graph.IsBezierCurvePoint;
+                    BezierCurve bezier = new BezierCurve();
+                    if (isBezierendpoint)
+                    {
+                        BezierCurves.TryGetValue(point.Graph.BezierCurveID, out bezier);
+                    }
                     Dictionary<int, double> targets = point.Target.ToList().FindAll(kp => Points.ContainsKey(kp.Key)).ToDictionary(kp => kp.Key, kp => kp.Value);
-                    return targets.Select(kp => new MapPath() { StartPoint = point, EndPoint = Points[kp.Key] }).ToList();
+                    return targets.Select(kp => new MapPath()
+                    {
+                        IsEQLink = point.StationType != STATION_TYPE.Normal | Points[kp.Key].StationType != STATION_TYPE.Normal,
+                        StartPtIndex = index,
+                        EndPtIndex = kp.Key,
+                        StartCoordination = new double[2] { point.X, point.Y },
+                        EndCoordination = new double[2] { Points[kp.Key].X, Points[kp.Key].Y },
+                        IsBezier = isBezierendpoint,
+                        BezierMiddleCoordination = isBezierendpoint ? bezier.MidPointCoordination : new double[2] { 0, 0 }
+                    }
+                    ).ToList();
                 }
                 MapPath[] pathes = Points.ToList().FindAll(point => point.Value.Target.Count != 0).SelectMany(point => GetMapPathes(point.Value)).ToArray();
                 return pathes;

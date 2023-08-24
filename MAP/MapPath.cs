@@ -10,22 +10,14 @@ namespace AGVSystemCommonNet6.MAP
     public class MapPath
     {
         public MapPath() { }
-        public MapPoint StartPoint { get; set; }
-        public MapPoint EndPoint { get; set; }
+        public int StartPtIndex { get; set; }
+        public int EndPtIndex { get; set; }
+        public double[] StartCoordination { get; set; }
+        public double[] EndCoordination { get; set; }
+        public bool IsEQLink { get; set; }
+        public string PathID => $"{StartPtIndex}_{EndPtIndex}";
+        public bool IsBezier { get; set; } = false ;
+        public double[] BezierMiddleCoordination{ get; set; }
 
-        public bool IsEQLink
-        {
-            get
-            {
-                return EndPoint.IsEQLink | StartPoint.IsEQLink;
-            }
-        }
-        public bool IsPathClose
-        {
-            get
-            {
-                return !StartPoint.Enable | !EndPoint.Enable;
-            }
-        }
     }
 }
