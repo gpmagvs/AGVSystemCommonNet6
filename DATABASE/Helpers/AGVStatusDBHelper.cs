@@ -86,9 +86,47 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
         }
 
+        private static bool dbBusyFlag = false;
+        public async Task<(bool confirm, string errorMesg)> Update(IEnumerable<clsAGVStateDto> AGVStateDtos)
+        {
+            using (var dbhelper = new DbContextHelper(connection_str))
+            {
+                foreach (var AGVStateDto in AGVStateDtos)
+                {
+                    clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
+                    if (agvState != null)
+                    {
+                       
+                        agvState.AGV_Description = AGVStateDto.AGV_Description;
+                        agvState.Model = AGVStateDto.Model;
+                        agvState.MainStatus = AGVStateDto.MainStatus;
+                        agvState.OnlineStatus = AGVStateDto.OnlineStatus;
+                        agvState.CurrentLocation = AGVStateDto.CurrentLocation;
+                        agvState.CurrentCarrierID = AGVStateDto.CurrentCarrierID;
+                        agvState.BatteryLevel = AGVStateDto.BatteryLevel;
+                        agvState.TaskName = AGVStateDto.TaskName;
+                        agvState.TaskRunStatus = AGVStateDto.TaskRunStatus;
+                        agvState.TaskRunAction = AGVStateDto.TaskRunAction;
+                        agvState.Theta = AGVStateDto.Theta;
+                        agvState.Connected = AGVStateDto.Connected;
+                    }
+                    else
+                    {
+                        AGVStateDto.Enabled = true;
+                        Add(AGVStateDto);
+                    }
+                }
+                int ret = await dbhelper._context.SaveChangesAsync();
+            }
+            return (true, "");
+        }
         public async Task<(bool confirm, string errorMesg)> Update(clsAGVStateDto AGVStateDto)
         {
-
+            if (dbBusyFlag)
+            {
+                return (false, "");
+            }
+            dbBusyFlag = true;
             try
             {
                 using (var dbhelper = new DbContextHelper(connection_str))
@@ -119,10 +157,12 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     }
                     int ret = await dbhelper._context.SaveChangesAsync();
                 }
+                dbBusyFlag = false;
                 return (true, "");
             }
             catch (Exception ex)
             {
+                dbBusyFlag = false;
                 return (false, ex.Message);
             }
         }
