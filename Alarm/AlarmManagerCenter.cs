@@ -1,4 +1,6 @@
-﻿using AGVSystemCommonNet6.Configuration;
+﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.Alarm.VMS_ALARM;
+using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -231,6 +233,71 @@ namespace AGVSystemCommonNet6.Alarm
                 //File.WriteAllLines(Path.Combine(folder, "test.csv"), list, Encoding.UTF8);
             };
 
+        }
+
+        public static void SetAlarmsChecked(List<clsAlarmDto> unchecked_alarms)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                foreach (var _alarm in unchecked_alarms)
+                {
+                    var alarm_found = dbhelper._context.SystemAlarms.FirstOrDefault(alarm => alarm == _alarm);
+                    alarm_found.Checked = true;
+                }
+
+                dbhelper._context.SaveChanges();
+            }
+        }
+
+        public static void SetAlarmsAllCheckedByEquipmentName(string name)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                foreach (var _alarm in dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name))
+                {
+                    _alarm.Checked = true;
+                }
+
+                dbhelper._context.SaveChanges();
+            }
+        }
+
+        public static clsAlarmDto[] GetAlarmsByEqName(string name)
+        {
+            clsAlarmDto[] alarms = new clsAlarmDto[0];
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                alarms = dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name).ToArray();
+            }
+            return alarms;
+        }
+
+        public static void SetAlarmChecked(string name, int alarm_code)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                var alarms = dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name && alarm.AlarmCode == alarm_code).ToArray();
+                foreach (var item in alarms)
+                {
+                    item.Checked = true;
+                }
+                dbhelper._context.SaveChanges();
+            }
+        }
+
+        public static void UpdateAlarmDuration(string name, RunningStatus.clsAlarmCode alarm)
+        {
+
+        }
+
+        public static void UpdateAlarmDuration(string name, int alarm_ID)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                var alarms = dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name && alarm.AlarmCode == alarm_ID).ToArray();
+                alarms.Last().Duration = int.Parse(Math.Round((DateTime.Now - alarms.Last().Time).TotalSeconds) + "");
+                dbhelper._context.SaveChanges();
+            }
         }
     }
 
