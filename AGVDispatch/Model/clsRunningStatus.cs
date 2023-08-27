@@ -90,6 +90,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         /// </summary>
         public virtual int Alarm_Category { get; set; }
         public virtual string Alarm_Description { get; set; } = "";
+        public virtual string Alarm_Description_EN { get; set; } = "";
+
     }
 
 

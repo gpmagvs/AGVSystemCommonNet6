@@ -87,6 +87,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             public override int Alarm_Category { get; set; }
             [JsonProperty("Alarm Description")]
             public override string Alarm_Description { get; set; } = "";
+
+            [JsonProperty("Alarm Description EN")]
+            public override string Alarm_Description_EN { get; set; } = "";
         }
     }
     public class clsRunningStatusReportResponseMessage : MessageBase
