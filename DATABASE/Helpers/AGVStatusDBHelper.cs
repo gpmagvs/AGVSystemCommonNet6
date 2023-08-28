@@ -29,7 +29,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
             using (var dbhelper = new DbContextHelper(connection_str))
             {
-                return dbhelper._context.AgvStates.Where(agv => agv.AGV_Name == agv_name).First();
+                return dbhelper._context.AgvStates.Where(agv => agv.AGV_Name == agv_name).FirstOrDefault();
             }
         }
 
@@ -96,7 +96,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
                     if (agvState != null)
                     {
-                       
+
                         agvState.AGV_Description = AGVStateDto.AGV_Description;
                         agvState.Model = AGVStateDto.Model;
                         agvState.MainStatus = AGVStateDto.MainStatus;

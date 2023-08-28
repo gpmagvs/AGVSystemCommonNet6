@@ -22,7 +22,14 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         {
             get
             {
-                return Enum.GetValues(typeof(AlarmCodes)).Cast<AlarmCodes>().First(ac => (int)ac == Code);
+                try
+                {
+                    return Enum.GetValues(typeof(AlarmCodes)).Cast<AlarmCodes>().First(ac => (int)ac == Code);
+                }
+                catch (Exception ex)
+                {
+                    return AlarmCodes.Unknown;
+                }
             }
         }
 

@@ -285,7 +285,7 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        public static void UpdateAlarmDuration(string name, RunningStatus.clsAlarmCode alarm)
+        public static void UpdateAlarmDuration(string name, AGVSystemCommonNet6.AGVDispatch.Model.clsAlarmCode alarm)
         {
 
         }

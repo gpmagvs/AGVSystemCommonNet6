@@ -78,6 +78,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
     }
     public class clsAlarmCode
     {
+        [JsonProperty("Alarm ID")]
         public virtual int Alarm_ID { get; set; }
 
         /// <summary>
@@ -90,6 +91,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         /// </summary>
         public virtual int Alarm_Category { get; set; }
         public virtual string Alarm_Description { get; set; } = "";
+
         public virtual string Alarm_Description_EN { get; set; } = "";
 
     }

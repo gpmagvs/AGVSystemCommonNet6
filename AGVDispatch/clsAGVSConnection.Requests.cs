@@ -67,28 +67,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         }
 
-        private async Task<(bool, SimpleRequestResponseWithTimeStamp runningStateReportAck)> TryRnningStateReportWithActionFinishAtLastPtAsync()
-        {
-            try
-            {
-                byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg, true);
-                await WriteDataOut(data, msg.SystemBytes);
-                if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
-                {
-                    clsRunningStatusReportResponseMessage QueryResponseMessage = mesg as clsRunningStatusReportResponseMessage;
-                    if (QueryResponseMessage != null)
-                        return (true, QueryResponseMessage.RuningStateReportAck);
-                    else
-                        return (false, null);
-                }
-                else
-                    return (false, null);
-            }
-            catch (Exception)
-            {
-                return (false, null);
-            }
-        }
+
 
         private async Task<(bool, SimpleRequestResponseWithTimeStamp runningStateReportAck)> TryRnningStateReportAsync()
         {
@@ -96,8 +75,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 if (UseWebAPI)
                 {
-                    var runnginStatus = AGVSMessageFactory.CreateRunningStateReportQueryData();
+                    clsRunningStatus runnginStatus = AGVSMessageFactory.OnWebAPIProtocolGetRunningStatus();
                     SimpleRequestResponse response = await PostRunningStatus(runnginStatus);
+
                     return (response.ReturnCode == RETURN_CODE.OK | response.ReturnCode == RETURN_CODE.NG, new SimpleRequestResponseWithTimeStamp
                     {
                         ReturnCode = response.ReturnCode,

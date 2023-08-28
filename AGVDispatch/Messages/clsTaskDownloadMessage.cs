@@ -41,7 +41,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         [JsonProperty("Action Type")]
         public ACTION_TYPE Action_Type { get; set; }
-
+      
         public clsCST[] CST { get; set; } = new clsCST[0];
         public int Destination { get; set; }
         public int Height { get; set; }
@@ -220,4 +220,4 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public int CST_Type { get; set; }
     }
 
-}
+   }

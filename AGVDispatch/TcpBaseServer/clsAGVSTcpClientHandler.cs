@@ -61,35 +61,42 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             private void ClientMsgRevCallback(IAsyncResult ar)
             {
-                clsSocketState ClientSocketState = ar.AsyncState as clsSocketState;
-                int revDataLen = ClientSocketState.socket.EndReceive(ar);
-                ClientSocketState.revedDataLen += revDataLen;
-                string str = ClientSocketState.revedString;
-                Console.WriteLine(str);
-                if (ClientSocketState.TryFindEndChar(out int index))
+                try
                 {
-                    int remaindData = ClientSocketState.revedDataLen - (index + 1);
-                    //0 =>整包都是完整資料
-                    if (remaindData != 0)
+                    clsSocketState ClientSocketState = ar.AsyncState as clsSocketState;
+                    int revDataLen = ClientSocketState.socket.EndReceive(ar);
+                    ClientSocketState.revedDataLen += revDataLen;
+                    string str = ClientSocketState.revedString;
+                    if (ClientSocketState.TryFindEndChar(out int index))
                     {
-                        var newBuffer = new byte[clsSocketState.BufferSize];
-                        Array.Copy(ClientSocketState.buffer, index + 1, newBuffer, 0, remaindData);
-                        ClientSocketState.buffer = newBuffer;
-                        ClientSocketState.revedDataLen = remaindData;
+                        int remaindData = ClientSocketState.revedDataLen - (index + 1);
+                        //0 =>整包都是完整資料
+                        if (remaindData != 0)
+                        {
+                            var newBuffer = new byte[clsSocketState.BufferSize];
+                            Array.Copy(ClientSocketState.buffer, index + 1, newBuffer, 0, remaindData);
+                            ClientSocketState.buffer = newBuffer;
+                            ClientSocketState.revedDataLen = remaindData;
+                        }
+                        else
+                        {
+                            HandleClientMsg(ClientSocketState.revedString);
+                            ClientSocketState.buffer = new byte[clsSocketState.BufferSize];
+                            ClientSocketState.revedDataLen = 0;
+                        }
                     }
-                    else
+                    int offset = ClientSocketState.revedDataLen; //2
+                    int toRevLen = clsSocketState.BufferSize - offset;
+                    Task.Factory.StartNew(() =>
                     {
-                        HandleClientMsg(ClientSocketState.revedString);
-                        ClientSocketState.buffer = new byte[clsSocketState.BufferSize];
-                        ClientSocketState.revedDataLen = 0;
-                    }
+                        ClientSocketState.socket.BeginReceive(ClientSocketState.buffer, offset, toRevLen, SocketFlags.None, new AsyncCallback(ClientMsgRevCallback), ClientSocketState);
+                    });
                 }
-                int offset = ClientSocketState.revedDataLen; //2
-                int toRevLen = clsSocketState.BufferSize - offset;
-                Task.Factory.StartNew(() =>
+                catch (Exception ex)
                 {
-                    ClientSocketState.socket.BeginReceive(ClientSocketState.buffer, offset, toRevLen, SocketFlags.None, new AsyncCallback(ClientMsgRevCallback), ClientSocketState);
-                });
+                    _SocketClient.Dispose();
+                }
+                
             }
 
             private async Task HandleClientMsg(string clientMsg)

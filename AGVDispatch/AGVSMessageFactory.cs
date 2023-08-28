@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.AGVDispatch.Model;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -9,8 +10,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public static string SID { get; set; } = "001:001:001";
         public static string EQName { get; set; } = "AGV_1";
 
-        public delegate RunningStatus GetVCSRunningDataDelegate(bool getPoseWithLastPtOfTrajectory = false);
-        public static GetVCSRunningDataDelegate OnVCSRunningDataRequest;
+        public delegate clsRunningStatus GetRunningDataUseWebAPIProtocolDelegate();
+        public static GetRunningDataUseWebAPIProtocolDelegate OnWebAPIProtocolGetRunningStatus;
+
+        public delegate RunningStatus GetRunningDataUseTCPIPProtocolDelegate();
+        public static GetRunningDataUseTCPIPProtocolDelegate OnTcpIPProtocolGetRunningStatus;
 
         private static int SystemByteStored = 8790;
         private static int System_Byte_Cyclic
@@ -154,38 +158,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             return Encoding.ASCII.GetBytes(FormatSendOutString(mesg.ToJson()));
         }
-        internal static Model.clsRunningStatus CreateRunningStateReportQueryData()
-        {
-            RunningStatus? runningData = OnVCSRunningDataRequest?.Invoke();
+    
 
-            return new Model.clsRunningStatus
-            {
-                AGV_Reset_Flag = runningData.AGV_Reset_Flag,
-                AGV_Status = runningData.AGV_Status,
-                Alarm_Code = runningData.Alarm_Code,
-                Cargo_Status = runningData.Cargo_Status,
-                Coordination = runningData.Coordination,
-                CPU_Usage_Percent = runningData.CPU_Usage_Percent,
-                CSTID = runningData.CSTID,
-                Electric_Volume = runningData.Electric_Volume,
-                Escape_Flag = runningData.Escape_Flag,
-                Fork_Height = runningData.Fork_Height,
-                Last_Visited_Node = runningData.Last_Visited_Node,
-                Odometry = runningData.Odometry,
-                RAM_Usage_Percent = runningData.RAM_Usage_Percent,
-                Sensor_Status = runningData.Sensor_Status,
-                Signal_Strength = runningData.Signal_Strength,
-                Time_Stamp = runningData.Time_Stamp
-            };
-        }
         internal static byte[] CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg, bool getPoseOfLastPtOfTrajectory = false)
         {
-            RunningStatus? runningData = OnVCSRunningDataRequest?.Invoke(getPoseOfLastPtOfTrajectory);
+            var runningData = OnWebAPIProtocolGetRunningStatus?.Invoke();
             msg = new clsRunningStatusReportMessage();
             msg.SID = SID;
             msg.EQName = EQName;
             msg.SystemBytes = System_Byte_Cyclic;
-            msg.Header.Add("0105", runningData);
+            msg.Header.Add("0105", (RunningStatus)runningData);
             return Encoding.ASCII.GetBytes(FormatSendOutString(msg.ToJson()));
         }
 
@@ -196,7 +178,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         internal static byte[] CreateTaskFeedbackMessageData(clsTaskDownloadData taskData, int PointIndex, TASK_RUN_STATUS task_status, out clsTaskFeedbackMessage taskFeedbackMessage)
         {
-            RunningStatus? runningData = OnVCSRunningDataRequest?.Invoke(false);
             taskFeedbackMessage = new clsTaskFeedbackMessage()
             {
                 SID = SID,

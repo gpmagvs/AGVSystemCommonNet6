@@ -364,9 +364,6 @@
         EQP_UNLOAD_BUT_EQP_HAS_NO_CARGO = 860012,
         Cant_Change_Online_Mode_Code_Error = 860013,
         Cant_TransferTask_TO_AGVC = 860014,
-        Handshake_Fail_EQ_BUSY_ON = 860015,
-        Handshake_Fail_EQ_BUSY_OFF = 860016,
-        Handshake_Fail_AGV_DOWN = 860017,
         Motion_control_Wrong_Unknown_Code = 860018,
         UserAbort_Initialize_Process = 860019,
         Sick_Lidar_Communication_Error = 860020,
@@ -378,5 +375,12 @@
         Fork_Has_Cargo_But_Initialize_Running = 860026,
         Fork_Disabled = 860027,
         AGV_Cant_Goto_Workstation_When_Fork_Is_Disabled = 860028,
+        Unknown = 404404,
+
+        Handshake_Fail_EQ_BUSY_ON = 810015,
+        Handshake_Fail_EQ_BUSY_OFF = 810016,
+        Handshake_Fail_AGV_DOWN = 810017,
+        Handshake_Fail_EQ_Busy_ON_When_AGV_BUSY = 810018,
+        Handshake_Fail_EQ_READY_OFF_When_AGV_BUSY = 810019,
     }
 }
