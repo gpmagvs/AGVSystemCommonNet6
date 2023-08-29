@@ -11,6 +11,13 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class MapPoint
     {
+        public MapPoint() { }
+        public MapPoint(string Name, int TagNumber)
+        {
+            this.Name = Name;
+            this.TagNumber = TagNumber;
+        }
+
         public double X { get; set; }
         public double Y { get; set; }
         public string? Name { get; set; } = "";

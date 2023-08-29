@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSConnection
     {
-        public string WebAPIHost => $"http://{IP}:{Port}";
+        
         public HttpHelper WebAPIHttp;
         public async Task<OnlineModeQueryResponse> GetOnlineMode()
         {
