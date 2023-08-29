@@ -105,7 +105,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 int disconnect_cnt = 0;
                 while (true)
                 {
-                    await Task.Delay(10);
+                    await Task.Delay(500);
                     try
                     {
 
