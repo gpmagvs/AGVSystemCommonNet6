@@ -225,12 +225,20 @@ namespace AGVSystemCommonNet6.Alarm
                 );
                 count = _alarms.Count();
                 alarms = _alarms.Skip((currentpage - 1) * 15).Take(15).ToList();
-
-                //var folder = Path.Combine(Environment.CurrentDirectory, "wwwroot/images");
-                //List<string> list = _alarms.Select(alarm => $"{alarm.Time},{alarm.Task_Name}").ToList();
-                //File.WriteAllLines(Path.Combine(folder, "test.csv"), list, Encoding.UTF8);
             };
+        }
+        public static void SaveTocsv( DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                var _alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
+                                    && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name)) && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
+                );
 
+                var folder = Path.Combine(Environment.CurrentDirectory, "wwwroot/images");
+                List<string> list = _alarms.Select(alarm => $"{alarm.Time},{alarm.Task_Name},{alarm.Equipment_Name},,{alarm.AlarmCode}{alarm.Description_En},{alarm.Description_Zh},{alarm.Duration},{alarm.OccurLocation},{alarm.Level}").ToList();
+                File.WriteAllLines(Path.Combine(folder, "AlarmQuery"+ DateTime.Now.ToString("yyyy-MM-dd-HH")+".csv"), list, Encoding.UTF8);
+            };
         }
     }
 

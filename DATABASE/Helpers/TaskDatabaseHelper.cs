@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -154,25 +155,31 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             dbContext.SaveChanges();
         }
-        public static void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsTaskDto> Task)
+        public static void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, out List<clsTaskDto> Task)
+        {
+            count = 0;
+            Task = new List<clsTaskDto>();
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                var _Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
+                                    && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
+                );
+                count = _Task.Count();
+                Task = _Task.Skip((currentpage - 1) * 15).Take(15).ToList();
+            };
+        }
+        public static void SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
         {
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                Task = new List<clsTaskDto>();
-                if (AGV_Name == "ALL")
-                {
-                    count = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Count();
-                    int skipindex = (currentpage - 1) * 10;
-                    Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Skip(skipindex).Take(10).ToList();
+                var _Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
+                                    && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
+                );
 
-                }
-                else
-                {
-                    count = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Count();
-                    int skipindex = (currentpage - 1) * 10;
-                    Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime && Task.DesignatedAGVName == AGV_Name).Skip(skipindex).Take(10).ToList();
-                }
-            }
+                var folder = Path.Combine(Environment.CurrentDirectory, "wwwroot/images");
+                List<string> list = _Task.Select(Task => $"{Task.RecieveTime},{Task.FinishTime},{Task.TaskName},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.Carrier_ID},{Task.From_Station},{Task.To_Station},{Task.FailureReason}").ToList();
+                File.WriteAllLines(Path.Combine(folder, "TaskQuery" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv"), list, Encoding.UTF8);
+            };
         }
 
         public TASK_RUN_STATUS GetTaskStateByID(string taskName)
