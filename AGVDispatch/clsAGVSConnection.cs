@@ -52,12 +52,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
             this.IP = IP;
             this.Port = Port;
             LocalIP = null;
+            WebAPIHttp = new HttpTools.HttpHelper(WebAPIHost);
         }
         public clsAGVSConnection(string HostIP, int HostPort, string localIP)
         {
             this.IP = HostIP;
             this.Port = HostPort;
             this.LocalIP = localIP;
+            WebAPIHttp = new HttpTools.HttpHelper(WebAPIHost);
         }
 
 

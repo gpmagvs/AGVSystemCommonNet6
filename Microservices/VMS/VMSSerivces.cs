@@ -1,7 +1,7 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.RunMode;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE.Helpers;
-using AGVSystemCommonNet6.HttpHelper;
+using AGVSystemCommonNet6.HttpTools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -81,7 +81,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             //confirm = confirm, message
             try
             {
-                Dictionary<string, object> response = await Http.PostAsync<Dictionary<string, object>, object>($"{VMSHostUrl}/api/System/RunMode?mode={mode}", null);
+                HttpHelper http = new HttpHelper(VMSHostUrl);
+                Dictionary<string, object> response = await http.PostAsync<Dictionary<string, object>, object>($"/api/System/RunMode?mode={mode}", null);
                 return ( (bool)response["confirm"], response["message"].ToString());
             }
             catch (Exception ex)
@@ -99,7 +100,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         {
             try
             {
-                bool alive = await Http.GetAsync<bool>($"{VMSHostUrl}/api/System/VMSAliveCheck");
+                HttpHelper http = new HttpHelper(VMSHostUrl);
+                bool alive = await http.GetAsync<bool>($"/api/System/VMSAliveCheck");
                 return (alive, "");
             }
             catch (Exception ex)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AGVSystemCommonNet6.HttpHelper
+namespace AGVSystemCommonNet6.HttpTools
 {
     public class clsAPIRequestResult
     {

@@ -1,5 +1,5 @@
 ﻿using AGVSystemCommonNet6.Configuration;
-using AGVSystemCommonNet6.HttpHelper;
+using AGVSystemCommonNet6.HttpTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +10,17 @@ namespace AGVSystemCommonNet6.Microservices
 {
     public class MapSync
     {
-        public static async Task<(bool,string)> SendReloadRequest(string map_file_path)
+        public static async Task<(bool, string)> SendReloadRequest(string map_file_path)
         {
             try
             {
-                bool alive = await Http.GetAsync<bool>(string.Format("{0}/{1}",AGVSConfigulator.SysConfigs.VMSHost,$"api/Map/Reload?map_file={map_file_path}"));
+                HttpHelper http = new HttpHelper(AGVSConfigulator.SysConfigs.VMSHost);
+                bool alive = await http.GetAsync<bool>($"/api/Map/Reload?map_file={map_file_path}");
                 return (alive, "");
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "Timeout");
             }
             catch (Exception ex)
             {
