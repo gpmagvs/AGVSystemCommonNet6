@@ -173,8 +173,8 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 if (resetAllSameCode)
                 {
-                    var alarms_same_code = dbhelper._context.Set<clsAlarmDto>().Where(_alarm => _alarm.AlarmCode == alarm.AlarmCode).ToList();
-                    foreach (var alarm_ in alarms_same_code)
+                    var alarms_same_code = dbhelper._context.SystemAlarms.Where(_alarm => _alarm.AlarmCode == alarm.AlarmCode && _alarm.Checked == false);
+                    foreach (clsAlarmDto? alarm_ in alarms_same_code)
                     {
                         alarm_.Checked = true;
                         alarm_.ResetAalrmMemberName = alarm.ResetAalrmMemberName;
@@ -183,7 +183,7 @@ namespace AGVSystemCommonNet6.Alarm
                 }
                 else
                 {
-                    if (dbhelper._context.Set<clsAlarmDto>().FirstOrDefault(a => a == alarm) != null)
+                    if (dbhelper._context.Set<clsAlarmDto>().FirstOrDefault(a => a == alarm && a.Checked == false) != null)
                     {
                         alarm.Checked = true;
                         UpdateAlarm(alarm);

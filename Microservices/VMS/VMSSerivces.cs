@@ -38,7 +38,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
 
                 while (true)
                 {
-                    Thread.Sleep(1);
+                    await Task.Delay(1000);
                     try
                     {
                         bool hasVmsDisconnectAlarm = alarm != null;
@@ -47,25 +47,25 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                         {
                             if (!response.alive)
                             {
-                                disconnectAlarm.Checked = false;
-                                disconnectAlarm.Time = new DateTime(DateTime.Now.Ticks);
-                                disconnectAlarm.ResetAalrmMemberName = "";
+                                sw.Restart();
+                                AGVStatusDBHelper agv_status_db = new AGVStatusDBHelper();
+                                agv_status_db.ChangeAllOffline();
+                                AlarmManagerCenter.UpdateAlarm(disconnectAlarm);
+                            }
+                            else
+                            {
+                                sw.Restart();
+                                disconnectAlarm.ResetAalrmMemberName = typeof(AliveChecker).Name;
+                                AlarmManagerCenter.ResetAlarm(disconnectAlarm, true);
                             }
                         }
-                        if (!response.alive)
+                        else if(!response.alive)
                         {
                             disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
-
-                            AGVStatusDBHelper agv_status_db = new AGVStatusDBHelper();
-                            agv_status_db.ChangeAllOffline();
                             AlarmManagerCenter.UpdateAlarm(disconnectAlarm);
+                            continue;
                         }
-                        else
-                        {
-                            sw.Restart();
-                            disconnectAlarm.ResetAalrmMemberName = typeof(AliveChecker).Name;
-                            AlarmManagerCenter.ResetAlarm(disconnectAlarm, true);
-                        }
+                       
                         previous_alive_state = response.alive;
                     }
                     catch (Exception ex)
