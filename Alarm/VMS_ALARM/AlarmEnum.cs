@@ -98,6 +98,7 @@
         Ultrasonic_Sensor_Error_Left_Far = 883,
         Ultrasonic_Sensor_Error_Right_Far = 884,
         Switch_Type_Error = 1000,
+        Switch_Type_Error_Vertical = 1001,
         FrontProtection_Area3 = 1010,
         BackProtection_Area3 = 1020,
         LeftProtection_Area3 = 1030,
@@ -393,5 +394,8 @@
         Handshake_Fail_AGV_DOWN = 810017,
         Handshake_Fail_EQ_Busy_ON_When_AGV_BUSY = 810018,
         Handshake_Fail_EQ_READY_OFF_When_AGV_BUSY = 810019,
+        Fork_Initialize_Process_Interupt = 860029,
+        Fork_Initialize_Process_Error_Occur = 860030,
+        Fork_Initialized_But_Home_Input_Not_ON = 860031,
     }
 }

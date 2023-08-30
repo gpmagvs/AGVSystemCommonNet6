@@ -12,7 +12,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
     public class clsTaskDownloadMessage : MessageBase
     {
         public Dictionary<string, clsTaskDownloadData> Header { get; set; } = new Dictionary<string, clsTaskDownloadData>();
-
         public clsTaskDownloadData TaskDownload => this.Header[Header.Keys.First()];
 
     }
@@ -41,7 +40,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         [JsonProperty("Action Type")]
         public ACTION_TYPE Action_Type { get; set; }
-      
+
         public clsCST[] CST { get; set; } = new clsCST[0];
         public int Destination { get; set; }
         public int Height { get; set; }
@@ -120,10 +119,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     direction = (ushort)point.Control_Mode.Spin,
                     map = point.Map_Name,
                     changeMap = 0,
-                    speed = point.Speed,
+                    speed = taskData.HasCargo ? point.Speed / 2 : point.Speed,
                     ultrasonicDistance = point.UltrasonicDistance
                 }).ToArray();
-
 
                 if (taskData.IsAfterLoadingAction) //Loading 結束
                 {
@@ -131,7 +129,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     pathInfo = pathInfo.Reverse().ToArray();
                     goal.finalGoalID = (ushort)taskData.Homing_Trajectory.First().Point_ID;
                     goal.mobilityModes = (ushort)GUIDE_TYPE.Color_Tap_Backward;
-
                 }
 
                 goal.planPath.poses = poses;
@@ -150,7 +147,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// </summary>
         public bool IsTaskSegmented => ExecutingTrajecory.Length == 0 ? false : ExecutingTrajecory.Last().Point_ID != Destination;
 
-        public clsTaskDownloadData TurnToBackTaskData()
+        /// <summary>
+        /// 回Home點的任務 (mobility=2)
+        /// </summary>
+        /// <returns></returns>
+        public clsTaskDownloadData CreateGoHomeTaskDownloadData()
         {
             var taskData = JsonConvert.DeserializeObject<clsTaskDownloadData>(this.ToJson());
             taskData.IsAfterLoadingAction = true;
@@ -160,6 +161,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         }
         [JsonIgnore]
         public clsPathInfo TrafficInfo { get; set; } = new clsPathInfo();
+        public bool HasCargo { get; set; } = false;
     }
 
 
@@ -220,4 +222,4 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public int CST_Type { get; set; }
     }
 
-   }
+}
