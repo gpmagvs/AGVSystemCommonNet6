@@ -21,7 +21,12 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public string TimeStamp { get; set; }
 
     }
+    public class TaskDownloadRequestResponse
+    {
+        public TASK_DOWNLOAD_RETURN_CODES ReturnCode { get; set; }
+        public string Message { get; set; }
 
+    }
     public class SimpleRequestResponse
     {
         [JsonProperty("Return Code")]

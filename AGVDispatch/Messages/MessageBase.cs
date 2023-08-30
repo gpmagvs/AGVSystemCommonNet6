@@ -13,13 +13,53 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         ABORT
     }
 
+
     public enum RETURN_CODE : int
     {
         OK = 0,
         NG = 1,
         System_Error = 404,
         Connection_Fail = 405,
-        No_Response = 406
+        No_Response = 406,
+        Status_Abnormal = 407,
+        TASK_DOWNLOAD_DATA_ILLEAGAL = 408
+    }
+
+    public enum TASK_DOWNLOAD_RETURN_CODES : int
+    {
+        OK = 0,
+        /// <summary>
+        /// AGV狀態DOWN
+        /// </summary>
+        AGV_STATUS_DOWN = 1,
+        /// <summary>
+        /// AGV沒有在TAG上
+        /// </summary>
+        AGV_NOT_ON_TAG = 2,
+        /// <summary>
+        /// 工作站點不存在設定值
+        /// </summary>
+        WORKSTATION_NOT_SETTING_YET = 3,
+        /// <summary>
+        /// AGV低電量
+        /// </summary>
+        AGV_BATTERY_LOW_LEVEL = 4,
+        /// <summary>
+        /// AGV無法用一般移動的方式導航至工作站點內
+        /// </summary>
+        AGV_CANNOT_GO_TO_WORKSTATION_WITH_NORMAL_MOVE_ACTION = 5,
+        /// <summary>
+        /// 任務資料不合法
+        /// </summary>
+        TASK_DOWNLOAD_DATA_ILLEAGAL = 6,
+        /// <summary>
+        /// 系統例外
+        /// </summary>
+        SYSTEM_EXCEPTION = 7,
+        /// <summary>
+        /// 無任何路線供AGV導航
+        /// </summary>
+        NO_PATH_FOR_NAVIGATION = 8,
     }
 
     public enum TASK_RUN_STATUS : int

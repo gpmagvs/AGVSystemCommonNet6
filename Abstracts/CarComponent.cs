@@ -33,7 +33,7 @@ namespace AGVSystemCommonNet6.Abstracts
         {
             OnAlarmResetHandle();
         }
-        public virtual  void OnAlarmResetHandle()
+        public virtual void OnAlarmResetHandle()
         {
 
         }
@@ -53,7 +53,10 @@ namespace AGVSystemCommonNet6.Abstracts
             set
             {
                 _StateData = value;
-                CheckStateDataContent();
+                Task.Factory.StartNew(() =>
+                {
+                    CheckStateDataContent();
+                });
                 lastUpdateTime = DateTime.Now;
             }
         }

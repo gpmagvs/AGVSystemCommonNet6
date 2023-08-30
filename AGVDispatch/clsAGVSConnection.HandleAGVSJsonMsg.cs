@@ -46,8 +46,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     MSG = taskDownloadReq;
                     AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
                     taskDownloadReq.TaskDownload.OriTaskDataJson = _json;
-                    bool accept_task = OnTaskDownload(taskDownloadReq.TaskDownload);
-                    if (TryTaskDownloadReqAckAsync(accept_task, taskDownloadReq.SystemBytes))
+                    var return_code = OnTaskDownload(taskDownloadReq.TaskDownload);
+                    if (TryTaskDownloadReqAckAsync(return_code == TASK_DOWNLOAD_RETURN_CODES.OK, taskDownloadReq.SystemBytes))
                     {
                         OnTaskDownloadFeekbackDone?.Invoke(this, taskDownloadReq.TaskDownload);
                     }
