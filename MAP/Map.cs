@@ -13,6 +13,14 @@ namespace AGVSystemCommonNet6.MAP
         public string Name { get; set; }
         public string Note { get; set; }
         public int PointIndex { get; set; }
+        /// <summary>
+        /// 圖片的像素大小
+        /// </summary>
+        public int[] Map_Image_Size { get; set; } = new int[2] { 400, 400 };
+        /// <summary>
+        /// 地圖邊界對應實際長度 [x1,y1,x2,y2]
+        /// </summary>
+        public double[] Map_Image_Boundary { get; set; } = new double[4] { -20, -20, 20, 20 };
         public Dictionary<int, MapPoint> Points { get; set; }
         public Dictionary<string, BezierCurve> BezierCurves { get; set; } = new Dictionary<string, BezierCurve>();
 
