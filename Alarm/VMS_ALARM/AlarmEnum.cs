@@ -397,5 +397,7 @@
         Fork_Initialize_Process_Interupt = 860029,
         Fork_Initialize_Process_Error_Occur = 860030,
         Fork_Initialized_But_Home_Input_Not_ON = 860031,
+        Fork_Go_Home_But_Home_Sensor_Signal_Error = 860032,
+        Fork_Initialized_But_Driver_Position_Not_ZERO = 860033,
     }
 }
