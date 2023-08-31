@@ -11,26 +11,20 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
-    public class AGVStatusDBHelper : TaskDatabaseHelper
+    public class AGVStatusDBHelper : DBHelperAbstract
     {
+        private DbSet<clsAGVStateDto> AGVStatusSet => dbContext.AgvStates;
         public new List<clsAGVStateDto> GetALL(bool enabled_agv_only = true)
         {
-            using (var dbhelper = new DbContextHelper(connection_str))
-            {
-                if (enabled_agv_only)
-                    return dbhelper._context.AgvStates.Where(agv => agv.Enabled).ToList();
-                else
-                    return dbhelper._context.AgvStates.ToList();
-            }
+            if (enabled_agv_only)
+                return AGVStatusSet.Where(agv => agv.Enabled).ToList();
+            else
+                return AGVStatusSet.ToList();
         }
 
         public clsAGVStateDto GetAGVStateByName(string agv_name)
         {
-
-            using (var dbhelper = new DbContextHelper(connection_str))
-            {
-                return dbhelper._context.AgvStates.Where(agv => agv.AGV_Name == agv_name).FirstOrDefault();
-            }
+            return AGVStatusSet.Where(agv => agv.AGV_Name == agv_name).FirstOrDefault();
         }
 
         /// <summary>
@@ -42,13 +36,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             try
             {
-                using (var dbhelper = new DbContextHelper(connection_str))
-                {
-                    Console.WriteLine($"{JsonConvert.SerializeObject(AGVStateDto, Formatting.Indented)}");
-                    dbhelper._context.Set<clsAGVStateDto>().Add(AGVStateDto);
-                    int ret = await dbhelper._context.SaveChangesAsync();
-                    return ret;
-                }
+                AGVStatusSet.Add(AGVStateDto);
+                return SaveChanges();
             }
             catch (DbUpdateException ex)
             {
@@ -66,19 +55,16 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             string errorMesg = string.Empty;
             try
             {
-                using (var dbhelper = new DbContextHelper(connection_str))
+                clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == agv_name);
+                if (agvState != null)
                 {
-                    clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == agv_name);
-                    if (agvState != null)
-                    {
-                        agvState.BatteryLevel = batteryLevel;
-                        int ret = await dbhelper._context.SaveChangesAsync();
+                    agvState.BatteryLevel = batteryLevel;
+                    int ret = SaveChanges();
 
-                        return (true, "");
-                    }
-                    else
-                        return (false, "Can't Get AGV Data");
+                    return (true, "");
                 }
+                else
+                    return (false, "Can't Get AGV Data");
             }
             catch (Exception ex)
             {
@@ -89,11 +75,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         private static bool dbBusyFlag = false;
         public async Task<(bool confirm, string errorMesg)> Update(IEnumerable<clsAGVStateDto> AGVStateDtos)
         {
-            using (var dbhelper = new DbContextHelper(connection_str))
-            {
                 foreach (var AGVStateDto in AGVStateDtos)
                 {
-                    clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
+                    clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
                     if (agvState != null)
                     {
 
@@ -115,8 +99,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                         AGVStateDto.Enabled = true;
                         Add(AGVStateDto);
                     }
-                }
-                int ret = await dbhelper._context.SaveChangesAsync();
+                int ret =   SaveChanges();
             }
             return (true, "");
         }
@@ -129,9 +112,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             dbBusyFlag = true;
             try
             {
-                using (var dbhelper = new DbContextHelper(connection_str))
-                {
-                    clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
+                    clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
                     if (agvState != null)
                     {
                         if (JsonConvert.SerializeObject(agvState) == JsonConvert.SerializeObject(AGVStateDto))
@@ -155,8 +136,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                         AGVStateDto.Enabled = true;
                         Add(AGVStateDto);
                     }
-                    int ret = await dbhelper._context.SaveChangesAsync();
-                }
+                int ret = SaveChanges();
+          
                 dbBusyFlag = false;
                 return (true, "");
             }
@@ -169,35 +150,32 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public bool IsExist(string AGVName)
         {
-            using (var dbhelper = new DbContextHelper(connection_str))
-            {
-                clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == AGVName);
+           
+                clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == AGVName);
                 return agvState != null;
-            }
+          
         }
 
         public void UpdateConnected(string name, bool value)
         {
-            using (var dbhelper = new DbContextHelper(connection_str))
-            {
-                clsAGVStateDto? agvState = dbhelper._context.Set<clsAGVStateDto>().FirstOrDefault(dto => dto.AGV_Name == name);
+          
+                clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == name);
                 if (agvState != null)
                 {
 
                     agvState.Connected = value;
                     dbhelper._context.SaveChangesAsync();
                 }
-            }
         }
 
         internal void ChangeAllOffline()
         {
-            foreach (var agv_status in dbContext.AgvStates)
+            foreach (var agv_status in AGVStatusSet)
             {
                 agv_status.OnlineStatus = clsEnums.ONLINE_STATE.OFFLINE;
                 agv_status.Connected = false;
             }
-            dbContext.SaveChangesAsync();
+            SaveChanges();
         }
     }
 }

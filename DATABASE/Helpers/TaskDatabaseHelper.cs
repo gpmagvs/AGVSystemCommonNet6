@@ -2,6 +2,8 @@
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.TASK;
+using AGVSystemCommonNet6.Tools.Database;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,37 +14,33 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
-    public class TaskDatabaseHelper : DBHelperAbstract, IDisposable
+    public class TaskDatabaseHelper : DBHelperAbstract
     {
         private bool disposedValue;
-
-        public List<clsTaskDto> GetALL()
+        private DbSet<clsTaskDto> TaskSet => dbhelper._context.Tasks;
+        public TaskDatabaseHelper() : base()
         {
-            var alltasks = dbContext.Tasks.ToList();
-            return alltasks;
+        }
+        public async Task<List<clsTaskDto>> GetALL()
+        {
+            return await TaskSet.ToListAsync();
         }
 
 
         public List<clsTaskDto> GetALLInCompletedTask()
         {
-            using (var dbhelper = new DbContextHelper(connection_str))
-            {
-                var incompleteds = dbhelper._context.Set<clsTaskDto>().Where(tsk => tsk.State == TASK_RUN_STATUS.WAIT | tsk.State == TASK_RUN_STATUS.NAVIGATING).OrderByDescending(t => t.RecieveTime).ToList();
+                var incompleteds =TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.WAIT | tsk.State == TASK_RUN_STATUS.NAVIGATING).OrderByDescending(t => t.RecieveTime).ToList();
                 if (incompleteds.Count > 0)
                 {
                 }
                 return incompleteds;
-            }
         }
 
         public List<clsTaskDto> GetALLCompletedTask(int num = 20)
         {
-            using (var dbhelper = new DbContextHelper(connection_str))
-            {
-                TASK_RUN_STATUS[] endTaskSTatus = new TASK_RUN_STATUS[] { TASK_RUN_STATUS.FAILURE, TASK_RUN_STATUS.CANCEL, TASK_RUN_STATUS.ACTION_FINISH, TASK_RUN_STATUS.NO_MISSION };
-                var incompleteds = dbhelper._context.Set<clsTaskDto>().Where(tsk => endTaskSTatus.Contains(tsk.State)).OrderByDescending(t => t.RecieveTime).Take(num).ToList();
-                return incompleteds;
-            }
+            TASK_RUN_STATUS[] endTaskSTatus = new TASK_RUN_STATUS[] { TASK_RUN_STATUS.FAILURE, TASK_RUN_STATUS.CANCEL, TASK_RUN_STATUS.ACTION_FINISH, TASK_RUN_STATUS.NO_MISSION };
+            var incompleteds = TaskSet.Where(tsk => endTaskSTatus.Contains(tsk.State)).OrderByDescending(t => t.RecieveTime).Take(num).ToList();
+            return incompleteds;
         }
 
         /// <summary>
@@ -54,13 +52,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             try
             {
-                using (var dbhelper = new DbContextHelper(connection_str))
-                {
-                    Console.WriteLine($"{JsonConvert.SerializeObject(taskState, Formatting.Indented)}");
-                    dbhelper._context.Tasks.Add(taskState);
-                    int ret = dbhelper._context.SaveChanges();
-                    return ret;
-                }
+                Console.WriteLine($"{JsonConvert.SerializeObject(taskState, Formatting.Indented)}");
+                TaskSet.Add(taskState);
+                return SaveChanges();
             }
             catch (Exception ex)
             {
@@ -68,11 +62,11 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
         }
 
-        public bool Update(clsTaskDto taskState)
+        public async Task<bool> Update(clsTaskDto taskState)
         {
             try
             {
-                var task = GetALL().FirstOrDefault(task => task.TaskName == taskState.TaskName);
+                var task = TaskSet.FirstOrDefault(task => task.TaskName == taskState.TaskName);
                 if (task == null)
                     return false;
                 var typeA = typeof(clsTaskDto);
@@ -93,7 +87,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                         }
                     }
                 }
-               dbContext.SaveChanges();
+                SaveChanges();
                 return true;
             }
             catch (Exception ex)
@@ -107,7 +101,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             try
             {
-                clsTaskDto? taskExist = dbContext.Tasks.FirstOrDefault(tsk => tsk.TaskName == task_name);
+                clsTaskDto? taskExist = TaskSet.FirstOrDefault(tsk => tsk.TaskName == task_name);
                 if (taskExist != null)
                 {
                     taskExist.State = TASK_RUN_STATUS.CANCEL;
@@ -125,53 +119,22 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         }
 
-        protected virtual void Dispose(bool disposing)
+        public   void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsTaskDto> Task)
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                }
 
-                disposedValue = true;
+            Task = new List<clsTaskDto>();
+            if (AGV_Name == "ALL")
+            {
+                count = TaskSet.Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Count();
+                int skipindex = (currentpage - 1) * 10;
+                Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Skip(skipindex).Take(10).ToList();
+
             }
-        }
-
-        // ~TaskDatabaseHelper()
-        // {
-        //     // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        public void SaveChanges()
-        {
-            dbContext.SaveChanges();
-        }
-        public static void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsTaskDto> Task)
-        {
-            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            else
             {
-                Task = new List<clsTaskDto>();
-                if (AGV_Name == "ALL")
-                {
-                    count = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Count();
-                    int skipindex = (currentpage - 1) * 10;
-                    Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Skip(skipindex).Take(10).ToList();
-
-                }
-                else
-                {
-                    count = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Count();
-                    int skipindex = (currentpage - 1) * 10;
-                    Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime && Task.DesignatedAGVName == AGV_Name).Skip(skipindex).Take(10).ToList();
-                }
+                count = TaskSet.Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime).Count();
+                int skipindex = (currentpage - 1) * 10;
+                Task = TaskSet.Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime && Task.DesignatedAGVName == AGV_Name).Skip(skipindex).Take(10).ToList();
             }
         }
 
@@ -179,14 +142,11 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             try
             {
-                using (var dbhelper = new DbContextHelper(connection_str))
-                {
-                    var taskDto = dbhelper._context.Set<clsTaskDto>().FirstOrDefault(tk => tk.TaskName == taskName);
+                    var taskDto = TaskSet.FirstOrDefault(tk => tk.TaskName == taskName);
                     if (taskDto != null)
                         return taskDto.State;
                     else
                         return TASK_RUN_STATUS.WAIT;
-                }
             }
             catch (Exception ex)
             {
@@ -196,12 +156,12 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public List<clsTaskDto> GetTasksByTimeInterval(DateTime start, DateTime end)
         {
-            return dbContext.Tasks.Where(tk=>tk.RecieveTime>=start && tk.FinishTime<=end).ToList();
+            return  TaskSet.Where(tk => tk.RecieveTime >= start && tk.FinishTime <= end).ToList();
         }
 
         public void SetRunningTaskWait()
         {
-            foreach (var task in dbContext.Tasks.Where(tsk=>tsk.State== TASK_RUN_STATUS.NAVIGATING))
+            foreach (var task in TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.NAVIGATING))
             {
                 task.State = TASK_RUN_STATUS.WAIT;
             }
