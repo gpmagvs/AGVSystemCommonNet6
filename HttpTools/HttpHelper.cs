@@ -30,7 +30,41 @@ namespace AGVSystemCommonNet6.HttpTools
                 BaseAddress = new Uri(baseUrl)
             };
         }
+        public async Task<(bool success, string json)> PostAsync(string api_route, object data)
+        {
+            string contentDataJson = string.Empty;
+            string url = this.baseUrl + api_route;
+            if (data != null)
+                contentDataJson = JsonConvert.SerializeObject(data);
+            var content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                Stopwatch sw = Stopwatch.StartNew();
+                var response = await http_client.PostAsync(api_route, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    return (true, responseJson);
+                }
+                else
+                {
+                    var errmsg = $"Failed to POST to {url}. Response status code: {response.StatusCode}";
+                    Console.WriteLine(errmsg);
+                    throw new HttpRequestException(errmsg);
+                }
+            }
+            catch (TaskCanceledException ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
 
+        }
         public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data)
         {
             string contentDataJson = string.Empty;
@@ -72,13 +106,13 @@ namespace AGVSystemCommonNet6.HttpTools
             try
             {
                 string jsonContent = "";
-                string url = this.baseUrl+$"{api_route}";
+                string url = this.baseUrl + $"{api_route}";
                 HttpResponseMessage response = null;
                 response = await http_client.GetAsync(api_route);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     jsonContent = await response.Content.ReadAsStringAsync();
-                   
+
                     var result = JsonConvert.DeserializeObject<Tin>(jsonContent);
                     return result;
                 }
@@ -96,6 +130,6 @@ namespace AGVSystemCommonNet6.HttpTools
 
 
         }
-      
+
     }
 }
