@@ -27,16 +27,21 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         }
 
 
-        public List<clsTaskDto> GetALLInCompletedTask()
+        public List<clsTaskDto> GetALLInCompletedTask(bool notracking = false)
         {
-            return TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.WAIT | tsk.State == TASK_RUN_STATUS.NAVIGATING).OrderByDescending(t => t.RecieveTime).ToList();
+            var _incomplete_tasks = TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.WAIT | tsk.State == TASK_RUN_STATUS.NAVIGATING).OrderByDescending(t => t.RecieveTime);
+            if (notracking)
+                return _incomplete_tasks.AsNoTracking().ToList();
+            return _incomplete_tasks.ToList();
         }
 
-        public List<clsTaskDto> GetALLCompletedTask(int num = 20)
+        public List<clsTaskDto> GetALLCompletedTask(int num = 20, bool notracking = false)
         {
             TASK_RUN_STATUS[] endTaskSTatus = new TASK_RUN_STATUS[] { TASK_RUN_STATUS.FAILURE, TASK_RUN_STATUS.CANCEL, TASK_RUN_STATUS.ACTION_FINISH, TASK_RUN_STATUS.NO_MISSION };
-            var incompleteds = TaskSet.Where(tsk => endTaskSTatus.Contains(tsk.State)).OrderByDescending(t => t.RecieveTime).Take(num).ToList();
-            return incompleteds;
+            var _complete_tasks = TaskSet.Where(tsk => endTaskSTatus.Contains(tsk.State)).OrderByDescending(t => t.RecieveTime).Take(num);
+            if (notracking)
+                return _complete_tasks.AsNoTracking().ToList();
+            return _complete_tasks.ToList();
         }
 
         /// <summary>
@@ -138,7 +143,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             try
             {
-                var taskDto = TaskSet.FirstOrDefault(tk => tk.TaskName == taskName);
+                var taskDto = TaskSet.Where(tk => tk.TaskName == taskName).AsNoTracking().FirstOrDefault();
                 if (taskDto != null)
                     return taskDto.State;
                 else
