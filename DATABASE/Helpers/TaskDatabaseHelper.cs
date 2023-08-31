@@ -29,11 +29,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public List<clsTaskDto> GetALLInCompletedTask()
         {
-                var incompleteds =TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.WAIT | tsk.State == TASK_RUN_STATUS.NAVIGATING).OrderByDescending(t => t.RecieveTime).ToList();
-                if (incompleteds.Count > 0)
-                {
-                }
-                return incompleteds;
+            return TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.WAIT | tsk.State == TASK_RUN_STATUS.NAVIGATING).OrderByDescending(t => t.RecieveTime).ToList();
         }
 
         public List<clsTaskDto> GetALLCompletedTask(int num = 20)
@@ -119,7 +115,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         }
 
-        public   void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsTaskDto> Task)
+        public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, out List<clsTaskDto> Task)
         {
 
             Task = new List<clsTaskDto>();
@@ -142,11 +138,11 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             try
             {
-                    var taskDto = TaskSet.FirstOrDefault(tk => tk.TaskName == taskName);
-                    if (taskDto != null)
-                        return taskDto.State;
-                    else
-                        return TASK_RUN_STATUS.WAIT;
+                var taskDto = TaskSet.FirstOrDefault(tk => tk.TaskName == taskName);
+                if (taskDto != null)
+                    return taskDto.State;
+                else
+                    return TASK_RUN_STATUS.WAIT;
             }
             catch (Exception ex)
             {
@@ -156,7 +152,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public List<clsTaskDto> GetTasksByTimeInterval(DateTime start, DateTime end)
         {
-            return  TaskSet.Where(tk => tk.RecieveTime >= start && tk.FinishTime <= end).ToList();
+            return TaskSet.Where(tk => tk.RecieveTime >= start && tk.FinishTime <= end).ToList();
         }
 
         public void SetRunningTaskWait()
