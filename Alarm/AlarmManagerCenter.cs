@@ -229,7 +229,7 @@ namespace AGVSystemCommonNet6.Alarm
         }
         public static string SaveTocsv( DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
         {
-            var folder = Path.Combine(Environment.CurrentDirectory, "wwwroot/images");
+            var folder = Path.Combine(Environment.CurrentDirectory, @"d:\\SaveLog");
             string FilePath = Path.Combine(folder, "AlarmQuery" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv");
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
