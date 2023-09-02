@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AGVSystemCommonNet6.TASK;
+using AGVSystemCommonNet6.User;
 
 namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
     public class DbContextHelper : IDisposable
     {
-        private readonly string _connectionString;
+        public readonly string _connectionString;
         internal AGVSDbContext _context;
         private bool disposedValue;
 
@@ -30,6 +31,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 if (disposing)
                 {
                 }
+                _context.Database.CloseConnection();
                 _context.Dispose();
                 disposedValue = true;
             }

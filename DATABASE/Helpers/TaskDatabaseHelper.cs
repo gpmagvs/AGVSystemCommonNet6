@@ -65,36 +65,45 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public async Task<bool> Update(clsTaskDto taskState)
         {
-            try
-            {
-                var task = TaskSet.FirstOrDefault(task => task.TaskName == taskState.TaskName);
-                if (task == null)
-                    return false;
-                var typeA = typeof(clsTaskDto);
-                var typeB = typeof(clsTaskDto);
-                var propertiesB = typeB.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                foreach (var propertyB in propertiesB)
-                {
 
-                    if (propertyB.Name != "TaskName")
-                    {
-                        var valueB = propertyB.GetValue(taskState, null);
-                        try
-                        {
-                            propertyB.SetValue(task, valueB, null);
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-                }
-                SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
+            using (var transaction = dbContext.Database.BeginTransaction())
             {
-                return false;
+                using (var dbcontext = new DbContextHelper(base.connection_str))
+                    try
+                    {
+                        var task = dbcontext._context.Tasks.FirstOrDefault(task => task.TaskName == taskState.TaskName);
+                        if (task == null)
+                            return false;
+                        var typeA = typeof(clsTaskDto);
+                        var typeB = typeof(clsTaskDto);
+                        var propertiesB = typeB.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                        foreach (var propertyB in propertiesB)
+                        {
+
+                            if (propertyB.Name != "TaskName")
+                            {
+                                var valueB = propertyB.GetValue(taskState, null);
+                                try
+                                {
+                                    propertyB.SetValue(task, valueB, null);
+                                }
+                                catch (Exception)
+                                {
+                                }
+                            }
+                        }
+                        dbcontext._context.SaveChanges();
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        AlarmManagerCenter.AddAlarm(ALARMS.Task_Status_Cant_Save_To_Database);
+                        transaction.Rollback();
+                        return false;
+                    }
             }
+            return true;
+
         }
 
 
@@ -106,7 +115,6 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 if (taskExist != null)
                 {
                     taskExist.State = TASK_RUN_STATUS.CANCEL;
-                    taskExist.RecieveTime = DateTime.Now;
                     taskExist.FinishTime = DateTime.Now;
                     taskExist.FailureReason = "User Canceled";
                     dbContext.SaveChanges();
@@ -139,10 +147,11 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
         }
 
-        public TASK_RUN_STATUS GetTaskStateByID(string taskName)
+        public async Task< TASK_RUN_STATUS> GetTaskStateByID(string taskName)
         {
             try
             {
+                await Task.Delay(100);
                 var taskDto = TaskSet.Where(tk => tk.TaskName == taskName).AsNoTracking().FirstOrDefault();
                 if (taskDto != null)
                     return taskDto.State;

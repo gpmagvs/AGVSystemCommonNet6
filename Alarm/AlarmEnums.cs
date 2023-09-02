@@ -62,7 +62,10 @@ namespace AGVSystemCommonNet6.Alarm
         CANNOT_DISPATCH_TASK_WITH_ILLEAGAL_STATUS = 43,
         AGV_BATTERY_LOW_LEVEL = 44,
         AGV_WORKSTATION_DATA_NOT_SETTING = 45,
-        AGV_AT_UNKNON_TAG_LOCATION = 46
+        AGV_AT_UNKNON_TAG_LOCATION = 46,
+        Task_Status_Cant_Save_To_Database = 47,
+        Task_Cancel_Fail = 48,
+        Task_Add_To_Database_Fail = 49
     }
 
 }

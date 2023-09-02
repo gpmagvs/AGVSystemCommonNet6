@@ -93,13 +93,13 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     agvState.TaskRunAction = AGVStateDto.TaskRunAction;
                     agvState.Theta = AGVStateDto.Theta;
                     agvState.Connected = AGVStateDto.Connected;
+                    int ret = SaveChanges();
                 }
                 else
                 {
                     AGVStateDto.Enabled = true;
                     Add(AGVStateDto);
                 }
-                int ret = SaveChanges();
             }
             return (true, "");
         }
