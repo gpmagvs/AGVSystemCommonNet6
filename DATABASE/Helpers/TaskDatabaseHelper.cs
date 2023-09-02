@@ -144,8 +144,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
         {
-            var folder = Path.Combine(Environment.CurrentDirectory, @"d:\\SaveLog");
-            string FilePath = Path.Combine(folder, "TaskQuery" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv");
+            var folder = Path.Combine(Environment.CurrentDirectory, @"SaveLog\\Task");
+            Directory.CreateDirectory(folder);
+            string FilePath = Path.Combine(folder, "TaskQuery_" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv");
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 var _Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
@@ -159,7 +160,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         }
 
 
-        public async Task< TASK_RUN_STATUS> GetTaskStateByID(string taskName)
+        public async Task<TASK_RUN_STATUS> GetTaskStateByID(string taskName)
         {
             try
             {
