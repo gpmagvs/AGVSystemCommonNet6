@@ -23,16 +23,20 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         {
             LOG.INFO("Alarm List File to load :" + alarm_JsonFile);
             message = string.Empty;
-            if (File.Exists(alarm_JsonFile))
+            try
             {
+                if (!File.Exists(alarm_JsonFile))
+                {
+                    File.Copy(Path.Combine(Environment.CurrentDirectory, "src/AlarmList.json"), alarm_JsonFile);
+                }
                 AlarmList = JsonConvert.DeserializeObject<List<clsAlarmCode>>(File.ReadAllText(alarm_JsonFile));
                 LOG.INFO($"Alarm List Loaded !.{AlarmList.Count}");
                 return true;
             }
-            else
+            catch (Exception ex)
             {
-                message = $"Alarm List Load Fail ,File isn't exist {alarm_JsonFile}";
-                LOG.WARN(message);
+                LOG.Critical($"Alarm Code List load fail. {ex.Message} ", ex);
+                Environment.Exit(0);
                 return false;
             }
         }
