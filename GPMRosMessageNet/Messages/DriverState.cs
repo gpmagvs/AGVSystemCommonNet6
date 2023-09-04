@@ -23,7 +23,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
         {
             this.name = "";
             this.state = -1;
-            this.errorCode = 40;
+            this.errorCode = 0;
             this.speed = 0.0f;
             this.position = 0.0f;
             this.voltage = 0;
