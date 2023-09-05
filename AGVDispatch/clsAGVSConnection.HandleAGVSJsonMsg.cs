@@ -52,8 +52,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     MSG = onlineModeChageReq;
                     AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
                     var modereq = onlineModeChageReq.Header["0107"].ModeRequest;
-                    OnRemoteModeChanged?.Invoke(modereq, true);
-                    TryOnlineModeChangeReqRply_0108(onlineModeChageReq.SystemBytes);
+                    bool? agv_accept = OnRemoteModeChanged?.Invoke(modereq, true);
+                    TrySimpleReply("0108", (bool)agv_accept, onlineModeChageReq.SystemBytes);
                 }
                 else if (msgType == MESSAGE_TYPE.REQ_0301_TASK_DOWNLOAD)  //TASK DOWNLOAD
                 {
@@ -79,7 +79,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     MSG = taskResetMsg;
                     AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
                     bool reset_accept = OnTaskResetReq(taskResetMsg.ResetData.ResetMode, false);
-                    TryTaskResetReqAckAsync(reset_accept, taskResetMsg.SystemBytes);
+                    TrySimpleReply("0306", reset_accept, taskResetMsg.SystemBytes);
                 }
                 else if (msgType == MESSAGE_TYPE.ACK_0322)
                 {

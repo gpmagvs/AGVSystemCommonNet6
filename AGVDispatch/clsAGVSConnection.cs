@@ -306,7 +306,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
 
 
-        public async Task<bool> WriteDataOut(byte[] dataByte, int systemBytes)
+        public async Task<bool> SendMsgToAGVSAndWaitReply(byte[] dataByte, int systemBytes)
         {
             if (!IsConnected())
                 return false;
@@ -316,19 +316,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     ManualResetEvent manualResetEvent = new ManualResetEvent(false);
                     socketState.stream.Write(dataByte, 0, dataByte.Length);
-                    if (WaitAGVSReplyMREDictionary.ContainsKey(systemBytes))
-                    {
-
-                    }
                     bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
-
                     if (addsucess)
                         manualResetEvent.WaitOne();
                     else
                     {
                         LOG.WARN($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
                     }
-
                 }
                 catch (IOException ioex)
                 {
@@ -342,8 +336,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
 
             });
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(Debugger.IsAttached ? 13 : 1));
-
+            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(Debugger.IsAttached ? 13 : 5));
             try
             {
                 _task.Start();

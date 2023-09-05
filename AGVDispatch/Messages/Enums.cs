@@ -26,7 +26,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         Connection_Fail = 405,
         No_Response = 406,
         Status_Abnormal = 407,
-        TASK_DOWNLOAD_DATA_ILLEAGAL = 408
+        TASK_DOWNLOAD_DATA_ILLEAGAL = 408,
+        No_Found_Reply_In_Store = 409
     }
 
     public enum TASK_DOWNLOAD_RETURN_CODES : int

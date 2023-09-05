@@ -44,7 +44,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                         else
                         {
-                            bool success = await WriteDataOut(data, msg.SystemBytes);
+                            bool success = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
                             if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase _retMsg))
                             {
                                 clsSimpleReturnMessage msg_return = (clsSimpleReturnMessage)_retMsg;
@@ -87,7 +87,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 else
                 {
                     byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg);
-                    await WriteDataOut(data, msg.SystemBytes);
+                    bool success = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
+
+                    if (!success)
+                    {
+                        return (false, null);
+                    }
                     if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                     {
                         clsRunningStatusReportResponseMessage QueryResponseMessage = mesg as clsRunningStatusReportResponseMessage;
@@ -108,42 +113,48 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-        private void TryOnlineModeChangeReqRply_0108(int systemBytes)
+        private void TrySimpleReply(string header_key, bool reset_accept, int system_byte)
         {
-            byte[] data = AGVSMessageFactory.CreateSimpleReturnMessageData("0108", true, systemBytes, out clsSimpleReturnWithTimestampMessage msg);
-            Console.WriteLine(msg.ToJson());
-            bool writeOutSuccess = WriteDataOut(data);
-            Console.WriteLine("TryTaskResetReqAckAsync : " + writeOutSuccess);
-        }
-        private void TryTaskResetReqAckAsync(bool reset_accept, int system_byte)
-        {
-            byte[] data = AGVSMessageFactory.CreateSimpleReturnMessageData("0306", reset_accept, system_byte, out clsSimpleReturnWithTimestampMessage msg);
+            byte[] data = AGVSMessageFactory.CreateSimpleReturnMessageData(header_key, reset_accept, system_byte, out clsSimpleReturnWithTimestampMessage msg);
             Console.WriteLine(msg.ToJson());
             bool writeOutSuccess = WriteDataOut(data);
             Console.WriteLine("TryTaskResetReqAckAsync : " + writeOutSuccess);
 
         }
+
+        /// <summary>
+        /// Send 0103 Online Request with tag 
+        /// </summary>
+        /// <param name="currentTag"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public async Task<(bool success, RETURN_CODE return_code)> TrySendOnlineModeChangeRequest(int currentTag, REMOTE_MODE mode)
         {
-            Console.WriteLine($"[Online Mode Change] 車載請求 {mode} , Tag {currentTag}");
             try
             {
                 AGVOnlineReturnCode = RETURN_CODE.No_Response;
                 WaitAGVSAcceptOnline = new ManualResetEvent(false);
                 if (UseWebAPI)
                 {
-
                     SimpleRequestResponse response = await PostOnlineModeChangeRequset(currentTag, mode);
                     return (response.ReturnCode == RETURN_CODE.OK | response.ReturnCode == RETURN_CODE.NG, response.ReturnCode);
                 }
-                byte[] data = AGVSMessageFactory.CreateOnlineModeChangeRequesData(currentTag, mode, out clsOnlineModeRequestMessage msg);
-                await WriteDataOut(data, msg.SystemBytes);
-                if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
+                else
                 {
+                    byte[] data = AGVSMessageFactory.CreateOnlineModeChangeRequesData(currentTag, mode, out clsOnlineModeRequestMessage msg);
+                    bool agvs_replyed = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
+                    if (!agvs_replyed)
+                        return (false, RETURN_CODE.No_Response);
+                    if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
+                    {
+                        await Task.Delay(1);
+                        WaitAGVSAcceptOnline.WaitOne(5000);
+                        bool success = AGVOnlineReturnCode == RETURN_CODE.OK;
+                        return (success, AGVOnlineReturnCode);
+                    }
+                    else
+                        return (false, RETURN_CODE.No_Found_Reply_In_Store);
                 }
-                WaitAGVSAcceptOnline.WaitOne(1000);
-                bool success = AGVOnlineReturnCode == RETURN_CODE.OK;
-                return (success, AGVOnlineReturnCode);
             }
             catch (Exception ex)
             {
@@ -165,7 +176,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
 
                 byte[] data = AGVSMessageFactory.CreateOnlineModeQueryData(out clsOnlineModeQueryMessage msg);
-                await WriteDataOut(data, msg.SystemBytes);
+                await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
 
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                 {
@@ -187,7 +198,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
                 byte[] data = AGVSMessageFactory.CreateCarrierRemovedData(new string[] { toRemoveCSTID }, task_name, opid, out clsCarrierRemovedMessage msg);
-                await WriteDataOut(data, msg.SystemBytes);
+                await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
 
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                 {
