@@ -158,7 +158,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             return Encoding.UTF8.GetBytes(FormatSendOutString(mesg.ToJson()));
         }
-    
+
 
         internal static byte[] CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg, bool getPoseOfLastPtOfTrajectory = false)
         {
@@ -176,7 +176,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return string.Format("{0}*{1}", json, "\r");
         }
 
-        internal static byte[] CreateTaskFeedbackMessageData(clsTaskDownloadData taskData, int PointIndex, TASK_RUN_STATUS task_status, out clsTaskFeedbackMessage taskFeedbackMessage)
+        internal static byte[] CreateTaskFeedbackMessageData(clsTaskDownloadData taskData, int PointIndex, TASK_RUN_STATUS task_status, int tag, clsCoordination coordination, out clsTaskFeedbackMessage taskFeedbackMessage)
         {
             taskFeedbackMessage = new clsTaskFeedbackMessage()
             {
@@ -187,12 +187,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                    {
                        {"0303", new FeedbackData
                         {
-                            TaskName = taskData.Task_Name,
-                             TaskSimplex = taskData.Task_Simplex,
-                              TaskSequence = taskData.Task_Sequence,
-                               PointIndex = PointIndex,
-                                TaskStatus = task_status,
-                                 TimeStamp = DateTime.Now.ToAGVSTimeFormat(),
+                           TaskName = taskData.Task_Name,
+                           TaskSimplex = taskData.Task_Simplex,
+                           TaskSequence = taskData.Task_Sequence,
+                           PointIndex = PointIndex,
+                           TaskStatus = task_status,
+                           LastVisitedNode= tag,
+                           Coordination = coordination,
+                           TimeStamp = DateTime.Now.ToAGVSTimeFormat(),
                         }
                     }
                    }

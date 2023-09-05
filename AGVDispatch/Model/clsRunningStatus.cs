@@ -75,6 +75,13 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
 
     public class clsCoordination
     {
+        public clsCoordination() { }
+        public clsCoordination(double X, double Y, double Theta)
+        {
+            this.X = X;
+            this.Y = Y;
+            this.Theta = Theta;
+        }
         public double X { get; set; }
         public double Y { get; set; }
         public double Theta { get; set; }

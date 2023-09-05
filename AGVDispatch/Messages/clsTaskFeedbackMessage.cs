@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AGVSystemCommonNet6.AGVDispatch.Model;
+using Newtonsoft.Json;
 using static AGVSystemCommonNet6.AGVDispatch.Messages.RunningStatus;
 
 namespace AGVSystemCommonNet6.AGVDispatch.Messages
@@ -27,5 +28,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         [JsonProperty("Task Status")]
         public TASK_RUN_STATUS TaskStatus { get; set; }
+
+        [JsonProperty("Coordination")]
+        public clsCoordination Coordination { get; set; } = new clsCoordination();
+
+        [JsonProperty("Last Visited Node")]
+        public int LastVisitedNode { get; set; } = -1;
     }
 }
