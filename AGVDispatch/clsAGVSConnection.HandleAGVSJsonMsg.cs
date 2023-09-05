@@ -15,14 +15,20 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             MessageBase? MSG = null;
             MESSAGE_TYPE msgType = GetMESSAGE_TYPE(_json);
+            LOG.INFO(_json, false);
 
             try
             {
+                if (msgType == MESSAGE_TYPE.UNKNOWN)
+                {
+                    LOG.ERROR($"Recieve undefined Msg {_json}");
+                    return;
+                }
+
                 if (msgType == MESSAGE_TYPE.ACK_0102)
                 {
                     clsOnlineModeQueryResponseMessage? onlineModeQuAck = JsonConvert.DeserializeObject<clsOnlineModeQueryResponseMessage>(_json);
                     CurrentREMOTE_MODE_Downloaded = onlineModeQuAck.OnlineModeQueryResponse.RemoteMode;
-                    OnRemoteModeChanged(CurrentREMOTE_MODE_Downloaded, true);
                     MSG = onlineModeQuAck;
                     AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
                 }
@@ -39,6 +45,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     clsRunningStatusReportResponseMessage? runningStateReportAck = JsonConvert.DeserializeObject<clsRunningStatusReportResponseMessage>(_json);
                     MSG = runningStateReportAck;
                     AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
+                }
+                else if (msgType == MESSAGE_TYPE.REQ_0107_AGVS_Online_Req) //AGVS要求上線
+                {
+                    clsOnlineModeRequestMessage? onlineModeChageReq = JsonConvert.DeserializeObject<clsOnlineModeRequestMessage>(_json);
+                    MSG = onlineModeChageReq;
+                    AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
+                    var modereq = onlineModeChageReq.Header["0107"].ModeRequest;
+                    OnRemoteModeChanged?.Invoke(modereq, true);
+                    TryOnlineModeChangeReqRply_0108(onlineModeChageReq.SystemBytes);
                 }
                 else if (msgType == MESSAGE_TYPE.REQ_0301_TASK_DOWNLOAD)  //TASK DOWNLOAD
                 {

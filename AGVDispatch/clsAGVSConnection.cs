@@ -36,6 +36,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
             ACK_0104 = 0104,
             REQ_0105_RUNNING_STATUS_REPORT = 0105,
             ACK_0106 = 0106,
+            REQ_0107_AGVS_Online_Req = 0107,
+            ACK_0107_AGVS_Online_Req = 0108,
             REQ_0301_TASK_DOWNLOAD = 0301,
             ACK_0302_TASK_DOWNLOADED_ACK = 0302,
             REQ_0303_TASK_FEEDBACK_REPORT = 0303,
@@ -100,7 +102,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task<bool> Start()
         {
-            _ = Task.Run(async () =>
+            _ = Task.Factory.StartNew(async () =>
             {
                 int disconnect_cnt = 0;
                 while (true)
@@ -117,18 +119,23 @@ namespace AGVSystemCommonNet6.AGVDispatch
                                 continue;
                             }
                         }
-                        (bool, OnlineModeQueryResponse onlineModeQuAck) result = TryOnlineModeQueryAsync().Result;
+                        (bool, OnlineModeQueryResponse onlineModeQuAck) result = (false, new OnlineModeQueryResponse());
+                        int retryCnt = 0;
+                        while (!result.Item1)
+                        {
+                            await Task.Delay(1);
+                            retryCnt += 1;
+                            if (retryCnt > 10)
+                                break;
+                            result = TryOnlineModeQueryAsync().Result;
+                        }
 
                         if (!result.Item1)
                         {
                             LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
-                            disconnect_cnt += 1;
-                            if (disconnect_cnt > (Debugger.IsAttached ? 5 : 50))
-                            {
-                                if (!UseWebAPI)
-                                    Disconnect();
-                                Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_Disconnect;
-                            }
+                            if (!UseWebAPI)
+                                Disconnect();
+                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_Disconnect;
                             continue;
                         }
                         else
@@ -139,7 +146,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             disconnect_cnt = 0;
                         }
 
-                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
+                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = (false, new SimpleRequestResponseWithTimeStamp());
+
+                        int runing_state_rp_retryCnt = 0;
+                        while (!runningStateReport_result.Item1)
+                        {
+                            await Task.Delay(10);
+                            runing_state_rp_retryCnt += 1;
+                            if (runing_state_rp_retryCnt > 10)
+                                break;
+                            runningStateReport_result = TryRnningStateReportAsync().Result;
+                        }
+
                         if (!runningStateReport_result.Item1)
                             LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
 
@@ -231,6 +249,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return MESSAGE_TYPE.REQ_0105_RUNNING_STATUS_REPORT;
             if (firstHeaderKey.Contains("0106"))
                 return MESSAGE_TYPE.ACK_0106;
+            if (firstHeaderKey.Contains("0107"))
+                return MESSAGE_TYPE.REQ_0107_AGVS_Online_Req;
             if (firstHeaderKey.Contains("0301"))
                 return MESSAGE_TYPE.REQ_0301_TASK_DOWNLOAD;
             if (firstHeaderKey.Contains("0302"))

@@ -108,6 +108,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
+        private void TryOnlineModeChangeReqRply_0108(int systemBytes)
+        {
+            byte[] data = AGVSMessageFactory.CreateSimpleReturnMessageData("0108", true, systemBytes, out clsSimpleReturnWithTimestampMessage msg);
+            Console.WriteLine(msg.ToJson());
+            bool writeOutSuccess = WriteDataOut(data);
+            Console.WriteLine("TryTaskResetReqAckAsync : " + writeOutSuccess);
+        }
         private void TryTaskResetReqAckAsync(bool reset_accept, int system_byte)
         {
             byte[] data = AGVSMessageFactory.CreateSimpleReturnMessageData("0306", reset_accept, system_byte, out clsSimpleReturnWithTimestampMessage msg);

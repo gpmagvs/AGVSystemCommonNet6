@@ -50,7 +50,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                     }
             };
-            return Encoding.ASCII.GetBytes(FormatSendOutString(ackMesg.ToJson()));
+            return Encoding.UTF8.GetBytes(FormatSendOutString(ackMesg.ToJson()));
 
         }
 
@@ -91,7 +91,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                     }
             };
-            return Encoding.ASCII.GetBytes(FormatSendOutString(ackMesg.ToJson()));
+            return Encoding.UTF8.GetBytes(FormatSendOutString(ackMesg.ToJson()));
 
         }
 
@@ -120,7 +120,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 TimeStamp = DateTime.Now.ToAGVSTimeFormat(),
             });
 
-            return Encoding.ASCII.GetBytes(FormatSendOutString(mesg.ToJson()));
+            return Encoding.UTF8.GetBytes(FormatSendOutString(mesg.ToJson()));
 
         }
 
@@ -156,19 +156,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             });
 
-            return Encoding.ASCII.GetBytes(FormatSendOutString(mesg.ToJson()));
+            return Encoding.UTF8.GetBytes(FormatSendOutString(mesg.ToJson()));
         }
     
 
         internal static byte[] CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg, bool getPoseOfLastPtOfTrajectory = false)
         {
-            var runningData = OnWebAPIProtocolGetRunningStatus?.Invoke();
+            var runningData = OnTcpIPProtocolGetRunningStatus?.Invoke();
             msg = new clsRunningStatusReportMessage();
             msg.SID = SID;
             msg.EQName = EQName;
             msg.SystemBytes = System_Byte_Cyclic;
-            msg.Header.Add("0105", (RunningStatus)runningData);
-            return Encoding.ASCII.GetBytes(FormatSendOutString(msg.ToJson()));
+            msg.Header.Add("0105", runningData);
+            return Encoding.UTF8.GetBytes(FormatSendOutString(msg.ToJson()));
         }
 
         public static string FormatSendOutString(string json)
@@ -197,7 +197,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     }
                    }
             };
-            return Encoding.ASCII.GetBytes(FormatSendOutString(taskFeedbackMessage.ToJson()));
+            return Encoding.UTF8.GetBytes(FormatSendOutString(taskFeedbackMessage.ToJson()));
 
         }
 
@@ -221,7 +221,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                      }
                  }
             };
-            return Encoding.ASCII.GetBytes(FormatSendOutString(carrierRemovedMessage.ToJson()));
+            return Encoding.UTF8.GetBytes(FormatSendOutString(carrierRemovedMessage.ToJson()));
 
         }
 
