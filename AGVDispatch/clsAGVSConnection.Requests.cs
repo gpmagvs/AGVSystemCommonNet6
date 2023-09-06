@@ -134,8 +134,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             try
             {
-                AGVOnlineReturnCode = RETURN_CODE.No_Response;
-                WaitAGVSAcceptOnline = new ManualResetEvent(false);
                 if (UseWebAPI)
                 {
                     SimpleRequestResponse response = await PostOnlineModeChangeRequset(currentTag, mode);
@@ -151,9 +149,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                     {
                         await Task.Delay(1);
-                        WaitAGVSAcceptOnline.WaitOne(5000);
                         bool success = AGVOnlineReturnCode == RETURN_CODE.OK;
-                        return (success, AGVOnlineReturnCode);
+                        return (success, RETURN_CODE.OK);
                     }
                     else
                         return (false, RETURN_CODE.No_Found_Reply_In_Store);

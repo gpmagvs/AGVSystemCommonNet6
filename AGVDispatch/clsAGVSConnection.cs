@@ -235,7 +235,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
         private RETURN_CODE AGVOnlineReturnCode;
-        private ManualResetEvent WaitAGVSAcceptOnline = new ManualResetEvent(false);
         public Task CarrierRemovedRequestAsync(string v, string[] vs)
         {
             throw new NotImplementedException();
@@ -324,43 +323,41 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             if (!IsConnected())
                 return false;
-            Task _task = new Task(() =>
-            {
-                try
-                {
-                    ManualResetEvent manualResetEvent = new ManualResetEvent(false);
-                    socketState.stream.Write(dataByte, 0, dataByte.Length);
-                    bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
-                    if (addsucess)
-                        manualResetEvent.WaitOne();
-                    else
-                    {
-                        LOG.WARN($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
-                    }
-                }
-                catch (IOException ioex)
-                {
-                    Console.WriteLine($"[AGVS] 發送訊息的過程中發生 IOException : {ioex.Message}");
-                    Disconnect();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[AGVS] 發送訊息的過程中發生未知的錯誤  {ex.Message}");
-                    Disconnect();
-                }
+            return await Task.Factory.StartNew(() =>
+             {
+                 try
+                 {
+                     ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+                     socketState.stream.Write(dataByte, 0, dataByte.Length);
+                     bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
+                     LOG.INFO($"Try Add {systemBytes} to WaitAGVSReplyMREDictionary", false);
+                     if (addsucess)
+                     {
+                         LOG.INFO($" Add {systemBytes} to WaitAGVSReplyMREDictionary SUCCESS  , manualResetEvent.WaitOne();", false);
+                         manualResetEvent.WaitOne();
+                         return true;
+                     }
+                     else
+                     {
+                         LOG.WARN($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
+                         return false;
+                     }
+                 }
+                 catch (IOException ioex)
+                 {
+                     LOG.ERROR($"[AGVS] 發送訊息的過程中發生 IOException : {ioex.Message}", ioex);
+                     Disconnect();
+                     return false;
+                 }
+                 catch (Exception ex)
+                 {
+                     LOG.ERROR($"[AGVS] 發送訊息的過程中發生未知的錯誤 : {ex.Message}", ex);
+                     //Disconnect();
+                     return false;
+                 }
 
-            });
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(Debugger.IsAttached ? 13 : 5));
-            try
-            {
-                _task.Start();
-                _task.Wait(cts.Token);
-                return true;
-            }
-            catch (OperationCanceledException ex)
-            {
-                return false;
-            }
+             });
+
         }
 
 

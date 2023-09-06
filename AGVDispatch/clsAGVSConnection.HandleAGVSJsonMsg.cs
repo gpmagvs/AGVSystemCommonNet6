@@ -35,17 +35,17 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
                 else if (msgType == MESSAGE_TYPE.ACK_0104)  //AGV上線請求的回覆
                 {
+                    LOG.INFO($"AGVS Reply 0104 :{_json}");
                     clsOnlineModeRequestResponseMessage? onlineModeRequestResponse = JsonConvert.DeserializeObject<clsOnlineModeRequestResponseMessage>(_json);
                     AGVOnlineReturnCode = onlineModeRequestResponse.ReturnCode;
-                    WaitAGVSAcceptOnline.Set();
                     MSG = onlineModeRequestResponse;
-                    AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
+                    AGVSMessageStoreDictionary.TryAdd(onlineModeRequestResponse.SystemBytes, MSG);
                 }
                 else if (msgType == MESSAGE_TYPE.ACK_0106)  //Running State Report的回覆
                 {
                     clsRunningStatusReportResponseMessage? runningStateReportAck = JsonConvert.DeserializeObject<clsRunningStatusReportResponseMessage>(_json);
                     MSG = runningStateReportAck;
-                    AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
+                    AGVSMessageStoreDictionary.TryAdd(runningStateReportAck.SystemBytes, MSG);
                 }
                 else if (msgType == MESSAGE_TYPE.REQ_0107_AGVS_Online_Req) //AGVS要求上線
                 {
@@ -72,13 +72,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     clsSimpleReturnMessage? taskFeedbackAck = JsonConvert.DeserializeObject<clsSimpleReturnMessage>(_json);
                     MSG = taskFeedbackAck;
-                    AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
+                    AGVSMessageStoreDictionary.TryAdd(taskFeedbackAck.SystemBytes, MSG);
                 }
                 else if (msgType == MESSAGE_TYPE.REQ_0305)
                 {
                     clsTaskResetReqMessage? taskResetMsg = JsonConvert.DeserializeObject<clsTaskResetReqMessage>(_json);
                     MSG = taskResetMsg;
-                    AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
+                    AGVSMessageStoreDictionary.TryAdd(taskResetMsg.SystemBytes, MSG);
                     bool reset_accept = OnTaskResetReq(taskResetMsg.ResetData.ResetMode, false);
                     TrySimpleReply("0306", reset_accept, taskResetMsg.SystemBytes);
                 }
@@ -86,8 +86,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     clsSimpleReturnWithTimestampMessage? taskFeedbackAck = JsonConvert.DeserializeObject<clsSimpleReturnWithTimestampMessage>(_json);
                     MSG = taskFeedbackAck;
-                    AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
+                    AGVSMessageStoreDictionary.TryAdd(taskFeedbackAck.SystemBytes, MSG);
                 }
+
                 MSG.OriJsonString = _json;
                 if (WaitAGVSReplyMREDictionary.TryRemove(MSG.SystemBytes, out ManualResetEvent mse))
                 {
