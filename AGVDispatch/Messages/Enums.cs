@@ -8,7 +8,12 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 {
     public enum REMOTE_MODE : int
     {
-        OFFLINE = 0, ONLINE = 1
+        OFFLINE = 0,
+        ONLINE = 1,
+        /// <summary>
+        /// 切換中
+        /// </summary>
+        SWITCHING = 2
     }
 
     public enum RESET_MODE : int
@@ -27,7 +32,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         No_Response = 406,
         Status_Abnormal = 407,
         TASK_DOWNLOAD_DATA_ILLEAGAL = 408,
-        No_Found_Reply_In_Store = 409
+        No_Found_Reply_In_Store = 409,
+        PROCESSING = 410
     }
     public enum PROCESS_RESULT
     {

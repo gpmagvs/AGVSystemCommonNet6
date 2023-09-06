@@ -221,7 +221,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
 
         }
-        private REMOTE_MODE CurrentREMOTE_MODE_Downloaded = REMOTE_MODE.OFFLINE;
+        private REMOTE_MODE _CurrentREMOTE_MODE_Downloaded = REMOTE_MODE.OFFLINE;
+        private REMOTE_MODE CurrentREMOTE_MODE_Downloaded
+        {
+            get => _CurrentREMOTE_MODE_Downloaded;
+            set
+            {
+                if (_CurrentREMOTE_MODE_Downloaded != value)
+                {
+                    OnRemoteModeChanged?.Invoke(value, true);
+                    _CurrentREMOTE_MODE_Downloaded = value;
+                }
+            }
+        }
         private RETURN_CODE AGVOnlineReturnCode;
         private ManualResetEvent WaitAGVSAcceptOnline = new ManualResetEvent(false);
         public Task CarrierRemovedRequestAsync(string v, string[] vs)

@@ -53,8 +53,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     MSG = onlineModeChageReq;
                     AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
                     var modereq = onlineModeChageReq.Header["0107"].ModeRequest;
-                    bool? agv_accept = OnRemoteModeChanged?.Invoke(modereq, true);
-                    TrySimpleReply("0108", (bool)agv_accept, onlineModeChageReq.SystemBytes);
+                    // bool? agv_accept = OnRemoteModeChanged?.Invoke(modereq, true);
+                    TrySimpleReply("0108", true, onlineModeChageReq.SystemBytes);
                 }
                 else if (msgType == MESSAGE_TYPE.REQ_0301_TASK_DOWNLOAD)  //TASK DOWNLOAD
                 {

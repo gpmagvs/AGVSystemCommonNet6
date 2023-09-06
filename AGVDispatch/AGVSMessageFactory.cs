@@ -21,7 +21,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             get
             {
-                SystemByteStored = SystemByteStored + 1;
+                SystemByteStored = SystemByteStored + 2;
                 if (SystemByteStored >= int.MaxValue)
                     SystemByteStored = 1;
                 return int.Parse(SystemByteStored.ToString());
