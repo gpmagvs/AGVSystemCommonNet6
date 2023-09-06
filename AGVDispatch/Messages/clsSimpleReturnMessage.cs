@@ -31,6 +31,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
     {
         [JsonProperty("Return Code")]
         public RETURN_CODE ReturnCode { get; set; }
+
+        [JsonProperty("Process Result")]
+        public PROCESS_RESULT ProcessResult { get; set; }
         public string Message { get; set; }
 
     }

@@ -159,7 +159,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
 
                         if (!runningStateReport_result.Item1)
+                        {
                             LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                        }
 
                     }
                     catch (Exception ex)

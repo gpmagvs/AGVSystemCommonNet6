@@ -36,6 +36,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     try
                     {
                         byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
+                        LOG.TRACE(msg.ToJson(), false);
                         if (UseWebAPI)
                         {
                             SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(msg.Header.Values.First()));
@@ -87,6 +88,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 else
                 {
                     byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg);
+                    LOG.TRACE(msg.ToJson(), false);
                     bool success = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
 
                     if (!success)
@@ -142,6 +144,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 else
                 {
                     byte[] data = AGVSMessageFactory.CreateOnlineModeChangeRequesData(currentTag, mode, out clsOnlineModeRequestMessage msg);
+                    LOG.TRACE(msg.ToJson(), false);
                     bool agvs_replyed = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
                     if (!agvs_replyed)
                         return (false, RETURN_CODE.No_Response);
@@ -176,6 +179,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
 
                 byte[] data = AGVSMessageFactory.CreateOnlineModeQueryData(out clsOnlineModeQueryMessage msg);
+                LOG.TRACE(msg.ToJson(), false);
                 await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
 
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
@@ -198,6 +202,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
                 byte[] data = AGVSMessageFactory.CreateCarrierRemovedData(new string[] { toRemoveCSTID }, task_name, opid, out clsCarrierRemovedMessage msg);
+                LOG.TRACE(msg.ToJson(), false);
                 await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
 
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))

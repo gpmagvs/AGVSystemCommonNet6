@@ -13,6 +13,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
     {
         public void HandleAGVSJsonMsg(string _json)
         {
+            LOG.TRACE(_json, false);
             MessageBase? MSG = null;
             MESSAGE_TYPE msgType = GetMESSAGE_TYPE(_json);
             LOG.INFO(_json, false);

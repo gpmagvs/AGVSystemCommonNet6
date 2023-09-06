@@ -20,6 +20,12 @@ namespace AGVSystemCommonNet6.Log
         {
             Log(new LogItem(LogLevel.Trace, info, show_console, color), caller_class_name);
         }
+        public static void TRACE(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
+        {
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            TRACE(info, caller_class_name);
+            Log(new LogItem(LogLevel.Trace, info, show_console, color), caller_class_name);
+        }
         public static void INFO(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
@@ -30,7 +36,7 @@ namespace AGVSystemCommonNet6.Log
         public static void WARN(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
-            TRACE(info, caller_class_name );
+            TRACE(info, caller_class_name);
             Log(new LogItem(LogLevel.Warning, info, show_console, color), caller_class_name);
         }
         public static void ERROR(string info, Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White)

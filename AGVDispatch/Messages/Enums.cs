@@ -29,7 +29,13 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         TASK_DOWNLOAD_DATA_ILLEAGAL = 408,
         No_Found_Reply_In_Store = 409
     }
-
+    public enum PROCESS_RESULT
+    {
+        Processed = 1,
+        UnProcessed = 2,
+        LessTime = 3,
+        OverTime = 4
+    }
     public enum TASK_DOWNLOAD_RETURN_CODES : int
     {
         OK = 0,
