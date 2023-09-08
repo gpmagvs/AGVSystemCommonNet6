@@ -7,7 +7,8 @@ namespace AGVSystemCommonNet6.Log
 {
     public class LOG
     {
-        public static string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), _LogFolderName);
+        public
+            static string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), _LogFolderName);
         private static string _LogFolderName = "VMS LOG";
         public static void SetLogFolderName(string logFolderName)
         {
@@ -118,7 +119,7 @@ namespace AGVSystemCommonNet6.Log
                     {
                         using (StreamWriter writer = new StreamWriter(fileName, true))
                         {
-                            writer.WriteLine(string.Format("{0} {1}", logItem.Time, logItem.logFullLine));
+                            writer.WriteLine(string.Format("{0} {1}", logItem.Time.ToString("yyyy/MM/dd HH:mm:ss.ffff"), logItem.logFullLine));
                         }
                     }
                     catch (Exception)
