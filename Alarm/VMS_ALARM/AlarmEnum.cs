@@ -408,5 +408,7 @@
         Handshake_Fail_TA4_EQ_BUSY_OFF ,
         Handshake_Fail_TA5_EQ_L_REQ ,
         Handshake_Fail_TA5_EQ_U_REQ ,
+        Laser_Mode_Switch_Fail_Exception,
+        Laser_Mode_Switch_Fail_Timeout,
     }
 }
