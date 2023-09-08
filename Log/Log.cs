@@ -7,7 +7,7 @@ namespace AGVSystemCommonNet6.Log
 {
     public class LOG
     {
-        internal static string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), _LogFolderName);
+        public static string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), _LogFolderName);
         private static string _LogFolderName = "VMS LOG";
         public static void SetLogFolderName(string logFolderName)
         {
