@@ -26,7 +26,7 @@ namespace AGVSystemCommonNet6.Log
             this.logMsg = logMsg;
         }
 
-        public string logFullLine => $" [{level}][{Caller}] {logMsg}{(exception != null ? exception.StackTrace + (exception.InnerException == null ? "" : "\r\nInner exception:" + exception.InnerException.StackTrace) : "")}";
+        public string logFullLine => $" |{level}|{Caller}|{logMsg}{(exception != null ? exception.StackTrace + (exception.InnerException == null ? "" : "\r\nInner exception:" + exception.InnerException.StackTrace) : "")}";
 
         public string Caller { get; internal set; }
 

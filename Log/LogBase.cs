@@ -11,13 +11,13 @@ namespace AGVSystemCommonNet6.Log
 {
     public class LogBase
     {
-        public  string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), LogFolderName);
+        public string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), LogFolderName);
         internal string LogFolderName = "VMS LOG";
-        private  ConcurrentQueue<LogItem> logItemQueue = new ConcurrentQueue<LogItem>();
-        private  Task WriteLogToFileTask;
+        private ConcurrentQueue<LogItem> logItemQueue = new ConcurrentQueue<LogItem>();
+        private Task WriteLogToFileTask;
 
-   
-        public  void Log(LogItem logItem, string caller_class_name = "")
+
+        public void Log(LogItem logItem, string caller_class_name = "")
         {
             if (WriteLogToFileTask == null)
             {
@@ -39,12 +39,13 @@ namespace AGVSystemCommonNet6.Log
 
                 if (logItemQueue.TryDequeue(out var logItem))
                 {
+                    //2023-09-12/Info/2023-09-12-12.log
                     string subFolder = Path.Combine(LogFolder, DateTime.Now.ToString("yyyy-MM-dd"));
 
                     if (!Directory.Exists(subFolder))
                         Directory.CreateDirectory(subFolder);
 
-                    string fileName = Path.Combine(subFolder, $"{logItem.level.ToString()}.log");
+                    string fileName = Path.Combine(subFolder, $"{DateTime.Now.ToString("yyyy-MM-dd HH")}.log");
 
                     try
                     {
@@ -107,7 +108,7 @@ namespace AGVSystemCommonNet6.Log
                     }
                 }
             }
-        }
+            }
 
+        }
     }
-}

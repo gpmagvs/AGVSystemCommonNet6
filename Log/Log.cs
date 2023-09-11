@@ -28,27 +28,23 @@ namespace AGVSystemCommonNet6.Log
         public static void INFO(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
-            TRACE(info, caller_class_name);
             _logger.Log(new LogItem(LogLevel.Information, info, show_console, color), caller_class_name);
         }
 
         public static void WARN(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
-            TRACE(info, caller_class_name);
             _logger.Log(new LogItem(LogLevel.Warning, info, show_console, color), caller_class_name);
         }
         public static void ERROR(string info, Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             string msg = string.Format("{0}。Exception Message:{1}", info, ex.Message + "\r\n" + ex.StackTrace);
-            TRACE(msg, caller_class_name);
             _logger.Log(new LogItem(LogLevel.Error, msg, show_console, color) { exception = ex }, caller_class_name);
         }
         public static void ERROR(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
-            TRACE(info, caller_class_name);
             _logger.Log(new LogItem(LogLevel.Error, string.Format("{0}", info, show_console, color)), caller_class_name);
         }
 
@@ -56,7 +52,6 @@ namespace AGVSystemCommonNet6.Log
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             string msg = string.Format("Message:{0}。StackTrace:{1}", ex.Message, ex.StackTrace);
-            TRACE(msg, caller_class_name);
             _logger.Log(new LogItem(LogLevel.Error, msg, show_console, color) { exception = ex }, caller_class_name);
         }
 
@@ -71,14 +66,12 @@ namespace AGVSystemCommonNet6.Log
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             string _msg = string.Format("Message:{0}。StackTrace:{1}", ex.Message, ex.StackTrace);
-            TRACE(_msg, caller_class_name);
             _logger.Log(new LogItem(LogLevel.Critical, _msg, show_console, color) { exception = ex }, caller_class_name);
         }
 
         public static void Critical(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
-            TRACE(info, caller_class_name);
             _logger.Log(new LogItem(LogLevel.Critical, info, show_console, color), caller_class_name);
         }
 
