@@ -33,7 +33,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         Status_Abnormal = 407,
         TASK_DOWNLOAD_DATA_ILLEAGAL = 408,
         No_Found_Reply_In_Store = 409,
-        PROCESSING = 410
+        PROCESSING = 410,
+        Current_Tag_Cannot_Online = 411
     }
     public enum PROCESS_RESULT
     {
