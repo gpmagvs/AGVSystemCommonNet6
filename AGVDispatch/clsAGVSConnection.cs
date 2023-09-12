@@ -330,16 +330,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                      ManualResetEvent manualResetEvent = new ManualResetEvent(false);
                      socketState.stream.Write(dataByte, 0, dataByte.Length);
                      bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
-                     LOG.INFO($"Try Add {systemBytes} to WaitAGVSReplyMREDictionary", false);
                      if (addsucess)
                      {
-                         LOG.INFO($" Add {systemBytes} to WaitAGVSReplyMREDictionary SUCCESS  , manualResetEvent.WaitOne();", false);
                          manualResetEvent.WaitOne();
                          return true;
                      }
                      else
                      {
-                         LOG.WARN($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
+                         LOG.Critical($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
                          return false;
                      }
                  }
