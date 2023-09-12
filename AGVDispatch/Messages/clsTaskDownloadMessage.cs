@@ -115,7 +115,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 var pathInfo = _ExecutingTrajecory.Select(point => new PathInfo()
                 {
                     tagid = (ushort)point.Point_ID,
-                    laserMode = (ushort)point.Laser,
+                    laserMode = (ushort)point.Control_Mode.Dodge,
                     direction = (ushort)point.Control_Mode.Spin,
                     map = point.Map_Name,
                     changeMap = 0,
@@ -210,6 +210,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
     }
     public class clsControlMode
     {
+        /// <summary>
+        /// 車控用雷射
+        /// </summary>
         public int Dodge { get; set; }
         public int Spin { get; set; }
     }
