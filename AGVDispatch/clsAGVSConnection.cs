@@ -14,7 +14,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
     {
         public override string alarm_locate_in_name => "TCP AGVSConnection";
 
-        TcpClient tcpClient;
+        TcpClient? tcpClient;
         clsSocketState socketState = new clsSocketState();
         ConcurrentDictionary<int, ManualResetEvent> WaitAGVSReplyMREDictionary = new ConcurrentDictionary<int, ManualResetEvent>();
         ConcurrentDictionary<int, MessageBase> AGVSMessageStoreDictionary = new ConcurrentDictionary<int, MessageBase>();
@@ -115,6 +115,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         {
                             if (!UseWebAPI)
                             {
+                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{Port})");
                                 Connect();
                                 continue;
                             }
@@ -123,15 +124,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         int retryCnt = 0;
                         while (!result.Item1)
                         {
-                            await Task.Delay(1);
+                            Thread.Sleep(1000);
                             retryCnt += 1;
-                            if (retryCnt > 10)
+                            if (retryCnt > 5)
                                 break;
                             result = TryOnlineModeQueryAsync().Result;
-
                             if (!result.Item1)
                             {
-                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}");
+                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/5");
                             }
                         }
 
@@ -151,18 +151,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             disconnect_cnt = 0;
                         }
 
-                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = (false, new SimpleRequestResponseWithTimeStamp());
-
-                        int runing_state_rp_retryCnt = 0;
-                        while (!runningStateReport_result.Item1)
-                        {
-                            await Task.Delay(10);
-                            runing_state_rp_retryCnt += 1;
-                            if (runing_state_rp_retryCnt > 10)
-                                break;
-                            runningStateReport_result = TryRnningStateReportAsync().Result;
-                        }
-
+                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
                         if (!runningStateReport_result.Item1)
                         {
                             LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
@@ -240,7 +229,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
         private RETURN_CODE AGVOnlineReturnCode;
-        private ManualResetEvent WaitAGVSAcceptOnline = new ManualResetEvent(false);
         public Task CarrierRemovedRequestAsync(string v, string[] vs)
         {
             throw new NotImplementedException();
@@ -293,7 +281,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
         public override void Disconnect()
         {
-            tcpClient?.Dispose();
+            if (tcpClient != null)
+            {
+                try
+                {
+
+                    tcpClient.Close();
+                    tcpClient?.Dispose();
+                }
+                catch (Exception)
+                {
+
+                }
+            }
             tcpClient = null;
         }
 
@@ -329,43 +329,39 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             if (!IsConnected())
                 return false;
-            Task _task = new Task(() =>
-            {
-                try
-                {
-                    ManualResetEvent manualResetEvent = new ManualResetEvent(false);
-                    socketState.stream.Write(dataByte, 0, dataByte.Length);
-                    bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
-                    if (addsucess)
-                        manualResetEvent.WaitOne(2000);
-                    else
-                    {
-                        LOG.WARN($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
-                    }
-                }
-                catch (IOException ioex)
-                {
-                    Console.WriteLine($"[AGVS] 發送訊息的過程中發生 IOException : {ioex.Message}");
-                    Disconnect();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[AGVS] 發送訊息的過程中發生未知的錯誤  {ex.Message}");
-                    Disconnect();
-                }
+            return await Task.Factory.StartNew(() =>
+             {
+                 try
+                 {
+                     ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+                     socketState.stream.Write(dataByte, 0, dataByte.Length);
+                     bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
+                     if (addsucess)
+                     {
+                         manualResetEvent.WaitOne(2000);
+                         return true;
+                     }
+                     else
+                     {
+                         LOG.Critical($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
+                         return false;
+                     }
+                 }
+                 catch (IOException ioex)
+                 {
+                     LOG.ERROR($"[AGVS] 發送訊息的過程中發生 IOException : {ioex.Message}", ioex);
+                     Disconnect();
+                     return false;
+                 }
+                 catch (Exception ex)
+                 {
+                     LOG.ERROR($"[AGVS] 發送訊息的過程中發生未知的錯誤 : {ex.Message}", ex);
+                     //Disconnect();
+                     return false;
+                 }
 
-            });
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(Debugger.IsAttached ? 13 : 5));
-            try
-            {
-                _task.Start();
-                _task.Wait(cts.Token);
-                return true;
-            }
-            catch (OperationCanceledException ex)
-            {
-                return false;
-            }
+             });
+
         }
 
 

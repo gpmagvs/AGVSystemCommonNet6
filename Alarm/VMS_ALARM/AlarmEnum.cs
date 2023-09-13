@@ -399,5 +399,16 @@
         Fork_Initialized_But_Home_Input_Not_ON = 860031,
         Fork_Go_Home_But_Home_Sensor_Signal_Error = 860032,
         Fork_Initialized_But_Driver_Position_Not_ZERO = 860033,
+        Handshake_Fail_EQ_BUSY_NOT_ON = 860034,
+        Handshake_Fail_EQ_BUSY_NOT_OFF = 860035,
+        Handshake_Fail_TA1_EQ_L_REQ = 460036,
+        Handshake_Fail_TA1_EQ_U_REQ ,
+        Handshake_Fail_TA2_EQ_READY ,
+        Handshake_Fail_TA3_EQ_BUSY_ON ,
+        Handshake_Fail_TA4_EQ_BUSY_OFF ,
+        Handshake_Fail_TA5_EQ_L_REQ ,
+        Handshake_Fail_TA5_EQ_U_REQ ,
+        Laser_Mode_Switch_Fail_Exception,
+        Laser_Mode_Switch_Fail_Timeout,
     }
 }

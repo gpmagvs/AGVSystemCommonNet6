@@ -20,7 +20,6 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
         }
         protected override void OnGoalActive()
         {
-
         }
 
         protected override void OnGoalPreempting()
@@ -48,10 +47,10 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
                 }
                 else
                 {
-
                     Console.WriteLine("OnNAVGoalReceived?.Invoke(this, goal);");
+                    SetAccepted();
                     OnNAVGoalReceived?.Invoke(this, goal);
-                }
+                };
             }
             else
             {

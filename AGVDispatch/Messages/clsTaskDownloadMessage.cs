@@ -91,7 +91,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 }
                 int finalTag = taskData.Destination; //需要預先下發目標點(注意!並不是Trajection的最後一點,是整段導航任務的最後一點==>Trajection的最後一點如果跟Destination不同,表示AGVS在AGV行進途中會下發新的路徑過來)
 
-                GUIDE_TYPE mobility_mode = taskData.Action_Type == ACTION_TYPE.None ? GUIDE_TYPE.SLAM : taskData.Action_Type == ACTION_TYPE.Discharge ? GUIDE_TYPE.Color_Tap_Backward : GUIDE_TYPE.Color_Tap_Forward;
+                GUIDE_TYPE mobility_mode = taskData.Action_Type == ACTION_TYPE.None ? GUIDE_TYPE.SLAM :  GUIDE_TYPE.Color_Tap_Forward;
                 TaskCommandGoal goal = new TaskCommandGoal();
                 goal.taskID = taskData.Task_Name;
                 goal.finalGoalID = (ushort)finalTag;
@@ -115,7 +115,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 var pathInfo = _ExecutingTrajecory.Select(point => new PathInfo()
                 {
                     tagid = (ushort)point.Point_ID,
-                    laserMode = (ushort)point.Laser,
+                    laserMode = (ushort)point.Control_Mode.Dodge,
                     direction = (ushort)point.Control_Mode.Spin,
                     map = point.Map_Name,
                     changeMap = 0,
@@ -128,7 +128,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     poses = poses.Reverse().ToArray();
                     pathInfo = pathInfo.Reverse().ToArray();
                     goal.finalGoalID = (ushort)taskData.Homing_Trajectory.First().Point_ID;
-                    goal.mobilityModes = (ushort)GUIDE_TYPE.Color_Tap_Backward;
+                    goal.mobilityModes = (ushort)GUIDE_TYPE.Color_Tap_Forward;
                 }
 
                 goal.planPath.poses = poses;
@@ -210,6 +210,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
     }
     public class clsControlMode
     {
+        /// <summary>
+        /// 車控用雷射
+        /// </summary>
         public int Dodge { get; set; }
         public int Spin { get; set; }
     }
