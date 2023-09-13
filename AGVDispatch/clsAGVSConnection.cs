@@ -128,6 +128,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (retryCnt > 10)
                                 break;
                             result = TryOnlineModeQueryAsync().Result;
+
+                            if (!result.Item1)
+                            {
+                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}");
+                            }
                         }
 
                         if (!result.Item1)
@@ -332,7 +337,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     socketState.stream.Write(dataByte, 0, dataByte.Length);
                     bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
                     if (addsucess)
-                        manualResetEvent.WaitOne();
+                        manualResetEvent.WaitOne(2000);
                     else
                     {
                         LOG.WARN($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
