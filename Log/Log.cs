@@ -23,7 +23,6 @@ namespace AGVSystemCommonNet6.Log
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             TRACE(info, caller_class_name);
-            _logger.Log(new LogItem(LogLevel.Trace, info, show_console, color), caller_class_name);
         }
         public static void INFO(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
         {

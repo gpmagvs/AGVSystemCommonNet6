@@ -1,6 +1,9 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.Alarm;
+using AGVSystemCommonNet6.Log;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -19,6 +22,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
 
             private Socket _SocketClient = null;
+            public string ClientIP { get; private set; } = "";
             public clsSocketState ClientSocketState { get; set; } = new clsSocketState();
             public event EventHandler<clsMsgSendEventArg> OnClientMsgSendIn;
             public event EventHandler<clsOnlineModeQueryMessage> OnClientOnlineModeQuery;
@@ -54,8 +58,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 set
                 {
                     _SocketClient = value;
+                    var endpoint = _SocketClient?.RemoteEndPoint.ToString();
+                    ClientIP = endpoint.Split(':')[0];
                     ClientSocketState = new clsSocketState { socket = value };
-                    _SocketClient.BeginReceive(ClientSocketState.buffer, 0, 32768, SocketFlags.None, new AsyncCallback(ClientMsgRevCallback), ClientSocketState);
+                    try
+                    {
+                        _SocketClient.BeginReceive(ClientSocketState.buffer, 0, 32768, SocketFlags.None, new AsyncCallback(ClientMsgRevCallback), ClientSocketState);
+                    }
+                    catch (Exception ex)
+                    {
+                        AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
+                        LOG.ERROR($"{ClientIP} {ex.Message}", ex);
+                        _SocketClient.Dispose();
+                    }
                 }
             }
 
@@ -94,9 +109,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
                 catch (Exception ex)
                 {
+                    AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
+                    LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                     _SocketClient.Dispose();
                 }
-                
+
             }
 
             private async Task HandleClientMsg(string clientMsg)
@@ -143,23 +160,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 try
                 {
                     SocketClient.Send(Encoding.ASCII.GetBytes(json + "*\r"));
-
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
+                    LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                 }
-                //*\r
             }
 
-            public string ClientIP
-            {
-                get
-                {
-                    var endpoint = SocketClient?.RemoteEndPoint.ToString();
-                    return endpoint.Split(':')[0];
-                }
-            }
+
         }
     }
 }

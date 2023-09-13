@@ -91,7 +91,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 }
                 int finalTag = taskData.Destination; //需要預先下發目標點(注意!並不是Trajection的最後一點,是整段導航任務的最後一點==>Trajection的最後一點如果跟Destination不同,表示AGVS在AGV行進途中會下發新的路徑過來)
 
-                GUIDE_TYPE mobility_mode = taskData.Action_Type == ACTION_TYPE.None ? GUIDE_TYPE.SLAM :  GUIDE_TYPE.Color_Tap_Forward;
+                GUIDE_TYPE mobility_mode = taskData.Action_Type == ACTION_TYPE.None ? GUIDE_TYPE.SLAM : GUIDE_TYPE.Color_Tap_Forward;
                 TaskCommandGoal goal = new TaskCommandGoal();
                 goal.taskID = taskData.Task_Name;
                 goal.finalGoalID = (ushort)finalTag;
@@ -119,7 +119,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     direction = (ushort)point.Control_Mode.Spin,
                     map = point.Map_Name,
                     changeMap = 0,
-                    speed = taskData.HasCargo ? point.Speed / 2 : point.Speed,
+                    speed = point.Speed,
                     ultrasonicDistance = point.UltrasonicDistance
                 }).ToArray();
 
@@ -142,11 +142,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             }
 
         }
-        /// <summary>
-        /// 是否為切片任務(軌跡最後一點TAG不為目標點TAG)
-        /// </summary>
-        public bool IsTaskSegmented => ExecutingTrajecory.Length == 0 ? false : ExecutingTrajecory.Last().Point_ID != Destination;
-
+      
         /// <summary>
         /// 回Home點的任務 (mobility=2)
         /// </summary>
@@ -159,8 +155,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             // taskData.Homing_Trajectory = taskData.Homing_Trajectory.Reverse().ToArray();
             return taskData;
         }
-        [JsonIgnore]
-        public clsPathInfo TrafficInfo { get; set; } = new clsPathInfo();
         public bool HasCargo { get; set; } = false;
     }
 
