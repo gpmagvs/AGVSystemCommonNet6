@@ -338,7 +338,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                      bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
                      if (addsucess)
                      {
-                         manualResetEvent.WaitOne();
+                         manualResetEvent.WaitOne(2000);
                          return true;
                      }
                      else
