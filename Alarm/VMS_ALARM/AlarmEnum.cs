@@ -133,7 +133,10 @@
         Cant_Check_ZaxisPos_1 = 1604,
         Cant_Check_ZaxisPos_2 = 1605,
         Cant_Check_ZaxisPos_3 = 1606,
-        Cst_Slope_Error_ = 1610,
+        /// <summary>
+        /// 貨物傾斜
+        /// </summary>
+        Cst_Slope_Error = 1610,
         Cst_Slope_Error_1 = 1611,
         Cst_Slope_Error_2 = 1612,
         Cst_Slope_Error_3 = 1613,
