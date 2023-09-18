@@ -182,13 +182,10 @@ namespace AGVSystemCommonNet6.MAP
                             Key_Password = mapStation.AutoDoor?.KeyPassword,
                         };
 
-                        int.TryParse(mapStation.DodgeMode, out int DogeMode);
-                        int.TryParse(mapStation.SpinMode, out int SpinMode);
-
                         var Control_Mode = new clsControlMode
                         {
-                            Dodge = DogeMode,
-                            Spin = SpinMode
+                            Dodge = mapStation.DodgeMode,
+                            Spin = mapStation.SpinMode
                         };
 
                         return new clsMapPoint()

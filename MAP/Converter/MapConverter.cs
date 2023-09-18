@@ -52,7 +52,8 @@ namespace AGVSystemCommonNet6.MAP.Converter
                         KeyPassword = ""
                     },
                     Bay = "",
-                    DodgeMode = "",
+                    DodgeMode = 0,
+                    SpinMode = 0,
                     LsrMode = 1,
                     InvolvePoint = "",
                     MotionInfo = new MotionInfo()
@@ -63,8 +64,7 @@ namespace AGVSystemCommonNet6.MAP.Converter
                             GroundHoleSensor = "",
                             UltrasonicSensor = ""
                         }
-                    },
-                    SpinMode = "",
+                    }
 
 
                 })
