@@ -211,7 +211,7 @@
         Handshake_Fail_EQ_GO = 3206,
         Handshake_Fail_Because_Person_EQ_GO = 3207,
         Handshake_Fail_Inside_EQ_EQ_GO = 3208,
-        Handshake_Timeout = 3210
+        Handshake_Timeout = 3210,
         Precheck_IO_Fail_X20 = 3220,
         Precheck_IO_Fail_EQ_L_REQ = 3221,
         Precheck_IO_Fail_EQ_U_REQ = 3222,

@@ -84,9 +84,9 @@ namespace AGVSystemCommonNet6.MAP
         /// </summary>
         public Dictionary<int, double>? Target { get; set; } = new Dictionary<int, double>();
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public int DodgeMode { get; set; } = 0;
+        public int? DodgeMode { get; set; } = 0;
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public int SpinMode { get; set; } = 0;
+        public int? SpinMode { get; set; } = 0;
         public string? SubMap { get; set; } = "";
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public AutoDoor? AutoDoor { get; set; } = new AutoDoor();

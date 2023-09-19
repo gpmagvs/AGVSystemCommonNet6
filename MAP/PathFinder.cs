@@ -184,8 +184,8 @@ namespace AGVSystemCommonNet6.MAP
 
                         var Control_Mode = new clsControlMode
                         {
-                            Dodge = mapStation.DodgeMode,
-                            Spin = mapStation.SpinMode
+                            Dodge = (int)(mapStation.DodgeMode==null? 0: mapStation.DodgeMode),
+                            Spin = (int)(mapStation.SpinMode == null ? 0 : mapStation.SpinMode)
                         };
 
                         return new clsMapPoint()
