@@ -153,7 +153,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                     && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
                 );
 
-                List<string> list = _Task.Select(Task => $"{Task.RecieveTime},{Task.FinishTime},{Task.TaskName},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.Carrier_ID},{Task.From_Station},{Task.To_Station},{Task.FailureReason}").ToList();
+                List<string> list = _Task.Select(Task => $"{Task.RecieveTime},{Task.StartTime},{Task.FinishTime},{Task.TaskName},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.Carrier_ID},{Task.From_Station},{Task.To_Station},{Task.FailureReason}").ToList();
                 File.WriteAllLines(FilePath, list, Encoding.UTF8);
             };
             return FilePath;

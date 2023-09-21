@@ -11,6 +11,7 @@ namespace AGVSystemCommonNet6.TASK
     public class clsTaskDto
     {
         public DateTime RecieveTime { get; set; }
+        public DateTime StartTime { get; set; }
         public DateTime FinishTime { get; set; }
 
         [Key]
