@@ -16,6 +16,11 @@ namespace AGVSystemCommonNet6.Configuration
         public string VMSTcpServerIP = "127.0.0.1";
         public int VMSTcpServerPort = 5500;
 
+        /// <summary>
+        /// 前端用戶閒置超過此秒數後自動登出。
+        /// 單位:秒
+        /// </summary>
+        public int WebUserLogoutExipreTime { get; set; } =300;
         public clsMapConfigs MapConfigs { get; set; } = new clsMapConfigs();
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
     }

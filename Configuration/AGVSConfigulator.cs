@@ -11,16 +11,17 @@ namespace AGVSystemCommonNet6.Configuration
     {
         public static SystemConfigs LoadConfig(string configFilePath)
         {
+            SystemConfigs systemConfigs = new SystemConfigs();
             if (File.Exists(configFilePath))
             {
-                return JsonConvert.DeserializeObject<SystemConfigs>(File.ReadAllText(configFilePath));
+                systemConfigs= JsonConvert.DeserializeObject<SystemConfigs>(File.ReadAllText(configFilePath));
             }
             else
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(configFilePath));
-                File.WriteAllText(configFilePath, JsonConvert.SerializeObject(new SystemConfigs(), Formatting.Indented));
-                return new SystemConfigs();
             }
+            File.WriteAllText(configFilePath, JsonConvert.SerializeObject(systemConfigs, Formatting.Indented));
+            return systemConfigs;
         }
         public static SystemConfigs SysConfigs { get; set; }
         public static void Init()
