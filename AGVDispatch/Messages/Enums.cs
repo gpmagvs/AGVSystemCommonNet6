@@ -35,7 +35,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         No_Found_Reply_In_Store = 409,
         PROCESSING = 410,
         Current_Tag_Cannot_Online = 411,
-        AGV_Need_Park_Above_Tag = 412
+        AGV_Need_Park_Above_Tag = 412,
+        Cannot_Switch_Remote_Mode_When_Task_Executing = 413
     }
     public enum PROCESS_RESULT
     {
