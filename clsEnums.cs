@@ -34,6 +34,10 @@ namespace AGVSystemCommonNet6
         {
             FORK_AGV,
             YUNTECH_FORK_AGV,
+            /// <summary>
+            /// 巡檢AGV
+            /// </summary>
+            INSPECTION_AGV,
             UNKNOWN = 999
         }
 
@@ -57,7 +61,8 @@ namespace AGVSystemCommonNet6
         {
             GPM_FORK,
             GPM_SUBMARINE_SHIELD,
-            YUNTECH_FORK
+            YUNTECH_FORK,
+            GPM_INSPECTION_AGV
         }
     }
 }

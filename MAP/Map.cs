@@ -58,7 +58,7 @@ namespace AGVSystemCommonNet6.MAP
         }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public Dictionary<string, Bay> Bays { get; set; }
+        public Dictionary<string, Bay> Bays { get; set; } = new Dictionary<string, Bay>();
 
 
     }

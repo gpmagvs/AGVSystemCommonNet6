@@ -91,7 +91,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 }
                 int finalTag = taskData.Destination; //需要預先下發目標點(注意!並不是Trajection的最後一點,是整段導航任務的最後一點==>Trajection的最後一點如果跟Destination不同,表示AGVS在AGV行進途中會下發新的路徑過來)
 
-                GUIDE_TYPE mobility_mode = taskData.Action_Type == ACTION_TYPE.None ? GUIDE_TYPE.SLAM : GUIDE_TYPE.Color_Tap_Forward;
+                GUIDE_TYPE mobility_mode = DetermineGuideType(taskData.Action_Type);
                 TaskCommandGoal goal = new TaskCommandGoal();
                 goal.taskID = taskData.Task_Name;
                 goal.finalGoalID = (ushort)finalTag;
@@ -142,7 +142,19 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             }
 
         }
-      
+
+        /// <summary>
+        /// 決定導航移動導引模式
+        /// </summary>
+        /// <param name="_Action_Type"></param>
+        /// <returns></returns>
+        private static GUIDE_TYPE DetermineGuideType(ACTION_TYPE _Action_Type)
+        {
+            if (_Action_Type == ACTION_TYPE.None | _Action_Type == ACTION_TYPE.Measure | _Action_Type == ACTION_TYPE.ExchangeBattery | _Action_Type == ACTION_TYPE.Escape)
+                return GUIDE_TYPE.SLAM;
+            else
+                return GUIDE_TYPE.Color_Tap_Forward;
+        }
         /// <summary>
         /// 回Home點的任務 (mobility=2)
         /// </summary>
