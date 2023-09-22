@@ -76,8 +76,12 @@ namespace AGVSystemCommonNet6.TASK
                         return "充電";
                     case ACTION_TYPE.Carry:
                         return "搬運";
+                    case ACTION_TYPE.Measure:
+                        return "量測";
+                    case ACTION_TYPE.ExchangeBattery:
+                        return "交換電池";
                     default:
-                        return "未知";
+                        return Action.ToString();
                 }
             }
         }

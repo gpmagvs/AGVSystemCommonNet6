@@ -53,7 +53,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public clsMapPoint[] ExecutingTrajecory => Trajectory.Length != 0 ? Trajectory : Homing_Trajectory;
         public List<int> TagsOfTrajectory => ExecutingTrajecory.Select(pt => pt.Point_ID).ToList();
         public string OriTaskDataJson = "";
-        public bool IsAfterLoadingAction = false;
+        public bool GoTOHomePoint = false;
 
         /// <summary>
         /// 送給車控CommandActionClient的 TaskCommandGoal
@@ -123,12 +123,12 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     ultrasonicDistance = point.UltrasonicDistance
                 }).ToArray();
 
-                if (taskData.IsAfterLoadingAction) //Loading 結束
+                if (taskData.GoTOHomePoint) //Loading 結束
                 {
                     poses = poses.Reverse().ToArray();
                     pathInfo = pathInfo.Reverse().ToArray();
                     goal.finalGoalID = (ushort)taskData.Homing_Trajectory.First().Point_ID;
-                    goal.mobilityModes = (ushort)GUIDE_TYPE.Color_Tap_Forward;
+                    goal.mobilityModes = (ushort)DetermineGuideType(taskData.Action_Type);
                 }
 
                 goal.planPath.poses = poses;
@@ -150,7 +150,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// <returns></returns>
         private static GUIDE_TYPE DetermineGuideType(ACTION_TYPE _Action_Type)
         {
-            if (_Action_Type == ACTION_TYPE.None | _Action_Type == ACTION_TYPE.Measure | _Action_Type == ACTION_TYPE.ExchangeBattery | _Action_Type == ACTION_TYPE.Escape)
+            if (_Action_Type == ACTION_TYPE.None | _Action_Type == ACTION_TYPE.Measure | _Action_Type == ACTION_TYPE.Escape)
                 return GUIDE_TYPE.SLAM;
             else
                 return GUIDE_TYPE.Color_Tap_Forward;
@@ -162,7 +162,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public clsTaskDownloadData CreateGoHomeTaskDownloadData()
         {
             var taskData = JsonConvert.DeserializeObject<clsTaskDownloadData>(this.ToJson());
-            taskData.IsAfterLoadingAction = true;
+            taskData.GoTOHomePoint = true;
             taskData.Destination = Homing_Trajectory.First().Point_ID;
             // taskData.Homing_Trajectory = taskData.Homing_Trajectory.Reverse().ToArray();
             return taskData;

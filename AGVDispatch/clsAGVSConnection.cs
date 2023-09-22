@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.AGVDispatch
 {
@@ -49,6 +50,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
 
         public string LocalIP { get; }
+        public AGV_MODEL AGV_Model { get; }
+
         public clsAGVSConnection(string IP, int Port) : base(IP, Port)
         {
             this.IP = IP;
@@ -56,11 +59,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
             LocalIP = null;
             WebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
         }
-        public clsAGVSConnection(string HostIP, int HostPort, string localIP)
+        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_MODEL AGV_Model = AGV_MODEL.FORK_AGV)
         {
             this.IP = HostIP;
             this.Port = HostPort;
             this.LocalIP = localIP;
+            this.AGV_Model = AGV_Model;
             WebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
         }
 

@@ -15,7 +15,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public HttpHelper WebAPIHttp;
         public async Task<OnlineModeQueryResponse> GetOnlineMode()
         {
-            var response = await WebAPIHttp.GetAsync<Dictionary<string, object>>($"/api/AGV/OnlineMode?AGVName={AGVSMessageFactory.EQName}&Model=0");
+            var response = await WebAPIHttp.GetAsync<Dictionary<string, object>>($"/api/AGV/OnlineMode?AGVName={AGVSMessageFactory.EQName}&Model={AGV_Model}");
 
             return new OnlineModeQueryResponse
             {
@@ -32,7 +32,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
         public async Task<SimpleRequestResponse> PostRunningStatus(clsRunningStatus status)
         {
-            var response = await WebAPIHttp.PostAsync<Dictionary<string, object>, clsRunningStatus>($"/api/AGV/AGVStatus?AGVName={AGVSMessageFactory.EQName}&Model=0", status);
+            var response = await WebAPIHttp.PostAsync<Dictionary<string, object>, clsRunningStatus>($"/api/AGV/AGVStatus?AGVName={AGVSMessageFactory.EQName}&Model={AGV_Model}", status);
             var returnCode = int.Parse(response["ReturnCode"].ToString());
             return new SimpleRequestResponse
             {
@@ -45,7 +45,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
-                var response = await WebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData> ($"/api/AGV/TaskFeedback?AGVName={AGVSMessageFactory.EQName}&Model=0", feedback);
+                var response = await WebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData> ($"/api/AGV/TaskFeedback?AGVName={AGVSMessageFactory.EQName}&Model={AGV_Model}", feedback);
                 var returnCode = int.Parse(response["ReturnCode"].ToString());
                 return new SimpleRequestResponse
                 {
