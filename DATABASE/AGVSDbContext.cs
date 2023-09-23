@@ -16,6 +16,10 @@ namespace AGVSystemCommonNet6.DATABASE
         public DbSet<AvailabilityDto> Availabilitys { get; set; }
         public DbSet<RTAvailabilityDto> RealTimeAvailabilitys { get; set; }
         public DbSet<clsTaskTrajecotroyStore> TaskTrajecotroyStores { get; set; }
+        /// <summary>
+        /// 儀器量測結果
+        /// </summary>
+        public DbSet<clsMeasureResult> InstrumentMeasureResult { get; set; }
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options)
             : base(options)
         {

@@ -418,5 +418,6 @@
         Laser_Mode_Switch_Fail_Exception,
         Laser_Mode_Switch_Fail_Timeout,
         Localization_Fail,
+        Measure_Result_Data_Report_Fail,
     }
 }

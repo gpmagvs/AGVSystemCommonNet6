@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSConnection
     {
-        
+
         public HttpHelper WebAPIHttp;
         public async Task<OnlineModeQueryResponse> GetOnlineMode()
         {
@@ -26,7 +26,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task<SimpleRequestResponse> PostOnlineModeChangeRequset(int currentTag, REMOTE_MODE mode)
         {
-            string api_route = mode== REMOTE_MODE.ONLINE? $"/api/AGV/OnlineReq?AGVName={AGVSMessageFactory.EQName}&tag={currentTag}": $"/api/AGV/OfflineReq?AGVName={AGVSMessageFactory.EQName}&";
+            string api_route = mode == REMOTE_MODE.ONLINE ? $"/api/AGV/OnlineReq?AGVName={AGVSMessageFactory.EQName}&tag={currentTag}" : $"/api/AGV/OfflineReq?AGVName={AGVSMessageFactory.EQName}&";
             var response = await WebAPIHttp.PostAsync<SimpleRequestResponse, object>(api_route, null);
             return response;
         }
@@ -45,7 +45,31 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
-                var response = await WebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData> ($"/api/AGV/TaskFeedback?AGVName={AGVSMessageFactory.EQName}&Model={AGV_Model}", feedback);
+                var response = await WebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData>($"/api/AGV/TaskFeedback?AGVName={AGVSMessageFactory.EQName}&Model={AGV_Model}", feedback);
+                var returnCode = int.Parse(response["ReturnCode"].ToString());
+                return new SimpleRequestResponse
+                {
+                    ReturnCode = Enum.GetValues(typeof(RETURN_CODE)).Cast<RETURN_CODE>().First(code => ((int)code) == returnCode),
+                    Message = response["Message"].ToString()
+                };
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 上報量測資料
+        /// </summary>
+        /// <param name="measure_reuslt"></param>
+        /// <returns></returns>
+        public async Task<SimpleRequestResponse> ReportMeasureData(clsMeasureResult measure_reuslt)
+        {
+            try
+            {
+                // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
+                var response = await WebAPIHttp.PostAsync<Dictionary<object, string>, clsMeasureResult>($"/api/AGV/ReportMeasure?AGVName={AGVSMessageFactory.EQName}&Model={AGV_Model}", measure_reuslt);
                 var returnCode = int.Parse(response["ReturnCode"].ToString());
                 return new SimpleRequestResponse
                 {
