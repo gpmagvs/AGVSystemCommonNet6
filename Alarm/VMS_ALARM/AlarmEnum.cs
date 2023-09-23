@@ -417,5 +417,6 @@
         Fork_Initialized_But_Driver_Position_Not_ZERO = 860033,
         Laser_Mode_Switch_Fail_Exception,
         Laser_Mode_Switch_Fail_Timeout,
+        Localization_Fail,
     }
 }
