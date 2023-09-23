@@ -242,6 +242,7 @@
         Handshake_Fail_BAT_EXG_EQ_TRREQ_NOT_OFF,
         Handshake_Fail_BAT_EXG_EQ_COMPT_NOT_ON,
         Handshake_Fail_BAT_EXG_EQ_COMPT_NOT_OFF,
+        Handshake_Fail_BAT_Remove_Timeout,
         AAsk_Remote_Cst_Status_Fail = 3300,
         BAsk_Remote_Cst_Status_Timeout = 3310,
         AGVs_Abort_Task = 3500,
