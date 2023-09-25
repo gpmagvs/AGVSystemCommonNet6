@@ -10,8 +10,6 @@ namespace AGVSystemCommonNet6.DATABASE
     public class AGVSDatabase : DBHelperAbstract
     {
         public AGVSDbContext tables => base.dbContext;
-        public AGVSDatabase()
-        {
-        }
+        public AGVSDatabase():base() { }
     }
 }
