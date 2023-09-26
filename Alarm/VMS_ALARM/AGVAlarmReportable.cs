@@ -54,12 +54,6 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                         AlarmManager.AddWarning(value);
                         LOG.WARN($"{alarm_locate_in_name} Warning: {value}");
                     }
-                    else
-                    {
-
-                        CurrentAlarmState = STATE.WARNING;
-                        AlarmManager.ClearAlarm(_current_warning_code);
-                    }
                     _current_warning_code = value;
                 }
             }
@@ -78,11 +72,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                         AlarmManager.AddAlarm(value, false);
                         LOG.ERROR($"{alarm_locate_in_name} Alarm: {value}");
                     }
-                    else
-                    {
-                        CurrentAlarmState = STATE.NORMAL;
-                        AlarmManager.ClearAlarm(_current_alarm_code);
-                    }
+
                     _current_alarm_code = value;
                 }
             }
