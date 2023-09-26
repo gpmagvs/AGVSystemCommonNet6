@@ -50,7 +50,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
         }
 
-        public async Task<(bool confirm, string errorMesg)> UpdateBatteryLevel(string agv_name, double batteryLevel)
+        public async Task<(bool confirm, string errorMesg)> UpdateBatteryLevel(string agv_name, double[] batteryLevel)
         {
             string errorMesg = string.Empty;
             try
@@ -58,7 +58,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == agv_name);
                 if (agvState != null)
                 {
-                    agvState.BatteryLevel = batteryLevel;
+                    agvState.BatteryLevel_1 = batteryLevel[0];
+                    agvState.BatteryLevel_2 = batteryLevel.Length >= 2 ? batteryLevel[1] : 0;
                     int ret = SaveChanges();
 
                     return (true, "");
@@ -87,7 +88,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     agvState.OnlineStatus = AGVStateDto.OnlineStatus;
                     agvState.CurrentLocation = AGVStateDto.CurrentLocation;
                     agvState.CurrentCarrierID = AGVStateDto.CurrentCarrierID;
-                    agvState.BatteryLevel = AGVStateDto.BatteryLevel;
+                    agvState.BatteryLevel_1 = AGVStateDto.BatteryLevel_1;
+                    agvState.BatteryLevel_2 = AGVStateDto.BatteryLevel_2;
                     agvState.TaskName = AGVStateDto.TaskName;
                     agvState.TaskRunStatus = AGVStateDto.TaskRunStatus;
                     agvState.TaskRunAction = AGVStateDto.TaskRunAction;
@@ -124,7 +126,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     agvState.OnlineStatus = AGVStateDto.OnlineStatus;
                     agvState.CurrentLocation = AGVStateDto.CurrentLocation;
                     agvState.CurrentCarrierID = AGVStateDto.CurrentCarrierID;
-                    agvState.BatteryLevel = AGVStateDto.BatteryLevel;
+                    agvState.BatteryLevel_1 = AGVStateDto.BatteryLevel_1;
+                    agvState.BatteryLevel_2 = AGVStateDto.BatteryLevel_2;
                     agvState.TaskName = AGVStateDto.TaskName;
                     agvState.TaskRunStatus = AGVStateDto.TaskRunStatus;
                     agvState.TaskRunAction = AGVStateDto.TaskRunAction;
