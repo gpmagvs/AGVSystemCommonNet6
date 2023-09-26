@@ -199,7 +199,7 @@
         F0GPM_Motion_control_RunMove_Abort = 2400,
         Can_not_Pass_Task_to_Motion_Control = 2401,
         F1Action_Server_Not_Ready0F1Action = 2410,
-        FATask_Path_Road_Closed = 2500,
+        Task_Path_Road_Closed = 2500,
         AGV_Alive_Check_Fail = 3000,
         Registration_Reject = 3040,
         Registration_Timeout = 3050,
