@@ -8,7 +8,10 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
     public class TaskCommandActionClient : ActionClient<TaskCommandAction, TaskCommandActionGoal, TaskCommandActionResult, TaskCommandActionFeedback, TaskCommandGoal, TaskCommandResult, TaskCommandFeedback>, IDisposable
     {
         public Action<ActionStatus> OnActionStatusChanged;
-        public TaskCommandGoal goal;
+        public TaskCommandGoal goal = new TaskCommandGoal()
+        {
+            taskID = ""
+        };
         private bool disposedValue;
 
         public TaskCommandActionClient(string actionName, RosSocket rosSocket)
