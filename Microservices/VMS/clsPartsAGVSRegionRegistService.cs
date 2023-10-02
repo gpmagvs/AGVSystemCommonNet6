@@ -57,6 +57,11 @@ namespace AGVSystemCommonNet6.Microservices.VMS
 
         private async Task<(bool accept, string message)> SendToPartsAGVS(RegistEventObject data_obj)
         {
+            if (string.IsNullOrEmpty(IP))
+                return (false, "IP format Illeagle");
+            if (data_obj.List_AreaName.Count == 0)
+                return (false, "Regist/Unregist Area Names can't empty");
+
             var ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             ClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
             try
@@ -65,32 +70,38 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
             catch (Exception ex)
             {
+                ClientSocket.Dispose();
                 return (false, ex.Message);
             }
 
-            if (string.IsNullOrEmpty(IP))
-                return (false, "IP format Illeagle");
-
-            if (data_obj.List_AreaName.Count == 0)
-                return (false, "Regist/Unregist Area Names can't empty");
-
             string SendOutMessage = Newtonsoft.Json.JsonConvert.SerializeObject(data_obj);
-            ClientSocket.Send(System.Text.Encoding.ASCII.GetBytes(SendOutMessage));
+            ClientSocket.Send(Encoding.ASCII.GetBytes(SendOutMessage));
+            CancellationTokenSource cancelwait = new CancellationTokenSource();
+            cancelwait.CancelAfter(TimeSpan.FromSeconds(2));
+            string ReceiveDataString = "";
             while (true)
             {
+                await Task.Delay(1);
+                if (cancelwait.IsCancellationRequested)
+                {
+                    ClientSocket.Dispose();
+                    return (false, "Timeout");
+                }
                 if (ClientSocket.Available == 0)
                 {
-                    await Task.Delay(1);
+                    continue;
                 }
                 else
                 {
-                    await Task.Delay(1);
-                    break;
+                    byte[] buffer = new byte[ClientSocket.Available];
+                    ClientSocket.Receive(buffer);
+                    ReceiveDataString += Encoding.ASCII.GetString(buffer);
+                    if (ReceiveDataString == "OK" | ReceiveDataString == "NG")
+                    {
+                        break;
+                    }
                 }
             }
-            byte[] ReceiveData = new byte[ClientSocket.Available];
-            ClientSocket.Receive(ReceiveData);
-            string ReceiveDataString = System.Text.Encoding.ASCII.GetString(ReceiveData);
             bool isPartsAGVSAccept = ReceiveDataString.ToUpper() == "OK";
             string region_names_str = string.Join("", data_obj.List_AreaName);
             return (isPartsAGVSAccept, isPartsAGVSAccept ? $"Parts AGVS Accept {data_obj.RegistEvent} [{region_names_str}]" : $"Parts AGVS Reject {data_obj.RegistEvent} [{region_names_str}]");
