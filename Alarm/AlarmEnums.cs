@@ -67,7 +67,8 @@ namespace AGVSystemCommonNet6.Alarm
         Task_Cancel_Fail = 48,
         Task_Add_To_Database_Fail = 49,
         AGV_TCPIP_DISCONNECT = 50,
-        Save_Measure_Data_to_DB_Fail = 51
+        Save_Measure_Data_to_DB_Fail = 51,
+        Region_Has_No_Agv_To_Dispatch_Task = 52
     }
 
 }
