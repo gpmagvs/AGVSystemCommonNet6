@@ -73,7 +73,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     MSG = taskFeedbackAck;
                     AGVSMessageStoreDictionary.TryAdd(taskFeedbackAck.SystemBytes, MSG);
                 }
-                else if (msgType == MESSAGE_TYPE.REQ_0305)
+                else if (msgType == MESSAGE_TYPE.REQ_0305_TASK_CANCEL)
                 {
                     clsTaskResetReqMessage? taskResetMsg = JsonConvert.DeserializeObject<clsTaskResetReqMessage>(_json);
                     MSG = taskResetMsg;
