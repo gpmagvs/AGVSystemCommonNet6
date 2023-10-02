@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static AGVSystemCommonNet6.clsEnums;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace AGVSystemCommonNet6.AGVDispatch.Model
 {
@@ -39,6 +41,12 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
 
         public virtual double RAM_Usage_Percent { get; set; } = 0;
 
+        /// <summary>
+        ///   與 AGVS Reset Command 相關，若收到 AGVS 下 AGVS Reset
+        ///  Command 給 AGV
+        ///⚫ AGVC 停下後為 true
+        ///⚫ 重新收到 0301 任務後為 fals
+        /// </summary>
         public virtual bool AGV_Reset_Flag { get; set; }
         public virtual double Signal_Strength { get; set; } = 0;
 
@@ -54,7 +62,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         /// <summary>
         /// 0:tray, 1:rack
         /// </summary>
-        public int CargoType { get; set; } = 0; // 0:tray, 1:rack
+        public virtual int CargoType { get; set; } = 0; // 0:tray, 1:rack
 
         public clsDriverStates[] DriversStatus { get; set; } = new clsDriverStates[0];
         public clsForkStates ForkStatus { get; set; } = new clsForkStates();

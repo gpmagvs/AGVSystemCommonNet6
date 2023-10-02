@@ -60,7 +60,15 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public override int Cargo_Status { get; set; } = 0;
 
         public override string[] CSTID { get; set; } = new string[0];
+
+        /// <summary>
+        ///  0:None,200:Tray
+        /// </summary>
+        [JsonProperty("Cargo Type")]
+        public override int CargoType { get; set; } = 0;
+
         public override double Odometry { get; set; } = 0;
+
 
 
         [JsonProperty("Electric Volume")]

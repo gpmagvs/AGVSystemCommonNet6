@@ -419,5 +419,7 @@
         Laser_Mode_Switch_Fail_Timeout,
         Localization_Fail,
         Measure_Result_Data_Report_Fail,
+        Exception_When_AGVC_AGVS_Task_Reset_Abort,
+        Exception_When_AGVC_AGVS_Task_Reset_CycleStop,
     }
 }
