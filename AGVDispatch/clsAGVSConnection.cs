@@ -46,6 +46,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
             REQ_0305_TASK_CANCEL = 0305,
             ACK_0306_TASK_CANCEL_ACK = 0306,
             ACK_0322 = 0322,
+            REQ_0323_VirtualID_Query = 0323,
+            ACK_0324_VirtualID_ACK = 0324,
             UNKNOWN = 9999,
         }
 
@@ -279,6 +281,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return MESSAGE_TYPE.ACK_0306_TASK_CANCEL_ACK;
             if (firstHeaderKey.Contains("0322"))
                 return MESSAGE_TYPE.ACK_0322;
+            if (firstHeaderKey.Contains("0323"))
+                return MESSAGE_TYPE.REQ_0323_VirtualID_Query;
+            if (firstHeaderKey.Contains("0324"))
+                return MESSAGE_TYPE.ACK_0324_VirtualID_ACK;
             else
                 return MESSAGE_TYPE.UNKNOWN;
         }

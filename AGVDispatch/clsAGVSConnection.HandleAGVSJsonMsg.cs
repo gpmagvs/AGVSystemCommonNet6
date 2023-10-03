@@ -88,6 +88,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     AGVSMessageStoreDictionary.TryAdd(taskFeedbackAck.SystemBytes, MSG);
                 }
 
+                else if (msgType == MESSAGE_TYPE.ACK_0324_VirtualID_ACK) //Virtual ID Query結果回傳
+                {
+                    clsCarrierVirtualIDResponseMessage? virtualIDQuAck = JsonConvert.DeserializeObject<clsCarrierVirtualIDResponseMessage>(_json);
+                    MSG = virtualIDQuAck;
+                    AGVSMessageStoreDictionary.TryAdd(virtualIDQuAck.SystemBytes, MSG);
+                }
+
+
                 MSG.OriJsonString = _json;
                 if (WaitAGVSReplyMREDictionary.TryRemove(MSG.SystemBytes, out ManualResetEvent mse))
                 {

@@ -157,7 +157,24 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-
+        public async Task<(bool result, string virtual_id, string message)> TryGetVirtualID()
+        {
+            byte[] data = AGVSMessageFactory.Create0323VirtualIDQueryMsg(out clsCarrierVirtualIDQueryMessage? msg);
+            if (await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes))
+            {
+                if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
+                {
+                    clsCarrierVirtualIDResponseMessage QueryResponseMessage = mesg as clsCarrierVirtualIDResponseMessage;
+                    return (true, QueryResponseMessage.CarrierVirtualIDResponse.VirtualID, "Success");
+                }
+                else
+                    return (false, "", "Fail");
+            }
+            else
+            {
+                return (false, "", "Fail");
+            }
+        }
         public async Task<(bool, OnlineModeQueryResponse onlineModeQuAck)> TryOnlineModeQueryAsync()
         {
             try

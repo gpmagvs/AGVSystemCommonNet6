@@ -42,6 +42,9 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                 CN = CN,
                 Code = Code,
                 Description = Description,
+                ELevel = ELevel,
+                IsRecoverable = IsRecoverable,
+                Time = Time,
 
             };
         }
