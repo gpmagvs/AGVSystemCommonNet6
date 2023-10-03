@@ -368,6 +368,5 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         }
 
-
     }
 }

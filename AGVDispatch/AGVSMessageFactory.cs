@@ -227,5 +227,31 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         }
 
+        /// <summary>
+        /// 生成0323Message
+        /// </summary>
+        /// <param name="carrierVirtualIDQueryMessage"></param>
+        /// <returns></returns>
+        internal static byte[] Create0323VirtualIDQueryMsg(out clsCarrierVirtualIDQueryMessage carrierVirtualIDQueryMessage)
+        {
+            carrierVirtualIDQueryMessage = new clsCarrierVirtualIDQueryMessage()
+            {
+                SID = SID,
+                EQName = EQName,
+                SystemBytes = System_Byte_Cyclic,
+                Header = new Dictionary<string, clsVirtualIDQu>()
+                 {
+                     {
+                         "0323", new clsVirtualIDQu()
+                         {
+                              Time_Stamp =DateTime.Now.ToAGVSTimeFormat(),
+                         }
+                     }
+                 }
+            };
+            return Encoding.UTF8.GetBytes(FormatSendOutString(carrierVirtualIDQueryMessage.ToJson()));
+
+        }
+
     }
 }
