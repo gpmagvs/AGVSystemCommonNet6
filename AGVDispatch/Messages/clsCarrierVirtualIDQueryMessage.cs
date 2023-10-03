@@ -15,8 +15,22 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
     public class clsVirtualIDQu
     {
+        public enum VIRTUAL_ID_QUERY_TYPE
+        {
+            READ_FAIL = 2,
+            NOT_MATCH = 3
+        }
+    
         [JsonProperty("Time Stamp")]
         public string Time_Stamp { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonProperty("Query Type")]
+        public VIRTUAL_ID_QUERY_TYPE QueryType { get; set; } = VIRTUAL_ID_QUERY_TYPE.READ_FAIL;
+
+        [JsonProperty("CST Type")]
+        public CST_TYPE CSTType { get; set; } = CST_TYPE.Tray;
     }
 
     /// <summary>
@@ -34,5 +48,10 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public string TimeStamp { get; set; }
         [JsonProperty("Virtual ID")]
         public string VirtualID { get; set; } = "";
+    }
+    public class clsCarrierVirtualIDResponseWebAPI: clsCarrierVirtualIDResponse
+    {
+        public new DateTime TimeStamp { get; set; }
+        public new string VirtualID { get; set; } = "";
     }
 }

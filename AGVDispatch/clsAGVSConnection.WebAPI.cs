@@ -83,6 +83,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
+        public async Task<clsCarrierVirtualIDResponseWebAPI> GetCarrierVirtualID()
+        {
+            try
+            {
+                // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
+                clsCarrierVirtualIDResponseWebAPI response = await WebAPIHttp.GetAsync<clsCarrierVirtualIDResponseWebAPI>($"/api/AGV/CarrierVirtualID?AGVName={AGVSMessageFactory.EQName}&Model={AGV_Model}");
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
 
     }
 }

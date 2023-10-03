@@ -168,6 +168,7 @@
         Oh_Action_but_Empty_Take = 1750,
         Load_But_Occupy = 1800,
         Read_Cst_ID_Fail = 1850,
+        Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID = 1851,
         Cst_ID_Not_Match = 1860,
         Instrument_Error = 1900,
         Instrument_IO_Error_ = 1901,

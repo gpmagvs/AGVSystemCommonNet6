@@ -101,7 +101,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tin> GetAsync<Tin>(string api_route)
+        public async Task<Tout> GetAsync<Tout>(string api_route)
         {
             try
             {
@@ -112,8 +112,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     jsonContent = await response.Content.ReadAsStringAsync();
-
-                    var result = JsonConvert.DeserializeObject<Tin>(jsonContent);
+                    var result = JsonConvert.DeserializeObject<Tout>(jsonContent);
                     return result;
                 }
                 else

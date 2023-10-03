@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.AGVDispatch.Model;
 using Newtonsoft.Json;
 using System.Text;
+using static AGVSystemCommonNet6.AGVDispatch.Messages.clsVirtualIDQu;
 
 namespace AGVSystemCommonNet6.AGVDispatch
 {
@@ -232,7 +233,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// </summary>
         /// <param name="carrierVirtualIDQueryMessage"></param>
         /// <returns></returns>
-        internal static byte[] Create0323VirtualIDQueryMsg(out clsCarrierVirtualIDQueryMessage carrierVirtualIDQueryMessage)
+        internal static byte[] Create0323VirtualIDQueryMsg(VIRTUAL_ID_QUERY_TYPE QueryType, CST_TYPE CstType, out clsCarrierVirtualIDQueryMessage carrierVirtualIDQueryMessage)
         {
             carrierVirtualIDQueryMessage = new clsCarrierVirtualIDQueryMessage()
             {
@@ -245,6 +246,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                          "0323", new clsVirtualIDQu()
                          {
                               Time_Stamp =DateTime.Now.ToAGVSTimeFormat(),
+                              QueryType=QueryType,
+                              CSTType= CstType
                          }
                      }
                  }

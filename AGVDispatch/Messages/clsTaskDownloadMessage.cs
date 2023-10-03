@@ -228,7 +228,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         [JsonProperty("CST ID")]
         public string CST_ID { get; set; }
         [JsonProperty("CST Type")]
-        public int CST_Type { get; set; }
+        public CST_TYPE CST_Type { get; set; }
     }
 
 }

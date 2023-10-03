@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
+using AGVSystemCommonNet6.Alarm.VMS_ALARM;
 using AGVSystemCommonNet6.Log;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static AGVSystemCommonNet6.AGVDispatch.Messages.clsVirtualIDQu;
 
 namespace AGVSystemCommonNet6.AGVDispatch
 {
@@ -157,9 +159,21 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-        public async Task<(bool result, string virtual_id, string message)> TryGetVirtualID()
+        public async Task<(bool result, string virtual_id, string message)> TryGetVirtualID(VIRTUAL_ID_QUERY_TYPE QueryType, CST_TYPE CstType)
         {
-            byte[] data = AGVSMessageFactory.Create0323VirtualIDQueryMsg(out clsCarrierVirtualIDQueryMessage? msg);
+            if (UseWebAPI)
+            {
+                try
+                {
+                    var response = await GetCarrierVirtualID();
+                    return (true, response.VirtualID, "");
+                }
+                catch (Exception ex)
+                {
+                    return (false, "", ex.Message);
+                }
+            }
+            byte[] data = AGVSMessageFactory.Create0323VirtualIDQueryMsg(QueryType, CstType,out clsCarrierVirtualIDQueryMessage ? msg);
             if (await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes))
             {
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
@@ -168,7 +182,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     return (true, QueryResponseMessage.CarrierVirtualIDResponse.VirtualID, "Success");
                 }
                 else
+                {
                     return (false, "", "Fail");
+                }
             }
             else
             {

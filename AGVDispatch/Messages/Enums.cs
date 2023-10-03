@@ -144,4 +144,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         TrayEQ_ULD = 221,
         Unknown = 9999
     }
+    public enum CST_TYPE
+    {
+        None = 0,
+        Tray = 200
+    }
 }
