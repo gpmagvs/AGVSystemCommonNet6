@@ -117,10 +117,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         private void TrySimpleReply(string header_key, bool reset_accept, int system_byte)
         {
             byte[] data = AGVSMessageFactory.CreateSimpleReturnMessageData(header_key, reset_accept, system_byte, out clsSimpleReturnWithTimestampMessage msg);
-            Console.WriteLine(msg.ToJson());
             bool writeOutSuccess = WriteDataOut(data);
-            Console.WriteLine("TryTaskResetReqAckAsync : " + writeOutSuccess);
-
         }
 
         /// <summary>

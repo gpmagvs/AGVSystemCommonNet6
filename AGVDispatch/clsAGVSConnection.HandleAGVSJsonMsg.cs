@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSConnection
     {
-        public void HandleAGVSJsonMsg(string _json)
+        public async void HandleAGVSJsonMsg(string _json)
         {
             MessageBase? MSG = null;
             MESSAGE_TYPE msgType = GetMESSAGE_TYPE(_json);
@@ -73,12 +73,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     MSG = taskFeedbackAck;
                     AGVSMessageStoreDictionary.TryAdd(taskFeedbackAck.SystemBytes, MSG);
                 }
-                else if (msgType == MESSAGE_TYPE.REQ_0305)
+                else if (msgType == MESSAGE_TYPE.REQ_0305_TASK_CANCEL)
                 {
                     clsTaskResetReqMessage? taskResetMsg = JsonConvert.DeserializeObject<clsTaskResetReqMessage>(_json);
                     MSG = taskResetMsg;
                     AGVSMessageStoreDictionary.TryAdd(taskResetMsg.SystemBytes, MSG);
-                    bool reset_accept = OnTaskResetReq(taskResetMsg.ResetData.ResetMode, false);
+                    bool reset_accept = await OnTaskResetReq(taskResetMsg.ResetData.ResetMode, false);
                     TrySimpleReply("0306", reset_accept, taskResetMsg.SystemBytes);
                 }
                 else if (msgType == MESSAGE_TYPE.ACK_0322)

@@ -14,7 +14,10 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         [JsonProperty("Time Stamp")]
         public string Time_Stamp { get; set; }
 
-        [JsonProperty("ResetMode Mode")]
+        [JsonProperty("Reset Mode")]
         public RESET_MODE ResetMode { get; set; }
+
+        [JsonProperty("Reset Type")]
+        public RESET_TYPE ResetType { get; set; }
     }
 }

@@ -10,6 +10,17 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class Map
     {
+        public enum MAP_VERSION
+        {
+            V1 = 1,
+            V2 = 2
+        }
+
+        /// <summary>
+        /// 地圖版本
+        /// V1:設定接設定在點上,路徑(線段)不可設定屬性; V2 : 路徑(線段)可設定屬性
+        /// </summary>
+        public virtual MAP_VERSION Version { get; set; }= MAP_VERSION.V1;
         public string Name { get; set; }
         public string Note { get; set; }
         public int PointIndex { get; set; }
@@ -56,6 +67,7 @@ namespace AGVSystemCommonNet6.MAP
                 return pathes;
             }
         }
+        public List<MapPath_V2> Segments { get; set; } = new List<MapPath_V2>();
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<string, Bay> Bays { get; set; } = new Dictionary<string, Bay>();

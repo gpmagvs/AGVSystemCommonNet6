@@ -22,7 +22,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         bool VMS_API_Call_Fail_Flag = true;
         public delegate TASK_DOWNLOAD_RETURN_CODES taskDonwloadExecuteDelage(clsTaskDownloadData taskDownloadData);
         public delegate bool onlineModeChangeDelelage(REMOTE_MODE mode, bool isAGVSRequest);
-        public delegate bool taskResetReqDelegate(RESET_MODE reset_data, bool isNormal);
+        public delegate Task<bool> taskResetReqDelegate(RESET_MODE reset_data, bool isNormal);
         public event EventHandler<clsTaskDownloadData> OnTaskDownloadFeekbackDone;
         public taskDonwloadExecuteDelage OnTaskDownload;
         public onlineModeChangeDelelage OnRemoteModeChanged;
@@ -43,8 +43,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
             ACK_0302_TASK_DOWNLOADED_ACK = 0302,
             REQ_0303_TASK_FEEDBACK_REPORT = 0303,
             ACK_0304_TASK_FEEDBACK_REPORT_ACK = 0304,
-            REQ_0305 = 0305,
-            ACK_0306 = 0306,
+            REQ_0305_TASK_CANCEL = 0305,
+            ACK_0306_TASK_CANCEL_ACK = 0306,
             ACK_0322 = 0322,
             UNKNOWN = 9999,
         }
@@ -73,7 +73,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             try
             {
-
                 if (UseWebAPI)
                     return true;
 
@@ -274,10 +273,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK;
 
             if (firstHeaderKey.Contains("0305"))
-                return MESSAGE_TYPE.REQ_0305;
+                return MESSAGE_TYPE.REQ_0305_TASK_CANCEL;
 
             if (firstHeaderKey.Contains("0306"))
-                return MESSAGE_TYPE.ACK_0306;
+                return MESSAGE_TYPE.ACK_0306_TASK_CANCEL_ACK;
             if (firstHeaderKey.Contains("0322"))
                 return MESSAGE_TYPE.ACK_0322;
             else

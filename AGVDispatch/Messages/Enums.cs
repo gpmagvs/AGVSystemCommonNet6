@@ -21,6 +21,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         CYCLE_STOP,
         ABORT
     }
+    public enum RESET_TYPE : int
+    {
+        CYCLE_STOP,
+        ABORT
+    }
 
 
     public enum RETURN_CODE : int
