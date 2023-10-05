@@ -29,12 +29,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task TryTaskFeedBackAsync(clsTaskDownloadData taskData, int point_index, TASK_RUN_STATUS task_status, int currentTAg, clsCoordination coordination)
         {
-            _ = Task.Run(async () =>
+            await Task.Factory.StartNew(async () =>
             {
-                await Task.Delay(1000);
                 while (true)
                 {
                     await Task.Delay(1);
+                    LOG.INFO($" Task Feedback to AGVS {task_status}");
                     try
                     {
                         byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
@@ -70,7 +70,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
 
 
-
+        public RunningStatus previousRunningStatusReport_via_TCPIP = new RunningStatus();
+        public clsRunningStatus previousRunningStatusReport_via_WEBAPI = new clsRunningStatus();
         private async Task<(bool, SimpleRequestResponseWithTimeStamp runningStateReportAck)> TryRnningStateReportAsync()
         {
             try
@@ -79,7 +80,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     clsRunningStatus runnginStatus = AGVSMessageFactory.OnWebAPIProtocolGetRunningStatus();
                     SimpleRequestResponse response = await PostRunningStatus(runnginStatus);
-
+                    previousRunningStatusReport_via_WEBAPI = runnginStatus;
                     return (response.ReturnCode == RETURN_CODE.OK | response.ReturnCode == RETURN_CODE.NG, new SimpleRequestResponseWithTimeStamp
                     {
                         ReturnCode = response.ReturnCode,
@@ -96,6 +97,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     {
                         return (false, null);
                     }
+
+                    previousRunningStatusReport_via_TCPIP = msg.Header.First().Value;
                     if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                     {
                         clsRunningStatusReportResponseMessage QueryResponseMessage = mesg as clsRunningStatusReportResponseMessage;
@@ -173,7 +176,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     return (false, "", ex.Message);
                 }
             }
-            byte[] data = AGVSMessageFactory.Create0323VirtualIDQueryMsg(QueryType, CstType,out clsCarrierVirtualIDQueryMessage ? msg);
+            byte[] data = AGVSMessageFactory.Create0323VirtualIDQueryMsg(QueryType, CstType, out clsCarrierVirtualIDQueryMessage? msg);
             if (await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes))
             {
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))

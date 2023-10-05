@@ -98,7 +98,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                LOG.ERROR($"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{Port})..Will Retry it after 3 secoond...");
+                LOG.ERROR($"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{Port})..Will Retry it after 3 secoond...", false);
                 tcpClient = null;
                 Thread.Sleep(3000);
                 return false;
@@ -112,7 +112,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 int disconnect_cnt = 0;
                 while (true)
                 {
-                    await Task.Delay(500);
+                    await Task.Delay(300);
                     try
                     {
 
@@ -120,7 +120,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         {
                             if (!UseWebAPI)
                             {
-                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{Port})");
+                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{Port})", false);
                                 Connect();
                                 continue;
                             }
