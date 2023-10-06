@@ -50,6 +50,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         [JsonProperty("Station Type")]
         public STATION_TYPE Station_Type { get; set; }
 
+        [NonSerialized]
+        public bool IsActionFinishReported = false;
+
         public clsMapPoint[] ExecutingTrajecory => Trajectory.Length != 0 ? Trajectory : Homing_Trajectory;
         public List<int> TagsOfTrajectory => ExecutingTrajecory.Select(pt => pt.Point_ID).ToList();
         public string OriTaskDataJson = "";
@@ -140,7 +143,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 LOG.ERROR("RosTaskCommandGoal_取得ROS任務Goal物件時發生錯誤", ec);
                 return null;
             }
-
         }
 
         /// <summary>

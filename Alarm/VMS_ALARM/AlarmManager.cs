@@ -18,7 +18,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         private static SQLiteConnection db;
 
         internal static event EventHandler OnAllAlarmClear;
-        public static event EventHandler OnUnRecoverableAlarmOccur;
+        public static event EventHandler<AlarmCodes> OnUnRecoverableAlarmOccur;
         public static bool LoadAlarmList(string alarm_JsonFile, out string message)
         {
             LOG.INFO("Alarm List File to load :" + alarm_JsonFile);
@@ -93,6 +93,14 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         }
         public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
         {
+            if (CurrentAlarms.Count > 0)
+            {
+                bool isRepeatAlarm = CurrentAlarms.Any(al => al.Value.EAlarmCode == Alarm_code && (DateTime.Now - al.Key).TotalMilliseconds < 100);
+                if (isRepeatAlarm)
+                {
+                    return;
+                }
+            }
             try
             {
                 clsAlarmCode alarm = AlarmList.FirstOrDefault(a => a.EAlarmCode == Alarm_code);
@@ -117,7 +125,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                 }
 
                 if (!IsRecoverable)
-                    OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, EventArgs.Empty);
+                    OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, Alarm_code);
             }
             catch (Exception ex)
             {

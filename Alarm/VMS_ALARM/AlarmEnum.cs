@@ -109,6 +109,7 @@
         Cant_Change_With_Wrong_State = 1050,
         Monitor_Switch_Error_ = 1060,
         Cant_Online_Without_Tag = 1070,
+        Cant_Online_With_Forbid_Tag = 1071,
         /// <summary>
         /// 前方遠處障礙物
         /// </summary>
@@ -424,6 +425,6 @@
         Exception_When_AGVC_AGVS_Task_Reset_Abort,
         Exception_When_AGVC_AGVS_Task_Reset_CycleStop,
         GetVirtualIDFail,
-        
+
     }
 }
