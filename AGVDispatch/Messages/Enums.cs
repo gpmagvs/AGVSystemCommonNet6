@@ -85,6 +85,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// 無任何路線供AGV導航
         /// </summary>
         NO_PATH_FOR_NAVIGATION = 8,
+        OK_AGV_ALREADY_THERE = 100
     }
 
     public enum TASK_RUN_STATUS : int

@@ -33,7 +33,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 while (true)
                 {
-                    await Task.Delay(1);
+                    Thread.Sleep(1);
                     LOG.INFO($" Task Feedback to AGVS {task_status}");
                     try
                     {
@@ -50,7 +50,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase _retMsg))
                             {
                                 clsSimpleReturnMessage msg_return = (clsSimpleReturnMessage)_retMsg;
-                                LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {msg_return.ReturnData.ReturnCode}", false);
+                                LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {msg_return.ReturnData.ReturnCode}");
                                 break;
                             }
                             else

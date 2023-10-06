@@ -183,9 +183,17 @@ namespace AGVSystemCommonNet6.MAP
             if (RegistInfo == null)
                 RegistInfo = new clsMapPoiintRegist();
 
-            if (RegistInfo.IsRegisted && AGVName != "System")
+            if (RegistInfo.IsRegisted)
             {
-                return false;
+                if (AGVName != "System" && RegistInfo.RegisterAGVName != AGVName)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+
             }
             RegistInfo = new clsMapPoiintRegist()
             {
@@ -201,22 +209,25 @@ namespace AGVSystemCommonNet6.MAP
         public bool TryUnRegistPoint(string name, out string errMsg)
         {
             errMsg = "";
-
             if (RegistInfo == null)
+            {
                 RegistInfo = new clsMapPoiintRegist();
+                return true;
+            }
             if (!RegistInfo.IsRegisted)
                 return true;
-            if (name == "System" | RegistInfo.RegisterAGVName == name)
+
+            if (RegistInfo.RegisterAGVName != name && name != "System")
+            {
+                errMsg = $"{this.Name} 由{RegistInfo.RegisterAGVName}註冊,除系統與註冊者以外不可解註冊";
+                return false;
+            }
+            else
             {
                 Console.WriteLine($"{name} UnRegist Tag_{TagNumber}");
                 RegistInfo.RegisterAGVName = "";
                 RegistInfo.IsRegisted = false;
                 return true;
-            }
-            else
-            {
-                errMsg = "非註冊該點位之AGV無法解除註冊";
-                return false;
             }
         }
     }
