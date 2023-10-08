@@ -62,7 +62,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     catch (Exception ex)
                     {
                         LOG.ERROR($"TryTaskFeedBackAsync FAIL>.>>{ex.Message}", ex);
-                        return;
+                        continue;
                     }
                 }
             });
