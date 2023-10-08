@@ -136,7 +136,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             result = TryOnlineModeQueryAsync().Result;
                             if (!result.Item1)
                             {
-                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/5");
+                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/5", false);
                             }
                         }
 
