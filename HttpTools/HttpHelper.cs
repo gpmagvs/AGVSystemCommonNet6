@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.TASK;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -18,6 +19,7 @@ namespace AGVSystemCommonNet6.HttpTools
             public string ErrorMessage { get; set; } = string.Empty;
         }
         public HttpClient http_client { get; private set; }
+        public LogBase Logger;
         public readonly string baseUrl;
         public int timeout_sec { get; set; } = 5;
         public HttpHelper(string baseUrl, int timeout_sec = 5)
@@ -71,7 +73,7 @@ namespace AGVSystemCommonNet6.HttpTools
             string url = this.baseUrl + api_route;
             if (data != null)
                 contentDataJson = JsonConvert.SerializeObject(data);
-            var content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
+            StringContent content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
             try
             {
                 Stopwatch sw = Stopwatch.StartNew();

@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Alarm.VMS_ALARM;
 using AGVSystemCommonNet6.Log;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,6 +39,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     try
                     {
                         byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
+
                         if (UseWebAPI)
                         {
                             SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(msg.Header.Values.First()));

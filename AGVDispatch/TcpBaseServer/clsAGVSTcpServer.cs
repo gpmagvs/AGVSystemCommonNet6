@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.Abstracts;
 using AGVSystemCommonNet6.Configuration;
+using AGVSystemCommonNet6.Log;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,15 +20,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
                 SocketServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                string ip = AGVSConfigulator.SysConfigs.VMSTcpServerIP;
-                int port = AGVSConfigulator.SysConfigs.VMSTcpServerPort;
-                SocketServer.Bind(new IPEndPoint(IPAddress.Parse(ip), port));
+                IP = AGVSConfigulator.SysConfigs.VMSTcpServerIP;
+                Port= AGVSConfigulator.SysConfigs.VMSTcpServerPort;
+                SocketServer.Bind(new IPEndPoint(IPAddress.Parse(IP), Port));
                 SocketServer.Listen(1000);
                 Task.Factory.StartNew(() =>
                 {
                     AcceptListen();
                 });
-
                 return true;
             }
             catch (Exception ex)

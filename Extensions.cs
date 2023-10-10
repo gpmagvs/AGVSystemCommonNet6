@@ -66,11 +66,11 @@ namespace AGVSystemCommonNet6
             yaw = Math.Atan2(siny_cosp, cosy_cosp);
             return yaw * 180.0 / Math.PI;
         }
-        public static string ToJson(this object obj)
+        public static string ToJson(this object obj, Formatting format = Formatting.Indented)
         {
             try
             {
-                return JsonConvert.SerializeObject(obj, Formatting.Indented);
+                return JsonConvert.SerializeObject(obj, format);
             }
             catch (Exception ex)
             {
@@ -79,6 +79,18 @@ namespace AGVSystemCommonNet6
             }
         }
 
+        public static string GetString(this byte[] byte_data, Encoding encoder)
+        {
+            try
+            {
+                return encoder.GetString(byte_data);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                return "{}";
+            }
+        }
 
 
         /// <summary>

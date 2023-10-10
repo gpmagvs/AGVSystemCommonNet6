@@ -12,7 +12,16 @@ namespace AGVSystemCommonNet6.Log
     public class LogBase
     {
         public string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), LogFolderName);
-        internal string LogFolderName = "VMS LOG";
+        private string _LogFolderName = "GPM_AGV_LOG";
+        internal string LogFolderName
+        {
+            get => _LogFolderName;
+            set {
+                _LogFolderName= value;
+                if (!Directory.Exists(LogFolder))
+                    Directory.CreateDirectory(LogFolder);
+            }
+        }
         private ConcurrentQueue<LogItem> logItemQueue = new ConcurrentQueue<LogItem>();
         private Task WriteLogToFileTask;
 
@@ -35,8 +44,6 @@ namespace AGVSystemCommonNet6.Log
 
         private async void WriteLogWorker()
         {
-            if (!Directory.Exists(LogFolder))
-                Directory.CreateDirectory(LogFolder);
 
             while (true)
             {

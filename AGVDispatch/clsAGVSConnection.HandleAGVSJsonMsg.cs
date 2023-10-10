@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Log;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             MessageBase? MSG = null;
             MESSAGE_TYPE msgType = GetMESSAGE_TYPE(_json);
-            LOG.INFO(_json, false);
-
+            LogMsgFromAGVS(_json);
             try
             {
                 if (msgType == MESSAGE_TYPE.UNKNOWN)

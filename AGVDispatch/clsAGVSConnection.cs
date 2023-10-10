@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6.Abstracts;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Log;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -29,6 +30,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public taskResetReqDelegate OnTaskResetReq;
         public event EventHandler OnDisconnected;
         public bool UseWebAPI = false;
+        public LogBase Logger = new LogBase();
         public enum MESSAGE_TYPE
         {
             REQ_0101_ONLINE_MODE_QUERY = 0101,
@@ -50,7 +52,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             ACK_0324_VirtualID_ACK = 0324,
             UNKNOWN = 9999,
         }
-
         public string LocalIP { get; }
         public AGV_MODEL AGV_Model { get; }
 
@@ -60,6 +61,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             this.Port = Port;
             LocalIP = null;
             WebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
+            WebAPIHttp.Logger = this.Logger;
         }
         public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_MODEL AGV_Model = AGV_MODEL.FORK_AGV)
         {
@@ -68,9 +70,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
             this.LocalIP = localIP;
             this.AGV_Model = AGV_Model;
             WebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
+            WebAPIHttp.Logger = this.Logger;
         }
 
-
+        public void SetLogFolder(string folder_name)
+        {
+            Logger.LogFolderName = folder_name;
+        }
         public override bool Connect()
         {
             try
@@ -323,6 +329,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return false;
             try
             {
+                LogMsgToAGVS($"(TCP/IP) {dataByte.GetString(Encoding.ASCII)}");
                 socketState.stream.Write(dataByte, 0, dataByte.Length);
                 return true;
             }
@@ -343,7 +350,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                  try
                  {
                      ManualResetEvent manualResetEvent = new ManualResetEvent(false);
-                     socketState.stream.Write(dataByte, 0, dataByte.Length);
+                     WriteDataOut(dataByte);
+                     //socketState.stream.Write(dataByte, 0, dataByte.Length);
                      bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
                      if (addsucess)
                      {
@@ -372,6 +380,25 @@ namespace AGVSystemCommonNet6.AGVDispatch
              });
 
         }
-
+        private string AGVSServerUrl=> UseWebAPI? WebAPIHttp.baseUrl : $"{IP}:{Port}";
+        public async Task LogMsgToAGVS(string msg)
+        {
+            if (Logger == null)
+                return;
+            await Task.Factory.StartNew(() =>
+            {
+                
+                Logger.Log(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
+            });
+        }
+        public async Task LogMsgFromAGVS(string msg)
+        {
+            if (Logger == null)
+                return;
+            await Task.Factory.StartNew(() =>
+            {
+                Logger.Log(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
+            });
+        }
     }
 }
