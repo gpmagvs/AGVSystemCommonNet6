@@ -16,6 +16,11 @@ namespace AGVSystemCommonNet6.Log
         private ConcurrentQueue<LogItem> logItemQueue = new ConcurrentQueue<LogItem>();
         private Task WriteLogToFileTask;
 
+        public LogBase() { }
+        public LogBase(string LogFolderName)
+        {
+            this.LogFolderName = LogFolderName;
+        }
 
         public void Log(LogItem logItem, string caller_class_name = "")
         {
