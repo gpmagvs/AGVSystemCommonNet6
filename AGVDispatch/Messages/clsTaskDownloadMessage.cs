@@ -51,7 +51,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public STATION_TYPE Station_Type { get; set; }
 
         [NonSerialized]
-        public bool IsActionFinishReported = false;
+        public bool IsActionFinishReported = true;
 
         public clsMapPoint[] ExecutingTrajecory => Trajectory.Length != 0 ? Trajectory : Homing_Trajectory;
         public List<int> TagsOfTrajectory => ExecutingTrajecory.Select(pt => pt.Point_ID).ToList();
@@ -76,7 +76,13 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 return Station_Type == STATION_TYPE.EQ | Station_Type == STATION_TYPE.STK | Station_Type == STATION_TYPE.Charge_STK;
             }
         }
+        public bool HasCargo { get; set; } = false;
+        /// <summary>
+        /// 是否為本地任務
+        /// </summary>
 
+        [NonSerialized]
+        public bool IsLocalTask;
         /// <summary>
         /// 把派車任務DTO轉成送給車控CommandActionClient的 TaskCommandGoal
         /// </summary>
@@ -169,7 +175,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             // taskData.Homing_Trajectory = taskData.Homing_Trajectory.Reverse().ToArray();
             return taskData;
         }
-        public bool HasCargo { get; set; } = false;
+
     }
 
 

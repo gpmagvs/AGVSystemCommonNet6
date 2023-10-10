@@ -48,7 +48,14 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                 CurrentAlarms.TryRemove(exist_al);
             }
         }
-
+        public static void ClearAlarm(int alarm_code)
+        {
+            var exist_al = CurrentAlarms.FirstOrDefault(al => al.Value.Code == alarm_code);
+            if (exist_al.Value != null)
+            {
+                ClearAlarm(exist_al.Value.EAlarmCode);
+            }
+        }
 
         public static void ClearAlarm()
         {
@@ -168,5 +175,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             else
                 return AlarmCodes.Motion_control_Wrong_Unknown_Code;
         }
+
+
     }
 }

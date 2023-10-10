@@ -9,7 +9,7 @@ namespace AGVSystemCommonNet6.HttpTools
     public class clsAPIRequestResult
     {
         public bool Success => ReturnCode == 0;
-        public string Message { get; set; }
+        public string Message { get; set; } = "";
         public int ReturnCode { get; set; } = -1;
     }
 }
