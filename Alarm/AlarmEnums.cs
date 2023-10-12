@@ -68,7 +68,8 @@ namespace AGVSystemCommonNet6.Alarm
         Task_Add_To_Database_Fail = 49,
         AGV_TCPIP_DISCONNECT = 50,
         Save_Measure_Data_to_DB_Fail = 51,
-        Region_Has_No_Agv_To_Dispatch_Task = 52
+        Region_Has_No_Agv_To_Dispatch_Task = 52,
+        CANNOT_DISPATCH_CARRY_TASK_WHEN_AGV_HAS_CARGO = 53
     }
 
 }
