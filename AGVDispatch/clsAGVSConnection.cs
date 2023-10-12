@@ -361,6 +361,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                      else
                      {
                          LOG.Critical($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
+                         WaitAGVSReplyMREDictionary.TryRemove(systemBytes, out manualResetEvent);
                          return false;
                      }
                  }
@@ -380,14 +381,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
              });
 
         }
-        private string AGVSServerUrl=> UseWebAPI? WebAPIHttp.baseUrl : $"{IP}:{Port}";
+        private string AGVSServerUrl => UseWebAPI ? WebAPIHttp.baseUrl : $"{IP}:{Port}";
         public async Task LogMsgToAGVS(string msg)
         {
             if (Logger == null)
                 return;
             await Task.Factory.StartNew(() =>
             {
-                
+
                 Logger.Log(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
             });
         }
