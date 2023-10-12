@@ -92,9 +92,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 else
                 {
                     byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg);
-                    LOG.TRACE(msg.ToJson(), false);
                     bool success = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
-
                     if (!success)
                     {
                         return (false, null);
