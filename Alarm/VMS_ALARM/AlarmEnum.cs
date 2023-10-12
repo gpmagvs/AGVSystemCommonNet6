@@ -224,7 +224,7 @@
         Precheck_IO_Fail_EQ_READY_UP = 3224,
         Precheck_IO_Fail_EQ_READY_LOW = 3225,
         Precheck_IO_Fail_EQ_GO = 3226,
-        Precheck_IO_EQ_PIO_State_Not_Reset,
+        Precheck_IO_EQ_PIO_State_Not_Reset = 3227,
         Handshake_Fail_EQ_BUSY_ON = 3230,
         Handshake_Fail_EQ_BUSY_OFF = 3231,
         Handshake_Fail_AGV_DOWN = 3232,
