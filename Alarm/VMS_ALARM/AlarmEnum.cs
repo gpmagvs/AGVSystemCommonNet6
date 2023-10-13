@@ -23,6 +23,7 @@
         Battery1_Not_UnLock = 224,
         Battery2_Not_UnLock = 225,
         Action_Timeout = 250,
+        Fork_Action_Aborted = 251,
         Auto_Reset_Timeout = 260,
         Lock_Action_Timeout = 270,
         Lock1_Action_Timeout = 271,
@@ -425,6 +426,7 @@
         Exception_When_AGVC_AGVS_Task_Reset_Abort,
         Exception_When_AGVC_AGVS_Task_Reset_CycleStop,
         GetVirtualIDFail,
-
+        AGV_BarcodeReader_Not_Match_Tag_of_Destination,
+        AGV_Park_Position_Too_Far_From_Tag_Of_Destination,
     }
 }
