@@ -127,6 +127,7 @@
         Cant_Initial_when_Obstacle_Invade = 1530,
         AGV_State_Cant_Auto_Reset = 1540,
         Secondary_Done_But_is_Wrong_Pos = 1550,
+        AGV_Location_Not_Secondary = 1551,
         Cant_Manual_Action = 1560,
         Cant_Manual_Action_1 = 1561,
         Cant_Manual_Action_2 = 1562,
