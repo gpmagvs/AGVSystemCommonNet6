@@ -16,7 +16,7 @@ namespace AGVSystemCommonNet6.MAP
                     Name = "empty",
                     Note = "empty"
                 };
-            var json = System.IO.File.ReadAllText(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName);
+            var json = System.IO.File.ReadAllText(mapfile);
             if (json == null)
                 return null;
             try
