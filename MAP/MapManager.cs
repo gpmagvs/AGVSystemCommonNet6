@@ -1,13 +1,15 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Configuration;
 using Newtonsoft.Json;
+using RosSharp.RosBridgeClient;
 
 namespace AGVSystemCommonNet6.MAP
 {
     public class MapManager
     {
-        public static Map LoadMapFromFile(string mapfile)
+        public static Map LoadMapFromFile(string mapfile, out string errorMsg, bool auto_create_segment = true)
         {
+            errorMsg = "";
             if (!File.Exists(mapfile))
                 return new Map()
                 {
@@ -23,7 +25,7 @@ namespace AGVSystemCommonNet6.MAP
             {
                 var data_obj = JsonConvert.DeserializeObject<Dictionary<string, Map>>(json);
                 var map = data_obj["Map"];
-                if (map.Points.Count != 0 && map.Segments.Count == 0)
+                if (auto_create_segment && map.Points.Count != 0 && map.Segments.Count == 0)
                 {
                     List<MapPath_V2> GetMapPathes(Map map, MapPoint point)
                     {
@@ -49,14 +51,15 @@ namespace AGVSystemCommonNet6.MAP
             }
             catch (Exception ex)
             {
+                errorMsg = ex.Message + ex.StackTrace;
                 Console.WriteLine("LoadMapFromFile Error  : " + ex.Message);
                 return new Map();
             }
         }
         public static Map LoadMapFromFile()
         {
-            return LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName);
-     
+            return LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string msg, false);
+
         }
 
         public static bool SaveMapToFile(Map map_modified, string local_map_file_path)
