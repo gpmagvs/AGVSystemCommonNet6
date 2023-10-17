@@ -19,9 +19,8 @@ namespace AGVSystemCommonNet6.Tools.Database
                 db = new SQLiteConnection(databasePath);
                 db.CreateTable<clsAlarmCode>();
                 db.CreateTable<UserEntity>();
-
+                db.CreateTable<clsParkingAccuracy>();
                 CreateDefaultUsers();
-
             }
             catch (System.Exception ex)
             {
@@ -37,6 +36,13 @@ namespace AGVSystemCommonNet6.Tools.Database
             });
         }
 
+        public static void InsertParkingAccuracy(clsParkingAccuracy parkingAccuracy)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                db?.Insert(parkingAccuracy);
+            });
+        }
 
         public static void InsertUser(UserEntity user)
         {
@@ -116,6 +122,16 @@ namespace AGVSystemCommonNet6.Tools.Database
             });
         }
 
+        public static List<string>? QueryAllParkLoc()
+        {
+            return db?.Table<clsParkingAccuracy>().Select(record => $"{record.ParkingTag}:{record.ParkingLocation}").Distinct().ToList();
+        }
 
+        public static List<clsParkingAccuracy> QueryParkingAccuracy(int tag, string startTimeStr, string endTimeStr)
+        {
+            DateTime startTime = DateTime.Parse(startTimeStr);
+            DateTime endTime = DateTime.Parse(endTimeStr);
+            return db?.Table<clsParkingAccuracy>().Where(acq => acq.ParkingTag == tag && acq.Time >= startTime && acq.Time <= endTime).ToList();
+        }
     }
 }
