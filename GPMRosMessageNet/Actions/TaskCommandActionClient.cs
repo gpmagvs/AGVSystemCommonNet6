@@ -7,7 +7,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
 {
     public class TaskCommandActionClient : ActionClient<TaskCommandAction, TaskCommandActionGoal, TaskCommandActionResult, TaskCommandActionFeedback, TaskCommandGoal, TaskCommandResult, TaskCommandFeedback>, IDisposable
     {
-        public Action<ActionStatus> OnActionStatusChanged;
+        public event EventHandler<ActionStatus> OnActionStatusChanged;
         public TaskCommandGoal goal = new TaskCommandGoal()
         {
             taskID = ""
@@ -63,10 +63,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
                 var _actionStatus = (ActionStatus)(goalStatus.status);
                 if (previousActionStatus != _actionStatus)
                 {
-                    if (OnActionStatusChanged != null)
-                    {
-                        OnActionStatusChanged(_actionStatus);
-                    }
+                    Task.Factory.StartNew(() => OnActionStatusChanged?.Invoke(this, _actionStatus));
                 }
                 previousActionStatus = _actionStatus;
             }
