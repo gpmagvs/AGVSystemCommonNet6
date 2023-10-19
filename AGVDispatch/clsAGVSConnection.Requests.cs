@@ -22,6 +22,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 byte[] data = AGVSMessageFactory.CreateTaskDownloadReqAckData(accept_task, system_byte, out clsSimpleReturnMessage ackMsg);
                 LOG.INFO($"TaskDownload Ack : {ackMsg.ToJson()}");
+                _retMsg.Dispose();
+                ackMsg.Dispose();
                 return WriteDataOut(data);
             }
             else
@@ -53,12 +55,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             {
                                 clsSimpleReturnMessage msg_return = (clsSimpleReturnMessage)_retMsg;
                                 LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {msg_return.ReturnData.ReturnCode}");
+                                _retMsg.Dispose();
+                                msg.Dispose();
                                 break;
                             }
                             else
                             {
                                 LOG.ERROR($"TryTaskFeedBackAsync FAIL>.>>");
                             }
+                            msg.Dispose();
                         }
                     }
                     catch (Exception ex)
@@ -102,13 +107,26 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                     {
                         clsRunningStatusReportResponseMessage QueryResponseMessage = mesg as clsRunningStatusReportResponseMessage;
+
                         if (QueryResponseMessage != null)
-                            return (true, QueryResponseMessage.RuningStateReportAck);
+                        {
+                            SimpleRequestResponseWithTimeStamp ack = QueryResponseMessage.RuningStateReportAck;
+                            mesg.Dispose();
+                            QueryResponseMessage.Dispose();
+                            msg.Dispose();
+                            return (true, ack);
+                        }
                         else
+                        {
+                            msg.Dispose();
                             return (false, null);
+                        }
                     }
                     else
+                    {
+                        msg.Dispose();
                         return (false, null);
+                    }
                 }
 
 
@@ -182,7 +200,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                 {
                     clsCarrierVirtualIDResponseMessage QueryResponseMessage = mesg as clsCarrierVirtualIDResponseMessage;
-                    return (true, QueryResponseMessage.CarrierVirtualIDResponse.VirtualID, "Success");
+                    var id = QueryResponseMessage.CarrierVirtualIDResponse.VirtualID.ToString();
+                    mesg.Dispose();
+                    return (true, id, "Success");
                 }
                 else
                 {
@@ -212,7 +232,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                     {
                         clsOnlineModeQueryResponseMessage QueryResponseMessage = mesg as clsOnlineModeQueryResponseMessage;
-                        return (true, QueryResponseMessage.OnlineModeQueryResponse);
+                        var response = QueryResponseMessage.OnlineModeQueryResponse;
+                        mesg.Dispose();
+                        return (true, response);
                     }
                     else
                         return (false, null);

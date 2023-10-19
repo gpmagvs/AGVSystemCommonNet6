@@ -119,6 +119,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 while (true)
                 {
                     await Task.Delay(300);
+                    CheckAndClearOlderMessageStored();
                     try
                     {
 
@@ -175,6 +176,28 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
             });
             return true;
+        }
+
+        private void CheckAndClearOlderMessageStored()
+        {
+            try
+            {
+                IEnumerable<KeyValuePair<int, MessageBase>> allOldderMessage = AGVSMessageStoreDictionary.Where(kp => (DateTime.Now - kp.Value.createdTime).TotalSeconds >= 5);
+                if (allOldderMessage.Any())
+                {
+                    int count = allOldderMessage.Count();
+                    foreach (KeyValuePair<int, MessageBase> item in allOldderMessage)
+                    {
+                        AGVSMessageStoreDictionary.TryRemove(item.Key, out _);
+                        item.Value.Dispose();
+                    }
+                    LOG.TRACE($"Find {count} old message, remove from AGVSMessageStoreDictionary ");
+                }
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex.Message, ex);
+            }
         }
 
         void ReceieveCallbaak(IAsyncResult ar)
