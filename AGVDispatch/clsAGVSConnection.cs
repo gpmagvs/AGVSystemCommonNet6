@@ -118,6 +118,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 int disconnect_cnt = 0;
                 while (true)
                 {
+                    GC.Collect();
                     await Task.Delay(300);
                     CheckAndClearOlderMessageStored();
                     try
@@ -172,6 +173,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     }
                     catch (Exception ex)
                     {
+                        GC.Collect();
                     }
                 }
             });
