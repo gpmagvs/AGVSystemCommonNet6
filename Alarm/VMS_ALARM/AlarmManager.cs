@@ -12,6 +12,8 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
     {
 
         public static List<clsAlarmCode> AlarmList { get; private set; } = new List<clsAlarmCode>();
+        public static bool Active { get; set; } = true;
+
         public static ConcurrentDictionary<DateTime, clsAlarmCode> CurrentAlarms = new ConcurrentDictionary<DateTime, clsAlarmCode>()
         {
         };
@@ -68,6 +70,8 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
 
         public static void AddWarning(AlarmCodes Alarm_code)
         {
+            if (!Active)
+                return;
             clsAlarmCode warning = AlarmList.FirstOrDefault(a => a.EAlarmCode == Alarm_code);
             if (warning == null)
             {
@@ -96,10 +100,14 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         /// <param name="Alarm_code"></param>
         public static void AddAlarm(AlarmCodes Alarm_code)
         {
+            if (!Active)
+                return;
             AddAlarm(Alarm_code, true);
         }
         public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
         {
+            if (!Active)
+                return;
             if (CurrentAlarms.Count > 0)
             {
                 bool isRepeatAlarm = CurrentAlarms.Any(al => al.Value.EAlarmCode == Alarm_code && (DateTime.Now - al.Key).TotalMilliseconds < 100);
