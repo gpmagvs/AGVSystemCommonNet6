@@ -1,23 +1,81 @@
 ﻿using AGVSystemCommonNet6.Alarm.VMS_ALARM;
+using System.Net.NetworkInformation;
 
 namespace AGVSystemCommonNet6.Abstracts
 {
-    public abstract class Connection:AGVAlarmReportable
+    public abstract class Connection : AGVAlarmReportable
     {
         public string IP;
         public int Port;
+        public event EventHandler OnPingFail;
+        public event EventHandler OnPingSuccess;
+        public bool AutoPingServerCheck { get; set; } = true;
+        private bool _ping_success = true;
+        private bool ping_success
+        {
+            get => _ping_success;
+            set
+            {
+                if (_ping_success != value)
+                {
+                    _ping_success = value;
+                    if (!value)
+                        Task.Factory.StartNew(() => OnPingFail?.Invoke(this, EventArgs.Empty));
+                    else
+                        Task.Factory.StartNew(() => OnPingSuccess?.Invoke(this, EventArgs.Empty));
+                }
+            }
+        }
         public Connection()
         {
 
         }
-        public Connection(string IP, int Port)
+        public Connection(string IP, int Port, bool AutoPingServerCheck = false)
         {
             this.IP = IP;
             this.Port = Port;
+            if (AutoPingServerCheck)
+            {
+                PingServerCheckProcess();
+            }
         }
-        public abstract bool Connect();
+        public abstract Task<bool> Connect();
         public abstract void Disconnect();
         public abstract bool IsConnected();
+
+
+        protected void PingServerCheckProcess()
+        {
+            Task.Run(async () =>
+            {
+                while (AutoPingServerCheck)
+                {
+                    await Task.Delay(1000);
+                    ping_success = await PingServer();
+                }
+            });
+        }
+
+        public async Task<bool> PingServer()
+        {
+            Ping pingSender = new Ping();
+            // 設定要 ping 的主機或 IP
+            string address = IP;
+            try
+            {
+                PingReply reply = pingSender.Send(address);
+                if (reply.Status != IPStatus.Success)
+                {
+                    Console.WriteLine(reply.Status);
+                }
+                return reply.Status == IPStatus.Success;
+            }
+            catch (PingException ex)
+            {
+                Console.WriteLine($"Ping Error: {ex.Message}");
+                return false;
+            }
+        }
 
     }
 }

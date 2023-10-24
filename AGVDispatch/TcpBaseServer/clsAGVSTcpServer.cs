@@ -15,16 +15,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
     {
         public Socket SocketServer;
         public event EventHandler<clsAGVSTcpClientHandler> OnClientConnected;
-        public override bool Connect()
+        public override async Task<bool> Connect()
         {
             try
             {
                 SocketServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 IP = AGVSConfigulator.SysConfigs.VMSTcpServerIP;
-                Port= AGVSConfigulator.SysConfigs.VMSTcpServerPort;
+                Port = AGVSConfigulator.SysConfigs.VMSTcpServerPort;
                 SocketServer.Bind(new IPEndPoint(IPAddress.Parse(IP), Port));
                 SocketServer.Listen(1000);
-                Task.Factory.StartNew(() =>
+                await Task.Factory.StartNew(() =>
                 {
                     AcceptListen();
                 });
