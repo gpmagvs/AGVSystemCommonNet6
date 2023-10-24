@@ -54,8 +54,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
         public string LocalIP { get; }
         public AGV_MODEL AGV_Model { get; }
-
-        public clsAGVSConnection(string IP, int Port) : base(IP, Port)
+        public clsAGVSConnection(string IP, int Port, bool AutoPingServerCheck = true) : base(IP, Port, AutoPingServerCheck)
         {
             this.IP = IP;
             this.Port = Port;
@@ -71,13 +70,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
             this.AGV_Model = AGV_Model;
             WebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
             WebAPIHttp.Logger = this.Logger;
+            AutoPingServerCheck = true;
+            PingServerCheckProcess();
         }
 
         public void SetLogFolder(string folder_name)
         {
             Logger.LogFolderName = folder_name;
         }
-        public override bool Connect()
+        public override async Task<bool> Connect()
         {
             try
             {
@@ -106,7 +107,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 LOG.ERROR($"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{Port})..Will Retry it after 3 secoond...", false);
                 tcpClient = null;
-                Thread.Sleep(3000);
+                await Task.Delay(3000);
                 return false;
             }
         }
@@ -129,7 +130,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (!UseWebAPI)
                             {
                                 LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{Port})", false);
-                                Connect();
+                                await Connect();
                                 continue;
                             }
                         }
@@ -153,7 +154,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
                             if (!UseWebAPI)
                                 Disconnect();
-                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_Disconnect;
+                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_OnlineModeQuery_T1_Timeout;
                             continue;
                         }
                         else
