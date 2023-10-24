@@ -55,9 +55,14 @@ namespace AGVSystemCommonNet6.Tools.Database
             }
         }
 
-        public static int AlarmsTotalNum()
+        public static int AlarmsTotalNum(string alarm_type = "All")
         {
-            return db.Table<clsAlarmCode>().Count();
+            if (alarm_type.ToLower() == "all")
+                return db.Table<clsAlarmCode>().Count();
+            else if (alarm_type.ToLower() == "alarm")
+                return db.Table<clsAlarmCode>().Where(al => al.ELevel == clsAlarmCode.LEVEL.Alarm).Count();
+            else
+                return db.Table<clsAlarmCode>().Where(al => al.ELevel == clsAlarmCode.LEVEL.Warning).Count();
         }
 
         public static int ClearAllAlarm()
@@ -74,11 +79,20 @@ namespace AGVSystemCommonNet6.Tools.Database
 
         }
 
-        public static List<clsAlarmCode> QueryAlarm(int page, int page_size = 16)
+        public static List<clsAlarmCode> QueryAlarm(int page, int page_size = 16, string alarm_type = "All")
         {
             try
             {
-                var query = db.Table<clsAlarmCode>().OrderByDescending(f => f.Time).Skip(page_size * (page - 1)).Take(page_size);
+                TableQuery<clsAlarmCode> query = null;
+                if (alarm_type.ToLower() == "all")
+                {
+                    query = db.Table<clsAlarmCode>().OrderByDescending(f => f.Time).Skip(page_size * (page - 1)).Take(page_size);
+                }
+                else
+                {
+                    clsAlarmCode.LEVEL filterLevel = alarm_type.ToLower() == "alarm" ? clsAlarmCode.LEVEL.Alarm : clsAlarmCode.LEVEL.Warning;
+                    query = db.Table<clsAlarmCode>().OrderByDescending(f => f.Time).Where(al => al.ELevel == filterLevel).Skip(page_size * (page - 1)).Take(page_size);
+                }
                 return query.ToList();
             }
             catch (Exception ex)
