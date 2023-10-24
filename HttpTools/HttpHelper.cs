@@ -22,7 +22,7 @@ namespace AGVSystemCommonNet6.HttpTools
         public LogBase Logger;
         public readonly string baseUrl;
         public int timeout_sec { get; set; } = 5;
-        public HttpHelper(string baseUrl, int timeout_sec = 1)
+        public HttpHelper(string baseUrl, int timeout_sec = 3)
         {
             this.baseUrl = baseUrl;
             this.timeout_sec = timeout_sec;

@@ -24,11 +24,6 @@ namespace AGVSystemCommonNet6.Abstracts
             ABNORMAL
         }
 
-        public CarComponent()
-        {
-            AGVAlarmReportable.OnAlarmResetAsNoneRequest += AGVAlarmReportable_OnAlarmResetAsNoneRequest;
-        }
-
         private void AGVAlarmReportable_OnAlarmResetAsNoneRequest(object? sender, EventArgs e)
         {
             OnAlarmResetHandle();
@@ -40,6 +35,9 @@ namespace AGVSystemCommonNet6.Abstracts
         private Message _StateData;
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
+
+        public delegate bool AlarmHappendDelegate(AlarmCodes alarm);
+        public AlarmHappendDelegate OnAlarmHappened { get; set; }
 
         public object Data { get; }
 
