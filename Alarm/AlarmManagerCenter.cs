@@ -226,7 +226,7 @@ namespace AGVSystemCommonNet6.Alarm
                                     && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name)) && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
                 );
                 count = _alarms.Count();
-                alarms = _alarms.Skip((currentpage - 1) * 15).Take(15).ToList();
+                alarms = _alarms.Skip((currentpage - 1) * 20).Take(20).ToList();
             };
         }
         public static string SaveTocsv( DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)

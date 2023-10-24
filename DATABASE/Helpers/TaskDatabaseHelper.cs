@@ -139,7 +139,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                     && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
                 );
                 count = _Task.Count();
-                Task = _Task.Skip((currentpage - 1) * 15).Take(15).ToList();
+                Task = _Task.Skip((currentpage - 1) * 20).Take(20).ToList();
             };
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
