@@ -24,12 +24,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public delegate TASK_DOWNLOAD_RETURN_CODES taskDonwloadExecuteDelage(clsTaskDownloadData taskDownloadData);
         public delegate bool onlineModeChangeDelelage(REMOTE_MODE mode, bool isAGVSRequest);
         public delegate Task<bool> taskResetReqDelegate(RESET_MODE reset_data, bool isNormal);
+        public event EventHandler OnOnlineStateQueryFail;
         public event EventHandler<clsTaskDownloadData> OnTaskDownloadFeekbackDone;
+        public event EventHandler OnConnectionRestored;
         public taskDonwloadExecuteDelage OnTaskDownload;
         public onlineModeChangeDelelage OnRemoteModeChanged;
         public taskResetReqDelegate OnTaskResetReq;
         public event EventHandler OnDisconnected;
         public bool UseWebAPI = false;
+        private bool Disconnected = false;
+
         public LogBase Logger = new LogBase();
         public enum MESSAGE_TYPE
         {
@@ -116,7 +120,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             _ = Task.Factory.StartNew(async () =>
             {
-                int disconnect_cnt = 0;
                 while (true)
                 {
                     GC.Collect();
@@ -140,18 +143,20 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         {
                             Thread.Sleep(1000);
                             retryCnt += 1;
-                            if (retryCnt > 5)
+                            if (retryCnt > 10)
                                 break;
                             result = TryOnlineModeQueryAsync().Result;
                             if (!result.Item1)
                             {
-                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/5", false);
+                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/10", false);
                             }
                         }
 
                         if (!result.Item1)
                         {
+                            Disconnected = true;
                             LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
+                            OnOnlineStateQueryFail?.Invoke(this, EventArgs.Empty);
                             if (!UseWebAPI)
                                 Disconnect();
                             Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_OnlineModeQuery_T1_Timeout;
@@ -159,10 +164,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                         else
                         {
+                            if (Disconnected)
+                            {
+                                OnConnectionRestored?.Invoke(this, EventArgs.Empty);
+                            }
+                            Disconnected = false;
                             if (UseWebAPI)
                                 VMS_API_Call_Fail_Flag = false;
                             Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.None;
-                            disconnect_cnt = 0;
                         }
 
                         (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
@@ -326,7 +335,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 try
                 {
-
                     tcpClient.Close();
                     tcpClient?.Dispose();
                 }

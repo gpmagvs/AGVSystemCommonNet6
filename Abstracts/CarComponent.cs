@@ -51,10 +51,7 @@ namespace AGVSystemCommonNet6.Abstracts
             set
             {
                 _StateData = value;
-                Task.Factory.StartNew(() =>
-                {
-                    CheckStateDataContent();
-                });
+                CheckStateDataContent();
                 lastUpdateTime = DateTime.Now;
             }
         }
