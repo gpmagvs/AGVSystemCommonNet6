@@ -222,7 +222,7 @@ namespace AGVSystemCommonNet6.Alarm
             alarms = new List<clsAlarmDto>();
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                var _alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
+                var _alarms = dbhelper._context.Set<clsAlarmDto>().OrderByDescending(alarm => alarm.Time).Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
                                     && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name)) && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
                 );
                 count = _alarms.Count();

@@ -128,15 +128,41 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         }
 
-        public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, out List<clsTaskDto> Task)
+        public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string actionType, out List<clsTaskDto> Task)
         {
+            TASK_RUN_STATUS state_query = 0;
+            if (Result == "完成")
+                state_query = TASK_RUN_STATUS.ACTION_FINISH;
+            if (Result == "失敗")
+                state_query = TASK_RUN_STATUS.FAILURE;
+            if (Result == "取消")
+                state_query = TASK_RUN_STATUS.CANCEL;
+
+
+            ACTION_TYPE action_type_query = ACTION_TYPE.None;
+            if (actionType == "移動")
+                action_type_query = ACTION_TYPE.None;
+            if (actionType == "放貨")
+                action_type_query = ACTION_TYPE.Load;
+            if (actionType == "取貨")
+                action_type_query = ACTION_TYPE.Unload;
+            if (actionType == "充電")
+                action_type_query = ACTION_TYPE.Charge;
+            if (actionType == "搬運")
+                action_type_query = ACTION_TYPE.Carry;
+            if (actionType == "量測")
+                action_type_query = ACTION_TYPE.Measure;
+            if (actionType == "交換電池")
+                action_type_query = ACTION_TYPE.ExchangeBattery;
 
             count = 0;
             Task = new List<clsTaskDto>();
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                var _Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
+                var _Task = dbhelper._context.Set<clsTaskDto>().OrderByDescending(TK => TK.FinishTime).Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
                                     && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
+                                    && (Result == "ALL" ? true : Task.State == state_query)
+                                    && (actionType == "ALL" ? true : Task.Action == action_type_query)
                 );
                 count = _Task.Count();
                 Task = _Task.Skip((currentpage - 1) * 20).Take(20).ToList();
