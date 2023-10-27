@@ -139,7 +139,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                         DBhelper.InsertAlarm(alarm_save);
                 }
 
-                if (!IsRecoverable)
+                if (!IsRecoverable && Alarm_code!= AlarmCodes.Cst_ID_Not_Match && Alarm_code != AlarmCodes.Read_Cst_ID_Fail && Alarm_code != AlarmCodes.Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID)
                     OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, Alarm_code);
             }
             catch (Exception ex)
