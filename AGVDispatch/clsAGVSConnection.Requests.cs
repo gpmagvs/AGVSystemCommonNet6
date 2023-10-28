@@ -37,7 +37,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 while (true)
                 {
                     Thread.Sleep(1);
-                    LOG.INFO($" Task Feedback to AGVS {task_status}");
+                    LOG.INFO($"Try Task Feedback to AGVS {task_status}");
                     try
                     {
                         byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
