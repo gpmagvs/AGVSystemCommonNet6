@@ -11,6 +11,12 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
 
         public string name { get; set; }
         public string data { get; set; }
+
+        /// <summary>
+        /// -1:連線異常
+        /// 1:拍照完成
+        /// 2:拍照中
+        /// </summary>
         public ushort state { get; set; }
 
         public CSTReaderState()
