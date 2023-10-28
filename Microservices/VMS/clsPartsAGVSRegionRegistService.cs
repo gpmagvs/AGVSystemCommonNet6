@@ -15,7 +15,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             public enum REGIST_ACTION
             {
                 Regist,
-                Unregist
+                Unregist,
+                Query
             }
             public string AGVName { get; set; } = "External";
             public List<string> List_AreaName { get; set; } = new List<string>();
@@ -54,7 +55,20 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             };
             return await SendToPartsAGVS(obj);
         }
+        public async Task<(bool accept, Dictionary<string, string>)> Query()
+        {
+            RegistEventObject obj = new RegistEventObject()
+            {
+                AGVName = "",
+                RegistEventEnum = RegistEventObject.REGIST_ACTION.Query
+            };
+            var result = await SendToPartsAGVS(obj);
+            if (!result.accept)
+                return (false, new Dictionary<string, string>());
 
+            Dictionary<string, string> OutputData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(result.message);
+            return (true, OutputData);
+        }
         private async Task<(bool accept, string message)> SendToPartsAGVS(RegistEventObject data_obj)
         {
             if (string.IsNullOrEmpty(IP))
@@ -102,7 +116,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                     }
                 }
             }
-            bool isPartsAGVSAccept = ReceiveDataString.ToUpper() == "OK";
+            bool isPartsAGVSAccept = ReceiveDataString.ToUpper() != "NG";
             string region_names_str = string.Join("", data_obj.List_AreaName);
             return (isPartsAGVSAccept, isPartsAGVSAccept ? $"Parts AGVS Accept {data_obj.RegistEvent} [{region_names_str}]" : $"Parts AGVS Reject {data_obj.RegistEvent} [{region_names_str}]");
         }
