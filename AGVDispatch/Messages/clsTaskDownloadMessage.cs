@@ -82,7 +82,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// </summary>
 
         [NonSerialized]
-        public bool IsLocalTask;
+        public bool IsLocalTask = false;
         /// <summary>
         /// 把派車任務DTO轉成送給車控CommandActionClient的 TaskCommandGoal
         /// </summary>
@@ -171,8 +171,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         {
             var taskData = JsonConvert.DeserializeObject<clsTaskDownloadData>(this.ToJson());
             taskData.GoTOHomePoint = true;
+            taskData.IsLocalTask = IsLocalTask;
             taskData.Destination = Homing_Trajectory.First().Point_ID;
-            // taskData.Homing_Trajectory = taskData.Homing_Trajectory.Reverse().ToArray();
             return taskData;
         }
 

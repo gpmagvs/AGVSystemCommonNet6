@@ -30,7 +30,7 @@ namespace AGVSystemCommonNet6.Log
             _logger.Log(new LogItem(LogLevel.Information, info, show_console, color), caller_class_name);
         }
 
-        public static void WARN(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White)
+        public static void WARN(string info, bool show_console = true, ConsoleColor color = ConsoleColor.DarkYellow)
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             _logger.Log(new LogItem(LogLevel.Warning, info, show_console, color), caller_class_name);

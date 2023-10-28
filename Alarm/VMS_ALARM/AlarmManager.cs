@@ -108,6 +108,9 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         {
             if (!Active)
                 return;
+            if (Alarm_code == AlarmCodes.None)
+                IsRecoverable = true;
+
             if (CurrentAlarms.Count > 0)
             {
                 bool isRepeatAlarm = CurrentAlarms.Any(al => al.Value.EAlarmCode == Alarm_code && (DateTime.Now - al.Key).TotalMilliseconds < 100);
@@ -139,7 +142,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                         DBhelper.InsertAlarm(alarm_save);
                 }
 
-                if (!IsRecoverable && Alarm_code!= AlarmCodes.Cst_ID_Not_Match && Alarm_code != AlarmCodes.Read_Cst_ID_Fail && Alarm_code != AlarmCodes.Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID)
+                if (!IsRecoverable && Alarm_code != AlarmCodes.Cst_ID_Not_Match && Alarm_code != AlarmCodes.Read_Cst_ID_Fail && Alarm_code != AlarmCodes.Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID)
                     OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, Alarm_code);
             }
             catch (Exception ex)
