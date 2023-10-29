@@ -165,7 +165,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                     && (actionType == "ALL" ? true : Task.Action == action_type_query)
                 );
                 count = _Task.Count();
-                Task = _Task.Skip((currentpage - 1) * 20).Take(20).ToList();
+                Task = _Task.Skip((currentpage - 1) * 19).Take(19).ToList();
             };
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
