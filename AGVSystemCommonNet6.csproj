@@ -1,9 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyVersion>10.29.8</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,4 +29,16 @@
     <Folder Include="GPMRosMessageNet\Sick_Safetyscanners\" />
   </ItemGroup>
 
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  	<Exec Command="powershell.exe -ExecutionPolicy Bypass -File &quot;AutoVersionModify.ps1&quot;&#xD;&#xA;" />
+  </Target>
 </Project>
+
+
+
+
+
+
+
+
+
