@@ -70,6 +70,7 @@
         Fork_Bumper_Error_Up = 711,
         Fork_Bumper_Error_Down = 712,
         Fork_Height_Setting_Error = 713,
+        Fork_Pose_Change_Too_Large = 714,
         Ground_Hole_Sensor_Error = 800,
         Ground_Hole_Sensor_Error_Left_Front = 801,
         Ground_Hole_Sensor_Error_Right_Front = 802,

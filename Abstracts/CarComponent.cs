@@ -12,7 +12,12 @@ namespace AGVSystemCommonNet6.Abstracts
     {
         public enum COMPOENT_NAME
         {
-            BATTERY, DRIVER, IMU, BARCODE_READER, GUID_SENSOR, CST_READER,
+            BATTERY,
+            DRIVER, 
+            IMU,
+            BARCODE_READER,
+            GUID_SENSOR,
+            CST_READER,
             NAVIGATION,
             VERTIVAL_DRIVER,
             SICK
