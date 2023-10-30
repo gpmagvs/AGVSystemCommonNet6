@@ -397,7 +397,7 @@
         ROS_Bridge_server_Disconnect = 860005,
         AGV_Pose_Angle_Not_Match_To_Sick_Angle = 860006,
         USER_Press_SoftwareEMO_But_Exception_Occur = 860007,
-        AGVS_OnlineModeQuery_T1_Timeout = 860008,
+        AGVS_ALIVE_CHECK_TIMEOUT = 860008,
         AGVS_PING_FAIL = 86009,
         Task_Feedback_T1_Timeout = 860010,
         EQP_LOAD_BUT_EQP_HAS_OBSTACLE = 860011,

@@ -159,7 +159,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             OnOnlineStateQueryFail?.Invoke(this, EventArgs.Empty);
                             if (!UseWebAPI)
                                 Disconnect();
-                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_OnlineModeQuery_T1_Timeout;
+                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_ALIVE_CHECK_TIMEOUT;
                             continue;
                         }
                         else
