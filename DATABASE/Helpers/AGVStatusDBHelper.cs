@@ -95,6 +95,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     agvState.TaskRunAction = AGVStateDto.TaskRunAction;
                     agvState.Theta = AGVStateDto.Theta;
                     agvState.Connected = AGVStateDto.Connected;
+                    agvState.CurrentAction = AGVStateDto.CurrentAction;
+                    agvState.TransferProcess =  AGVStateDto.TransferProcess;
                     int ret = SaveChanges();
                 }
                 else

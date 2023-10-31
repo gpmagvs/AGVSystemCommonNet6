@@ -37,7 +37,7 @@ namespace AGVSystemCommonNet6
         /// 當前執行的任務動作
         /// </summary>
         public ACTION_TYPE CurrentAction { get; set; }
-
         public double Theta { get; set; }
+        public TRANSFER_PROCESS TransferProcess { get; set; }
     }
 }

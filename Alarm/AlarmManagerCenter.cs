@@ -84,9 +84,7 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        public static void AddAlarm(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM,
-
-             string Equipment_Name = "", string location = "", string taskName = "")
+        public static void AddAlarm(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
         {
             if (!Initialized)
                 Initialize();

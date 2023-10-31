@@ -203,6 +203,23 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
         }
 
+
+        public async Task<ACTION_TYPE> GetTaskActionTypeByID(string taskName)
+        {
+            try
+            {
+                await Task.Delay(100);
+                var taskDto = TaskSet.Where(tk => tk.TaskName == taskName).AsNoTracking().FirstOrDefault();
+                if (taskDto != null)
+                    return taskDto.Action;
+                else
+                    return  ACTION_TYPE.Unknown;
+            }
+            catch (Exception ex)
+            {
+                return ACTION_TYPE.Unknown;
+            }
+        }
         public List<clsTaskDto> GetTasksByTimeInterval(DateTime start, DateTime end)
         {
             return TaskSet.Where(tk => tk.RecieveTime >= start && tk.FinishTime <= end).ToList();

@@ -14,6 +14,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
     public static class VMSSerivces
     {
         public static string VMSHostUrl => "http://127.0.0.1:5036";
+        public static event EventHandler OnVMSReconnected;
         /// <summary>
         /// 請求VMS回覆
         /// </summary>
@@ -54,18 +55,19 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                             }
                             else
                             {
+                                OnVMSReconnected?.Invoke("", EventArgs.Empty);
                                 sw.Restart();
                                 disconnectAlarm.ResetAalrmMemberName = typeof(AliveChecker).Name;
                                 AlarmManagerCenter.ResetAlarm(disconnectAlarm, true);
                             }
                         }
-                        else if(!response.alive)
+                        else if (!response.alive)
                         {
                             disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
                             AlarmManagerCenter.UpdateAlarm(disconnectAlarm);
                             continue;
                         }
-                       
+
                         previous_alive_state = response.alive;
                     }
                     catch (Exception ex)
@@ -83,11 +85,11 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             {
                 HttpHelper http = new HttpHelper(VMSHostUrl);
                 Dictionary<string, object> response = await http.PostAsync<Dictionary<string, object>, object>($"/api/System/RunMode?mode={mode}", null);
-                return ( (bool)response["confirm"], response["message"].ToString());
+                return ((bool)response["confirm"], response["message"].ToString());
             }
             catch (Exception ex)
             {
-                return (false,$"[VMS]:{ex.Message}");
+                return (false, $"[VMS]:{ex.Message}");
             }
         }
 
