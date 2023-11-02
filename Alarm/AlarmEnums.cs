@@ -76,7 +76,9 @@ namespace AGVSystemCommonNet6.Alarm
         Source_Eq_Status_Down = 57,
         Destine_Eq_Status_Down = 58,
         Cannot_Auto_Parking_When_AGV_Has_Cargo = 59,
-        Source_Eq_Already_Has_Task_To_Excute = 60
+        Source_Eq_Already_Has_Task_To_Excute = 60,
+        Destine_EQ_Has_AGV = 61,
+        Destine_EQ_Has_Registed = 62
     }
 
 }

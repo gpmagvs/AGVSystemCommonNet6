@@ -73,7 +73,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         {
             if (string.IsNullOrEmpty(IP))
                 return (false, "IP format Illeagle");
-            if (data_obj.RegistEventEnum!= RegistEventObject.REGIST_ACTION.Query&&  data_obj.List_AreaName.Count == 0)
+            if (data_obj.RegistEventEnum != RegistEventObject.REGIST_ACTION.Query && data_obj.List_AreaName.Count == 0)
                 return (false, "Regist/Unregist Area Names can't empty");
 
             var ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
