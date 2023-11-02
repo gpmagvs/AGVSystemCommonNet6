@@ -98,7 +98,6 @@ namespace AGVSystemCommonNet6.TASK
         [Required]
         public string To_Slot { get; set; } = "-1";
 
-        [Required]
         public string Carrier_ID { get; set; } = "";
         /// <summary>
         /// 優先度

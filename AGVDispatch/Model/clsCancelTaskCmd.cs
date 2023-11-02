@@ -12,5 +12,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         public DateTime TimeStamp { get; set; }
         public RESET_MODE ResetMode { get; set; } = RESET_MODE.CYCLE_STOP;
         public string Task_Name { get; set; } = "";
+
+        public string CancelReasonMessage { get; set; } = "";
     }
 }

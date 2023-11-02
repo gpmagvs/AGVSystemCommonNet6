@@ -41,7 +41,7 @@ namespace AGVSystemCommonNet6.Abstracts
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
 
-        public delegate bool AlarmHappendDelegate(AlarmCodes alarm);
+        public delegate  Task<bool> AlarmHappendDelegate(AlarmCodes alarm);
         public AlarmHappendDelegate OnAlarmHappened { get; set; }
 
         public object Data { get; }

@@ -78,7 +78,11 @@ namespace AGVSystemCommonNet6.Alarm
         Cannot_Auto_Parking_When_AGV_Has_Cargo = 59,
         Source_Eq_Already_Has_Task_To_Excute = 60,
         Destine_EQ_Has_AGV = 61,
-        Destine_EQ_Has_Registed = 62
+        Destine_EQ_Has_Registed = 62,
+        UNLOAD_BUT_AGV_NO_CARGO_MOUNTED = 63,
+        UNLOAD_BUT_CARGO_ID_EMPTY = 64,
+        UNLOAD_BUT_CARGO_ID_NOT_MATCHED = 65,
+        TASK_DOWNLOAD_DATA_ILLEAGAL = 66
     }
 
 }

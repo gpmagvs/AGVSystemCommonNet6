@@ -22,7 +22,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 return AGVStatusSet.ToList();
         }
 
-        public clsAGVStateDto GetAGVStateByName(string agv_name)
+        public clsAGVStateDto GetAGVStateByAGVName(string agv_name)
         {
             return AGVStatusSet.Where(agv => agv.AGV_Name == agv_name).AsNoTracking().FirstOrDefault();
         }

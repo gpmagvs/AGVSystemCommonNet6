@@ -30,14 +30,20 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return false;
         }
 
-        public async Task TryTaskFeedBackAsync(clsTaskDownloadData taskData, int point_index, TASK_RUN_STATUS task_status, int currentTAg, clsCoordination coordination)
+        public async Task TryTaskFeedBackAsync(clsTaskDownloadData taskData, int point_index, TASK_RUN_STATUS task_status, int currentTAg, clsCoordination coordination, bool isTaskCancel = false, CancellationTokenSource cts = null)
         {
             await Task.Factory.StartNew(async () =>
             {
+                cts = cts == null ? new CancellationTokenSource(TimeSpan.FromSeconds(10)) : cts;
                 while (true)
                 {
                     Thread.Sleep(1);
-                    LOG.INFO($"Try Task Feedback to AGVS {task_status}");
+                    if (cts.IsCancellationRequested)
+                    {
+                        LOG.INFO($"Try Task Feedback to AGVS {task_status},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")} => Canceled");
+                        break;
+                    }
+                    LOG.INFO($"Try Task Feedback to AGVS {task_status},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}");
                     try
                     {
                         byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
@@ -45,7 +51,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         if (UseWebAPI)
                         {
                             SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(msg.Header.Values.First()));
-                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
+                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
                             return;
                         }
                         else

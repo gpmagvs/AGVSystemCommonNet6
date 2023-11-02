@@ -32,7 +32,22 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public taskResetReqDelegate OnTaskResetReq;
         public event EventHandler OnDisconnected;
         public bool UseWebAPI = false;
-        private bool Disconnected = false;
+        private bool _Connected = false;
+        public bool Connected
+        {
+            get => _Connected;
+            private set
+            {
+                if (_Connected != value)
+                {
+                    if (value)
+                        OnConnectionRestored?.Invoke(this, EventArgs.Empty);
+                    else
+                        OnDisconnected?.Invoke(this, EventArgs.Empty);
+                    _Connected = value;
+                }
+            }
+        }
 
         public LogBase Logger = new LogBase();
         public enum MESSAGE_TYPE
@@ -154,7 +169,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
                         if (!result.Item1)
                         {
-                            Disconnected = true;
                             LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
                             OnOnlineStateQueryFail?.Invoke(this, EventArgs.Empty);
                             if (!UseWebAPI)
@@ -164,11 +178,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                         else
                         {
-                            if (Disconnected)
-                            {
-                                OnConnectionRestored?.Invoke(this, EventArgs.Empty);
-                            }
-                            Disconnected = false;
+                            Connected = true;
                             if (UseWebAPI)
                                 VMS_API_Call_Fail_Flag = false;
                             Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.None;
@@ -344,6 +354,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
             }
             tcpClient = null;
+            Connected = false;
         }
 
         public override bool IsConnected()
