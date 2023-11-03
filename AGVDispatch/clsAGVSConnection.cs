@@ -31,8 +31,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public onlineModeChangeDelelage OnRemoteModeChanged;
         public taskResetReqDelegate OnTaskResetReq;
         public event EventHandler OnDisconnected;
+        public bool IsGetOnlineModeTrying = false;
         public bool UseWebAPI = false;
         private bool _Connected = false;
+
         public bool Connected
         {
             get => _Connected;
@@ -154,12 +156,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                         (bool, OnlineModeQueryResponse onlineModeQuAck) result = (false, new OnlineModeQueryResponse());
                         int retryCnt = 0;
+                        IsGetOnlineModeTrying = false;
                         while (!result.Item1)
                         {
                             Thread.Sleep(1000);
                             retryCnt += 1;
                             if (retryCnt > 10)
                                 break;
+                            if(retryCnt>3)
+                                IsGetOnlineModeTrying=true;
                             result = TryOnlineModeQueryAsync().Result;
                             if (!result.Item1)
                             {
@@ -178,6 +183,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                         else
                         {
+                            IsGetOnlineModeTrying = false;
                             Connected = true;
                             if (UseWebAPI)
                                 VMS_API_Call_Fail_Flag = false;

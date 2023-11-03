@@ -251,8 +251,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LOG.Critical(ex);
                 VMS_API_Call_Fail_Flag = true;
                 return (false, null);
             }
