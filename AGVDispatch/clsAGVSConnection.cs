@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.Abstracts;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Log;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -21,9 +22,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
         ConcurrentDictionary<int, ManualResetEvent> WaitAGVSReplyMREDictionary = new ConcurrentDictionary<int, ManualResetEvent>();
         ConcurrentDictionary<int, MessageBase> AGVSMessageStoreDictionary = new ConcurrentDictionary<int, MessageBase>();
         bool VMS_API_Call_Fail_Flag = true;
+
+        public delegate clsRunningStatus GetRunningDataUseWebAPIProtocolDelegate();
+        public delegate RunningStatus GetRunningDataUseTCPIPProtocolDelegate();
         public delegate TASK_DOWNLOAD_RETURN_CODES taskDonwloadExecuteDelage(clsTaskDownloadData taskDownloadData);
         public delegate bool onlineModeChangeDelelage(REMOTE_MODE mode, bool isAGVSRequest);
         public delegate Task<bool> taskResetReqDelegate(RESET_MODE reset_data, bool isNormal);
+
+        public GetRunningDataUseWebAPIProtocolDelegate OnWebAPIProtocolGetRunningStatus;
+        public GetRunningDataUseTCPIPProtocolDelegate OnTcpIPProtocolGetRunningStatus;
+
         public event EventHandler OnOnlineStateQueryFail;
         public event EventHandler<clsTaskDownloadData> OnTaskDownloadFeekbackDone;
         public event EventHandler OnConnectionRestored;
@@ -34,6 +42,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public bool IsGetOnlineModeTrying = false;
         public bool UseWebAPI = false;
         private bool _Connected = false;
+        public string SID { get; set; } = "001:001:001";
+        public string EQName { get; set; } = "AGV_1";
 
         public bool Connected
         {
@@ -94,6 +104,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
             AutoPingServerCheck = true;
             PingServerCheckProcess();
         }
+        public void Setup(string _SID, string _EQName)
+        {
+            SID = _SID;
+            EQName = _EQName;
+        }
 
         public void SetLogFolder(string folder_name)
         {
@@ -150,7 +165,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (!UseWebAPI)
                             {
                                 LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{Port})", false);
-                                await Connect();
+                                bool Reconnected = await Connect();
+                                Connected = Reconnected;
                                 continue;
                             }
                         }
@@ -163,8 +179,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             retryCnt += 1;
                             if (retryCnt > 10)
                                 break;
-                            if(retryCnt>3)
-                                IsGetOnlineModeTrying=true;
+                            if (retryCnt > 3)
+                                IsGetOnlineModeTrying = true;
                             result = TryOnlineModeQueryAsync().Result;
                             if (!result.Item1)
                             {

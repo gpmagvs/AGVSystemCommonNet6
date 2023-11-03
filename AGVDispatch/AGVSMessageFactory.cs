@@ -1,22 +1,16 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
 using Newtonsoft.Json;
+using System.Security.Cryptography;
 using System.Text;
+using System.Xml.Linq;
 using static AGVSystemCommonNet6.AGVDispatch.Messages.clsVirtualIDQu;
 
 namespace AGVSystemCommonNet6.AGVDispatch
 {
     public class AGVSMessageFactory
     {
-        public static string SID { get; set; } = "001:001:001";
-        public static string EQName { get; set; } = "AGV_1";
-
-        public delegate clsRunningStatus GetRunningDataUseWebAPIProtocolDelegate();
-        public static GetRunningDataUseWebAPIProtocolDelegate OnWebAPIProtocolGetRunningStatus;
-
-        public delegate RunningStatus GetRunningDataUseTCPIPProtocolDelegate();
-        public static GetRunningDataUseTCPIPProtocolDelegate OnTcpIPProtocolGetRunningStatus;
-
+       
         private static int SystemByteStored = 8790;
         private static int System_Byte_Cyclic
         {
@@ -28,13 +22,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return int.Parse(SystemByteStored.ToString());
             }
         }
-        public static void Setup(string _SID, string _EQName)
-        {
-            SID = _SID;
-            EQName = _EQName;
-        }
 
-        internal static byte[] CreateSimpleReturnMessageData(string headerKey, bool confirmed, int system_byte, out clsSimpleReturnWithTimestampMessage ackMesg)
+        internal static byte[] CreateSimpleReturnMessageData(string EQName,string SID,string headerKey, bool confirmed, int system_byte, out clsSimpleReturnWithTimestampMessage ackMesg)
         {
             ackMesg = new clsSimpleReturnWithTimestampMessage()
             {
@@ -76,7 +65,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         }
 
-        internal static byte[] CreateTaskDownloadReqAckData(bool accept_task, int system_byte, out clsSimpleReturnMessage ackMesg)
+        internal static byte[] CreateTaskDownloadReqAckData(string EQName, string SID, bool accept_task, int system_byte, out clsSimpleReturnMessage ackMesg)
         {
             ackMesg = new clsSimpleReturnMessage()
             {
@@ -110,7 +99,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         //    }
         //}
 
-        public static byte[] CreateOnlineModeQueryData(out clsOnlineModeQueryMessage mesg)
+        public static byte[] CreateOnlineModeQueryData(string EQName, string SID, out clsOnlineModeQueryMessage mesg)
         {
             mesg = new clsOnlineModeQueryMessage();
             mesg.SID = SID;
@@ -138,12 +127,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
             });
             return JsonConvert.SerializeObject(response);
         }
-        public static byte[] CreateOnlineModeQueryData()
+        public static byte[] CreateOnlineModeQueryData(string EQName, string SID)
         {
-            return CreateOnlineModeQueryData(out clsOnlineModeQueryMessage mesg);
+            return CreateOnlineModeQueryData(EQName, SID, out clsOnlineModeQueryMessage mesg);
         }
 
-        internal static byte[] CreateOnlineModeChangeRequesData(int currentTag, REMOTE_MODE mode, out clsOnlineModeRequestMessage mesg)
+        internal static byte[] CreateOnlineModeChangeRequesData(string EQName, string SID, int currentTag, REMOTE_MODE mode, out clsOnlineModeRequestMessage mesg)
         {
             mesg = new clsOnlineModeRequestMessage();
             mesg.SID = SID;
@@ -161,14 +150,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
 
 
-        internal static byte[] CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg, bool getPoseOfLastPtOfTrajectory = false)
+        internal static byte[] CreateRunningStateReportQueryData(string EQName, string SID, RunningStatus runningStatus, out clsRunningStatusReportMessage msg, bool getPoseOfLastPtOfTrajectory = false)
         {
-            var runningData = OnTcpIPProtocolGetRunningStatus?.Invoke();
             msg = new clsRunningStatusReportMessage();
             msg.SID = SID;
             msg.EQName = EQName;
             msg.SystemBytes = System_Byte_Cyclic;
-            msg.Header.Add("0105", runningData);
+            msg.Header.Add("0105", runningStatus);
             return Encoding.UTF8.GetBytes(FormatSendOutString(msg.ToJson()));
         }
 
@@ -177,7 +165,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return string.Format("{0}*{1}", json, "\r");
         }
 
-        internal static byte[] CreateTaskFeedbackMessageData(clsTaskDownloadData taskData, int PointIndex, TASK_RUN_STATUS task_status, int tag, clsCoordination coordination, out clsTaskFeedbackMessage taskFeedbackMessage)
+        internal static byte[] CreateTaskFeedbackMessageData(string EQName, string SID, clsTaskDownloadData taskData, int PointIndex, TASK_RUN_STATUS task_status, int tag, clsCoordination coordination, out clsTaskFeedbackMessage taskFeedbackMessage)
         {
             taskFeedbackMessage = new clsTaskFeedbackMessage()
             {
@@ -204,7 +192,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         }
 
-        internal static byte[] CreateCarrierRemovedData(string[] cstids, string task_name, string opid, out clsCarrierRemovedMessage carrierRemovedMessage)
+        internal static byte[] CreateCarrierRemovedData(string EQName, string SID, string[] cstids, string task_name, string opid, out clsCarrierRemovedMessage carrierRemovedMessage)
         {
             carrierRemovedMessage = new clsCarrierRemovedMessage()
             {
@@ -233,7 +221,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// </summary>
         /// <param name="carrierVirtualIDQueryMessage"></param>
         /// <returns></returns>
-        internal static byte[] Create0323VirtualIDQueryMsg(VIRTUAL_ID_QUERY_TYPE QueryType, CST_TYPE CstType, out clsCarrierVirtualIDQueryMessage carrierVirtualIDQueryMessage)
+        internal static byte[] Create0323VirtualIDQueryMsg(string EQName, string SID, VIRTUAL_ID_QUERY_TYPE QueryType, CST_TYPE CstType, out clsCarrierVirtualIDQueryMessage carrierVirtualIDQueryMessage)
         {
             carrierVirtualIDQueryMessage = new clsCarrierVirtualIDQueryMessage()
             {
