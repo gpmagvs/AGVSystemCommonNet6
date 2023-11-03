@@ -44,5 +44,6 @@ namespace AGVSystemCommonNet6.Configuration
 
     public class clsAGVTaskControlConfigs
     {
+        public bool CheckAGVCargoStatusWhenLDULDAction { get; set; } = true;
     }
 }

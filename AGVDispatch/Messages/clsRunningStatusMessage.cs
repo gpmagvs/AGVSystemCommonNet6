@@ -77,6 +77,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         [JsonProperty("Fork Height")]
         public  double Fork_Height { get; set; }
 
+        public bool IsCharging { get; set; } = false;
+
     }
     public class clsAlarmCode
     {

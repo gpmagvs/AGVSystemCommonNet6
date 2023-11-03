@@ -30,7 +30,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 Odometry = tcp_running_status_model.Odometry,
                 Sensor_Status = tcp_running_status_model.Sensor_Status,
                 Signal_Strength = tcp_running_status_model.Signal_Strength,
-                RAM_Usage_Percent = tcp_running_status_model.RAM_Usage_Percent
+                RAM_Usage_Percent = tcp_running_status_model.RAM_Usage_Percent,
+                IsCharging = tcp_running_status_model.IsCharging
             };
         }
 

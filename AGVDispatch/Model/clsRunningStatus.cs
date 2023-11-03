@@ -64,6 +64,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         /// </summary>
         public virtual int CargoType { get; set; } = 0; // 0:tray, 1:rack
 
+        public bool IsCharging { get; set; } = false;
         public clsDriverStates[] DriversStatus { get; set; } = new clsDriverStates[0];
         public clsForkStates ForkStatus { get; set; } = new clsForkStates();
     }

@@ -68,30 +68,33 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     PingServerCheckProcess();
                     try
                     {
-                        _SocketClient.BeginReceive(ClientSocketState.buffer, 0, 32768, SocketFlags.None, new AsyncCallback(ClientMsgRevCallback), ClientSocketState);
+                        Task.Factory.StartNew(() =>
+                        {
+                            _SocketClient.BeginReceive(ClientSocketState.buffer, 0, 32768, SocketFlags.None, new AsyncCallback(ClientMsgRevCallback), ClientSocketState);
+                        });
                     }
                     catch (Exception ex)
                     {
                         OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
                         AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
                         LOG.ERROR($"{ClientIP} {ex.Message}", ex);
-                        _SocketClient.Dispose();
+                        _SocketClient?.Dispose();
                     }
                 }
             }
             protected void PingServerCheckProcess()
             {
-                Task.Run(async () =>
+                Task.Factory.StartNew(async () =>
                 {
 
                     while (_SocketClient != null)
                     {
-                        await Task.Delay(1000);
+                        Thread.Sleep(1000);
                         _ping_success = await PingServer();
                         if (!_ping_success)
                         {
                             OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                            _SocketClient.Dispose();
+                            _SocketClient?.Dispose();
                             _SocketClient = null;
                         }
                     }
@@ -119,7 +122,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
             }
 
-            private void ClientMsgRevCallback(IAsyncResult ar)
+            private async void ClientMsgRevCallback(IAsyncResult ar)
             {
                 try
                 {
@@ -140,14 +143,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                         else
                         {
-                            HandleClientMsg(ClientSocketState.revedString);
+                            await HandleClientMsg(ClientSocketState.revedString);
                             ClientSocketState.buffer = new byte[clsSocketState.BufferSize];
                             ClientSocketState.revedDataLen = 0;
                         }
                     }
                     int offset = ClientSocketState.revedDataLen; //2
                     int toRevLen = clsSocketState.BufferSize - offset;
-                    Task.Factory.StartNew(() =>
+                    await Task.Factory.StartNew(() =>
                     {
                         try
                         {
@@ -158,7 +161,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
                             AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
                             LOG.ERROR($"{ClientIP} {ex.Message}", ex);
-                            _SocketClient.Dispose();
+                            _SocketClient?.Dispose();
                         }
                     });
                 }
@@ -167,10 +170,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
                     AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
                     LOG.ERROR($"{ClientIP} {ex.Message}", ex);
-                    _SocketClient.Dispose();
+                    _SocketClient?.Dispose();
                 }
 
             }
+
 
             private async Task HandleClientMsg(string clientMsg)
             {

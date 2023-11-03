@@ -97,6 +97,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     agvState.Connected = AGVStateDto.Connected;
                     agvState.CurrentAction = AGVStateDto.CurrentAction;
                     agvState.TransferProcess =  AGVStateDto.TransferProcess;
+                    agvState.IsCharging =  AGVStateDto.IsCharging;
                     int ret = SaveChanges();
                 }
                 else
