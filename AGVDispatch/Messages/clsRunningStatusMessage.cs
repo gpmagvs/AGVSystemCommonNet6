@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Model;
 using Newtonsoft.Json;
+using System.Globalization;
 using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.AGVDispatch.Messages
@@ -79,6 +80,13 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         public bool IsCharging { get; set; } = false;
 
+        public DateTime Time_Stamp_dt
+        {
+            get
+            {
+                return DateTime.ParseExact(Time_Stamp, "yyyyMMdd HH:mm:ss", CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces);
+            }
+        } 
     }
     public class clsAlarmCode
     {
