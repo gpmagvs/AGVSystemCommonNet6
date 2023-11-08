@@ -49,10 +49,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public bool Escape_Flag { get; set; }
         [JsonProperty("Station Type")]
         public STATION_TYPE Station_Type { get; set; }
-
-        [NonSerialized]
-        public bool IsActionFinishReported = true;
-
         public clsMapPoint[] ExecutingTrajecory => Trajectory.Length != 0 ? Trajectory : Homing_Trajectory;
         public List<int> TagsOfTrajectory => ExecutingTrajecory.Select(pt => pt.Point_ID).ToList();
         public string OriTaskDataJson = "";
@@ -77,12 +73,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             }
         }
         public bool HasCargo { get; set; } = false;
-        /// <summary>
-        /// 是否為本地任務
-        /// </summary>
-
-        [NonSerialized]
-        public bool IsLocalTask = false;
+    
         /// <summary>
         /// 把派車任務DTO轉成送給車控CommandActionClient的 TaskCommandGoal
         /// </summary>
@@ -172,10 +163,22 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             var taskData = JsonConvert.DeserializeObject<clsTaskDownloadData>(this.ToJson());
             taskData.GoTOHomePoint = true;
             taskData.IsLocalTask = IsLocalTask;
+            taskData.IsEQHandshake = IsEQHandshake;
+            taskData.IsActionFinishReported = IsActionFinishReported;
             taskData.Destination = Homing_Trajectory.First().Point_ID;
             return taskData;
         }
 
+
+        [NonSerialized]
+        public bool IsActionFinishReported = true;
+        [NonSerialized]
+        public bool IsEQHandshake = false;
+        /// <summary>
+        /// 是否為本地任務
+        /// </summary>
+        [NonSerialized]
+        public bool IsLocalTask = false;
     }
 
 

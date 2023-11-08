@@ -49,13 +49,13 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         /// </summary>
         /// <param name="taskState"></param>
         /// <returns></returns>
-        virtual public int Add(clsTaskDto taskState)
+        virtual public async Task<int> Add(clsTaskDto taskState)
         {
             try
             {
                 Console.WriteLine($"{JsonConvert.SerializeObject(taskState, Formatting.Indented)}");
                 TaskSet.Add(taskState);
-                return SaveChanges();
+                return await SaveChanges();
             }
             catch (Exception ex)
             {
@@ -213,7 +213,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 if (taskDto != null)
                     return taskDto.Action;
                 else
-                    return  ACTION_TYPE.Unknown;
+                    return ACTION_TYPE.Unknown;
             }
             catch (Exception ex)
             {

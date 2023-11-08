@@ -232,7 +232,7 @@
         Handshake_Fail_EQ_BUSY_OFF = 3231,
         Handshake_Fail_AGV_DOWN = 3232,
         Handshake_Fail_EQ_Busy_ON_When_AGV_BUSY = 3233,
-        Handshake_Fail_EQ_READY_OFF_When_AGV_BUSY = 3234,
+        Handshake_Fail_EQ_READY_OFF = 3234,
         Handshake_Fail_EQ_BUSY_NOT_ON = 3235,
         Handshake_Fail_EQ_BUSY_NOT_OFF = 3236,
         Handshake_Fail_TA1_EQ_L_REQ = 3237,
@@ -430,6 +430,6 @@
         Exception_When_AGVC_AGVS_Task_Reset_CycleStop,
         GetVirtualIDFail,
         AGV_BarcodeReader_Not_Match_Tag_of_Destination,
-        AGV_Park_Position_Too_Far_From_Tag_Of_Destination,
+        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042,
     }
 }

@@ -88,19 +88,25 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public clsAGVSConnection(string IP, int Port, bool AutoPingServerCheck = true) : base(IP, Port, AutoPingServerCheck)
         {
             this.IP = IP;
-            this.Port = Port;
+            this.VMSPort = Port;
             LocalIP = null;
-            WebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
-            WebAPIHttp.Logger = this.Logger;
+            VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
+            VMSWebAPIHttp.Logger = this.Logger;
+
+
+            AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
+            AGVsWebAPIHttp.Logger = this.Logger;
         }
         public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_MODEL AGV_Model = AGV_MODEL.FORK_AGV)
         {
             this.IP = HostIP;
-            this.Port = HostPort;
+            this.VMSPort = HostPort;
             this.LocalIP = localIP;
             this.AGV_Model = AGV_Model;
-            WebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
-            WebAPIHttp.Logger = this.Logger;
+            VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{VMSPort}");
+            VMSWebAPIHttp.Logger = this.Logger;
+            AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
+            AGVsWebAPIHttp.Logger = this.Logger;
             AutoPingServerCheck = true;
             PingServerCheckProcess();
         }
@@ -126,12 +132,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     IPEndPoint ipEndpoint = new IPEndPoint(IPAddress.Parse(LocalIP), 0);
                     tcpClient = new TcpClient(ipEndpoint);
                     tcpClient.ReceiveBufferSize = 65535;
-                    tcpClient.Connect(IP, Port);
+                    tcpClient.Connect(IP, VMSPort);
                 }
                 else
                 {
                     tcpClient = new TcpClient();
-                    tcpClient.Connect(IP, Port);
+                    tcpClient.Connect(IP, VMSPort);
                 }
                 socketState.stream = tcpClient.GetStream();
                 socketState.Reset();
@@ -141,7 +147,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                LOG.ERROR($"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{Port})..Will Retry it after 3 secoond...", false);
+                LOG.ERROR($"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{VMSPort})..Will Retry it after 3 secoond...", false);
                 tcpClient = null;
                 await Task.Delay(3000);
                 return false;
@@ -164,7 +170,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         {
                             if (!UseWebAPI)
                             {
-                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{Port})", false);
+                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{VMSPort})", false);
                                 bool Reconnected = await Connect();
                                 Connected = Reconnected;
                                 continue;
@@ -448,7 +454,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
              });
 
         }
-        private string AGVSServerUrl => UseWebAPI ? WebAPIHttp.baseUrl : $"{IP}:{Port}";
+        private string AGVSServerUrl => UseWebAPI ? VMSWebAPIHttp.baseUrl : $"{IP}:{VMSPort}";
         public async Task LogMsgToAGVS(string msg)
         {
             if (Logger == null)
@@ -468,5 +474,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 Logger.Log(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
             });
         }
+
     }
 }

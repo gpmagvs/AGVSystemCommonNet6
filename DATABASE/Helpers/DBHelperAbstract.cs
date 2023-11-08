@@ -22,9 +22,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             dbhelper = new DbContextHelper(connection_str);
         }
 
-        public int SaveChanges()
+        public async Task<int> SaveChanges()
         {
-            return dbhelper._context.SaveChanges();
+            return await dbhelper._context.SaveChangesAsync();
         }
 
         protected virtual void Dispose(bool disposing)

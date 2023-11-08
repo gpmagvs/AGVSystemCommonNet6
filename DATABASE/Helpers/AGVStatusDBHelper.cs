@@ -37,7 +37,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             try
             {
                 AGVStatusSet.Add(AGVStateDto);
-                return SaveChanges();
+                return await SaveChanges();
             }
             catch (DbUpdateException ex)
             {
@@ -60,7 +60,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 {
                     agvState.BatteryLevel_1 = batteryLevel[0];
                     agvState.BatteryLevel_2 = batteryLevel.Length >= 2 ? batteryLevel[1] : 0;
-                    int ret = SaveChanges();
+                    int ret = await SaveChanges();
 
                     return (true, "");
                 }
@@ -96,9 +96,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     agvState.Theta = AGVStateDto.Theta;
                     agvState.Connected = AGVStateDto.Connected;
                     agvState.CurrentAction = AGVStateDto.CurrentAction;
-                    agvState.TransferProcess =  AGVStateDto.TransferProcess;
-                    agvState.IsCharging =  AGVStateDto.IsCharging;
-                    int ret = SaveChanges();
+                    agvState.TransferProcess = AGVStateDto.TransferProcess;
+                    agvState.IsCharging = AGVStateDto.IsCharging;
+                    int ret = await SaveChanges();
                 }
                 else
                 {
@@ -142,7 +142,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     AGVStateDto.Enabled = true;
                     Add(AGVStateDto);
                 }
-                int ret = SaveChanges();
+                int ret = await SaveChanges();
 
                 dbBusyFlag = false;
                 return (true, "");
