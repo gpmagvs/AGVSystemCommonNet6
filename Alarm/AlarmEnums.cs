@@ -83,7 +83,8 @@ namespace AGVSystemCommonNet6.Alarm
         UNLOAD_BUT_CARGO_ID_EMPTY = 64,
         UNLOAD_BUT_CARGO_ID_NOT_MATCHED = 65,
         TASK_DOWNLOAD_DATA_ILLEAGAL = 66,
-        AGV_TaskFeedback_ERROR = 67
+        AGV_TaskFeedback_ERROR = 67,
+        EQ_Disconnect = 68
     }
 
 }

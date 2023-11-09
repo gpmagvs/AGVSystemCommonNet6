@@ -2,12 +2,13 @@
 using AGVSystemCommonNet6.Configuration;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
+using System.IO.Compression;
 
 namespace AGVSystemCommonNet6.MAP
 {
     public class MapManager
     {
-        public static Map LoadMapFromFile(string mapfile, out string errorMsg, bool auto_create_segment = true)
+        public static Map LoadMapFromFile(string mapfile, out string errorMsg, bool auto_create_segment = true, bool auto_check_path_error = true)
         {
             errorMsg = "";
             if (!File.Exists(mapfile))
@@ -47,6 +48,12 @@ namespace AGVSystemCommonNet6.MAP
                     map.Segments = pathes;
                     SaveMapToFile(map, mapfile);
                 }
+
+                if (auto_check_path_error)
+                {
+                    CheckMapSettingAndFix(map, mapfile);
+                }
+
                 return map;
             }
             catch (Exception ex)
@@ -66,6 +73,7 @@ namespace AGVSystemCommonNet6.MAP
         {
             try
             {
+                map_modified = CheckMapSettingAndFix(map_modified);
                 Dictionary<string, Map> dataToSave = new Dictionary<string, Map>()
                 {
                     {"Map",map_modified }
@@ -86,6 +94,26 @@ namespace AGVSystemCommonNet6.MAP
             tags.Sort();
             return tags;
         }
-
+        private static void CheckMapSettingAndFix(Map map, string save_path)
+        {
+            var fixmap = CheckMapSettingAndFix(map);
+            SaveMapToFile(fixmap, save_path);
+        }
+        private static Map CheckMapSettingAndFix(Map map)
+        {
+            if (map.Segments.Any(path => !IsPointExistAtMap(path.StartPtIndex) | !IsPointExistAtMap(path.EndPtIndex)))
+            {
+                var error_path = map.Segments.FindAll(path => !IsPointExistAtMap(path.StartPtIndex) | !IsPointExistAtMap(path.EndPtIndex));
+                foreach (var p in error_path)
+                {
+                    map.Segments.Remove(p);
+                }
+            }
+            return map;
+            bool IsPointExistAtMap(int pointIndex)
+            {
+                return map.Points.TryGetValue(pointIndex, out var point);
+            }
+        }
     }
 }
