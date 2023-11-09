@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.MAP;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient.MessageTypes.Geometry;
@@ -6,6 +7,7 @@ using RosSharp.RosBridgeClient.MessageTypes.Std;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using static AGVSystemCommonNet6.clsEnums;
 
@@ -137,7 +139,9 @@ namespace AGVSystemCommonNet6
         /// <returns></returns>
         public static double CalculateDistance(this MapPoint map_station, double from_loc_x, double from_loc_y)
         {
-            return Math.Sqrt(Math.Pow(map_station.X - from_loc_x, 2) + Math.Pow(map_station.Y - from_loc_y, 2));
+            double distance = Math.Sqrt(Math.Pow(map_station.X - from_loc_x, 2) + Math.Pow(map_station.Y - from_loc_y, 2));
+            Console.WriteLine($"Distance from {map_station.TagNumber} to ({from_loc_x},{from_loc_y}) is {distance}");
+            return distance;
         }
 
 

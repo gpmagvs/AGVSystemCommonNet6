@@ -7,8 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static AGVSystemCommonNet6.AGVDispatch.Messages.clsVirtualIDQu;
 
 namespace AGVSystemCommonNet6.AGVDispatch
@@ -20,7 +22,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             if (AGVSMessageStoreDictionary.TryRemove(system_byte, out MessageBase _retMsg))
             {
-                byte[] data = AGVSMessageFactory.CreateTaskDownloadReqAckData(accept_task, system_byte, out clsSimpleReturnMessage ackMsg);
+                byte[] data = AGVSMessageFactory.CreateTaskDownloadReqAckData(EQName, SID, accept_task, system_byte, out clsSimpleReturnMessage ackMsg);
                 LOG.INFO($"TaskDownload Ack : {ackMsg.ToJson()}");
                 _retMsg.Dispose();
                 ackMsg.Dispose();
@@ -30,22 +32,28 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return false;
         }
 
-        public async Task TryTaskFeedBackAsync(clsTaskDownloadData taskData, int point_index, TASK_RUN_STATUS task_status, int currentTAg, clsCoordination coordination)
+        public async Task TryTaskFeedBackAsync(clsTaskDownloadData taskData, int point_index, TASK_RUN_STATUS task_status, int currentTAg, clsCoordination coordination, bool isTaskCancel = false, CancellationTokenSource cts = null)
         {
             await Task.Factory.StartNew(async () =>
             {
+                cts = cts == null ? new CancellationTokenSource(TimeSpan.FromSeconds(10)) : cts;
                 while (true)
                 {
                     Thread.Sleep(1);
-                    LOG.INFO($" Task Feedback to AGVS {task_status}");
+                    if (cts.IsCancellationRequested)
+                    {
+                        LOG.INFO($"Try Task Feedback to AGVS {task_status},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")} => Canceled");
+                        break;
+                    }
+                    LOG.INFO($"Try Task Feedback to AGVS {task_status},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}");
                     try
                     {
-                        byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(taskData, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
+                        byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(EQName, SID, taskData, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
 
                         if (UseWebAPI)
                         {
                             SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(msg.Header.Values.First()));
-                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
+                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
                             return;
                         }
                         else
@@ -85,7 +93,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 if (UseWebAPI)
                 {
-                    clsRunningStatus runnginStatus = AGVSMessageFactory.OnWebAPIProtocolGetRunningStatus();
+                    clsRunningStatus runnginStatus = OnWebAPIProtocolGetRunningStatus();
                     SimpleRequestResponse response = await PostRunningStatus(runnginStatus);
                     previousRunningStatusReport_via_WEBAPI = runnginStatus;
                     return (response.ReturnCode == RETURN_CODE.OK | response.ReturnCode == RETURN_CODE.NG, new SimpleRequestResponseWithTimeStamp
@@ -96,7 +104,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
                 else
                 {
-                    byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(out clsRunningStatusReportMessage msg);
+                    RunningStatus runningStatus = OnTcpIPProtocolGetRunningStatus();
+                    byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(EQName, SID, runningStatus, out clsRunningStatusReportMessage msg);
                     bool success = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
                     if (!success)
                     {
@@ -139,7 +148,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         private void TrySimpleReply(string header_key, bool reset_accept, int system_byte)
         {
-            byte[] data = AGVSMessageFactory.CreateSimpleReturnMessageData(header_key, reset_accept, system_byte, out clsSimpleReturnWithTimestampMessage msg);
+            byte[] data = AGVSMessageFactory.CreateSimpleReturnMessageData(EQName, SID, header_key, reset_accept, system_byte, out clsSimpleReturnWithTimestampMessage msg);
             bool writeOutSuccess = WriteDataOut(data);
         }
 
@@ -160,7 +169,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
                 else
                 {
-                    byte[] data = AGVSMessageFactory.CreateOnlineModeChangeRequesData(currentTag, mode, out clsOnlineModeRequestMessage msg);
+                    byte[] data = AGVSMessageFactory.CreateOnlineModeChangeRequesData(EQName, SID, currentTag, mode, out clsOnlineModeRequestMessage msg);
                     bool agvs_replyed = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
                     if (!agvs_replyed)
                         return (false, RETURN_CODE.No_Response);
@@ -194,7 +203,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     return (false, "", ex.Message);
                 }
             }
-            byte[] data = AGVSMessageFactory.Create0323VirtualIDQueryMsg(QueryType, CstType, out clsCarrierVirtualIDQueryMessage? msg);
+            byte[] data = AGVSMessageFactory.Create0323VirtualIDQueryMsg(EQName, SID, QueryType, CstType, out clsCarrierVirtualIDQueryMessage? msg);
             if (await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes))
             {
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
@@ -225,7 +234,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     return (true, response);
                 }
 
-                byte[] data = AGVSMessageFactory.CreateOnlineModeQueryData(out clsOnlineModeQueryMessage msg);
+                byte[] data = AGVSMessageFactory.CreateOnlineModeQueryData(EQName, SID, out clsOnlineModeQueryMessage msg);
                 if (await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes))
                 {
 
@@ -245,8 +254,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LOG.Critical(ex);
                 VMS_API_Call_Fail_Flag = true;
                 return (false, null);
             }
@@ -256,7 +266,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             try
             {
-                byte[] data = AGVSMessageFactory.CreateCarrierRemovedData(new string[] { toRemoveCSTID }, task_name, opid, out clsCarrierRemovedMessage msg);
+                byte[] data = AGVSMessageFactory.CreateCarrierRemovedData(EQName, SID, new string[] { toRemoveCSTID }, task_name, opid, out clsCarrierRemovedMessage msg);
                 await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
 
                 if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))

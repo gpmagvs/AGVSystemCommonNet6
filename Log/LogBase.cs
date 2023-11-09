@@ -16,8 +16,9 @@ namespace AGVSystemCommonNet6.Log
         internal string LogFolderName
         {
             get => _LogFolderName;
-            set {
-                _LogFolderName= value;
+            set
+            {
+                _LogFolderName = value;
                 if (!Directory.Exists(LogFolder))
                     Directory.CreateDirectory(LogFolder);
             }
@@ -51,7 +52,6 @@ namespace AGVSystemCommonNet6.Log
 
                 if (logItemQueue.TryDequeue(out var logItem))
                 {
-                    //2023-09-12/Info/2023-09-12-12.log
                     string subFolder = Path.Combine(LogFolder, DateTime.Now.ToString("yyyy-MM-dd"));
 
                     if (!Directory.Exists(subFolder))
@@ -102,10 +102,10 @@ namespace AGVSystemCommonNet6.Log
                             default:
                                 break;
                         }
-                        Console.Write(" ");
-                        Console.BackgroundColor = ConsoleColor.White;
-                        Console.ForegroundColor = ConsoleColor.Black;
-                        Console.Write(logItem.Time + " ");
+                        Console.Write("[");
+                        //Console.BackgroundColor = ConsoleColor.Gray;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(logItem.Time.ToString("yy-MM-dd HH:mm:ss.ffff") + "] ");
                         Console.ForegroundColor = logItem.Color != ConsoleColor.White ? logItem.Color : foreColor;
                         Console.BackgroundColor = backColor;
                         Console.WriteLine(logItem.logFullLine);

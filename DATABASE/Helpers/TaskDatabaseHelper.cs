@@ -49,13 +49,13 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         /// </summary>
         /// <param name="taskState"></param>
         /// <returns></returns>
-        virtual public int Add(clsTaskDto taskState)
+        virtual public async Task<int> Add(clsTaskDto taskState)
         {
             try
             {
                 Console.WriteLine($"{JsonConvert.SerializeObject(taskState, Formatting.Indented)}");
                 TaskSet.Add(taskState);
-                return SaveChanges();
+                return await SaveChanges();
             }
             catch (Exception ex)
             {
@@ -165,7 +165,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                     && (actionType == "ALL" ? true : Task.Action == action_type_query)
                 );
                 count = _Task.Count();
-                Task = _Task.Skip((currentpage - 1) * 20).Take(20).ToList();
+                Task = _Task.Skip((currentpage - 1) * 19).Take(19).ToList();
             };
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
@@ -203,6 +203,23 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
         }
 
+
+        public async Task<ACTION_TYPE> GetTaskActionTypeByID(string taskName)
+        {
+            try
+            {
+                await Task.Delay(100);
+                var taskDto = TaskSet.Where(tk => tk.TaskName == taskName).AsNoTracking().FirstOrDefault();
+                if (taskDto != null)
+                    return taskDto.Action;
+                else
+                    return ACTION_TYPE.Unknown;
+            }
+            catch (Exception ex)
+            {
+                return ACTION_TYPE.Unknown;
+            }
+        }
         public List<clsTaskDto> GetTasksByTimeInterval(DateTime start, DateTime end)
         {
             return TaskSet.Where(tk => tk.RecieveTime >= start && tk.FinishTime <= end).ToList();

@@ -22,7 +22,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 return AGVStatusSet.ToList();
         }
 
-        public clsAGVStateDto GetAGVStateByName(string agv_name)
+        public clsAGVStateDto GetAGVStateByAGVName(string agv_name)
         {
             return AGVStatusSet.Where(agv => agv.AGV_Name == agv_name).AsNoTracking().FirstOrDefault();
         }
@@ -37,7 +37,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             try
             {
                 AGVStatusSet.Add(AGVStateDto);
-                return SaveChanges();
+                return await SaveChanges();
             }
             catch (DbUpdateException ex)
             {
@@ -60,7 +60,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 {
                     agvState.BatteryLevel_1 = batteryLevel[0];
                     agvState.BatteryLevel_2 = batteryLevel.Length >= 2 ? batteryLevel[1] : 0;
-                    int ret = SaveChanges();
+                    int ret = await SaveChanges();
 
                     return (true, "");
                 }
@@ -95,7 +95,10 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     agvState.TaskRunAction = AGVStateDto.TaskRunAction;
                     agvState.Theta = AGVStateDto.Theta;
                     agvState.Connected = AGVStateDto.Connected;
-                    int ret = SaveChanges();
+                    agvState.CurrentAction = AGVStateDto.CurrentAction;
+                    agvState.TransferProcess = AGVStateDto.TransferProcess;
+                    agvState.IsCharging = AGVStateDto.IsCharging;
+                    int ret = await SaveChanges();
                 }
                 else
                 {
@@ -139,7 +142,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     AGVStateDto.Enabled = true;
                     Add(AGVStateDto);
                 }
-                int ret = SaveChanges();
+                int ret = await SaveChanges();
 
                 dbBusyFlag = false;
                 return (true, "");

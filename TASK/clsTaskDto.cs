@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -98,7 +99,6 @@ namespace AGVSystemCommonNet6.TASK
         [Required]
         public string To_Slot { get; set; } = "-1";
 
-        [Required]
         public string Carrier_ID { get; set; } = "";
         /// <summary>
         /// 優先度
@@ -106,5 +106,8 @@ namespace AGVSystemCommonNet6.TASK
         /// 
         [Required]
         public int Priority { get; set; } = 50;
+
+        [NotMapped]
+        public  bool bypass_eq_status_check { get; set; } = false;
     }
 }

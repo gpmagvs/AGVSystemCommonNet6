@@ -21,8 +21,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 SocketServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 IP = AGVSConfigulator.SysConfigs.VMSTcpServerIP;
-                Port = AGVSConfigulator.SysConfigs.VMSTcpServerPort;
-                SocketServer.Bind(new IPEndPoint(IPAddress.Parse(IP), Port));
+                VMSPort = AGVSConfigulator.SysConfigs.VMSTcpServerPort;
+                SocketServer.Bind(new IPEndPoint(IPAddress.Parse(IP), VMSPort));
                 SocketServer.Listen(1000);
                 await Task.Factory.StartNew(() =>
                 {

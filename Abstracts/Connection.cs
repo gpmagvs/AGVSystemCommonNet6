@@ -6,7 +6,8 @@ namespace AGVSystemCommonNet6.Abstracts
     public abstract class Connection : AGVAlarmReportable
     {
         public string IP;
-        public int Port;
+        public int VMSPort;
+        public int AGVsPort = 5216;
         public event EventHandler OnPingFail;
         public event EventHandler OnPingSuccess;
         public bool AutoPingServerCheck { get; set; } = true;
@@ -33,7 +34,7 @@ namespace AGVSystemCommonNet6.Abstracts
         public Connection(string IP, int Port, bool AutoPingServerCheck = false)
         {
             this.IP = IP;
-            this.Port = Port;
+            this.VMSPort = Port;
             if (AutoPingServerCheck)
             {
                 PingServerCheckProcess();

@@ -64,6 +64,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         /// </summary>
         public virtual int CargoType { get; set; } = 0; // 0:tray, 1:rack
 
+        public bool IsCharging { get; set; } = false;
         public clsDriverStates[] DriversStatus { get; set; } = new clsDriverStates[0];
         public clsForkStates ForkStatus { get; set; } = new clsForkStates();
     }
@@ -96,7 +97,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
     }
     public class clsAlarmCode
     {
-        [JsonProperty("Alarm ID")]
         public virtual int Alarm_ID { get; set; }
 
         /// <summary>
@@ -112,7 +112,12 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
 
         public virtual string Alarm_Description_EN { get; set; } = "";
 
+        public string FullDescription
+        {
+            get
+            {
+                return $"[{Alarm_ID}]{Alarm_Description}({Alarm_Description_EN})";
+            }
+        }
     }
-
-
 }

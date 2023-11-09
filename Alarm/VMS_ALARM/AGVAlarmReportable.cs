@@ -54,6 +54,10 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                         AlarmManager.AddWarning(value);
                         LOG.WARN($"{alarm_locate_in_name} Warning: {value}");
                     }
+                    else
+                    {
+                        AlarmManager.ClearAlarm(_current_warning_code);
+                    }
                     _current_warning_code = value;
                 }
             }

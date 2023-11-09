@@ -84,9 +84,7 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        public static void AddAlarm(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM,
-
-             string Equipment_Name = "", string location = "", string taskName = "")
+        public static void AddAlarm(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
         {
             if (!Initialized)
                 Initialize();
@@ -216,20 +214,24 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        public static void AlarmQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, out List<clsAlarmDto> alarms)
+        public static void AlarmQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, out List<clsAlarmDto> alarms, string AlarmType = "ALL")
         {
             count = 0;
             alarms = new List<clsAlarmDto>();
+            ALARM_LEVEL level_to_query = AlarmType.ToUpper() == "ALARM" ? ALARM_LEVEL.ALARM : ALARM_LEVEL.WARNING;
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                var _alarms = dbhelper._context.Set<clsAlarmDto>().OrderByDescending(alarm => alarm.Time).Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
-                                    && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name)) && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
+                var _alarms = dbhelper._context.Set<clsAlarmDto>().OrderByDescending(alarm => alarm.Time).Where(alarm => alarm.Time >= startTime
+                                    && alarm.Time <= endTime
+                                    && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name))
+                                    && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
+                                    && (AlarmType == "ALL" ? (true) : (alarm.Level == level_to_query))
                 );
                 count = _alarms.Count();
-                alarms = _alarms.Skip((currentpage - 1) * 20).Take(20).ToList();
+                alarms = _alarms.Skip((currentpage - 1) * 19).Take(19).ToList();
             };
         }
-        public static string SaveTocsv( DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
+        public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
         {
             var folder = Path.Combine(Environment.CurrentDirectory, @"SaveLog\\Alarm");
             Directory.CreateDirectory(folder);

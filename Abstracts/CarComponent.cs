@@ -12,7 +12,12 @@ namespace AGVSystemCommonNet6.Abstracts
     {
         public enum COMPOENT_NAME
         {
-            BATTERY, DRIVER, IMU, BARCODE_READER, GUID_SENSOR, CST_READER,
+            BATTERY,
+            DRIVER, 
+            IMU,
+            BARCODE_READER,
+            GUID_SENSOR,
+            CST_READER,
             NAVIGATION,
             VERTIVAL_DRIVER,
             SICK
@@ -36,7 +41,7 @@ namespace AGVSystemCommonNet6.Abstracts
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
 
-        public delegate bool AlarmHappendDelegate(AlarmCodes alarm);
+        public delegate  Task<bool> AlarmHappendDelegate(AlarmCodes alarm);
         public AlarmHappendDelegate OnAlarmHappened { get; set; }
 
         public object Data { get; }

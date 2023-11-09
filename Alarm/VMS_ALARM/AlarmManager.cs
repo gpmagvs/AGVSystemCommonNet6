@@ -27,9 +27,15 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             message = string.Empty;
             try
             {
-                if (!File.Exists(alarm_JsonFile))
+                bool alarm_json_file_exist = File.Exists(alarm_JsonFile);
+                string default_alarm_json_file_path = Path.Combine(Environment.CurrentDirectory, "src/AlarmList.json");
+                FileInfo fiinfo = new FileInfo(default_alarm_json_file_path);
+                FileInfo fiinfo_on_param_folder = new FileInfo(alarm_JsonFile);
+                bool isAlarmDefaultUpdated = fiinfo.LastWriteTime > fiinfo_on_param_folder.LastWriteTime;
+                if (!alarm_json_file_exist | isAlarmDefaultUpdated)
                 {
-                    File.Copy(Path.Combine(Environment.CurrentDirectory, "src/AlarmList.json"), alarm_JsonFile);
+                    File.Copy(default_alarm_json_file_path, alarm_JsonFile,true);
+                    LOG.TRACE($"Copy New AlarmList.json file to {alarm_JsonFile}");
                 }
                 AlarmList = JsonConvert.DeserializeObject<List<clsAlarmCode>>(File.ReadAllText(alarm_JsonFile));
                 LOG.INFO($"Alarm List Loaded !.{AlarmList.Count}");
@@ -108,6 +114,9 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
         {
             if (!Active)
                 return;
+            if (Alarm_code == AlarmCodes.None)
+                IsRecoverable = true;
+
             if (CurrentAlarms.Count > 0)
             {
                 bool isRepeatAlarm = CurrentAlarms.Any(al => al.Value.EAlarmCode == Alarm_code && (DateTime.Now - al.Key).TotalMilliseconds < 100);
@@ -139,7 +148,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                         DBhelper.InsertAlarm(alarm_save);
                 }
 
-                if (!IsRecoverable && Alarm_code!= AlarmCodes.Cst_ID_Not_Match && Alarm_code != AlarmCodes.Read_Cst_ID_Fail && Alarm_code != AlarmCodes.Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID)
+                if (!IsRecoverable && Alarm_code != AlarmCodes.Cst_ID_Not_Match && Alarm_code != AlarmCodes.Read_Cst_ID_Fail && Alarm_code != AlarmCodes.Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID)
                     OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, Alarm_code);
             }
             catch (Exception ex)

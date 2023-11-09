@@ -29,6 +29,7 @@ namespace AGVSystemCommonNet6
         public double BatteryLevel_1 { get; set; } = 0;
         public double BatteryLevel_2 { get; set; } = 0;
         public bool Connected { get; set; }
+        public bool IsCharging { get; set; }
         public string TaskName { get; set; } = "";
 
         public TASK_RUN_STATUS TaskRunStatus { get; set; }
@@ -37,7 +38,7 @@ namespace AGVSystemCommonNet6
         /// 當前執行的任務動作
         /// </summary>
         public ACTION_TYPE CurrentAction { get; set; }
-
         public double Theta { get; set; }
+        public TRANSFER_PROCESS TransferProcess { get; set; }
     }
 }

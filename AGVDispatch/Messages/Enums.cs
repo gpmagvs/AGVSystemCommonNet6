@@ -41,7 +41,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         PROCESSING = 410,
         Current_Tag_Cannot_Online = 411,
         AGV_Need_Park_Above_Tag = 412,
-        Cannot_Switch_Remote_Mode_When_Task_Executing = 413
+        Cannot_Switch_Remote_Mode_When_Task_Executing = 413,
+        AGV_Not_Initialized = 414,
+        Busy = 415
     }
     public enum PROCESS_RESULT
     {
@@ -85,7 +87,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// 無任何路線供AGV導航
         /// </summary>
         NO_PATH_FOR_NAVIGATION = 8,
-        OK_AGV_ALREADY_THERE = 100
+        OK_AGV_ALREADY_THERE = 100,
+        TASK_CANCEL = 101
     }
 
     public enum TASK_RUN_STATUS : int
@@ -100,6 +103,15 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         CANCEL
     }
 
+    public enum TRANSFER_PROCESS : int
+    {
+        NOT_START_YET,
+        GO_TO_SOURCE_EQ,
+        WORKING_AT_SOURCE_EQ,
+        GO_TO_DESTINE_EQ,
+        WORKING_AT_DESTINE_EQ,
+        FINISH
+    }
     public enum ACTION_TYPE
     {
         None,

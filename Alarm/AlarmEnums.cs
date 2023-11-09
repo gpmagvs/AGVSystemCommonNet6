@@ -69,7 +69,21 @@ namespace AGVSystemCommonNet6.Alarm
         AGV_TCPIP_DISCONNECT = 50,
         Save_Measure_Data_to_DB_Fail = 51,
         Region_Has_No_Agv_To_Dispatch_Task = 52,
-        CANNOT_DISPATCH_CARRY_TASK_WHEN_AGV_HAS_CARGO = 53
+        CANNOT_DISPATCH_CARRY_TASK_WHEN_AGV_HAS_CARGO = 53,
+        CANNOT_DISPATCH_LOCAL_AUTO_TRANSFER_TASK = 54,
+        Source_Eq_Unload_Request_Off = 55,
+        Destine_Eq_Load_Request_Off = 56,
+        Source_Eq_Status_Down = 57,
+        Destine_Eq_Status_Down = 58,
+        Cannot_Auto_Parking_When_AGV_Has_Cargo = 59,
+        Source_Eq_Already_Has_Task_To_Excute = 60,
+        Destine_EQ_Has_AGV = 61,
+        Destine_EQ_Has_Registed = 62,
+        UNLOAD_BUT_AGV_NO_CARGO_MOUNTED = 63,
+        UNLOAD_BUT_CARGO_ID_EMPTY = 64,
+        UNLOAD_BUT_CARGO_ID_NOT_MATCHED = 65,
+        TASK_DOWNLOAD_DATA_ILLEAGAL = 66,
+        AGV_TaskFeedback_ERROR = 67
     }
 
 }

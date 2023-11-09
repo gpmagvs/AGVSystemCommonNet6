@@ -20,9 +20,10 @@ namespace AGVSystemCommonNet6.Configuration
         /// 前端用戶閒置超過此秒數後自動登出。
         /// 單位:秒
         /// </summary>
-        public int WebUserLogoutExipreTime { get; set; } =300;
+        public int WebUserLogoutExipreTime { get; set; } = 300;
         public clsMapConfigs MapConfigs { get; set; } = new clsMapConfigs();
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
+        public clsAGVTaskControlConfigs TaskControlConfigs { get; set; } = new clsAGVTaskControlConfigs();
     }
     public class clsMapConfigs
     {
@@ -39,5 +40,10 @@ namespace AGVSystemCommonNet6.Configuration
         public bool UseEQEmu { get; set; } = false;
         public string EquipmentManagementConfigFolder { get; set; } = "C://AGVS//EquipmentManagement_MEC";
 
+    }
+
+    public class clsAGVTaskControlConfigs
+    {
+        public bool CheckAGVCargoStatusWhenLDULDAction { get; set; } = true;
     }
 }
