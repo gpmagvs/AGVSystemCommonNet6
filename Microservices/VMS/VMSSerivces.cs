@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,6 +16,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
     {
         public static string VMSHostUrl => "http://127.0.0.1:5036";
         public static event EventHandler OnVMSReconnected;
+        public static List<clsAGVStateDto> AgvStatesData = new List<clsAGVStateDto>();
+        public static bool IsAlive = false;
         /// <summary>
         /// 請求VMS回覆
         /// </summary>
@@ -23,6 +26,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         {
             _ = Task.Factory.StartNew(async () =>
             {
+                IsAlive = true;
                 Stopwatch sw = Stopwatch.StartNew();
                 bool previous_alive_state = true;
                 clsAlarmCode alarm = AlarmManagerCenter.GetAlarmCode(ALARMS.VMS_DISCONNECT);
@@ -48,13 +52,15 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                         {
                             if (!response.alive)
                             {
+                                IsAlive = false;
                                 sw.Restart();
                                 disconnectAlarm.Checked = false;
                                 disconnectAlarm.Time = DateTime.Now;
-                                AlarmManagerCenter.AddAlarm(ALARMS.VMS_DISCONNECT, ALARM_SOURCE.AGVS,Equipment_Name:"VMS");
+                                AlarmManagerCenter.AddAlarm(ALARMS.VMS_DISCONNECT, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
                             }
                             else
                             {
+                                IsAlive = true;
                                 OnVMSReconnected?.Invoke("", EventArgs.Empty);
                                 sw.Restart();
                                 await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", ALARMS.VMS_DISCONNECT, "SystemAuto");
@@ -76,6 +82,33 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             });
         }
 
+        public static void AgvStateFetchWorker()
+        {
+            Task.Factory.StartNew(async () =>
+            {
+                while (true)
+                {
+                    await Task.Delay(100);
+                    if (!IsAlive)
+                        continue;
+
+                    AgvStatesData = await GetAGV_StatesData_FromVMS();
+                }
+            });
+        }
+
+        public static async Task<List<clsAGVStateDto>> GetAGV_StatesData_FromVMS()
+        {
+            try
+            {
+                HttpHelper httpHelper = new HttpHelper($"http://127.0.0.1:5036", timeout_sec: 2);
+                return await httpHelper.GetAsync<List<clsAGVStateDto>>("/api/VmsManager/AGVStatus");
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
         public static async Task<(bool confirm, string message)> RunModeSwitch(RUN_MODE mode)
         {
             //confirm = confirm, message
