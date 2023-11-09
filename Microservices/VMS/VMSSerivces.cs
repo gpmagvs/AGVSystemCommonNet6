@@ -21,7 +21,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         /// <returns></returns>
         public static async Task AliveCheckWorker()
         {
-            _ = Task.Run(async () =>
+            _ = Task.Factory.StartNew(async () =>
             {
                 Stopwatch sw = Stopwatch.StartNew();
                 bool previous_alive_state = true;
@@ -49,16 +49,15 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                             if (!response.alive)
                             {
                                 sw.Restart();
-                                AGVStatusDBHelper agv_status_db = new AGVStatusDBHelper();
-                                agv_status_db.ChangeAllOffline();
-                                AlarmManagerCenter.UpdateAlarm(disconnectAlarm);
+                                disconnectAlarm.Checked = false;
+                                disconnectAlarm.Time = DateTime.Now;
+                                AlarmManagerCenter.AddAlarm(ALARMS.VMS_DISCONNECT, ALARM_SOURCE.AGVS,Equipment_Name:"VMS");
                             }
                             else
                             {
                                 OnVMSReconnected?.Invoke("", EventArgs.Empty);
                                 sw.Restart();
-                                disconnectAlarm.ResetAalrmMemberName = typeof(AliveChecker).Name;
-                                AlarmManagerCenter.ResetAlarm(disconnectAlarm, true);
+                                await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", ALARMS.VMS_DISCONNECT, "SystemAuto");
                             }
                         }
                         else if (!response.alive)
@@ -72,7 +71,6 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                     }
                     catch (Exception ex)
                     {
-                        ErrorLog(ex);
                     }
                 }
             });
@@ -93,10 +91,6 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
         }
 
-        private static void ErrorLog(Exception ex)
-        {
-            Console.WriteLine($"[{typeof(AliveChecker).Name}] {ex.Message} ");
-        }
 
         private static async Task<(bool alive, string message)> VMSAliveCheck()
         {

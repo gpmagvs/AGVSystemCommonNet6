@@ -109,5 +109,51 @@ namespace AGVSystemCommonNet6.TASK
 
         [NotMapped]
         public  bool bypass_eq_status_check { get; set; } = false;
+
+        public void Update(clsTaskDto dto)
+        {
+            if (dto.RecieveTime != default(DateTime))
+                this.RecieveTime = dto.RecieveTime;
+
+            if (dto.StartTime != default(DateTime))
+                this.StartTime = dto.StartTime;
+
+            if (dto.FinishTime != default(DateTime))
+                this.FinishTime = dto.FinishTime;
+
+            if (!string.IsNullOrWhiteSpace(dto.TaskName))
+                this.TaskName = dto.TaskName;
+            // State是一个枚举，你可能总是想更新它，即使它是默认值。
+            this.State = dto.State;
+
+            if (!string.IsNullOrWhiteSpace(dto.DispatcherName))
+                this.DispatcherName = dto.DispatcherName;
+
+            if (!string.IsNullOrWhiteSpace(dto.FailureReason))
+                this.FailureReason = dto.FailureReason;
+
+            if (!string.IsNullOrWhiteSpace(dto.DesignatedAGVName))
+                this.DesignatedAGVName = dto.DesignatedAGVName;
+
+            this.Action = dto.Action;
+
+            if (!string.IsNullOrWhiteSpace(dto.From_Station))
+                this.From_Station = dto.From_Station;
+
+            if (!string.IsNullOrWhiteSpace(dto.From_Slot))
+                this.From_Slot = dto.From_Slot;
+
+            if (!string.IsNullOrWhiteSpace(dto.To_Station))
+                this.To_Station = dto.To_Station;
+
+            if (!string.IsNullOrWhiteSpace(dto.To_Slot))
+                this.To_Slot = dto.To_Slot;
+
+            if (!string.IsNullOrWhiteSpace(dto.Carrier_ID))
+                this.Carrier_ID = dto.Carrier_ID;
+            this.Priority = dto.Priority;
+            this.bypass_eq_status_check = dto.bypass_eq_status_check;
+        }
+
     }
 }
