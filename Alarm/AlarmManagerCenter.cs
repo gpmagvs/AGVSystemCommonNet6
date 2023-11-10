@@ -36,6 +36,17 @@ namespace AGVSystemCommonNet6.Alarm
         {
             LoadAlarmCodes();
             Initialized = true;
+            SetAllAlarmChecked();
+        }
+        public static async void SetAllAlarmChecked()
+        {
+            using var db = new AGVSDatabase();
+            foreach (var alarm in db.tables.SystemAlarms.Where(al =>! al.Checked))
+            {
+                alarm.Checked = true;
+            }  
+            int num=await db.SaveChanges();
+
         }
         public static void UpdateAlarm(clsAlarmDto alarmDto)
         {

@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.Microservices.VMS
 {
@@ -18,6 +19,29 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         public static event EventHandler OnVMSReconnected;
         public static List<clsAGVStateDto> AgvStatesData = new List<clsAGVStateDto>();
         public static bool IsAlive = false;
+
+
+        public static Dictionary<VMS_GROUP, VMSConfig>? ReadVMSVehicleGroupSetting(string Vehicle_Json_file)
+        {
+            if (File.Exists(Vehicle_Json_file))
+            {
+                var json = File.ReadAllText(Vehicle_Json_file);
+                if (json == null)
+                {
+                    return null;
+                }
+                return JsonConvert.DeserializeObject<Dictionary<VMS_GROUP, VMSConfig>>(json);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public static void SaveVMSVehicleGroupSetting(string Vehicle_Json_file,string json)
+        {
+            File.WriteAllText(Vehicle_Json_file, json);
+        }
+
         /// <summary>
         /// 請求VMS回覆
         /// </summary>
