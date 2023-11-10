@@ -14,8 +14,77 @@ namespace AGVSystemCommonNet6.Log
     public class clsAGVSLogAnaylsis
     {
         public string logFolder;
+
+        public List<clsTransferResult> AnalysisTransferTasks(DateTime[] timedt_range)
+        {
+            (List<clsTaskDownloadData> taskDownload, List<RunningStatus> runningStatus, List<FeedbackData> feedback) dataSet = GetDatas(timedt_range);
+            var AgvStatus = dataSet.runningStatus;
+            var taskFeedbackDatas = dataSet.feedback.OrderBy(t => GetDateTime(t.TimeStamp));
+            var downloaddata = dataSet.taskDownload;
+            var taskNameList = taskFeedbackDatas.Select(d => d.TaskName).Distinct().ToList();
+            ConcurrentBag<clsTransferResult> results = new ConcurrentBag<clsTransferResult>();
+            List<Task> taskList = new List<Task>();
+            foreach (var task_name in taskNameList)
+            {
+                var _tk = Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        var downloads = downloaddata.Where(t => t.Task_Name == task_name).ToList();
+                        if (downloads != null)
+                        {
+                            var actions = downloads.Where(d => d.Action_Type != ACTION_TYPE.None);
+                            if (actions.Count() == 0)
+                                return;
+                            if (actions.Any(t => t.Action_Type == ACTION_TYPE.Load))
+                            {
+                                var start_feedback = taskFeedbackDatas.FirstOrDefault(t => t.TaskName == task_name && t.TaskStatus == TASK_RUN_STATUS.NAVIGATING);
+                                var end_feedback = taskFeedbackDatas.LastOrDefault(t => t.TaskName == task_name && t.TaskStatus == TASK_RUN_STATUS.ACTION_FINISH);
+                                var source = actions.FirstOrDefault(a => a.Action_Type == ACTION_TYPE.Unload);
+                                if (source != null)
+                                {
+                                    var destine = actions.Last(a => a.Action_Type == ACTION_TYPE.Load);
+                                    var AgvStatusStart = AgvStatus.FirstOrDefault(st => (st.Time_Stamp_dt - GetDateTime(start_feedback.TimeStamp, "yyyyMMdd HH:mm:ss")).TotalSeconds > 0.1);
+                                    var AgvStatusEnd = AgvStatus.FirstOrDefault(st => (st.Time_Stamp_dt - GetDateTime(end_feedback.TimeStamp, "yyyyMMdd HH:mm:ss")).TotalSeconds > 0.1);
+                                    var transfer_record = new clsTransferResult
+                                    {
+                                        TaskName = task_name,
+                                        StartTime = GetDateTime(start_feedback.TimeStamp),
+                                        EndTime = GetDateTime(end_feedback.TimeStamp),
+                                        From = source.Destination,
+                                        To = destine.Destination,
+                                        StartLoc = start_feedback.LastVisitedNode,
+                                        StartStatus = AgvStatusStart,
+                                        EndStatus = AgvStatusEnd
+                                    };
+                                    results.Add(transfer_record);
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+
+                });
+                taskList.Add(_tk);
+            }
+            Task.WaitAll(taskList.ToArray());
+            var _results = results.OrderBy(t => t.StartTime).ToList();
+            return _results;
+
+        }
+
         public (List<clsTaskDownloadData>, List<RunningStatus>, List<FeedbackData>) GetDatas(DateTime[] timedt_range)
         {
+            if (!Directory.Exists(logFolder))
+                return (new List<clsTaskDownloadData>(), new List<RunningStatus>(), new List<FeedbackData>());
+
             DateTime startDate = new DateTime(timedt_range[0].Year, timedt_range[0].Month, timedt_range[0].Day, 0, 0, 0);
             DateTime endDate = new DateTime(timedt_range[1].Year, timedt_range[1].Month, timedt_range[1].Day, 23, 59, 59);
             //2023-11-06
@@ -53,6 +122,9 @@ namespace AGVSystemCommonNet6.Log
 
         public (List<clsTaskDownloadData>, List<RunningStatus>, List<FeedbackData>) GetDatas(string logFilePath)
         {
+            if (!Directory.Exists(logFolder))
+                return (new List<clsTaskDownloadData>(), new List<RunningStatus>(), new List<FeedbackData>());
+
             List<clsTaskDownloadData> outputs_task_download = new List<clsTaskDownloadData>();
             List<RunningStatus> outputs_runningStatus = new List<RunningStatus>();
             List<FeedbackData> outputs_feedback = new List<FeedbackData>();
@@ -134,71 +206,6 @@ namespace AGVSystemCommonNet6.Log
         {
             //20231106 10:00:00
             return DateTime.ParseExact(datetime_str, format, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces);
-        }
-
-        public List<clsTransferResult> AnalysisTransferTasks(DateTime[] timedt_range)
-        {
-            (List<clsTaskDownloadData> taskDownload, List<RunningStatus> runningStatus, List<FeedbackData> feedback) dataSet = GetDatas(timedt_range);
-            var AgvStatus = dataSet.runningStatus;
-            var taskFeedbackDatas = dataSet.feedback.OrderBy(t => GetDateTime(t.TimeStamp));
-            var downloaddata = dataSet.taskDownload;
-            var taskNameList = taskFeedbackDatas.Select(d => d.TaskName).Distinct().ToList();
-            ConcurrentBag<clsTransferResult> results = new ConcurrentBag<clsTransferResult>();
-            List<Task> taskList = new List<Task>();
-            foreach (var task_name in taskNameList)
-            {
-                var _tk = Task.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        var downloads = downloaddata.Where(t => t.Task_Name == task_name).ToList();
-                        if (downloads != null)
-                        {
-                            var actions = downloads.Where(d => d.Action_Type != ACTION_TYPE.None);
-                            if (actions.Count() == 0)
-                                return;
-                            if (actions.Any(t => t.Action_Type == ACTION_TYPE.Load))
-                            {
-                                var start_feedback = taskFeedbackDatas.FirstOrDefault(t => t.TaskName == task_name && t.TaskStatus == TASK_RUN_STATUS.NAVIGATING);
-                                var end_feedback = taskFeedbackDatas.LastOrDefault(t => t.TaskName == task_name && t.TaskStatus == TASK_RUN_STATUS.ACTION_FINISH);
-                                var source = actions.FirstOrDefault(a => a.Action_Type == ACTION_TYPE.Unload);
-                                if (source != null)
-                                {
-                                    var destine = actions.Last(a => a.Action_Type == ACTION_TYPE.Load);
-                                    var AgvStatusStart = AgvStatus.FirstOrDefault(st => (st.Time_Stamp_dt - GetDateTime(start_feedback.TimeStamp, "yyyyMMdd HH:mm:ss")).TotalSeconds > 0.1);
-                                    var AgvStatusEnd = AgvStatus.FirstOrDefault(st => (st.Time_Stamp_dt - GetDateTime(end_feedback.TimeStamp, "yyyyMMdd HH:mm:ss")).TotalSeconds > 0.1);
-                                    var transfer_record = new clsTransferResult
-                                    {
-                                        TaskName = task_name,
-                                        StartTime = GetDateTime(start_feedback.TimeStamp),
-                                        EndTime = GetDateTime(end_feedback.TimeStamp),
-                                        From = source.Destination,
-                                        To = destine.Destination,
-                                        StartLoc = start_feedback.LastVisitedNode,
-                                        StartStatus = AgvStatusStart,
-                                        EndStatus = AgvStatusEnd
-                                    };
-                                    results.Add(transfer_record);
-                                }
-                                else
-                                {
-
-                                }
-                            }
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-
-                });
-                taskList.Add(_tk);
-            }
-            Task.WaitAll(taskList.ToArray());
-            var _results = results.OrderBy(t => t.StartTime).ToList();
-            return _results;
-
         }
         public class clsTransferResult
         {
