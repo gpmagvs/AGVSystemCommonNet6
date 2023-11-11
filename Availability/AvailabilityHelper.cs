@@ -79,9 +79,9 @@ namespace AGVSystemCommonNet6.Availability
         int lastDay = -1;
         private void SyncAvaliabilityDataWorker()
         {
-            Task.Run(() =>
+            Task.Factory.StartNew(async () =>
             {
-                
+                Stopwatch write_db_stopwatch = Stopwatch.StartNew();
                 while (true)
                 {
                     if (lastDay != DateTime.Now.Day)
@@ -92,15 +92,19 @@ namespace AGVSystemCommonNet6.Availability
                         availability.CHARGE_TIME =
                         availability.UNKNOWN_TIME = 0;
                     }
-
                     availability.Time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
                     availability.IDLE_TIME = StateWatchers[MAIN_STATUS.IDLE].IsRunning ? availability.IDLE_TIME + 1 : availability.IDLE_TIME;
                     availability.RUN_TIME = StateWatchers[MAIN_STATUS.RUN].IsRunning ? availability.RUN_TIME + 1 : availability.RUN_TIME;
                     availability.DOWN_TIME = StateWatchers[MAIN_STATUS.DOWN].IsRunning ? availability.DOWN_TIME + 1 : availability.DOWN_TIME;
                     availability.CHARGE_TIME = StateWatchers[MAIN_STATUS.Charging].IsRunning ? availability.CHARGE_TIME + 1 : availability.CHARGE_TIME;
                     availability.UNKNOWN_TIME = StateWatchers[MAIN_STATUS.Unknown].IsRunning ? availability.UNKNOWN_TIME + 1 : availability.UNKNOWN_TIME;
-                    SaveDayAvailbilityToDatabase();
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
+
+                    await Task.Delay(1000);
+                    if (write_db_stopwatch.ElapsedMilliseconds > 10000)
+                    {
+                        SaveDayAvailbilityToDatabase();
+                        write_db_stopwatch.Restart();
+                    }
 
                     lastDay = DateTime.Now.Day;
                 }
@@ -188,28 +192,37 @@ namespace AGVSystemCommonNet6.Availability
         /// </summary>
         private void SaveDayAvailbilityToDatabase()
         {
-            using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            try
             {
-                var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
-                if (avaExist == null)
+                using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
-                    aGVSDbContext._context.Availabilitys.Add(new AvailabilityDto
+                    var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
+                    if (avaExist == null)
                     {
-                        KeyStr = availability.GetKey(),
-                        Time = availability.Time
-                    });
-                }
-                else
-                {
-                    avaExist.IDLE_TIME = availability.IDLE_TIME;
-                    avaExist.DOWN_TIME = availability.DOWN_TIME;
-                    avaExist.RUN_TIME = availability.RUN_TIME;
-                    avaExist.CHARGE_TIME = availability.CHARGE_TIME;
-                    avaExist.UNKNOWN_TIME = availability.UNKNOWN_TIME;
+                        aGVSDbContext._context.Availabilitys.Add(new AvailabilityDto
+                        {
+                            KeyStr = availability.GetKey(),
+                            Time = availability.Time
+                        });
+                    }
+                    else
+                    {
+                        avaExist.AGVName = availability.AGVName;
+                        avaExist.IDLE_TIME = availability.IDLE_TIME;
+                        avaExist.DOWN_TIME = availability.DOWN_TIME;
+                        avaExist.RUN_TIME = availability.RUN_TIME;
+                        avaExist.CHARGE_TIME = availability.CHARGE_TIME;
+                        avaExist.UNKNOWN_TIME = availability.UNKNOWN_TIME;
 
+                    }
+                    aGVSDbContext._context.SaveChanges();
                 }
-                aGVSDbContext._context.SaveChanges();
             }
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
+            }
+
         }
 
 
