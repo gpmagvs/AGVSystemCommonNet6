@@ -9,6 +9,7 @@ using static AGVSystemCommonNet6.clsEnums;
 using AGVSystemCommonNet6.Configuration;
 using SQLite;
 using AGVSystemCommonNet6.DATABASE.Helpers;
+using AGVSystemCommonNet6.Log;
 
 namespace AGVSystemCommonNet6.Availability
 {
@@ -75,12 +76,12 @@ namespace AGVSystemCommonNet6.Availability
             RestoreDataFromDatabase();
             SyncAvaliabilityDataWorker();
         }
-
+        int lastDay = -1;
         private void SyncAvaliabilityDataWorker()
         {
             Task.Run(() =>
             {
-                int lastDay = -1;
+                
                 while (true)
                 {
                     if (lastDay != DateTime.Now.Day)
@@ -115,6 +116,8 @@ namespace AGVSystemCommonNet6.Availability
                     var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
                     if (avaExist != null)
                     {
+                        lastDay = avaExist.Time.Day;
+
                         availability.IDLE_TIME = avaExist.IDLE_TIME;
                         availability.DOWN_TIME = avaExist.DOWN_TIME;
                         availability.RUN_TIME = avaExist.RUN_TIME;
