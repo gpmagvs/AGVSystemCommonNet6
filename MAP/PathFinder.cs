@@ -52,20 +52,20 @@ namespace AGVSystemCommonNet6.MAP
                 }
             }
         }
-        public clsPathInfo FindShortestPathByTagNumber(Dictionary<int, MapPoint> stations, int startTag, int endTag, PathFinderOption options = null)
+        public clsPathInfo FindShortestPathByTagNumber(Map map, int startTag, int endTag, PathFinderOption options = null)
         {
             try
             {
-                int startIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == startTag).Key;
-                int endIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == endTag).Key;
+                int startIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == startTag).Key;
+                int endIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == endTag).Key;
 
                 if (startIndex == endIndex)
                     return new clsPathInfo
                     {
-                        stations = new List<MapPoint>() { stations[startIndex] },
+                        stations = new List<MapPoint>() { map.Points[startIndex] },
                     };
 
-                var pathinfo = FindShortestPath(stations, startIndex, endIndex, options);
+                var pathinfo = FindShortestPath(map, startIndex, endIndex, options);
                 if (pathinfo.stations.Count == 0)
                     throw new NoPathForNavigatorException();
                 return pathinfo;
@@ -79,20 +79,20 @@ namespace AGVSystemCommonNet6.MAP
                 throw ex;
             }
         }
-        public clsPathInfo FindShortestPath(Dictionary<int, MapPoint> stations, MapPoint startStation, MapPoint endStation, PathFinderOption options = null)
+      
+        public clsPathInfo FindShortestPath(Map map, MapPoint startStation, MapPoint endStation, PathFinderOption options = null)
         {
-            int startIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == startStation.TagNumber).Key;
-            int endIndex = stations.FirstOrDefault(kp => kp.Value.TagNumber == endStation.TagNumber).Key;
+            int startIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == startStation.TagNumber).Key;
+            int endIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == endStation.TagNumber).Key;
 
-            return FindShortestPath(stations, startIndex, endIndex, options);
+            return FindShortestPath(map, startIndex, endIndex, options);
         }
-        public clsPathInfo FindShortestPath(Dictionary<int, MapPoint> stations, int startPtIndex, int endPtIndex, PathFinderOption options = null)
+
+        public clsPathInfo FindShortestPath(Map map, int startPtIndex, int endPtIndex, PathFinderOption options = null)
         {
-            stations = stations.ToList().FindAll(st => st.Value.Enable).ToDictionary(pt => pt.Key, pt => pt.Value);
+            var stations = map.Points.ToList().FindAll(st => st.Value.Enable).ToDictionary(pt => pt.Key, pt => pt.Value);
             try
             {
-
-                //Tag 73->9
                 List<KeyValuePair<int, MapPoint>> staions_ordered = new List<KeyValuePair<int, MapPoint>>();
 
                 if (options != null)
@@ -122,8 +122,8 @@ namespace AGVSystemCommonNet6.MAP
                     staions_ordered = normal_pts.OrderBy(k => k.Key).ToList();
                 }
 
-
-                int[,] graph = CreateDistanceMatrix(staions_ordered);
+                var refPathes = map.Segments;
+                int[,] graph = CreateDistanceMatrix(staions_ordered, ref refPathes);
 
                 int startIndex = staions_ordered.FindIndex(v => v.Key == startPtIndex);
                 int finalIndex = staions_ordered.FindIndex(v => v.Key == endPtIndex);
@@ -165,8 +165,8 @@ namespace AGVSystemCommonNet6.MAP
                 OnExceptionHappen?.Invoke(this, ex);
                 throw ex;
             }
-        }
 
+        }
         public static clsMapPoint[] GetTrajectory(string MapName, List<MapPoint> stations)
         {
             List<clsMapPoint> trajectoryPoints = new List<clsMapPoint>();
@@ -184,7 +184,7 @@ namespace AGVSystemCommonNet6.MAP
 
                         var Control_Mode = new clsControlMode
                         {
-                            Dodge = (int)(mapStation.DodgeMode==null? 0: mapStation.DodgeMode),
+                            Dodge = (int)(mapStation.DodgeMode == null ? 0 : mapStation.DodgeMode),
                             Spin = (int)(mapStation.SpinMode == null ? 0 : mapStation.SpinMode)
                         };
 
@@ -214,8 +214,7 @@ namespace AGVSystemCommonNet6.MAP
             }
             return trajectoryPoints.ToArray();
         }
-
-        private int[,] CreateDistanceMatrix(List<KeyValuePair<int, MapPoint>> stations)
+        private int[,] CreateDistanceMatrix(List<KeyValuePair<int, MapPoint>> stations, ref List<MapPath_V2> pathes)
         {
             var totalNormalStationNum = stations.Count;
             int[,] graph = new int[totalNormalStationNum, totalNormalStationNum];
@@ -223,7 +222,8 @@ namespace AGVSystemCommonNet6.MAP
             {
                 KeyValuePair<int, MapPoint> start_station = stations[row];
                 int start_station_index = start_station.Key;
-                List<int> near_stationIndexs = start_station.Value.Target.Select(t => t.Key).ToList();
+                var pathfound_ = pathes.FindAll(path => path.StartPtIndex == start_station_index);
+                List<int> near_stationIndexs = pathfound_.Select(path => path.EndPtIndex).ToList();
 
                 for (int col = 0; col < totalNormalStationNum; col++)
                 {
@@ -243,13 +243,11 @@ namespace AGVSystemCommonNet6.MAP
             }
             return graph;
         }
-
         private int CalculationDistance(MapPoint value1, MapPoint value2)
         {
             double distance = Math.Sqrt(Math.Pow(value1.X - value2.X, 2) + Math.Pow(value1.Y - value2.Y, 2));
             return int.Parse(Math.Round(distance * 10000, 0).ToString());
         }
-
 
         static void DijkstraAlgorithm(int[,] graph, int source, out int[] distance, out int[] parent)
         {
