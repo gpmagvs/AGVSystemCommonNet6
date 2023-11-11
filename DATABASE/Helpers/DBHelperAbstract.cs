@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.Configuration;
+using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Tools.Database;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,19 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public async Task<int> SaveChanges()
         {
-            return await dbhelper._context.SaveChangesAsync();
+            try
+            {
+                return await dbhelper._context.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
+                return await await Task.Factory.StartNew(async () =>
+                {
+                    return await SaveChanges();
+                });
+            }
         }
 
         protected virtual void Dispose(bool disposing)
