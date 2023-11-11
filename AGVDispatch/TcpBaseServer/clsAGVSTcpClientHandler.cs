@@ -76,7 +76,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     catch (Exception ex)
                     {
                         OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                        AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
+                        AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
                         LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                         _SocketClient?.Dispose();
                     }
@@ -159,7 +159,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         catch (Exception ex)
                         {
                             OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                            AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
+                            AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
                             LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                             _SocketClient?.Dispose();
                         }
@@ -168,7 +168,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 catch (Exception ex)
                 {
                     OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                    AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
+                    AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
                     LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                     _SocketClient?.Dispose();
                 }
@@ -225,7 +225,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 catch (Exception ex)
                 {
                     OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                    AlarmManagerCenter.AddAlarm(ALARMS.AGV_TCPIP_DISCONNECT);
+                    AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
                     LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                 }
             }

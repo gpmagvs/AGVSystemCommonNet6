@@ -80,7 +80,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                                 sw.Restart();
                                 disconnectAlarm.Checked = false;
                                 disconnectAlarm.Time = DateTime.Now;
-                                AlarmManagerCenter.AddAlarm(ALARMS.VMS_DISCONNECT, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
+                                AlarmManagerCenter.AddAlarmAsync(ALARMS.VMS_DISCONNECT, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
                             }
                             else
                             {
@@ -93,7 +93,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                         else if (!response.alive)
                         {
                             disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
-                            AlarmManagerCenter.UpdateAlarm(disconnectAlarm);
+                            AlarmManagerCenter.UpdateAlarmAsync(disconnectAlarm);
                             continue;
                         }
 
@@ -133,13 +133,13 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 return null;
             }
         }
-        public static async Task<(bool confirm, string message)> RunModeSwitch(RUN_MODE mode)
+        public static async Task<(bool confirm, string message)> RunModeSwitch(RUN_MODE mode, bool forecing_change=false)
         {
             //confirm = confirm, message
             try
             {
                 HttpHelper http = new HttpHelper(VMSHostUrl);
-                Dictionary<string, object> response = await http.PostAsync<Dictionary<string, object>, object>($"/api/System/RunMode?mode={mode}", null);
+                Dictionary<string, object> response = await http.PostAsync<Dictionary<string, object>, object>($"/api/System/RunMode?mode={mode}&forecing_change={forecing_change}", null);
                 return ((bool)response["confirm"], response["message"].ToString());
             }
             catch (Exception ex)

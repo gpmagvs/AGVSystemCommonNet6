@@ -76,7 +76,7 @@ namespace AGVSystemCommonNet6.Alarm
         Source_Eq_Status_Down = 57,
         Destine_Eq_Status_Down = 58,
         Cannot_Auto_Parking_When_AGV_Has_Cargo = 59,
-        Source_Eq_Already_Has_Task_To_Excute = 60,
+        Destine_Eq_Already_Has_Task_To_Excute = 60,
         Destine_EQ_Has_AGV = 61,
         Destine_EQ_Has_Registed = 62,
         UNLOAD_BUT_AGV_NO_CARGO_MOUNTED = 63,
@@ -85,7 +85,9 @@ namespace AGVSystemCommonNet6.Alarm
         TASK_DOWNLOAD_DATA_ILLEAGAL = 66,
         AGV_TaskFeedback_ERROR = 67,
         EQ_Disconnect = 68,
-        ERROR_WHEN_TASK_STATUS_CHAGE_DB = 69
+        ERROR_WHEN_TASK_STATUS_CHAGE_DB = 69,
+        Destine_Normal_Station_Has_Task_To_Reach = 70,
+        Destine_Eq_Station_Has_Task_To_Park = 71
     }
 
 }
