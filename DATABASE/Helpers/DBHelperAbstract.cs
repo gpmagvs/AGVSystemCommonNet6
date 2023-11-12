@@ -33,10 +33,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             catch (Exception ex)
             {
                 LOG.ERROR(ex);
-                return await await Task.Factory.StartNew(async () =>
-                {
-                    return await SaveChanges();
-                });
+                return 0;
             }
         }
 
