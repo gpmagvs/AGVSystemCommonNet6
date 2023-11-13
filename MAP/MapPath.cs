@@ -24,8 +24,9 @@ namespace AGVSystemCommonNet6.MAP
         public bool IsSingleCar { get; set; } = false;
 
         /// <summary>
-        /// 是否可通行(false:道路封閉)
+        /// 是否可旋轉
         /// </summary>
+        public bool IsRotationable { get; set; } = true;
         public bool IsPassable { get; set; } = true;
 
         /// <summary>
