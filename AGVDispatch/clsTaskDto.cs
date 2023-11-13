@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace AGVSystemCommonNet6.TASK
+namespace AGVSystemCommonNet6.AGVDispatch
 {
 
     public class clsTaskDto
@@ -24,7 +24,7 @@ namespace AGVSystemCommonNet6.TASK
         {
             get
             {
-                switch (this.State)
+                switch (State)
                 {
                     case TASK_RUN_STATUS.WAIT:
                         return "等待";
@@ -65,7 +65,7 @@ namespace AGVSystemCommonNet6.TASK
         {
             get
             {
-                switch (this.Action)
+                switch (Action)
                 {
                     case ACTION_TYPE.None:
                         return "移動";
@@ -108,51 +108,51 @@ namespace AGVSystemCommonNet6.TASK
         public int Priority { get; set; } = 50;
 
         [NotMapped]
-        public  bool bypass_eq_status_check { get; set; } = false;
+        public bool bypass_eq_status_check { get; set; } = false;
 
         public void Update(clsTaskDto dto)
         {
-            if (dto.RecieveTime != default(DateTime))
-                this.RecieveTime = dto.RecieveTime;
+            if (dto.RecieveTime != default)
+                RecieveTime = dto.RecieveTime;
 
-            if (dto.StartTime != default(DateTime))
-                this.StartTime = dto.StartTime;
+            if (dto.StartTime != default)
+                StartTime = dto.StartTime;
 
-            if (dto.FinishTime != default(DateTime))
-                this.FinishTime = dto.FinishTime;
+            if (dto.FinishTime != default)
+                FinishTime = dto.FinishTime;
 
             if (!string.IsNullOrWhiteSpace(dto.TaskName))
-                this.TaskName = dto.TaskName;
+                TaskName = dto.TaskName;
             // State是一个枚举，你可能总是想更新它，即使它是默认值。
-            this.State = dto.State;
+            State = dto.State;
 
             if (!string.IsNullOrWhiteSpace(dto.DispatcherName))
-                this.DispatcherName = dto.DispatcherName;
+                DispatcherName = dto.DispatcherName;
 
             if (!string.IsNullOrWhiteSpace(dto.FailureReason))
-                this.FailureReason = dto.FailureReason;
+                FailureReason = dto.FailureReason;
 
             if (!string.IsNullOrWhiteSpace(dto.DesignatedAGVName))
-                this.DesignatedAGVName = dto.DesignatedAGVName;
+                DesignatedAGVName = dto.DesignatedAGVName;
 
-            this.Action = dto.Action;
+            Action = dto.Action;
 
             if (!string.IsNullOrWhiteSpace(dto.From_Station))
-                this.From_Station = dto.From_Station;
+                From_Station = dto.From_Station;
 
             if (!string.IsNullOrWhiteSpace(dto.From_Slot))
-                this.From_Slot = dto.From_Slot;
+                From_Slot = dto.From_Slot;
 
             if (!string.IsNullOrWhiteSpace(dto.To_Station))
-                this.To_Station = dto.To_Station;
+                To_Station = dto.To_Station;
 
             if (!string.IsNullOrWhiteSpace(dto.To_Slot))
-                this.To_Slot = dto.To_Slot;
+                To_Slot = dto.To_Slot;
 
             if (!string.IsNullOrWhiteSpace(dto.Carrier_ID))
-                this.Carrier_ID = dto.Carrier_ID;
-            this.Priority = dto.Priority;
-            this.bypass_eq_status_check = dto.bypass_eq_status_check;
+                Carrier_ID = dto.Carrier_ID;
+            Priority = dto.Priority;
+            bypass_eq_status_check = dto.bypass_eq_status_check;
         }
 
     }

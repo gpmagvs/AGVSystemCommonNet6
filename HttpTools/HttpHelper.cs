@@ -1,5 +1,4 @@
 ﻿using AGVSystemCommonNet6.Log;
-using AGVSystemCommonNet6.TASK;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
