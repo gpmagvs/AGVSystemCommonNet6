@@ -1,4 +1,4 @@
-﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,15 +9,40 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class MapPath
     {
-        public MapPath() { }
         public int StartPtIndex { get; set; }
         public int EndPtIndex { get; set; }
+
         public double[] StartCoordination { get; set; }
         public double[] EndCoordination { get; set; }
-        public bool IsEQLink { get; set; }
         public string PathID => $"{StartPtIndex}_{EndPtIndex}";
-        public bool IsBezier { get; set; } = false ;
-        public double[] BezierMiddleCoordination{ get; set; }
 
+        public bool IsEQLink { get; set; }
+
+        /// <summary>
+        /// 是否僅允許一部車子通行
+        /// </summary>
+        public bool IsSingleCar { get; set; } = false;
+
+        /// <summary>
+        /// 是否可通行(false:道路封閉)
+        /// </summary>
+        public bool IsPassable { get; set; } = true;
+
+        /// <summary>
+        /// 是否為禁止停車之消防路徑
+        /// </summary>
+        public bool IsExtinguishingPath { get; set; } = false;
+
+        /// <summary>
+        /// 限速(為速度比例, ex. Speed=1 =>全速)
+        /// </summary>
+        public double Speed { get; set; } = 1;
+        public int LsrMode { get; set; }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public int? DodgeMode { get; set; } = 0;
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public int? SpinMode { get; set; } = 0;
     }
 }
