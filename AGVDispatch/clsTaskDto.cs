@@ -107,6 +107,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         [Required]
         public int Priority { get; set; } = 50;
 
+        public bool IsTrafficControlTask { get; set; } = false;
         [NotMapped]
         public bool bypass_eq_status_check { get; set; } = false;
 
@@ -152,6 +153,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             if (!string.IsNullOrWhiteSpace(dto.Carrier_ID))
                 Carrier_ID = dto.Carrier_ID;
             Priority = dto.Priority;
+            IsTrafficControlTask = dto.IsTrafficControlTask;
             bypass_eq_status_check = dto.bypass_eq_status_check;
         }
 
