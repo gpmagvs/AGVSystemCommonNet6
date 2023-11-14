@@ -164,6 +164,9 @@
         Delete_Job_Data_With_Cst_2 = 1712,
         Delete_Job_Data_With_Cst_3 = 1713,
         Delete_Job_Data_With_Cst_4 = 1714,
+        /// <summary>
+        /// 不該有料卻有料
+        /// </summary>
         Has_Cst_Without_Job = 1720,
         Has_Cst_Without_Job_1 = 1721,
         Has_Cst_Without_Job_2 = 1722,
