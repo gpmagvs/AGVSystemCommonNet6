@@ -1,8 +1,9 @@
-﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
-using AGVSystemCommonNet6.TASK;
 using AGVSystemCommonNet6.Tools.Database;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -227,12 +228,23 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public void SetRunningTaskWait()
         {
-            foreach (var task in TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.NAVIGATING))
+            try
             {
-                task.State = TASK_RUN_STATUS.WAIT;
-            }
-            dbContext.SaveChanges();
+                foreach (var task in TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.NAVIGATING))
+                {
+                    task.State = TASK_RUN_STATUS.WAIT;
+                }
+                dbContext.SaveChanges();
 
+            }
+            catch (SqliteException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AGVSystemCommonNet6;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
-using AGVSystemCommonNet6.TASK;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -65,8 +64,8 @@ namespace AGVSystemCommonNet6
         public bool HasChanged(clsAGVStateDto newState)
         {
             var clone_ = this.clone();
-            var clone_new=newState.clone();
-            clone_.Theta = clone_new.Theta =   0;
+            var clone_new = newState.clone();
+            clone_.Theta = clone_new.Theta = 0;
             bool isdifferent = clone_.ToJson() != clone_new.ToJson();
             return isdifferent;
         }

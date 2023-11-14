@@ -20,7 +20,7 @@ namespace AGVSystemCommonNet6.MAP
         /// 地圖版本
         /// V1:設定接設定在點上,路徑(線段)不可設定屬性; V2 : 路徑(線段)可設定屬性
         /// </summary>
-        public virtual MAP_VERSION Version { get; set; }= MAP_VERSION.V1;
+        public virtual MAP_VERSION Version { get; set; } = MAP_VERSION.V1;
         public string Name { get; set; }
         public string Note { get; set; }
         public int PointIndex { get; set; }
@@ -35,39 +35,7 @@ namespace AGVSystemCommonNet6.MAP
         public Dictionary<int, MapPoint> Points { get; set; }
         public Dictionary<string, BezierCurve> BezierCurves { get; set; } = new Dictionary<string, BezierCurve>();
 
-        [JsonIgnore]
-        public MapPath[] Pathes
-        {
-            get
-            {
-                List<MapPath> GetMapPathes(MapPoint point)
-                {
-                    int index = Points.FirstOrDefault(pt => pt.Value == point).Key;
-
-                    bool isBezierendpoint = point.Graph.IsBezierCurvePoint;
-                    BezierCurve bezier = new BezierCurve();
-                    if (isBezierendpoint)
-                    {
-                        BezierCurves.TryGetValue(point.Graph.BezierCurveID, out bezier);
-                    }
-                    Dictionary<int, double> targets = point.Target.ToList().FindAll(kp => Points.ContainsKey(kp.Key)).ToDictionary(kp => kp.Key, kp => kp.Value);
-                    return targets.Select(kp => new MapPath()
-                    {
-                        IsEQLink = point.StationType != STATION_TYPE.Normal | Points[kp.Key].StationType != STATION_TYPE.Normal,
-                        StartPtIndex = index,
-                        EndPtIndex = kp.Key,
-                        StartCoordination = new double[2] { point.X, point.Y },
-                        EndCoordination = new double[2] { Points[kp.Key].X, Points[kp.Key].Y },
-                        IsBezier = isBezierendpoint,
-                        BezierMiddleCoordination = isBezierendpoint ? bezier.MidPointCoordination : new double[2] { 0, 0 }
-                    }
-                    ).ToList();
-                }
-                MapPath[] pathes = Points.ToList().FindAll(point => point.Value.Target.Count != 0).SelectMany(point => GetMapPathes(point.Value)).ToArray();
-                return pathes;
-            }
-        }
-        public List<MapPath_V2> Segments { get; set; } = new List<MapPath_V2>();
+        public List<MapPath> Segments { get; set; } = new List<MapPath>();
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<string, Bay> Bays { get; set; } = new Dictionary<string, Bay>();
