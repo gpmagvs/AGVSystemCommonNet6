@@ -97,7 +97,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     }
                     catch (Exception ex)
                     {
-                        AlarmManagerCenter.AddAlarm(ALARMS.Task_Status_Cant_Save_To_Database);
+                        AlarmManagerCenter.AddAlarmAsync(ALARMS.Task_Status_Cant_Save_To_Database);
                         transaction.Rollback();
                         return false;
                     }

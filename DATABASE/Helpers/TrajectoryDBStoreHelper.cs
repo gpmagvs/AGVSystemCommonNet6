@@ -29,7 +29,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
         }
 
-        public async void StoreTrajectory(string taskID, string agvName, double x, double y, double theta)
+        public async Task<(bool success,string error_msg)> StoreTrajectory(string taskID, string agvName, double x, double y, double theta)
         {
             var coordination = new clsTrajCoordination
             {
@@ -63,10 +63,11 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
                     }
                     await db.SaveChanges();
+                    return (true, "");
                 }
                 catch (Exception ex)
                 {
-
+                    return (false, ex.Message);
                 }
 
             }

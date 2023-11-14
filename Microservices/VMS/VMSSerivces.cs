@@ -2,12 +2,14 @@
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.Microservices.VMS
 {
@@ -15,14 +17,40 @@ namespace AGVSystemCommonNet6.Microservices.VMS
     {
         public static string VMSHostUrl => "http://127.0.0.1:5036";
         public static event EventHandler OnVMSReconnected;
+        public static List<clsAGVStateDto> AgvStatesData = new List<clsAGVStateDto>();
+        public static bool IsAlive = false;
+
+
+        public static Dictionary<VMS_GROUP, VMSConfig>? ReadVMSVehicleGroupSetting(string Vehicle_Json_file)
+        {
+            if (File.Exists(Vehicle_Json_file))
+            {
+                var json = File.ReadAllText(Vehicle_Json_file);
+                if (json == null)
+                {
+                    return null;
+                }
+                return JsonConvert.DeserializeObject<Dictionary<VMS_GROUP, VMSConfig>>(json);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public static void SaveVMSVehicleGroupSetting(string Vehicle_Json_file,string json)
+        {
+            File.WriteAllText(Vehicle_Json_file, json);
+        }
+
         /// <summary>
         /// 請求VMS回覆
         /// </summary>
         /// <returns></returns>
         public static async Task AliveCheckWorker()
         {
-            _ = Task.Run(async () =>
+            _ = Task.Factory.StartNew(async () =>
             {
+                IsAlive = true;
                 Stopwatch sw = Stopwatch.StartNew();
                 bool previous_alive_state = true;
                 clsAlarmCode alarm = AlarmManagerCenter.GetAlarmCode(ALARMS.VMS_DISCONNECT);
@@ -48,23 +76,24 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                         {
                             if (!response.alive)
                             {
+                                IsAlive = false;
                                 sw.Restart();
-                                AGVStatusDBHelper agv_status_db = new AGVStatusDBHelper();
-                                agv_status_db.ChangeAllOffline();
-                                AlarmManagerCenter.UpdateAlarm(disconnectAlarm);
+                                disconnectAlarm.Checked = false;
+                                disconnectAlarm.Time = DateTime.Now;
+                                AlarmManagerCenter.AddAlarmAsync(ALARMS.VMS_DISCONNECT, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
                             }
                             else
                             {
+                                IsAlive = true;
                                 OnVMSReconnected?.Invoke("", EventArgs.Empty);
                                 sw.Restart();
-                                disconnectAlarm.ResetAalrmMemberName = typeof(AliveChecker).Name;
-                                AlarmManagerCenter.ResetAlarm(disconnectAlarm, true);
+                                await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", ALARMS.VMS_DISCONNECT, "SystemAuto");
                             }
                         }
                         else if (!response.alive)
                         {
                             disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
-                            AlarmManagerCenter.UpdateAlarm(disconnectAlarm);
+                            AlarmManagerCenter.UpdateAlarmAsync(disconnectAlarm);
                             continue;
                         }
 
@@ -72,19 +101,45 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                     }
                     catch (Exception ex)
                     {
-                        ErrorLog(ex);
                     }
                 }
             });
         }
 
-        public static async Task<(bool confirm, string message)> RunModeSwitch(RUN_MODE mode)
+        public static void AgvStateFetchWorker()
+        {
+            Task.Factory.StartNew(async () =>
+            {
+                while (true)
+                {
+                    await Task.Delay(100);
+                    if (!IsAlive)
+                        continue;
+
+                    AgvStatesData = await GetAGV_StatesData_FromVMS();
+                }
+            });
+        }
+
+        public static async Task<List<clsAGVStateDto>> GetAGV_StatesData_FromVMS()
+        {
+            try
+            {
+                HttpHelper httpHelper = new HttpHelper($"http://127.0.0.1:5036", timeout_sec: 2);
+                return await httpHelper.GetAsync<List<clsAGVStateDto>>("/api/VmsManager/AGVStatus");
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        public static async Task<(bool confirm, string message)> RunModeSwitch(RUN_MODE mode, bool forecing_change=false)
         {
             //confirm = confirm, message
             try
             {
                 HttpHelper http = new HttpHelper(VMSHostUrl);
-                Dictionary<string, object> response = await http.PostAsync<Dictionary<string, object>, object>($"/api/System/RunMode?mode={mode}", null);
+                Dictionary<string, object> response = await http.PostAsync<Dictionary<string, object>, object>($"/api/System/RunMode?mode={mode}&forecing_change={forecing_change}", null);
                 return ((bool)response["confirm"], response["message"].ToString());
             }
             catch (Exception ex)
@@ -93,10 +148,6 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
         }
 
-        private static void ErrorLog(Exception ex)
-        {
-            Console.WriteLine($"[{typeof(AliveChecker).Name}] {ex.Message} ");
-        }
 
         private static async Task<(bool alive, string message)> VMSAliveCheck()
         {

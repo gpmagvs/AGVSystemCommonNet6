@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Availability;
+using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.TASK;
 using AGVSystemCommonNet6.User;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,10 @@ namespace AGVSystemCommonNet6.DATABASE
         /// 儀器量測結果
         /// </summary>
         public DbSet<clsMeasureResult> InstrumentMeasureResult { get; set; }
+        /// <summary>
+        /// AGV 變成 Idle的地方、起始時間、結束時間
+        /// </summary>
+        public DbSet<clsStopRegionDto> StopRegionData { get; set; }
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options)
             : base(options)
         {

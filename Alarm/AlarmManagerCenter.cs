@@ -3,6 +3,7 @@ using AGVSystemCommonNet6.Alarm.VMS_ALARM;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
+using AGVSystemCommonNet6.Log;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -23,9 +24,9 @@ namespace AGVSystemCommonNet6.Alarm
         {
             get
             {
-                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+                using (var dbhelper = new AGVSDatabase())
                 {
-                    return dbhelper._context.Set<clsAlarmDto>().Where(al => !al.Checked).ToList();
+                    return dbhelper.tables.SystemAlarms.AsNoTracking().Where(al => !al.Checked).ToList();
                 }
             }
         }
@@ -36,13 +37,24 @@ namespace AGVSystemCommonNet6.Alarm
         {
             LoadAlarmCodes();
             Initialized = true;
+            SetAllAlarmChecked();
         }
-        public static void UpdateAlarm(clsAlarmDto alarmDto)
+        public static async void SetAllAlarmChecked()
+        {
+            using var db = new AGVSDatabase();
+            foreach (var alarm in db.tables.SystemAlarms.Where(al => !al.Checked))
+            {
+                alarm.Checked = true;
+            }
+            int num = await db.SaveChanges();
+
+        }
+        public static async Task UpdateAlarmAsync(clsAlarmDto alarmDto)
         {
             try
             {
-                var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection);
-                var alarmExist = dbhelper._context.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
+                var dbhelper = new AGVSDatabase();
+                var alarmExist = dbhelper.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
                 if (alarmExist != null)
                 {
                     foreach (var prop in alarmDto.GetType().GetProperties())
@@ -57,34 +69,38 @@ namespace AGVSystemCommonNet6.Alarm
                     }
 
                     //dbhelper._context.SystemAlarms.Update(alarmDto);
-                    dbhelper._context.SaveChanges();
+                    await dbhelper.SaveChanges();
                 }
                 else
-                    AddAlarm(alarmDto);
+                    await AddAlarmAsync(alarmDto);
             }
             catch (Exception ex)
             {
                 throw ex;
             }
         }
-        public static void AddAlarm(clsAlarmDto alarmDto)
+        public static async Task AddAlarmAsync(clsAlarmDto alarmDto)
         {
             if (!Initialized)
                 Initialize();
 
             try
             {
-                var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection);
-                dbhelper._context.SystemAlarms.Add(alarmDto);
-                dbhelper._context.SaveChangesAsync();
+                using var db = new AGVSDatabase();
+                db.tables.SystemAlarms.Add(alarmDto);
+                await db.SaveChanges();
             }
             catch (Exception ex)
             {
-                throw ex;
+                await Task.Factory.StartNew(async () =>
+                 {
+                     await Task.Delay(100);
+                     await AddAlarmAsync(alarmDto);
+                 });
             }
         }
 
-        public static void AddAlarm(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
+        public static async Task AddAlarmAsync(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
         {
             if (!Initialized)
                 Initialize();
@@ -116,11 +132,11 @@ namespace AGVSystemCommonNet6.Alarm
                     Time = DateTime.Now,
                     Source = source
                 };
-                AddAlarm(alarmDto);
+                await AddAlarmAsync(alarmDto);
             }
             catch (Exception ex)
             {
-                throw ex;
+                LOG.ERROR("AddAlarmAsync", ex);
             }
         }
 
@@ -176,7 +192,7 @@ namespace AGVSystemCommonNet6.Alarm
                     {
                         alarm_.Checked = true;
                         alarm_.ResetAalrmMemberName = alarm.ResetAalrmMemberName;
-                        UpdateAlarm(alarm_);
+                        UpdateAlarmAsync(alarm_);
                     }
                 }
                 else
@@ -184,7 +200,7 @@ namespace AGVSystemCommonNet6.Alarm
                     if (dbhelper._context.Set<clsAlarmDto>().FirstOrDefault(a => a == alarm && a.Checked == false) != null)
                     {
                         alarm.Checked = true;
-                        UpdateAlarm(alarm);
+                        UpdateAlarmAsync(alarm);
                     }
                 }
             }
@@ -247,18 +263,28 @@ namespace AGVSystemCommonNet6.Alarm
             };
             return FilePath;
         }
-
-        public static void SetAlarmsChecked(List<clsAlarmDto> unchecked_alarms)
+        public static async Task SetAlarmCheckedAsync(string eQName, int alarm_code, string checker_name = "")
         {
-            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            using (var dbhelper = new AGVSDatabase())
             {
-                foreach (var _alarm in unchecked_alarms)
+                var alarms = dbhelper.tables.SystemAlarms.Where(alarm => alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
+                foreach (var item in alarms)
                 {
-                    var alarm_found = dbhelper._context.SystemAlarms.FirstOrDefault(alarm => alarm == _alarm);
-                    alarm_found.Checked = true;
+                    item.Checked = true;
                 }
+                await dbhelper.SaveChanges();
+            }
+        }
+        public static async Task SetAlarmCheckedAsync(string eQName, ALARMS alarm_code, string checker_name = "")
+        {
+            await SetAlarmCheckedAsync(eQName, (int)alarm_code, checker_name);
+        }
 
-                dbhelper._context.SaveChanges();
+        public static async Task SetAlarmsCheckedAsync(string eQName, List<ALARMS> unchecked_alarms, string checker_name = "")
+        {
+            foreach (var _alarm in unchecked_alarms)
+            {
+                await SetAlarmCheckedAsync(eQName, (int)_alarm, checker_name);
             }
         }
 
@@ -285,18 +311,6 @@ namespace AGVSystemCommonNet6.Alarm
             return alarms;
         }
 
-        public static void SetAlarmChecked(string name, int alarm_code)
-        {
-            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
-            {
-                var alarms = dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name && alarm.AlarmCode == alarm_code).ToArray();
-                foreach (var item in alarms)
-                {
-                    item.Checked = true;
-                }
-                dbhelper._context.SaveChanges();
-            }
-        }
 
         public static void UpdateAlarmDuration(string name, AGVSystemCommonNet6.AGVDispatch.Model.clsAlarmCode alarm)
         {

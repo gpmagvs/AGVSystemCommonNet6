@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.TASK;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -40,5 +41,39 @@ namespace AGVSystemCommonNet6
         public ACTION_TYPE CurrentAction { get; set; }
         public double Theta { get; set; }
         public TRANSFER_PROCESS TransferProcess { get; set; }
+
+        public void Update(clsAGVStateDto entity)
+        {
+            AGV_Description = entity.AGV_Description;
+            Model = entity.Model;
+            MainStatus = entity.MainStatus;
+            OnlineStatus = entity.OnlineStatus;
+            CurrentLocation = entity.CurrentLocation;
+            CurrentCarrierID = entity.CurrentCarrierID;
+            BatteryLevel_1 = entity.BatteryLevel_1;
+            BatteryLevel_2 = entity.BatteryLevel_2;
+            TaskName = entity.TaskName;
+            TaskRunStatus = entity.TaskRunStatus;
+            TaskRunAction = entity.TaskRunAction;
+            Theta = entity.Theta;
+            Connected = entity.Connected;
+            CurrentAction = entity.CurrentAction;
+            TransferProcess = entity.TransferProcess;
+            IsCharging = entity.IsCharging;
+        }
+
+        public bool HasChanged(clsAGVStateDto newState)
+        {
+            var clone_ = this.clone();
+            var clone_new=newState.clone();
+            clone_.Theta = clone_new.Theta =   0;
+            bool isdifferent = clone_.ToJson() != clone_new.ToJson();
+            return isdifferent;
+        }
+
+        private clsAGVStateDto clone()
+        {
+            return JsonConvert.DeserializeObject<clsAGVStateDto>(this.ToJson());
+        }
     }
 }
