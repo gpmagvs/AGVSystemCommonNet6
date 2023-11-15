@@ -87,7 +87,8 @@ namespace AGVSystemCommonNet6.Alarm
         EQ_Disconnect = 68,
         ERROR_WHEN_TASK_STATUS_CHAGE_DB = 69,
         Destine_Normal_Station_Has_Task_To_Reach = 70,
-        Destine_Eq_Station_Has_Task_To_Park = 71
+        Destine_Eq_Station_Has_Task_To_Park = 71,
+        PING_CHECK_FAIL = 72
     }
 
 }

@@ -28,13 +28,13 @@ namespace AGVSystemCommonNet6.MAP
                 var map = data_obj["Map"];
                 if (auto_create_segment && map.Points.Count != 0 && map.Segments.Count == 0)
                 {
-                    List<MapPath_V2> GetMapPathes(Map map, MapPoint point)
+                    List<MapPath> GetMapPathes(Map map, MapPoint point)
                     {
                         var Points = map.Points;
                         int index = Points.FirstOrDefault(pt => pt.Value == point).Key;
                         bool isBezierendpoint = point.Graph.IsBezierCurvePoint;
                         Dictionary<int, double> targets = point.Target.ToList().FindAll(kp => Points.ContainsKey(kp.Key)).ToDictionary(kp => kp.Key, kp => kp.Value);
-                        return targets.Select(kp => new MapPath_V2()
+                        return targets.Select(kp => new MapPath()
                         {
                             IsEQLink = point.StationType != STATION_TYPE.Normal | Points[kp.Key].StationType != STATION_TYPE.Normal,
                             StartPtIndex = index,
@@ -44,7 +44,7 @@ namespace AGVSystemCommonNet6.MAP
                         }
                         ).ToList();
                     }
-                    List<MapPath_V2> pathes = map.Points.ToList().FindAll(point => point.Value.Target.Count != 0).SelectMany(point => GetMapPathes(map, point.Value)).ToList();
+                    List<MapPath> pathes = map.Points.ToList().FindAll(point => point.Value.Target.Count != 0).SelectMany(point => GetMapPathes(map, point.Value)).ToList();
                     map.Segments = pathes;
                     SaveMapToFile(map, mapfile);
                 }

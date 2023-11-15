@@ -172,38 +172,46 @@ namespace AGVSystemCommonNet6.MAP
                 return Target == null ? false : Target.Count != 0;
             }
         }
-        public clsMapPoiintRegist? RegistInfo { get; set; } = new clsMapPoiintRegist();
+        public clsMapPoiintRegist RegistInfo { get; set; } = new clsMapPoiintRegist();
 
         /// <summary>
         /// 註冊這個站點
         /// </summary>
         public bool TryRegistPoint(string AGVName, out clsMapPoiintRegist registInfo)
         {
-            registInfo = null;
-            if (RegistInfo == null)
-                RegistInfo = new clsMapPoiintRegist();
-
-            if (RegistInfo.IsRegisted)
+            try
             {
-                if (AGVName != "System" && RegistInfo.RegisterAGVName != AGVName)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+                registInfo = null;
+                if (RegistInfo == null)
+                    RegistInfo = new clsMapPoiintRegist();
 
+                if (RegistInfo.IsRegisted)
+                {
+                    if (AGVName != "System" && RegistInfo.RegisterAGVName != AGVName)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+
+                }
+                RegistInfo = new clsMapPoiintRegist()
+                {
+                    RegistTime = DateTime.Now,
+                    RegisterAGVName = AGVName
+                };
+                registInfo = RegistInfo;
+                RegistInfo.IsRegisted = true;
+                Console.WriteLine($"{AGVName} Regist Tag_{TagNumber}");
+                return true;
             }
-            RegistInfo = new clsMapPoiintRegist()
+            catch (Exception ex)
             {
-                RegistTime = DateTime.Now,
-                RegisterAGVName = AGVName
-            };
-            registInfo = RegistInfo;
-            RegistInfo.IsRegisted = true;
-            Console.WriteLine($"{AGVName} Regist Tag_{TagNumber}");
-            return true;
+                throw ex;
+            }
+
         }
 
         public bool TryUnRegistPoint(string name, out string errMsg)

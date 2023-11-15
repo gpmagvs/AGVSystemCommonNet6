@@ -256,7 +256,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                LOG.Critical(ex);
+                LOG.ERROR($"Try Get OnlineMode Fail{ex.Message}");
                 VMS_API_Call_Fail_Flag = true;
                 return (false, null);
             }

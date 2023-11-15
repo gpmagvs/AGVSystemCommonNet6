@@ -214,7 +214,7 @@ namespace AGVSystemCommonNet6.MAP
             }
             return trajectoryPoints.ToArray();
         }
-        private int[,] CreateDistanceMatrix(List<KeyValuePair<int, MapPoint>> stations, ref List<MapPath_V2> pathes)
+        private int[,] CreateDistanceMatrix(List<KeyValuePair<int, MapPoint>> stations, ref List<MapPath> pathes)
         {
             var totalNormalStationNum = stations.Count;
             int[,] graph = new int[totalNormalStationNum, totalNormalStationNum];

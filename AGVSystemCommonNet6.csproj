@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="GPMRosMessageNet\Sick_Safetyscanners\" />
+    <Folder Include="TASK\" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
