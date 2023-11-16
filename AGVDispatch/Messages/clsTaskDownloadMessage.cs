@@ -73,7 +73,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             }
         }
         public bool HasCargo { get; set; } = false;
-    
+
         /// <summary>
         /// 把派車任務DTO轉成送給車控CommandActionClient的 TaskCommandGoal
         /// </summary>
@@ -169,6 +169,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             return taskData;
         }
 
+        public clsOrderInfo OrderInfo { get; set; } = new clsOrderInfo();
 
         [NonSerialized]
         public bool IsActionFinishReported = true;
@@ -179,6 +180,17 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// </summary>
         [NonSerialized]
         public bool IsLocalTask = false;
+
+        /// <summary>
+        /// 任務訂單的資訊
+        /// </summary>
+        public class clsOrderInfo
+        {
+            public string DestineName { get; set; } = "";
+            public string SourceName { get; set; } = "";
+            public ACTION_TYPE ActionName { get; set; } = ACTION_TYPE.None;
+
+        }
     }
 
 
