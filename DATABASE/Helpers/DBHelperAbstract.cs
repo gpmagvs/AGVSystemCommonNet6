@@ -27,7 +27,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             try
             {
-                return await dbhelper._context.SaveChangesAsync();
+                return dbhelper._context.SaveChanges();
 
             }
             catch (Exception ex)
