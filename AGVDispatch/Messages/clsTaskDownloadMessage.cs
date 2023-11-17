@@ -188,7 +188,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         {
             public string DestineName { get; set; } = "";
             public string SourceName { get; set; } = "";
-            public ACTION_TYPE ActionName { get; set; } = ACTION_TYPE.None;
+            public ACTION_TYPE ActionName { get; set; } = ACTION_TYPE.NoAction;
 
         }
     }

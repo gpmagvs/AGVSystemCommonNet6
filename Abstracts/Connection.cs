@@ -59,12 +59,12 @@ namespace AGVSystemCommonNet6.Abstracts
 
         public async Task<bool> PingServer()
         {
+            PingOptions options = new PingOptions { Ttl = 128, DontFragment = true };
             Ping pingSender = new Ping();
-            // 設定要 ping 的主機或 IP
             string address = IP;
             try
             {
-                PingReply reply = pingSender.Send(address);
+                PingReply reply = pingSender.Send(address,2000,new byte[32], options);
                 if (reply.Status != IPStatus.Success)
                 {
                     Console.WriteLine(reply.Status);
