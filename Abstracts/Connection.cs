@@ -64,7 +64,7 @@ namespace AGVSystemCommonNet6.Abstracts
             string address = IP;
             try
             {
-                PingReply reply = pingSender.Send(address,2000,new byte[32], options);
+                PingReply reply = pingSender.Send(address,3000,new byte[32], options);
                 if (reply.Status != IPStatus.Success)
                 {
                     Console.WriteLine(reply.Status);
