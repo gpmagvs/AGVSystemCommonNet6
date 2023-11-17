@@ -132,6 +132,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         Hold,
         Break,
         Unknown,
+        NoAction=999
     }
     public enum STATION_TYPE : int
     {
