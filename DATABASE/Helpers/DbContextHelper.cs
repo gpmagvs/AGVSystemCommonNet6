@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public DbContextHelper(string connectionString)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(connectionString.Split('=')[1]));
+            //Directory.CreateDirectory(Path.GetDirectoryName(connectionString.Split('=')[1]));
             _connectionString = connectionString;
             CreateDbContext();
         }
@@ -19,7 +19,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         private void CreateDbContext()
         {
             var optionsBuilder = new DbContextOptionsBuilder<AGVSDbContext>();
-            optionsBuilder.UseSqlite(_connectionString);
+            //optionsBuilder.UseSqlite(_connectionString);
+            optionsBuilder.UseSqlServer(_connectionString);
             _context = new AGVSDbContext(optionsBuilder.Options);
         }
 
