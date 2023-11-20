@@ -28,24 +28,7 @@ namespace AGVSystemCommonNet6.MAP
                 var map = data_obj["Map"];
                 if (auto_create_segment && map.Points.Count != 0 && map.Segments.Count == 0)
                 {
-                    List<MapPath> GetMapPathes(Map map, MapPoint point)
-                    {
-                        var Points = map.Points;
-                        int index = Points.FirstOrDefault(pt => pt.Value == point).Key;
-                        bool isBezierendpoint = point.Graph.IsBezierCurvePoint;
-                        Dictionary<int, double> targets = point.Target.ToList().FindAll(kp => Points.ContainsKey(kp.Key)).ToDictionary(kp => kp.Key, kp => kp.Value);
-                        return targets.Select(kp => new MapPath()
-                        {
-                            IsEQLink = point.StationType != STATION_TYPE.Normal | Points[kp.Key].StationType != STATION_TYPE.Normal,
-                            StartPtIndex = index,
-                            EndPtIndex = kp.Key,
-                            StartCoordination = new double[2] { point.X, point.Y },
-                            EndCoordination = new double[2] { Points[kp.Key].X, Points[kp.Key].Y },
-                        }
-                        ).ToList();
-                    }
-                    List<MapPath> pathes = map.Points.ToList().FindAll(point => point.Value.Target.Count != 0).SelectMany(point => GetMapPathes(map, point.Value)).ToList();
-                    map.Segments = pathes;
+                    map.Segments = CreateSegments(map);
                     SaveMapToFile(map, mapfile);
                 }
 
@@ -68,7 +51,27 @@ namespace AGVSystemCommonNet6.MAP
             return LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string msg, false);
 
         }
-
+        public static List<MapPath> CreateSegments(Map map)
+        {
+            List<MapPath> GetMapPathes(Map map, MapPoint point)
+            {
+                var Points = map.Points;
+                int index = Points.FirstOrDefault(pt => pt.Value == point).Key;
+                bool isBezierendpoint = point.Graph.IsBezierCurvePoint;
+                Dictionary<int, double> targets = point.Target.ToList().FindAll(kp => Points.ContainsKey(kp.Key)).ToDictionary(kp => kp.Key, kp => kp.Value);
+                return targets.Select(kp => new MapPath()
+                {
+                    IsEQLink = point.StationType != STATION_TYPE.Normal | Points[kp.Key].StationType != STATION_TYPE.Normal,
+                    StartPtIndex = index,
+                    EndPtIndex = kp.Key,
+                    StartCoordination = new double[2] { point.X, point.Y },
+                    EndCoordination = new double[2] { Points[kp.Key].X, Points[kp.Key].Y },
+                }
+                ).ToList();
+            }
+            List<MapPath> pathes = map.Points.ToList().FindAll(point => point.Value.Target.Count != 0).SelectMany(point => GetMapPathes(map, point.Value)).ToList();
+            return pathes;
+        }
         public static bool SaveMapToFile(Map map_modified, string local_map_file_path)
         {
             try

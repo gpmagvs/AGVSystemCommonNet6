@@ -22,6 +22,12 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         }
         public Dictionary<string, clsAGVTrafficState> AGVTrafficStates { get; set; } = new Dictionary<string, clsAGVTrafficState>();
         public List<MapPoint> RegistedPoints { get; set; } = new List<MapPoint>();
+
+        /// <summary>
+        /// 被系統交通管制中的路徑
+        /// </summary>
+        public Dictionary<string, MapPath> ControledPathesByTraffic { get; set; } = new Dictionary<string, MapPath>();
+
         public TRAFFIC_ACTION GetTrafficStatusByTag(string agv_name, int tagNumber)
         {
             if (!AGVTrafficStates.TryGetValue(agv_name, out clsAGVTrafficState agv_state))

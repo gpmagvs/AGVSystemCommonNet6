@@ -172,12 +172,13 @@ namespace AGVSystemCommonNet6.MAP
                 return Target == null ? false : Target.Count != 0;
             }
         }
-        public clsMapPoiintRegist RegistInfo { get; set; } = new clsMapPoiintRegist();
+        [JsonIgnore]
+        public clsMapPoiintRegist RegistInfo = new clsMapPoiintRegist();
 
         /// <summary>
         /// 註冊這個站點
         /// </summary>
-        public bool TryRegistPoint(string AGVName, out clsMapPoiintRegist registInfo)
+        public bool TryRegistPoint(string AGVName, out clsMapPoiintRegist registInfo, bool IsBySystem = false)
         {
             try
             {
@@ -187,7 +188,7 @@ namespace AGVSystemCommonNet6.MAP
 
                 if (RegistInfo.IsRegisted)
                 {
-                    if (AGVName != "System" && RegistInfo.RegisterAGVName != AGVName)
+                    if (!IsBySystem && RegistInfo.RegisterAGVName != AGVName)
                     {
                         return false;
                     }
@@ -214,7 +215,7 @@ namespace AGVSystemCommonNet6.MAP
 
         }
 
-        public bool TryUnRegistPoint(string name, out string errMsg)
+        public bool TryUnRegistPoint(string name, out string errMsg, bool IsBySystem = false)
         {
             errMsg = "";
             if (RegistInfo == null)
@@ -225,7 +226,7 @@ namespace AGVSystemCommonNet6.MAP
             if (!RegistInfo.IsRegisted)
                 return true;
 
-            if (RegistInfo.RegisterAGVName != name && name != "System")
+            if (RegistInfo.RegisterAGVName != name && !IsBySystem)
             {
                 errMsg = $"{this.Name} 由{RegistInfo.RegisterAGVName}註冊,除系統與註冊者以外不可解註冊";
                 return false;
