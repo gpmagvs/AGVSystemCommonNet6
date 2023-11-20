@@ -22,6 +22,7 @@ namespace AGVSystemCommonNet6.Tools.Database
                 db.CreateTable<UserEntity>();
                 db.CreateTable<clsParkingAccuracy>();
                 CreateDefaultUsers();
+                db.TableChanged += Db_TableChanged;
             }
             catch (System.Exception ex)
             {
@@ -29,12 +30,16 @@ namespace AGVSystemCommonNet6.Tools.Database
             }
         }
 
+        private static void Db_TableChanged(object? sender, NotifyTableChangedEventArgs e)
+        {
+            RaiseDataBaseChangedEvent();
+        }
+
         public static void InsertAlarm(clsAlarmCode alarm)
         {
             Task.Factory.StartNew(() =>
             {
                 db?.Insert(alarm);
-                RaiseDataBaseChangedEvent();
             });
         }
 
@@ -43,7 +48,6 @@ namespace AGVSystemCommonNet6.Tools.Database
             Task.Factory.StartNew(() =>
             {
                 db?.Insert(parkingAccuracy);
-                RaiseDataBaseChangedEvent();
             });
         }
 
@@ -52,7 +56,6 @@ namespace AGVSystemCommonNet6.Tools.Database
             try
             {
                 db.Insert(user);
-                RaiseDataBaseChangedEvent();
             }
             catch (Exception ex)
             {
