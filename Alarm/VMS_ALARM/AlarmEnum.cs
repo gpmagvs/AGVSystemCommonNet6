@@ -43,6 +43,9 @@
         Vertical_Motor_Alarm = 410,
         Barcode_Module_Error = 500,
         IMU_Module_Error = 510,
+        IMU_Impacting_X_Dir = 511,
+        IMU_Impacting_Y_Dir = 512,
+        IMU_Impacting = 513,
         Guide_Module_Error = 520,
         Pin_Module_Communication_Error = 530,
         Front_Pin_Module_Communication_Error = 531,
@@ -433,6 +436,6 @@
         Exception_When_AGVC_AGVS_Task_Reset_CycleStop,
         GetVirtualIDFail,
         AGV_BarcodeReader_Not_Match_Tag_of_Destination,
-        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042,
+        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042
     }
 }
