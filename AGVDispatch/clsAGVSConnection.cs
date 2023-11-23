@@ -83,7 +83,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             ACK_0324_VirtualID_ACK = 0324,
             UNKNOWN = 9999,
         }
-        public string LocalIP { get; }
+        public string LocalIP { get; set; }
         public AGV_MODEL AGV_Model { get; }
         public clsAGVSConnection(string IP, int Port, bool AutoPingServerCheck = true) : base(IP, Port, AutoPingServerCheck)
         {
@@ -130,7 +130,17 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 if (LocalIP != null)
                 {
                     IPEndPoint ipEndpoint = new IPEndPoint(IPAddress.Parse(LocalIP), 0);
-                    tcpClient = new TcpClient(ipEndpoint);
+                    try
+                    {
+                        tcpClient = new TcpClient(ipEndpoint);
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.ERROR($"[AGVS] Connect Fail..本地網卡IP設定錯誤-{ipEndpoint.Address.ToString()} 不可用", ex, true);
+                        tcpClient = null;
+                        await Task.Delay(3000);
+                        return false;
+                    }
                     tcpClient.ReceiveBufferSize = 65535;
                     tcpClient.Connect(IP, VMSPort);
                 }

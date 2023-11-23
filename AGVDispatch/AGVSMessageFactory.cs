@@ -10,7 +10,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public class AGVSMessageFactory
     {
-       
+
+        public static Encoding Encoder = Encoding.UTF8;
         private static int SystemByteStored = 8790;
         private static int System_Byte_Cyclic
         {
@@ -23,7 +24,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-        internal static byte[] CreateSimpleReturnMessageData(string EQName,string SID,string headerKey, bool confirmed, int system_byte, out clsSimpleReturnWithTimestampMessage ackMesg)
+        internal static byte[] CreateSimpleReturnMessageData(string EQName, string SID, string headerKey, bool confirmed, int system_byte, out clsSimpleReturnWithTimestampMessage ackMesg)
         {
             ackMesg = new clsSimpleReturnWithTimestampMessage()
             {
@@ -40,7 +41,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                     }
             };
-            return Encoding.UTF8.GetBytes(FormatSendOutString(ackMesg.ToJson()));
+            return Encoder.GetBytes(FormatSendOutString(ackMesg.ToJson(Formatting.None)));
 
         }
 
@@ -81,7 +82,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                     }
             };
-            return Encoding.UTF8.GetBytes(FormatSendOutString(ackMesg.ToJson()));
+            return Encoder.GetBytes(FormatSendOutString(ackMesg.ToJson(Formatting.None)));
 
         }
 
@@ -110,7 +111,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 TimeStamp = DateTime.Now.ToAGVSTimeFormat(),
             });
 
-            return Encoding.UTF8.GetBytes(FormatSendOutString(mesg.ToJson()));
+            return Encoder.GetBytes(FormatSendOutString(mesg.ToJson(Formatting.None)));
 
         }
 
@@ -146,7 +147,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             });
 
-            return Encoding.UTF8.GetBytes(FormatSendOutString(mesg.ToJson()));
+            return Encoder.GetBytes(FormatSendOutString(mesg.ToJson(Formatting.None )));
         }
 
 
@@ -157,7 +158,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             msg.EQName = EQName;
             msg.SystemBytes = System_Byte_Cyclic;
             msg.Header.Add("0105", runningStatus);
-            return Encoding.UTF8.GetBytes(FormatSendOutString(msg.ToJson()));
+            return Encoder.GetBytes(FormatSendOutString(msg.ToJson(Formatting.None)));
         }
 
         public static string FormatSendOutString(string json)
@@ -188,7 +189,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     }
                    }
             };
-            return Encoding.UTF8.GetBytes(FormatSendOutString(taskFeedbackMessage.ToJson()));
+            return Encoder.GetBytes(FormatSendOutString(taskFeedbackMessage.ToJson(Formatting.None)));
 
         }
 
@@ -212,7 +213,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                      }
                  }
             };
-            return Encoding.UTF8.GetBytes(FormatSendOutString(carrierRemovedMessage.ToJson()));
+            return Encoder.GetBytes(FormatSendOutString(carrierRemovedMessage.ToJson(Formatting.None)));
 
         }
 
@@ -240,7 +241,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                      }
                  }
             };
-            return Encoding.UTF8.GetBytes(FormatSendOutString(carrierVirtualIDQueryMessage.ToJson()));
+            return Encoder.GetBytes(FormatSendOutString(carrierVirtualIDQueryMessage.ToJson(Formatting.None)));
 
         }
 
