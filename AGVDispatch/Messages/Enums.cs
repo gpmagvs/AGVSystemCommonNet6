@@ -88,7 +88,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// </summary>
         NO_PATH_FOR_NAVIGATION = 8,
         OK_AGV_ALREADY_THERE = 100,
-        TASK_CANCEL = 101
+        TASK_CANCEL = 101,
+        TASK_DOWN_LOAD_TIMEOUT = 102
     }
 
     public enum TASK_RUN_STATUS : int

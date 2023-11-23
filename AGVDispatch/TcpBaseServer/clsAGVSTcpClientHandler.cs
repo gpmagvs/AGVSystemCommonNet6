@@ -21,7 +21,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 public string Json { get; internal set; }
                 public clsAGVSConnection.MESSAGE_TYPE MsgType { get; internal set; }
             }
-
+            private int SystemBytes = 4000;
             private Socket _SocketClient = null;
             private bool _ping_success = false;
             public string ClientIP { get; private set; } = "";
@@ -220,6 +220,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             clsTaskFeedbackMessage taskFeedback = JsonConvert.DeserializeObject<clsTaskFeedbackMessage>(json);
                             OnClientTaskFeedback?.Invoke(this, taskFeedback);
                         }
+
+                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.ACK_0302_TASK_DOWNLOADED_ACK)
+                        {
+                            clsTaskDownloadAckMessage taskDownloadFeedback = JsonConvert.DeserializeObject<clsTaskDownloadAckMessage>(json);
+                            if (TaskDownloadMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
+                            {
+                                var response = taskDownloadFeedback.Header.First().Value;
+                                LOG.INFO($"Task Download To {AGV_Name}, AGV Response={response.ToJson()}");
+                                taskDownload_AGV_ReturnCode = response.ReturnCode;
+                                TaskDownloadWaitMRE.Set();
+                            }
+                        }
                     }
 
                 });
@@ -238,8 +250,50 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                 }
             }
-
-
+            private RETURN_CODE taskDownload_AGV_ReturnCode;
+            private ManualResetEvent TaskDownloadWaitMRE = new ManualResetEvent(false);
+            private clsTaskDownloadMessage TaskDownloadMsg;
+            public TaskDownloadRequestResponse SendTaskMessage(clsTaskDownloadData downloadData)
+            {
+                SystemBytes += 1;
+                TaskDownloadMsg = new clsTaskDownloadMessage()
+                {
+                    SystemBytes = SystemBytes,
+                    EQName = AGV_Name,
+                    Header = new Dictionary<string, clsTaskDownloadData>
+                             {
+                                 { "0301",downloadData }
+                             },
+                };
+                TaskDownloadWaitMRE.Reset();
+                SendJsonReply(JsonConvert.SerializeObject(TaskDownloadMsg));
+                LOG.INFO($"Task Download To {AGV_Name}, Wait Response...");
+                bool timeout = !TaskDownloadWaitMRE.WaitOne(TimeSpan.FromSeconds(3));
+                if (timeout)
+                {
+                    LOG.WARN($"Task Download To {AGV_Name}, Timeout!");
+                    return new TaskDownloadRequestResponse
+                    {
+                        ReturnCode = TASK_DOWNLOAD_RETURN_CODES.TASK_DOWN_LOAD_TIMEOUT
+                    };
+                }
+                else
+                {
+                    if (taskDownload_AGV_ReturnCode == RETURN_CODE.OK)
+                    {
+                        LOG.INFO($"Task Download To {AGV_Name}, AGV Accept!");
+                        return new TaskDownloadRequestResponse { ReturnCode = TASK_DOWNLOAD_RETURN_CODES.OK };
+                    }
+                    else
+                    {
+                        LOG.WARN($"Task Download To {AGV_Name}, AGV Return Code == {taskDownload_AGV_ReturnCode}");
+                        return new TaskDownloadRequestResponse
+                        {
+                            ReturnCode = TASK_DOWNLOAD_RETURN_CODES.TASK_CANCEL
+                        };
+                    }
+                }
+            }
         }
     }
 }
