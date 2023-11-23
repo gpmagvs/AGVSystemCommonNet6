@@ -320,8 +320,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public static MESSAGE_TYPE GetMESSAGE_TYPE(string message_json)
         {
-
-            var _Message = JsonConvert.DeserializeObject<Dictionary<string, object>>(message_json);
+            Dictionary<string, object>? _Message = new Dictionary<string, object>();
+            try
+            {
+                _Message = JsonConvert.DeserializeObject<Dictionary<string, object>>(message_json);
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR($"DeserializeObjec Error When GetMESSAGE_TYPE\r\n{message_json}", ex);
+                return MESSAGE_TYPE.UNKNOWN;
+            }
 
             string headerContent = _Message["Header"].ToString();
             var headers = JsonConvert.DeserializeObject<Dictionary<string, object>>(headerContent);

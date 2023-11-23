@@ -43,13 +43,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     get
                     {
-                        return Encoding.ASCII.GetString(buffer, 0, revedDataLen);
+                        return Encoding.UTF8.GetString(buffer, 0, revedDataLen);
                     }
                 }
 
                 public bool TryFindEndChar(out int lastIndexOfCR)
                 {
-                    lastIndexOfCR = revedString.LastIndexOf('\r');
+                    lastIndexOfCR = revedString.LastIndexOf('*');
                     if (lastIndexOfCR < 0)
                         return false;
                     return true;
@@ -130,23 +130,28 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     int revDataLen = ClientSocketState.socket.EndReceive(ar);
                     ClientSocketState.revedDataLen += revDataLen;
                     string str = ClientSocketState.revedString;
+
+                    if (str.Contains("0105"))
+                    {
+
+                    }
                     if (ClientSocketState.TryFindEndChar(out int index))
                     {
                         int remaindData = ClientSocketState.revedDataLen - (index + 1);
                         //0 =>整包都是完整資料
-                        if (remaindData != 0)
-                        {
-                            var newBuffer = new byte[clsSocketState.BufferSize];
-                            Array.Copy(ClientSocketState.buffer, index + 1, newBuffer, 0, remaindData);
-                            ClientSocketState.buffer = newBuffer;
-                            ClientSocketState.revedDataLen = remaindData;
-                        }
-                        else
-                        {
-                            await HandleClientMsg(ClientSocketState.revedString);
-                            ClientSocketState.buffer = new byte[clsSocketState.BufferSize];
-                            ClientSocketState.revedDataLen = 0;
-                        }
+                        //if (remaindData != 1)
+                        //{
+                        //    var newBuffer = new byte[clsSocketState.BufferSize];
+                        //    Array.Copy(ClientSocketState.buffer, index + 1, newBuffer, 0, remaindData);
+                        //    ClientSocketState.buffer = newBuffer;
+                        //    ClientSocketState.revedDataLen = remaindData;
+                        //}
+                        //else
+                        //{
+                        await HandleClientMsg(ClientSocketState.revedString);
+                        ClientSocketState.buffer = new byte[clsSocketState.BufferSize];
+                        ClientSocketState.revedDataLen = 0;
+                        //}
                     }
                     int offset = ClientSocketState.revedDataLen; //2
                     int toRevLen = clsSocketState.BufferSize - offset;
@@ -179,6 +184,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
             private async Task HandleClientMsg(string clientMsg)
             {
                 //"55688abc*\r"
+                if (clientMsg.Contains("0105"))
+                {
+
+                }
                 _ = Task.Factory.StartNew(() =>
                 {
                     string[] splited = clientMsg.Replace("*\r", "$").Split('$');
@@ -220,7 +229,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 try
                 {
-                    SocketClient.Send(Encoding.ASCII.GetBytes(json + "*\r"));
+                    SocketClient.Send(Encoding.UTF8.GetBytes(json + "*\r"));
                 }
                 catch (Exception ex)
                 {
