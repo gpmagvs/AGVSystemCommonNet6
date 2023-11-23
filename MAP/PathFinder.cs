@@ -163,7 +163,8 @@ namespace AGVSystemCommonNet6.MAP
             catch (Exception ex)
             {
                 OnExceptionHappen?.Invoke(this, ex);
-                throw ex;
+                return null;    
+                //throw ex;
             }
 
         }
