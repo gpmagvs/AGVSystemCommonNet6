@@ -24,7 +24,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 VMSPort = AGVSConfigulator.SysConfigs.VMSTcpServerPort;
                 SocketServer.Bind(new IPEndPoint(IPAddress.Parse(IP), VMSPort));
                 SocketServer.Listen(1000);
-                await Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(() =>
                 {
                     AcceptListen();
                 });
@@ -32,7 +32,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                return false;
+                throw ex;
             }
         }
 

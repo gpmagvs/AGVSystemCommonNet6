@@ -13,7 +13,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
     public class AGVStatusDBHelper : DBHelperAbstract
     {
         private DbSet<clsAGVStateDto> AGVStatusSet => dbContext.AgvStates;
-        public new List<clsAGVStateDto> GetALL(bool enabled_agv_only = true)
+        public List<clsAGVStateDto> GetALL(bool enabled_agv_only = true)
         {
             if (enabled_agv_only)
                 return AGVStatusSet.Where(agv => agv.Enabled).AsNoTracking().ToList();
