@@ -59,12 +59,12 @@ namespace AGVSystemCommonNet6.Abstracts
 
         public async Task<bool> PingServer()
         {
-            PingOptions options = new PingOptions { Ttl = 128, DontFragment = true };
+            PingOptions options = new PingOptions { Ttl = 128 };
             Ping pingSender = new Ping();
             string address = IP;
             try
             {
-                PingReply reply = pingSender.Send(address,2000,new byte[32], options);
+                PingReply reply = await pingSender.SendPingAsync(address, 5000, new byte[32], options);
                 if (reply.Status != IPStatus.Success)
                 {
                     Console.WriteLine(reply.Status);

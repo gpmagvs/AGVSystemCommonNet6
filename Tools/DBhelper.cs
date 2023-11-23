@@ -10,22 +10,29 @@ namespace AGVSystemCommonNet6.Tools.Database
     public class DBhelper
     {
         private static SQLiteConnection db;
-
+        public static string databasePath { get; private set; } = "database.db";
+        public static Action<string> OnDataBaseChanged;
         public static void Initialize(string dbName = "VMS")
         {
             try
             {
-                var databasePath = Path.Combine(Environment.CurrentDirectory, $"{dbName}.db");
+                databasePath = Path.Combine(Environment.CurrentDirectory, $"{dbName}.db");
                 db = new SQLiteConnection(databasePath);
                 db.CreateTable<clsAlarmCode>();
                 db.CreateTable<UserEntity>();
                 db.CreateTable<clsParkingAccuracy>();
                 CreateDefaultUsers();
+                db.TableChanged += Db_TableChanged;
             }
             catch (System.Exception ex)
             {
                 LOG.Critical($"初始化資料庫時發生錯誤＿{ex.Message}");
             }
+        }
+
+        private static void Db_TableChanged(object? sender, NotifyTableChangedEventArgs e)
+        {
+            RaiseDataBaseChangedEvent();
         }
 
         public static void InsertAlarm(clsAlarmCode alarm)
@@ -146,6 +153,14 @@ namespace AGVSystemCommonNet6.Tools.Database
             DateTime startTime = DateTime.Parse(startTimeStr);
             DateTime endTime = DateTime.Parse(endTimeStr);
             return db?.Table<clsParkingAccuracy>().Where(acq => acq.ParkingTag == tag && acq.Time >= startTime && acq.Time <= endTime).ToList();
+        }
+
+        private static void RaiseDataBaseChangedEvent()
+        {
+            if (OnDataBaseChanged != null)
+            {
+                OnDataBaseChanged(databasePath);
+            }
         }
     }
 }

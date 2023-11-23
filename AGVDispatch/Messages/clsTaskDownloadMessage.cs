@@ -190,6 +190,46 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             public string SourceName { get; set; } = "";
             public ACTION_TYPE ActionName { get; set; } = ACTION_TYPE.NoAction;
 
+            public delegate bool GetPortExistStatusDelegate();
+            public static GetPortExistStatusDelegate OnGetPortExistStatus;
+
+            public string DisplayText
+            {
+                get
+                {
+                    if (ActionName == ACTION_TYPE.Carry)
+                    {
+                        bool cargoOnAGV = false;
+                        if (OnGetPortExistStatus != null)
+                        {
+                            cargoOnAGV = OnGetPortExistStatus();
+                        }
+                        return cargoOnAGV ? $"前往[{DestineName}]放貨(來源-[{SourceName}])" : $"前往[{SourceName}]取貨(目的地-{DestineName})";
+                    }
+                    else if (ActionName == ACTION_TYPE.Load)
+                    {
+                        return $"[{DestineName}] 放貨中(來源-{SourceName})";
+                    }
+                    else if (ActionName == ACTION_TYPE.Unload)
+                    {
+                        return $"[{SourceName}] 取貨中(目的地-{DestineName})";
+                    }
+                    else if (ActionName == ACTION_TYPE.Charge)
+                    {
+                        return $"前往[{DestineName}] 充電";
+                    }
+                    else if (ActionName == ACTION_TYPE.Unpark | ActionName == ACTION_TYPE.Discharge)
+                    {
+                        return $"退出充電站前往[{SourceName}]";
+                    }
+                    else if (ActionName == ACTION_TYPE.None)
+                    {
+                        return $"移動至[{DestineName}]";
+                    }
+                    return "";
+                }
+            }
+
         }
     }
 
