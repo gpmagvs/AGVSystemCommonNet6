@@ -188,6 +188,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         {
             public string DestineName { get; set; } = "";
             public string SourceName { get; set; } = "";
+            public bool IsTransferTask { get; set; } = false;
             public ACTION_TYPE ActionName { get; set; } = ACTION_TYPE.NoAction;
 
             public delegate bool GetPortExistStatusDelegate();
@@ -208,11 +209,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     }
                     else if (ActionName == ACTION_TYPE.Load)
                     {
-                        return $"[{DestineName}] 放貨中(來源-{SourceName})";
+                        return !IsTransferTask ? $"{DestineName}放貨" : $"[{DestineName}] 放貨中(來源-{SourceName})";
                     }
                     else if (ActionName == ACTION_TYPE.Unload)
                     {
-                        return $"[{SourceName}] 取貨中(目的地-{DestineName})";
+                        return !IsTransferTask ? $"{DestineName}取貨" : $"[{SourceName}] 取貨中(目的地-{DestineName})";
                     }
                     else if (ActionName == ACTION_TYPE.Charge)
                     {
@@ -220,7 +221,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     }
                     else if (ActionName == ACTION_TYPE.Unpark | ActionName == ACTION_TYPE.Discharge)
                     {
-                        return $"退出充電站前往[{SourceName}]";
+                        return $"退出充電站前往[{(IsTransferTask ? SourceName : DestineName)}]";
                     }
                     else if (ActionName == ACTION_TYPE.None)
                     {

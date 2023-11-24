@@ -248,6 +248,7 @@
         Handshake_Fail_TA4_EQ_BUSY_OFF = 3241,
         Handshake_Fail_TA5_EQ_L_REQ = 3242,
         Handshake_Fail_TA5_EQ_U_REQ = 3243,
+        Handshake_Fail_TA5_EQ_READY_NOT_OFF = 3244,
         Handshake_Fail_BAT_EXG_EQ_VALID_NOT_ON = 3245,
         Handshake_Fail_BAT_EXG_EQ_VALID_NOT_OFF = 3246,
         Handshake_Fail_BAT_EXG_EQ_TRREQ_NOT_ON,
