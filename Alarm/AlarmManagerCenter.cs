@@ -41,12 +41,20 @@ namespace AGVSystemCommonNet6.Alarm
         }
         public static async void SetAllAlarmChecked()
         {
-            using var db = new AGVSDatabase();
-            foreach (var alarm in db.tables.SystemAlarms.Where(al => !al.Checked))
+            try
             {
-                alarm.Checked = true;
+
+                using var db = new AGVSDatabase();
+                foreach (var alarm in db.tables.SystemAlarms.Where(al => !al.Checked))
+                {
+                    alarm.Checked = true;
+                }
+                int num = await db.SaveChanges();
             }
-            int num = await db.SaveChanges();
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
+            }
 
         }
         public static async Task UpdateAlarmAsync(clsAlarmDto alarmDto)
@@ -265,14 +273,22 @@ namespace AGVSystemCommonNet6.Alarm
         }
         public static async Task SetAlarmCheckedAsync(string eQName, int alarm_code, string checker_name = "")
         {
-            using (var dbhelper = new AGVSDatabase())
+            try
             {
-                var alarms = dbhelper.tables.SystemAlarms.Where(alarm => alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
-                foreach (var item in alarms)
+
+                using (var dbhelper = new AGVSDatabase())
                 {
-                    item.Checked = true;
+                    var alarms = dbhelper.tables.SystemAlarms.Where(alarm => alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
+                    foreach (var item in alarms)
+                    {
+                        item.Checked = true;
+                    }
+                    await dbhelper.SaveChanges();
                 }
-                await dbhelper.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
             }
         }
         public static async Task SetAlarmCheckedAsync(string eQName, ALARMS alarm_code, string checker_name = "")
