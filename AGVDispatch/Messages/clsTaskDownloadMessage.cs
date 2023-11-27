@@ -171,16 +171,29 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         public clsOrderInfo OrderInfo { get; set; } = new clsOrderInfo();
 
-        [NonSerialized]
         public bool IsActionFinishReported = true;
-        [NonSerialized]
         public bool IsEQHandshake = false;
+
         /// <summary>
         /// 是否為本地任務
         /// </summary>
-        [NonSerialized]
         public bool IsLocalTask = false;
 
+        public bool IsSegmentTask
+        {
+            get
+            {
+                try
+                {
+                    return ExecutingTrajecory != null && (ExecutingTrajecory?.Length) != 0 && Destination != ExecutingTrajecory?.Last().Point_ID;
+                }
+                catch (Exception ex)
+                {
+                    LOG.WARN($" IsSegmentTask get fail:{ex.Message}");
+                    return false;
+                }
+            }
+        }
         /// <summary>
         /// 任務訂單的資訊
         /// </summary>
