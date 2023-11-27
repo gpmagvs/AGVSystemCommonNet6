@@ -39,7 +39,14 @@ namespace AGVSystemCommonNet6.Tools.Database
         {
             Task.Factory.StartNew(() =>
             {
-                db?.Insert(alarm);
+                try
+                {
+                    db?.Insert(alarm);
+                }
+                catch (Exception ex)
+                {
+                    LOG.ERROR(ex);
+                }
             });
         }
 
@@ -47,7 +54,15 @@ namespace AGVSystemCommonNet6.Tools.Database
         {
             Task.Factory.StartNew(() =>
             {
-                db?.Insert(parkingAccuracy);
+                try
+                {
+
+                    db?.Insert(parkingAccuracy);
+                }
+                catch (Exception ex)
+                {
+                    LOG.ERROR(ex);
+                }
             });
         }
 
@@ -59,6 +74,7 @@ namespace AGVSystemCommonNet6.Tools.Database
             }
             catch (Exception ex)
             {
+                LOG.ERROR(ex);
             }
         }
 
@@ -80,8 +96,8 @@ namespace AGVSystemCommonNet6.Tools.Database
             }
             catch (Exception ex)
             {
-
-                throw ex;
+                LOG.ERROR(ex);
+                return 0;
             }
 
         }
@@ -115,7 +131,6 @@ namespace AGVSystemCommonNet6.Tools.Database
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
