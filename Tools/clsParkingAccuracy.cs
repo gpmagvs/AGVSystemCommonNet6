@@ -17,6 +17,11 @@ namespace AGVSystemCommonNet6.Tools
         public double X { get; set; }
         public double Y { get; set; }
 
+        public double Slam_X { get; set; }
+        public double Slam_Y { get; set; }
+
+        public double Slam_Theta { get; set; }
+
         public double DistanceToTagCenter
         {
             get

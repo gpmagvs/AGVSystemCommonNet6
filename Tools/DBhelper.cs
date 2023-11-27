@@ -148,11 +148,15 @@ namespace AGVSystemCommonNet6.Tools.Database
             return db?.Table<clsParkingAccuracy>().Select(record => $"{record.ParkingTag}:{record.ParkingLocation}").Distinct().ToList();
         }
 
-        public static List<clsParkingAccuracy> QueryParkingAccuracy(int tag, string startTimeStr, string endTimeStr)
+        public static List<clsParkingAccuracy> QueryParkingAccuracy(int tag, string startTimeStr, string endTimeStr, string taskName)
         {
             DateTime startTime = DateTime.Parse(startTimeStr);
             DateTime endTime = DateTime.Parse(endTimeStr);
-            return db?.Table<clsParkingAccuracy>().Where(acq => acq.ParkingTag == tag && acq.Time >= startTime && acq.Time <= endTime).ToList();
+            var Timematch = db?.Table<clsParkingAccuracy>().Where(acq => acq.Time >= startTime && acq.Time <= endTime);
+            if (tag != -1)
+                return Timematch.Where(acq => acq.ParkingTag == tag).OrderBy(acq => acq.ParkingTag).ToList();
+            else
+                return Timematch.Where(acq => acq.TaskName.Contains(taskName)).OrderBy(acq => acq.ParkingTag).ToList();
         }
 
         private static void RaiseDataBaseChangedEvent()
