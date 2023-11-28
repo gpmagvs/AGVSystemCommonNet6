@@ -41,5 +41,9 @@ namespace AGVSystemCommonNet6.MAP
         public Dictionary<string, Bay> Bays { get; set; } = new Dictionary<string, Bay>();
 
 
+        public IEnumerable<int> GetStationTags()
+        {
+            return Points.Where(pt => pt.Value.StationType != STATION_TYPE.Normal).Select(pt => pt.Value.TagNumber).ToList();
+        }
     }
 }
