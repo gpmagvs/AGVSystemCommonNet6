@@ -46,6 +46,7 @@
         IMU_Impacting_X_Dir = 511,
         IMU_Impacting_Y_Dir = 512,
         IMU_Impacting = 513,
+        IMU_Pitch_State_Error = 514,
         Guide_Module_Error = 520,
         Pin_Module_Communication_Error = 530,
         Front_Pin_Module_Communication_Error = 531,
