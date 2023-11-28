@@ -58,13 +58,23 @@ namespace AGVSystemCommonNet6.Log
                         Directory.CreateDirectory(subFolder);
 
                     string fileName = Path.Combine(subFolder, $"{DateTime.Now.ToString("yyyy-MM-dd HH")}.log");
-
-                    try
+                    if (logItem.WriteToNewFileLogName != "")
                     {
-                        using (StreamWriter writer = new StreamWriter(fileName, true))
+                        string NewLogfileName = Path.Combine(subFolder, $"{DateTime.Now.ToString("yyyy-MM-dd HH")}_{logItem.WriteToNewFileLogName}.log");
+                        try
                         {
+                            using StreamWriter writer = new StreamWriter(NewLogfileName, true);
                             writer.WriteLine(string.Format("{0} {1}", logItem.Time.ToString("yyyy/MM/dd HH:mm:ss.ffff"), logItem.logFullLine));
                         }
+                        catch (Exception)
+                        {
+                            continue;
+                        }
+                    }
+                    try
+                    {
+                        using StreamWriter writer = new StreamWriter(fileName, true);
+                        writer.WriteLine(string.Format("{0} {1}", logItem.Time.ToString("yyyy/MM/dd HH:mm:ss.ffff"), logItem.logFullLine));
                     }
                     catch (Exception)
                     {
