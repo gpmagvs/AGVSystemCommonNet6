@@ -20,6 +20,8 @@ namespace AGVSystemCommonNet6.Tools
         public double Slam_X { get; set; }
         public double Slam_Y { get; set; }
 
+        public bool IsGoodParkingLoaction { get; set; } = true;
+
         public double Slam_Theta { get; set; }
 
         public double DistanceToTagCenter
