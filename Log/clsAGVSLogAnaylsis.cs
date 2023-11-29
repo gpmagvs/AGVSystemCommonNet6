@@ -215,7 +215,12 @@ namespace AGVSystemCommonNet6.Log
             public double TimeSpend { get => (EndTime - StartTime).TotalSeconds; }
             public int From { get; set; }
             public int To { get; set; }
+
             public int StartLoc { get; set; }
+
+            public string FromName { get; set; } = "";
+            public string ToName { get; set; } = "";
+            public string StartLocName { get; set; } = "";
             public double BatLvStart { get => StartStatus.Electric_Volume[0]; }
             public double BatLvEnd { get => EndStatus.Electric_Volume[0]; }
             public double BatLoss { get => BatLvStart - BatLvEnd; }

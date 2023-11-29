@@ -25,8 +25,11 @@ namespace AGVSystemCommonNet6.Vehicle_Control.Models
 
         public string ExecuteTaskName { get; set; } = "";
         public string ExecuteTaskSimpleName { get; set; } = "";
-
+        public double Odometry { get; set; } = 0;
         public string CargoID { get; set; } = "";
+
+        public int DestineTag { get; set; } = 0;
+
         public ACTION_TYPE TaskAction { get; set; }
     }
 }

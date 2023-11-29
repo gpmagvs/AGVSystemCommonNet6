@@ -3,12 +3,13 @@ using AGVSystemCommonNet6.User;
 using AGVSystemCommonNet6.Vehicle_Control.Models;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using SQLite;
+using static AGVSystemCommonNet6.Log.clsAGVSLogAnaylsis;
 
 namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 {
     public class DBhelper
     {
-        private static SQLiteConnection db;
+        public static SQLiteConnection db;
         public static string databasePath { get; private set; } = "database.db";
         public static Action<string> OnDataBaseChanged;
         public static void Initialize(string dbName = "VMS")
@@ -87,7 +88,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             {
                 db.Insert(status);
             }
-            catch  (SQLite.SQLiteException ex)
+            catch (SQLite.SQLiteException ex)
             {
                 db.CreateTable(typeof(clsAGVStatusTrack));
                 db.Insert(status);
@@ -208,6 +209,60 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             {
                 OnDataBaseChanged(databasePath);
             }
+        }
+
+        public static List<clsTransferResult> QueryTodayTransferRecord()
+        {
+            DateTime from = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            DateTime to = from.AddDays(1);
+            return QueryTransferRecord(from, to);
+
+        }
+        public static List<clsTransferResult> QueryTransferRecord(DateTime from, DateTime to)
+        {
+            List<clsTransferResult> outputs = new List<clsTransferResult>();
+            var filtered = db.Table<clsAGVStatusTrack>().Where(stat => stat.Time >= from && stat.Time <= to);
+            if (filtered.Count() == 0)
+                return new List<clsTransferResult>();
+            //掰運-放貨
+            var loadActions = filtered.Where(stat => stat.Status == clsEnums.SUB_STATUS.RUN && stat.TaskAction == AGVDispatch.Messages.ACTION_TYPE.Load);
+            foreach (clsAGVStatusTrack state in loadActions)
+            {
+                var taskName = state.ExecuteTaskName;
+                //取貨
+                var transferActions = filtered.Where(stat => stat.ExecuteTaskName == taskName);
+                if (transferActions.Any(st => st.TaskAction == AGVDispatch.Messages.ACTION_TYPE.Unload))
+                {
+                    var initState = transferActions.First();
+                    var unloadActionStartState = transferActions.First(st => st.TaskAction == AGVDispatch.Messages.ACTION_TYPE.Unload);
+                    var loadActionStartState = transferActions.First(st => st.TaskAction == AGVDispatch.Messages.ACTION_TYPE.Load);
+                    var finalState = filtered.FirstOrDefault(st => st.Time > loadActionStartState.Time);
+                    finalState = finalState == null ? loadActionStartState : finalState;
+
+                    clsTransferResult transferInfo = new clsTransferResult
+                    {
+                        StartTime = initState.Time,
+                        EndTime = finalState.Time,
+                        StartStatus = new AGVDispatch.Messages.RunningStatus
+                        {
+                            Odometry = initState.Odometry,
+                            Electric_Volume = new double[2] { initState.BatteryLevel1, initState.BatteryLevel2 }
+                        },
+                        EndStatus = new AGVDispatch.Messages.RunningStatus
+                        {
+                            Odometry = finalState.Odometry,
+                            Electric_Volume = new double[2] { finalState.BatteryLevel1, finalState.BatteryLevel2 }
+                        },
+                        From = unloadActionStartState.DestineTag,
+                        To = loadActionStartState.DestineTag,
+                        TaskName = taskName,
+                        StartLoc = initState.DestineTag
+                    };
+                    outputs.Add(transferInfo);
+                }
+            }
+
+            return outputs;
         }
     }
 }
