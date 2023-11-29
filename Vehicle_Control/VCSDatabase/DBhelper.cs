@@ -1,7 +1,7 @@
 ﻿using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.User;
 using AGVSystemCommonNet6.Vehicle_Control.Models;
-using AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM;
+using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using SQLite;
 
 namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
@@ -70,6 +70,22 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             try
             {
                 db.Insert(user);
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
+            }
+        }
+
+        /// <summary>
+        /// 儲存AGV狀態
+        /// </summary>
+        /// <param name="status"></param>
+        public static void AddAgvStatusData(clsAGVStatusTrack status)
+        {
+            try
+            {
+                db.Insert(status);
             }
             catch (Exception ex)
             {

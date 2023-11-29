@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM
+namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 {
     public class clsAlarmCode
     {

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using SQLite;
 using System.Collections.Concurrent;
 
-namespace AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM
+namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 {
     public class AlarmManager
     {
