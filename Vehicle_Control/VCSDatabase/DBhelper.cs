@@ -87,6 +87,11 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             {
                 db.Insert(status);
             }
+            catch  (SQLite.SQLiteException ex)
+            {
+                db.CreateTable(typeof(clsAGVStatusTrack));
+                db.Insert(status);
+            }
             catch (Exception ex)
             {
                 LOG.ERROR(ex);

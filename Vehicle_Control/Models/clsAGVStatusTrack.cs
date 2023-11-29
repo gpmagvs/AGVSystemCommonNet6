@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,5 +25,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.Models
 
         public string ExecuteTaskName { get; set; } = "";
         public string ExecuteTaskSimpleName { get; set; } = "";
+
+        public string CargoID { get; set; } = "";
+        public ACTION_TYPE TaskAction { get; set; }
     }
 }

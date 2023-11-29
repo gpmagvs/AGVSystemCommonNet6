@@ -23,13 +23,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public string Task_Name { get; set; } = "";
 
         [JsonProperty("Task Simplex")]
-        public string Task_Simplex
-        {
-            get
-            {
-                return $"{Task_Name}-{Task_Sequence}";
-            }
-        }
+        public string Task_Simplex { get; set; } = "";
 
         [JsonProperty("Task Sequence")]
         public int Task_Sequence { get; set; }
