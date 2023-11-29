@@ -1,11 +1,6 @@
 ﻿using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AGVSystemCommonNet6.Tools
+namespace AGVSystemCommonNet6.Vehicle_Control.Models
 {
     public class clsParkingAccuracy
     {

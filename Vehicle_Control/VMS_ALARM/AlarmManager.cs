@@ -1,12 +1,10 @@
-﻿using AGVSystemCommonNet6.GPMRosMessageNet.Messages;
-using AGVSystemCommonNet6.Log;
-using AGVSystemCommonNet6.Tools.Database;
+﻿using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using Newtonsoft.Json;
 using SQLite;
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 
-namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
+namespace AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM
 {
     public class AlarmManager
     {
@@ -34,7 +32,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                 bool isAlarmDefaultUpdated = fiinfo.LastWriteTime > fiinfo_on_param_folder.LastWriteTime;
                 if (!alarm_json_file_exist | isAlarmDefaultUpdated)
                 {
-                    File.Copy(default_alarm_json_file_path, alarm_JsonFile,true);
+                    File.Copy(default_alarm_json_file_path, alarm_JsonFile, true);
                     LOG.TRACE($"Copy New AlarmList.json file to {alarm_JsonFile}");
                 }
                 AlarmList = JsonConvert.DeserializeObject<List<clsAlarmCode>>(File.ReadAllText(alarm_JsonFile));
@@ -93,7 +91,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             warning_save.Time = DateTime.Now;
             warning_save.ELevel = clsAlarmCode.LEVEL.Warning;
             warning_save.IsRecoverable = true;
-            var existAlar = (CurrentAlarms.FirstOrDefault(al => al.Value.EAlarmCode == Alarm_code));
+            var existAlar = CurrentAlarms.FirstOrDefault(al => al.Value.EAlarmCode == Alarm_code);
             if (existAlar.Value != null)
                 CurrentAlarms.TryRemove(existAlar.Key, out _);
             CurrentAlarms.TryAdd(warning_save.Time, warning_save);

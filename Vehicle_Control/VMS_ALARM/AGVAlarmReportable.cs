@@ -1,12 +1,7 @@
 ﻿using AGVSystemCommonNet6.Log;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static AGVSystemCommonNet6.Abstracts.CarComponent;
+using static AGVSystemCommonNet6.Vehicle_Control.CarComponent;
 
-namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
+namespace AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM
 {
     public abstract class AGVAlarmReportable
     {

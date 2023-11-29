@@ -9,8 +9,11 @@
 
   <ItemGroup>
     <Compile Remove="Navigator\**" />
+    <Compile Remove="TASK\**" />
     <EmbeddedResource Remove="Navigator\**" />
+    <EmbeddedResource Remove="TASK\**" />
     <None Remove="Navigator\**" />
+    <None Remove="TASK\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,7 +32,6 @@
 
   <ItemGroup>
     <Folder Include="GPMRosMessageNet\Sick_Safetyscanners\" />
-    <Folder Include="TASK\" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
@@ -210,7 +211,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             OnOnlineStateQueryFail?.Invoke(this, EventArgs.Empty);
                             if (!UseWebAPI)
                                 Disconnect();
-                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_ALIVE_CHECK_TIMEOUT;
+                            Current_Warning_Code = AlarmCodes.AGVS_ALIVE_CHECK_TIMEOUT;
                             continue;
                         }
                         else
@@ -219,7 +220,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             Connected = true;
                             if (UseWebAPI)
                                 VMS_API_Call_Fail_Flag = false;
-                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.None;
+                            Current_Warning_Code = AlarmCodes.None;
                         }
 
                         (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;

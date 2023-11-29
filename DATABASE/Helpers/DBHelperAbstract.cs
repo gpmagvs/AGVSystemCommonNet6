@@ -1,6 +1,5 @@
 ﻿using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.Log;
-using AGVSystemCommonNet6.Tools.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;

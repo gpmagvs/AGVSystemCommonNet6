@@ -1,11 +1,10 @@
-﻿using SQLite;
-using System.Drawing.Printing;
-using System.Security.Claims;
-using AGVSystemCommonNet6.Alarm.VMS_ALARM;
+﻿using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.User;
-using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Vehicle_Control.Models;
+using AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM;
+using SQLite;
 
-namespace AGVSystemCommonNet6.Tools.Database
+namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 {
     public class DBhelper
     {
@@ -24,7 +23,7 @@ namespace AGVSystemCommonNet6.Tools.Database
                 CreateDefaultUsers();
                 db.TableChanged += Db_TableChanged;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 LOG.Critical($"初始化資料庫時發生錯誤＿{ex.Message}");
             }

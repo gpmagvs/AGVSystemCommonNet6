@@ -1,9 +1,7 @@
-﻿using AGVSystemCommonNet6.Alarm;
-using AGVSystemCommonNet6.Alarm.VMS_ALARM;
-using AGVSystemCommonNet6.Log;
+﻿using AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM;
 using RosSharp.RosBridgeClient;
 
-namespace AGVSystemCommonNet6.Abstracts
+namespace AGVSystemCommonNet6.Vehicle_Control
 {
     /// <summary>
     /// 車控發佈的 module_information 各元件狀態
@@ -13,7 +11,7 @@ namespace AGVSystemCommonNet6.Abstracts
         public enum COMPOENT_NAME
         {
             BATTERY,
-            DRIVER, 
+            DRIVER,
             IMU,
             BARCODE_READER,
             GUID_SENSOR,
@@ -41,7 +39,7 @@ namespace AGVSystemCommonNet6.Abstracts
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
 
-        public delegate  Task<bool> AlarmHappendDelegate(AlarmCodes alarm);
+        public delegate Task<bool> AlarmHappendDelegate(AlarmCodes alarm);
         public AlarmHappendDelegate OnAlarmHappened { get; set; }
 
         public object Data { get; }

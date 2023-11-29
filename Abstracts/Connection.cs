@@ -1,4 +1,4 @@
-﻿using AGVSystemCommonNet6.Alarm.VMS_ALARM;
+﻿using AGVSystemCommonNet6.Vehicle_Control.VMS_ALARM;
 using System.Net.NetworkInformation;
 
 namespace AGVSystemCommonNet6.Abstracts
