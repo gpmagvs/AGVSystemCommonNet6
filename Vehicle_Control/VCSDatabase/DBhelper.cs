@@ -99,14 +99,24 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             }
         }
 
-        public static int AlarmsTotalNum(string alarm_type = "All")
+        public static int AlarmsTotalNum(DateTime from, DateTime to, string alarm_type = "All", int code = 0)
         {
-            if (alarm_type.ToLower() == "all")
-                return db.Table<clsAlarmCode>().Count();
-            else if (alarm_type.ToLower() == "alarm")
-                return db.Table<clsAlarmCode>().Where(al => al.ELevel == clsAlarmCode.LEVEL.Alarm).Count();
-            else
-                return db.Table<clsAlarmCode>().Where(al => al.ELevel == clsAlarmCode.LEVEL.Warning).Count();
+            try
+            {
+
+                if (alarm_type.ToLower() == "all")
+                    return db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).Count();
+                else if (alarm_type.ToLower() == "alarm")
+                    return db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).Where(al => al.ELevel == clsAlarmCode.LEVEL.Alarm).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).Count();
+                else
+                    return db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).Where(al => al.ELevel == clsAlarmCode.LEVEL.Warning).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).Count();
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
 
         public static int ClearAllAlarm()
@@ -123,21 +133,33 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 
         }
 
-        public static List<clsAlarmCode> QueryAlarm(int page, int page_size = 16, string alarm_type = "All")
+        public static List<clsAlarmCode> QueryAlarmCodeClassifies()
         {
             try
             {
-                TableQuery<clsAlarmCode> query = null;
+                return db.Table<clsAlarmCode>().ToList().DistinctBy(al => al.EAlarmCode).OrderBy(al => al.Code).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public static List<clsAlarmCode> QueryAlarm(DateTime from, DateTime to, int page, int page_size = 16, string alarm_type = "All", int code = 0)
+        {
+            try
+            {
+                var query = new List<clsAlarmCode>();
                 if (alarm_type.ToLower() == "all")
                 {
-                    query = db.Table<clsAlarmCode>().OrderByDescending(f => f.Time).Skip(page_size * (page - 1)).Take(page_size);
+                    query = db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).OrderByDescending(f => f.Time).Skip(page_size * (page - 1)).Take(page_size).ToList();
                 }
                 else
                 {
                     clsAlarmCode.LEVEL filterLevel = alarm_type.ToLower() == "alarm" ? clsAlarmCode.LEVEL.Alarm : clsAlarmCode.LEVEL.Warning;
-                    query = db.Table<clsAlarmCode>().OrderByDescending(f => f.Time).Where(al => al.ELevel == filterLevel).Skip(page_size * (page - 1)).Take(page_size);
+                    query = db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).OrderByDescending(f => f.Time).Where(al => al.ELevel == filterLevel).Skip(page_size * (page - 1)).Take(page_size).ToList();
                 }
-                return query.ToList();
+                return query;
             }
             catch (Exception ex)
             {
