@@ -173,71 +173,7 @@ namespace AGVSystemCommonNet6.MAP
             }
         }
         [JsonIgnore]
-        public clsMapPoiintRegist RegistInfo = new clsMapPoiintRegist();
+        public clsPointRegistInfo RegistInfo = new clsPointRegistInfo();
 
-        /// <summary>
-        /// 註冊這個站點
-        /// </summary>
-        public bool TryRegistPoint(string AGVName, out clsMapPoiintRegist registInfo, bool IsBySystem = false)
-        {
-            try
-            {
-                registInfo = null;
-                if (RegistInfo == null)
-                    RegistInfo = new clsMapPoiintRegist();
-
-                if (RegistInfo.IsRegisted)
-                {
-                    if (!IsBySystem && RegistInfo.RegisterAGVName != AGVName)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
-
-                }
-                RegistInfo = new clsMapPoiintRegist()
-                {
-                    RegistTime = DateTime.Now,
-                    RegisterAGVName = AGVName
-                };
-                registInfo = RegistInfo;
-                RegistInfo.IsRegisted = true;
-                Console.WriteLine($"{AGVName} Regist Tag_{TagNumber}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-        }
-
-        public bool TryUnRegistPoint(string name, out string errMsg, bool IsBySystem = false)
-        {
-            errMsg = "";
-            if (RegistInfo == null)
-            {
-                RegistInfo = new clsMapPoiintRegist();
-                return true;
-            }
-            if (!RegistInfo.IsRegisted)
-                return true;
-
-            if (RegistInfo.RegisterAGVName != name && !IsBySystem)
-            {
-                errMsg = $"{this.Name} 由{RegistInfo.RegisterAGVName}註冊,除系統與註冊者以外不可解註冊";
-                return false;
-            }
-            else
-            {
-                Console.WriteLine($"{name} UnRegist Tag_{TagNumber}");
-                RegistInfo.RegisterAGVName = "";
-                RegistInfo.IsRegisted = false;
-                return true;
-            }
-        }
     }
 }

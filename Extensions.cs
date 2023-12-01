@@ -80,7 +80,17 @@ namespace AGVSystemCommonNet6
                 return "{}";
             }
         }
-
+        public static T Clone<T>(this T obt)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(obt.ToJson(Formatting.None));
+            }
+            catch (Exception)
+            {
+                return obt;
+            }
+        }
         public static string GetString(this byte[] byte_data, Encoding encoder)
         {
             try
@@ -139,7 +149,7 @@ namespace AGVSystemCommonNet6
         /// <returns></returns>
         public static double CalculateDistance(this MapPoint map_station, double from_loc_x, double from_loc_y)
         {
-            if(map_station==null)
+            if (map_station == null)
                 return -1;
             double distance = Math.Sqrt(Math.Pow(map_station.X - from_loc_x, 2) + Math.Pow(map_station.Y - from_loc_y, 2));
             Console.WriteLine($"Distance from {map_station.TagNumber} to ({from_loc_x},{from_loc_y}) is {distance}");

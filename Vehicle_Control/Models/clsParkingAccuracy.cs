@@ -1,11 +1,6 @@
 ﻿using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AGVSystemCommonNet6.Tools
+namespace AGVSystemCommonNet6.Vehicle_Control.Models
 {
     public class clsParkingAccuracy
     {
@@ -16,6 +11,13 @@ namespace AGVSystemCommonNet6.Tools
         public int ParkingTag { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
+
+        public double Slam_X { get; set; }
+        public double Slam_Y { get; set; }
+
+        public bool IsGoodParkingLoaction { get; set; } = true;
+
+        public double Slam_Theta { get; set; }
 
         public double DistanceToTagCenter
         {

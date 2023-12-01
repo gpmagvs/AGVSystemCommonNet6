@@ -14,12 +14,15 @@ namespace AGVSystemCommonNet6.Log
 
         public ConsoleColor Color { get; set; } = ConsoleColor.White;
 
-        public LogItem(LogLevel level, string logMsg, bool show_console = true, ConsoleColor color = ConsoleColor.White)
+        public string WriteToNewFileLogName { get; set; } = "";
+
+        public LogItem(LogLevel level, string logMsg, bool show_console = true, ConsoleColor color = ConsoleColor.White,string WriteToNewFileLogName="")
         {
             this.level = level;
             this.logMsg = logMsg;
             this.show_console = show_console;
             this.Color = color;
+            this.WriteToNewFileLogName = WriteToNewFileLogName;
         }
         public LogItem(string logMsg)
         {

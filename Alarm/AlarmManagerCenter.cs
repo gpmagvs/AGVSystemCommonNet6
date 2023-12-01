@@ -1,18 +1,10 @@
-﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
-using AGVSystemCommonNet6.Alarm.VMS_ALARM;
-using AGVSystemCommonNet6.Configuration;
+﻿using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Log;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.Alarm
 {
@@ -41,12 +33,20 @@ namespace AGVSystemCommonNet6.Alarm
         }
         public static async void SetAllAlarmChecked()
         {
-            using var db = new AGVSDatabase();
-            foreach (var alarm in db.tables.SystemAlarms.Where(al => !al.Checked))
+            try
             {
-                alarm.Checked = true;
+
+                using var db = new AGVSDatabase();
+                foreach (var alarm in db.tables.SystemAlarms.Where(al => !al.Checked))
+                {
+                    alarm.Checked = true;
+                }
+                int num = await db.SaveChanges();
             }
-            int num = await db.SaveChanges();
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
+            }
 
         }
         public static async Task UpdateAlarmAsync(clsAlarmDto alarmDto)
@@ -99,6 +99,7 @@ namespace AGVSystemCommonNet6.Alarm
                  });
             }
         }
+        static object AlarmLockObject = new object();
 
         public static async Task AddAlarmAsync(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
         {
@@ -132,6 +133,11 @@ namespace AGVSystemCommonNet6.Alarm
                     Time = DateTime.Now,
                     Source = source
                 };
+                lock (AlarmLockObject)
+                {
+                    alarmDto.Time = DateTime.Now;
+                }
+                
                 await AddAlarmAsync(alarmDto);
             }
             catch (Exception ex)
@@ -265,14 +271,22 @@ namespace AGVSystemCommonNet6.Alarm
         }
         public static async Task SetAlarmCheckedAsync(string eQName, int alarm_code, string checker_name = "")
         {
-            using (var dbhelper = new AGVSDatabase())
+            try
             {
-                var alarms = dbhelper.tables.SystemAlarms.Where(alarm => alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
-                foreach (var item in alarms)
+
+                using (var dbhelper = new AGVSDatabase())
                 {
-                    item.Checked = true;
+                    var alarms = dbhelper.tables.SystemAlarms.Where(alarm => alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
+                    foreach (var item in alarms)
+                    {
+                        item.Checked = true;
+                    }
+                    await dbhelper.SaveChanges();
                 }
-                await dbhelper.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
             }
         }
         public static async Task SetAlarmCheckedAsync(string eQName, ALARMS alarm_code, string checker_name = "")

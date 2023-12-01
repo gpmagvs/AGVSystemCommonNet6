@@ -21,7 +21,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 public string Json { get; internal set; }
                 public clsAGVSConnection.MESSAGE_TYPE MsgType { get; internal set; }
             }
-
+            private int SystemBytes = 4000;
             private Socket _SocketClient = null;
             private bool _ping_success = false;
             public string ClientIP { get; private set; } = "";
@@ -43,13 +43,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     get
                     {
-                        return Encoding.ASCII.GetString(buffer, 0, revedDataLen);
+                        return Encoding.UTF8.GetString(buffer, 0, revedDataLen);
                     }
                 }
 
                 public bool TryFindEndChar(out int lastIndexOfCR)
                 {
-                    lastIndexOfCR = revedString.LastIndexOf('\r');
+                    lastIndexOfCR = revedString.LastIndexOf('*');
                     if (lastIndexOfCR < 0)
                         return false;
                     return true;
@@ -130,23 +130,28 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     int revDataLen = ClientSocketState.socket.EndReceive(ar);
                     ClientSocketState.revedDataLen += revDataLen;
                     string str = ClientSocketState.revedString;
+
+                    if (str.Contains("0105"))
+                    {
+
+                    }
                     if (ClientSocketState.TryFindEndChar(out int index))
                     {
                         int remaindData = ClientSocketState.revedDataLen - (index + 1);
                         //0 =>整包都是完整資料
-                        if (remaindData != 0)
-                        {
-                            var newBuffer = new byte[clsSocketState.BufferSize];
-                            Array.Copy(ClientSocketState.buffer, index + 1, newBuffer, 0, remaindData);
-                            ClientSocketState.buffer = newBuffer;
-                            ClientSocketState.revedDataLen = remaindData;
-                        }
-                        else
-                        {
-                            await HandleClientMsg(ClientSocketState.revedString);
-                            ClientSocketState.buffer = new byte[clsSocketState.BufferSize];
-                            ClientSocketState.revedDataLen = 0;
-                        }
+                        //if (remaindData != 1)
+                        //{
+                        //    var newBuffer = new byte[clsSocketState.BufferSize];
+                        //    Array.Copy(ClientSocketState.buffer, index + 1, newBuffer, 0, remaindData);
+                        //    ClientSocketState.buffer = newBuffer;
+                        //    ClientSocketState.revedDataLen = remaindData;
+                        //}
+                        //else
+                        //{
+                        await HandleClientMsg(ClientSocketState.revedString);
+                        ClientSocketState.buffer = new byte[clsSocketState.BufferSize];
+                        ClientSocketState.revedDataLen = 0;
+                        //}
                     }
                     int offset = ClientSocketState.revedDataLen; //2
                     int toRevLen = clsSocketState.BufferSize - offset;
@@ -179,6 +184,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
             private async Task HandleClientMsg(string clientMsg)
             {
                 //"55688abc*\r"
+                if (clientMsg.Contains("0105"))
+                {
+
+                }
                 _ = Task.Factory.StartNew(() =>
                 {
                     string[] splited = clientMsg.Replace("*\r", "$").Split('$');
@@ -211,6 +220,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             clsTaskFeedbackMessage taskFeedback = JsonConvert.DeserializeObject<clsTaskFeedbackMessage>(json);
                             OnClientTaskFeedback?.Invoke(this, taskFeedback);
                         }
+
+                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.ACK_0302_TASK_DOWNLOADED_ACK)
+                        {
+                            clsTaskDownloadAckMessage taskDownloadFeedback = JsonConvert.DeserializeObject<clsTaskDownloadAckMessage>(json);
+                            if (TaskDownloadMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
+                            {
+                                var response = taskDownloadFeedback.Header.First().Value;
+                                LOG.INFO($"Task Download To {AGV_Name}, AGV Response={response.ToJson()}");
+                                taskDownload_AGV_ReturnCode = response.ReturnCode;
+                                TaskDownloadWaitMRE.Set();
+                            }
+                        }
                     }
 
                 });
@@ -220,7 +241,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 try
                 {
-                    SocketClient.Send(Encoding.ASCII.GetBytes(json + "*\r"));
+                    SocketClient.Send(Encoding.UTF8.GetBytes(json + "*\r"));
                 }
                 catch (Exception ex)
                 {
@@ -229,8 +250,50 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                 }
             }
-
-
+            private RETURN_CODE taskDownload_AGV_ReturnCode;
+            private ManualResetEvent TaskDownloadWaitMRE = new ManualResetEvent(false);
+            private clsTaskDownloadMessage TaskDownloadMsg;
+            public TaskDownloadRequestResponse SendTaskMessage(clsTaskDownloadData downloadData)
+            {
+                SystemBytes += 1;
+                TaskDownloadMsg = new clsTaskDownloadMessage()
+                {
+                    SystemBytes = SystemBytes,
+                    EQName = AGV_Name,
+                    Header = new Dictionary<string, clsTaskDownloadData>
+                             {
+                                 { "0301",downloadData }
+                             },
+                };
+                TaskDownloadWaitMRE.Reset();
+                SendJsonReply(JsonConvert.SerializeObject(TaskDownloadMsg));
+                LOG.INFO($"Task Download To {AGV_Name}, Wait Response...");
+                bool timeout = !TaskDownloadWaitMRE.WaitOne(TimeSpan.FromSeconds(3));
+                if (timeout)
+                {
+                    LOG.WARN($"Task Download To {AGV_Name}, Timeout!");
+                    return new TaskDownloadRequestResponse
+                    {
+                        ReturnCode = TASK_DOWNLOAD_RETURN_CODES.TASK_DOWN_LOAD_TIMEOUT
+                    };
+                }
+                else
+                {
+                    if (taskDownload_AGV_ReturnCode == RETURN_CODE.OK)
+                    {
+                        LOG.INFO($"Task Download To {AGV_Name}, AGV Accept!");
+                        return new TaskDownloadRequestResponse { ReturnCode = TASK_DOWNLOAD_RETURN_CODES.OK };
+                    }
+                    else
+                    {
+                        LOG.WARN($"Task Download To {AGV_Name}, AGV Return Code == {taskDownload_AGV_ReturnCode}");
+                        return new TaskDownloadRequestResponse
+                        {
+                            ReturnCode = TASK_DOWNLOAD_RETURN_CODES.TASK_CANCEL
+                        };
+                    }
+                }
+            }
         }
     }
 }

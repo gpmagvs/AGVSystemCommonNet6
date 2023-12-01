@@ -1,4 +1,4 @@
-﻿namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
+﻿namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 {
     public enum AlarmCodes
     {
@@ -43,6 +43,10 @@
         Vertical_Motor_Alarm = 410,
         Barcode_Module_Error = 500,
         IMU_Module_Error = 510,
+        IMU_Impacting_X_Dir = 511,
+        IMU_Impacting_Y_Dir = 512,
+        IMU_Impacting = 513,
+        IMU_Pitch_State_Error = 514,
         Guide_Module_Error = 520,
         Pin_Module_Communication_Error = 530,
         Front_Pin_Module_Communication_Error = 531,
@@ -245,6 +249,7 @@
         Handshake_Fail_TA4_EQ_BUSY_OFF = 3241,
         Handshake_Fail_TA5_EQ_L_REQ = 3242,
         Handshake_Fail_TA5_EQ_U_REQ = 3243,
+        Handshake_Fail_TA5_EQ_READY_NOT_OFF = 3244,
         Handshake_Fail_BAT_EXG_EQ_VALID_NOT_ON = 3245,
         Handshake_Fail_BAT_EXG_EQ_VALID_NOT_OFF = 3246,
         Handshake_Fail_BAT_EXG_EQ_TRREQ_NOT_ON,
@@ -433,6 +438,6 @@
         Exception_When_AGVC_AGVS_Task_Reset_CycleStop,
         GetVirtualIDFail,
         AGV_BarcodeReader_Not_Match_Tag_of_Destination,
-        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042,
+        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042
     }
 }

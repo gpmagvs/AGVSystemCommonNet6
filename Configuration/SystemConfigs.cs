@@ -9,7 +9,7 @@ namespace AGVSystemCommonNet6.Configuration
 {
     public class SystemConfigs
     {
-        public string DBConnection = "Data Source=D://param//Database//AGVSWebSystem.db";
+        public string DBConnection = "Server=127.0.0.1;Database=GPMAGVs;User Id=sa;Password=12345678;Encrypt=False";
         public string VMSHost = "http://localhost:5036";
         public string AGVSHost = "http://localhost:5216";
 

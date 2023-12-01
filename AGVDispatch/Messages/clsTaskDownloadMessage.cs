@@ -23,13 +23,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public string Task_Name { get; set; } = "";
 
         [JsonProperty("Task Simplex")]
-        public string Task_Simplex
-        {
-            get
-            {
-                return $"{Task_Name}-{Task_Sequence}";
-            }
-        }
+        public string Task_Simplex { get; set; } = "";
 
         [JsonProperty("Task Sequence")]
         public int Task_Sequence { get; set; }
@@ -171,16 +165,29 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         public clsOrderInfo OrderInfo { get; set; } = new clsOrderInfo();
 
-        [NonSerialized]
         public bool IsActionFinishReported = true;
-        [NonSerialized]
         public bool IsEQHandshake = false;
+
         /// <summary>
         /// 是否為本地任務
         /// </summary>
-        [NonSerialized]
         public bool IsLocalTask = false;
 
+        public bool IsSegmentTask
+        {
+            get
+            {
+                try
+                {
+                    return ExecutingTrajecory != null && (ExecutingTrajecory?.Length) != 0 && Destination != ExecutingTrajecory?.Last().Point_ID;
+                }
+                catch (Exception ex)
+                {
+                    LOG.WARN($" IsSegmentTask get fail:{ex.Message}");
+                    return false;
+                }
+            }
+        }
         /// <summary>
         /// 任務訂單的資訊
         /// </summary>
@@ -188,7 +195,48 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         {
             public string DestineName { get; set; } = "";
             public string SourceName { get; set; } = "";
+            public bool IsTransferTask { get; set; } = false;
             public ACTION_TYPE ActionName { get; set; } = ACTION_TYPE.NoAction;
+
+            public delegate bool GetPortExistStatusDelegate();
+            public static GetPortExistStatusDelegate OnGetPortExistStatus;
+
+            public string DisplayText
+            {
+                get
+                {
+                    if (ActionName == ACTION_TYPE.Carry)
+                    {
+                        bool cargoOnAGV = false;
+                        if (OnGetPortExistStatus != null)
+                        {
+                            cargoOnAGV = OnGetPortExistStatus();
+                        }
+                        return cargoOnAGV ? $"前往[{DestineName}]放貨(來源-[{SourceName}])" : $"前往[{SourceName}]取貨(目的地-{DestineName})";
+                    }
+                    else if (ActionName == ACTION_TYPE.Load)
+                    {
+                        return !IsTransferTask ? $"{DestineName}放貨" : $"[{DestineName}] 放貨中(來源-{SourceName})";
+                    }
+                    else if (ActionName == ACTION_TYPE.Unload)
+                    {
+                        return !IsTransferTask ? $"{DestineName}取貨" : $"[{SourceName}] 取貨中(目的地-{DestineName})";
+                    }
+                    else if (ActionName == ACTION_TYPE.Charge)
+                    {
+                        return $"前往[{DestineName}] 充電";
+                    }
+                    else if (ActionName == ACTION_TYPE.Unpark | ActionName == ACTION_TYPE.Discharge)
+                    {
+                        return $"退出充電站前往[{(IsTransferTask ? SourceName : DestineName)}]";
+                    }
+                    else if (ActionName == ACTION_TYPE.None)
+                    {
+                        return $"移動至[{DestineName}]";
+                    }
+                    return "";
+                }
+            }
 
         }
     }

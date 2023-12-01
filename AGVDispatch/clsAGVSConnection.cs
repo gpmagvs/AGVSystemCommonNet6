@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
@@ -83,7 +84,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             ACK_0324_VirtualID_ACK = 0324,
             UNKNOWN = 9999,
         }
-        public string LocalIP { get; }
+        public string LocalIP { get; set; }
         public AGV_MODEL AGV_Model { get; }
         public clsAGVSConnection(string IP, int Port, bool AutoPingServerCheck = true) : base(IP, Port, AutoPingServerCheck)
         {
@@ -130,7 +131,17 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 if (LocalIP != null)
                 {
                     IPEndPoint ipEndpoint = new IPEndPoint(IPAddress.Parse(LocalIP), 0);
-                    tcpClient = new TcpClient(ipEndpoint);
+                    try
+                    {
+                        tcpClient = new TcpClient(ipEndpoint);
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.ERROR($"[AGVS] Connect Fail..本地網卡IP設定錯誤-{ipEndpoint.Address.ToString()} 不可用", ex, true);
+                        tcpClient = null;
+                        await Task.Delay(3000);
+                        return false;
+                    }
                     tcpClient.ReceiveBufferSize = 65535;
                     tcpClient.Connect(IP, VMSPort);
                 }
@@ -200,7 +211,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             OnOnlineStateQueryFail?.Invoke(this, EventArgs.Empty);
                             if (!UseWebAPI)
                                 Disconnect();
-                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.AGVS_ALIVE_CHECK_TIMEOUT;
+                            Current_Warning_Code = AlarmCodes.AGVS_ALIVE_CHECK_TIMEOUT;
                             continue;
                         }
                         else
@@ -209,7 +220,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             Connected = true;
                             if (UseWebAPI)
                                 VMS_API_Call_Fail_Flag = false;
-                            Current_Warning_Code = Alarm.VMS_ALARM.AlarmCodes.None;
+                            Current_Warning_Code = AlarmCodes.None;
                         }
 
                         (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
@@ -320,8 +331,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public static MESSAGE_TYPE GetMESSAGE_TYPE(string message_json)
         {
-
-            var _Message = JsonConvert.DeserializeObject<Dictionary<string, object>>(message_json);
+            Dictionary<string, object>? _Message = new Dictionary<string, object>();
+            try
+            {
+                _Message = JsonConvert.DeserializeObject<Dictionary<string, object>>(message_json);
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR($"DeserializeObjec Error When GetMESSAGE_TYPE\r\n{message_json}", ex);
+                return MESSAGE_TYPE.UNKNOWN;
+            }
 
             string headerContent = _Message["Header"].ToString();
             var headers = JsonConvert.DeserializeObject<Dictionary<string, object>>(headerContent);

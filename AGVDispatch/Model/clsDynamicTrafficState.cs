@@ -21,36 +21,13 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
             WAIT_TRAFFIC_STATE_NOT_UPDATE_YET,
         }
         public Dictionary<string, clsAGVTrafficState> AGVTrafficStates { get; set; } = new Dictionary<string, clsAGVTrafficState>();
-        public List<MapPoint> RegistedPoints { get; set; } = new List<MapPoint>();
+        public Dictionary<int, clsPointRegistInfo> RegistedPoints { get; set; } = new Dictionary<int, clsPointRegistInfo>();
 
         /// <summary>
         /// 被系統交通管制中的路徑
         /// </summary>
         public Dictionary<string, MapPath> ControledPathesByTraffic { get; set; } = new Dictionary<string, MapPath>();
-
-        public TRAFFIC_ACTION GetTrafficStatusByTag(string agv_name, int tagNumber)
-        {
-            if (!AGVTrafficStates.TryGetValue(agv_name, out clsAGVTrafficState agv_state))
-                return TRAFFIC_ACTION.WAIT;
-
-            MapPoint? toPoint = RegistedPoints.FirstOrDefault(pt => pt.TagNumber == tagNumber);
-            if (toPoint == null)
-            {
-                return TRAFFIC_ACTION.PASS;
-            }
-
-            if (toPoint.RegistInfo.IsRegisted)
-            {
-                if (toPoint.RegistInfo.RegisterAGVName != agv_name)
-                {
-                    return TRAFFIC_ACTION.WAIT;
-                }
-                else
-                    return TRAFFIC_ACTION.PASS;
-            }
-            else
-                return TRAFFIC_ACTION.PASS;
-        }
+      
     }
 
     /// <summary>

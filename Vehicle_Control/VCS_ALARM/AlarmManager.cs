@@ -1,12 +1,10 @@
-﻿using AGVSystemCommonNet6.GPMRosMessageNet.Messages;
-using AGVSystemCommonNet6.Log;
-using AGVSystemCommonNet6.Tools.Database;
+﻿using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using Newtonsoft.Json;
 using SQLite;
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 
-namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
+namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 {
     public class AlarmManager
     {
@@ -34,7 +32,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
                 bool isAlarmDefaultUpdated = fiinfo.LastWriteTime > fiinfo_on_param_folder.LastWriteTime;
                 if (!alarm_json_file_exist | isAlarmDefaultUpdated)
                 {
-                    File.Copy(default_alarm_json_file_path, alarm_JsonFile,true);
+                    File.Copy(default_alarm_json_file_path, alarm_JsonFile, true);
                     LOG.TRACE($"Copy New AlarmList.json file to {alarm_JsonFile}");
                 }
                 AlarmList = JsonConvert.DeserializeObject<List<clsAlarmCode>>(File.ReadAllText(alarm_JsonFile));
@@ -93,7 +91,7 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             warning_save.Time = DateTime.Now;
             warning_save.ELevel = clsAlarmCode.LEVEL.Warning;
             warning_save.IsRecoverable = true;
-            var existAlar = (CurrentAlarms.FirstOrDefault(al => al.Value.EAlarmCode == Alarm_code));
+            var existAlar = CurrentAlarms.FirstOrDefault(al => al.Value.EAlarmCode == Alarm_code);
             if (existAlar.Value != null)
                 CurrentAlarms.TryRemove(existAlar.Key, out _);
             CurrentAlarms.TryAdd(warning_save.Time, warning_save);
@@ -157,42 +155,5 @@ namespace AGVSystemCommonNet6.Alarm.VMS_ALARM
             }
 
         }
-        public static AlarmCodes ConvertAGVCAlarmCode(AlarmCodeMsg alarm_code, out clsAlarmCode.LEVEL Level)
-        {
-            int code = alarm_code.AlarmCode;
-            int level = alarm_code.Level;
-            Level = level == 1 ? clsAlarmCode.LEVEL.Warning : clsAlarmCode.LEVEL.Alarm;
-
-            if (code == 1)
-                return AlarmCodes.Motion_control_Wrong_Received_Msg;
-            else if (code == 2)
-                return AlarmCodes.Motion_control_Wrong_Extend_Path;
-            else if (code == 3)
-                return AlarmCodes.Motion_control_Out_Of_Line_While_Forwarding_End;
-            else if (code == 4)
-                return AlarmCodes.Motion_control_Out_Of_Line_While_Tracking_End_Point;
-            else if (code == 5)
-                return AlarmCodes.Motion_control_Out_Of_Line_While_Moving;
-            else if (code == 6)
-                return AlarmCodes.Motion_control_Out_Of_Line_While_Secondary;
-            else if (code == 7)
-                return AlarmCodes.Motion_control_Missing_Tag_On_End_Point;
-            else if (code == 8)
-                return AlarmCodes.Motion_control_Missing_Tag_While_Moving;
-            else if (code == 9)
-                return AlarmCodes.Motion_control_Missing_Tag_While_Secondary;
-            else if (code == 10)
-                return AlarmCodes.Motion_control_Wrong_Initial_Position_In_Secondary;
-            else if (code == 11)
-                return AlarmCodes.Motion_control_Wrong_Initial_Angle_In_Secondary;
-            else if (code == 12)
-                return AlarmCodes.Motion_control_Wrong_Unknown_Code;
-            else if (code == 13)
-                return AlarmCodes.Map_Recognition_Rate_Too_Low;
-            else
-                return AlarmCodes.Motion_control_Wrong_Unknown_Code;
-        }
-
-
     }
 }
