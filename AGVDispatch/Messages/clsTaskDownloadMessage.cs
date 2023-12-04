@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6.GPMRosMessageNet.Actions;
 using AGVSystemCommonNet6.GPMRosMessageNet.Messages;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Vehicle_Control.Models;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient.Actionlib;
 using RosSharp.RosBridgeClient.MessageTypes.Geometry;
@@ -188,6 +189,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 }
             }
         }
+
+        [NonSerialized]
+        public List<clsVibrationRecord> VibrationRecords = new List<clsVibrationRecord>();
+
+
         /// <summary>
         /// 任務訂單的資訊
         /// </summary>

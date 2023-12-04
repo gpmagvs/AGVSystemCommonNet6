@@ -2,11 +2,8 @@
 
 namespace AGVSystemCommonNet6.Vehicle_Control.Models
 {
-    public class clsParkingAccuracy
+    public class clsParkingAccuracy: TaskStatusModelBase
     {
-        [PrimaryKey]
-        public DateTime Time { get; set; }
-        public string TaskName { get; set; } = "";
         public string ParkingLocation { get; set; } = "";
         public int ParkingTag { get; set; }
         public double X { get; set; }
