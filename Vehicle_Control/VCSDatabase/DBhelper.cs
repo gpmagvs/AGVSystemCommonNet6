@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.User;
 using AGVSystemCommonNet6.Vehicle_Control.Models;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
+using RosSharp.RosBridgeClient.MessageTypes.Std;
 using SQLite;
 using static AGVSystemCommonNet6.Log.clsAGVSLogAnaylsis;
 
@@ -329,19 +330,43 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 
             public static object QueryVibrationRecordsByTime(DateTime from, DateTime to)
             {
-                var tasksStaus = db?.Table<clsVibrationStatusWhenAGVMoving>().Where(s => s.Time >= from && s.Time <= to);
-                var data = tasksStaus.OrderBy(t => t.Time).SelectMany(t => t.VibrationRecords).ToList();
-                var output = new
+                try
                 {
-                    data = data,
-                    max_x = data.Max(v => Math.Abs(v.AccelermetorValue.x)),
-                    max_y = data.Max(v => Math.Abs(v.AccelermetorValue.y)),
-                    max_z = data.Max(v => Math.Abs(v.AccelermetorValue.z)),
-                    avg_x = data.Average(v => Math.Abs(v.AccelermetorValue.x)),
-                    avg_y = data.Average(v => Math.Abs(v.AccelermetorValue.y)),
-                    avg_z = data.Average(v => Math.Abs(v.AccelermetorValue.z))
-                };
-                return output;
+
+                    var tasksStaus = db?.Table<clsVibrationStatusWhenAGVMoving>().Where(s => s.Time >= from && s.Time <= to);
+                    var filtered = tasksStaus.OrderBy(t => t.Time).Where(t => t.VirbrationRecordsJsonString != "");
+                    var data = filtered.SelectMany(t => t.VibrationRecords).ToList();
+                    var output = new
+                    {
+                        data = data,
+                        max_x = data.Max(v => Math.Abs(v.AccelermetorValue.x)),
+                        max_y = data.Max(v => Math.Abs(v.AccelermetorValue.y)),
+                        max_z = data.Max(v => Math.Abs(v.AccelermetorValue.z)),
+                        avg_x = data.Average(v => Math.Abs(v.AccelermetorValue.x)),
+                        avg_y = data.Average(v => Math.Abs(v.AccelermetorValue.y)),
+                        avg_z = data.Average(v => Math.Abs(v.AccelermetorValue.z))
+                    };
+                    return output;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            public static clsEnums.SUB_STATUS QueryStatusWithTime(DateTime time)
+            {
+                var lastStatus = db.Table<clsAGVStatusTrack>().LastOrDefault(status => status.Time < time);
+                if (lastStatus != null)
+                    return lastStatus.Status;
+                else
+                    return clsEnums.SUB_STATUS.UNKNOWN;
+            }
+
+            public static List<clsAGVStatusTrack> QueryStatusWithTimeRange(DateTime from, DateTime to)
+            {
+                var lastStatus = db.Table<clsAGVStatusTrack>().Where(status => status.Time >= from && status.Time <= to);
+                return lastStatus.ToList();
             }
         }
     }

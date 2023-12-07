@@ -28,7 +28,8 @@ namespace AGVSystemCommonNet6
             Initializing = 5,
             ALARM = 6,
             WARNING = 7,
-            STOP
+            STOP,
+            UNKNOWN
         }
         public enum AGV_MODEL
         {
