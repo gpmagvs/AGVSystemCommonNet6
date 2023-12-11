@@ -71,6 +71,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         {
             try
             {
+                if (db.Table<UserEntity>().FirstOrDefault(user_ => user_.UserName == user.UserName) != null)
+                    return;
                 db.Insert(user);
             }
             catch (Exception ex)

@@ -11,6 +11,7 @@
         Zaxis_Up_Limit = 50,
         Zaxis_Down_Limit = 60,
         Wago_IO_Disconnect = 100,
+        Wago_IO_WRITE_Disconnect = 101,
         Wago_IO_Read_Fail = 120,
         Wago_IO_Write_Fail = 130,
         PLC_MC_Disconnect = 150,
