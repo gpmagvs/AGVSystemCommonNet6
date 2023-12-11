@@ -147,12 +147,12 @@ namespace AGVSystemCommonNet6
         /// <param name="from_loc_x"></param>
         /// <param name="from_loc_y"></param>
         /// <returns></returns>
-        public static double CalculateDistance(this MapPoint map_station, double from_loc_x, double from_loc_y)
+        public static double CalculateDistance(this MapPoint map_station, double from_loc_x, double from_loc_y,int tag=-1)
         {
             if (map_station == null)
                 return -1;
             double distance = Math.Sqrt(Math.Pow(map_station.X - from_loc_x, 2) + Math.Pow(map_station.Y - from_loc_y, 2));
-            Console.WriteLine($"Distance from {map_station.TagNumber} to ({from_loc_x},{from_loc_y}) is {distance}");
+            Console.WriteLine($"Distance from ({map_station.X},{map_station.Y}) (Tag:{map_station.TagNumber}) to ({from_loc_x},{from_loc_y})(Tag:{tag}) is {distance}");
             return distance;
         }
 
@@ -166,7 +166,7 @@ namespace AGVSystemCommonNet6
         /// <returns></returns>
         public static double CalculateDistance(this MapPoint map_station, MapPoint from_station)
         {
-            return map_station.CalculateDistance(from_station.X, from_station.Y);
+            return map_station.CalculateDistance(from_station.X, from_station.Y,from_station.TagNumber);
         }
 
 
