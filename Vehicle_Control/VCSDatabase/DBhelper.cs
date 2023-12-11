@@ -141,7 +141,40 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
                 throw ex;
             }
         }
-
+        public static int AddUDULDRecord(LDULDRecord record)
+        {
+            try
+            {
+                return db.Insert(record);
+            }
+            catch (SQLite.SQLiteException ex)
+            {
+                db.CreateTable(typeof(LDULDRecord));
+                return db.Insert(record);
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
+                return 0;
+            }
+        }
+        public static int ModifyUDLUDRecord(LDULDRecord reoc)
+        {
+            try
+            {
+                var exist_record = db.Table<LDULDRecord>().FirstOrDefault(rd => rd.StartTime == reoc.StartTime);
+                if (exist_record != null)
+                {
+                    return db.Update(reoc);
+                }
+                else
+                    return AddUDULDRecord(reoc);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
         public static int ClearAllAlarm()
         {
             try
