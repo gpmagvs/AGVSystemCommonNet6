@@ -431,6 +431,7 @@
         Fork_Initialized_But_Home_Input_Not_ON = 860031,
         Fork_Go_Home_But_Home_Sensor_Signal_Error = 860032,
         Fork_Initialized_But_Driver_Position_Not_ZERO = 860033,
+        Laser_Mode_Switch_Fail_DO_Write_Fail,
         Laser_Mode_Switch_Fail_Exception,
         Laser_Mode_Switch_Fail_Timeout,
         Localization_Fail,
