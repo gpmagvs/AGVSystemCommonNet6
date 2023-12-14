@@ -38,7 +38,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         public clsCST[] CST { get; set; } = new clsCST[0];
         public int Destination { get; set; }
-        public int Height { get; set; }
+        public int Height { get; set; } = 0;
 
         [JsonProperty("Escape Flag")]
         public bool Escape_Flag { get; set; }
