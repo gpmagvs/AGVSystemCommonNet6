@@ -10,7 +10,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
     {
 
         public static List<clsAlarmCode> AlarmList { get; private set; } = new List<clsAlarmCode>();
-        public static bool Active { get; set; } = true;
+        public static bool Active { get; set; } = false;
 
         public static ConcurrentDictionary<DateTime, clsAlarmCode> CurrentAlarms = new ConcurrentDictionary<DateTime, clsAlarmCode>()
         {
