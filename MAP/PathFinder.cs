@@ -130,7 +130,7 @@ namespace AGVSystemCommonNet6.MAP
 
                 if (startIndex == -1 | finalIndex == -1)
                 {
-                    return new clsPathInfo();
+                    return null;
                 }
 
                 var _startStation = staions_ordered[startIndex].Value;

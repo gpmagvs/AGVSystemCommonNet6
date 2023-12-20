@@ -97,6 +97,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public string To_Station { get; set; } = "-1";
 
         [Required]
+        public int Height { get; set; } = 0;
+
+        [Required]
         public string To_Slot { get; set; } = "-1";
 
         public string Carrier_ID { get; set; } = "";

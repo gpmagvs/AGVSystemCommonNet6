@@ -30,5 +30,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         /// </remark>
         /// </summary>
         public double VehicleLength { get; set; } = 145.0;
+
+        public List<int> List_ChargeStation { get; set; } = new List<int>();
     }
 }
