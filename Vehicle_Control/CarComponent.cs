@@ -60,6 +60,12 @@ namespace AGVSystemCommonNet6.Vehicle_Control
         }
 
 
-        public abstract void CheckStateDataContent();
+        public virtual void CheckStateDataContent()
+        {
+            if (_StateData == null)
+            {
+                return;
+            }
+        }
     }
 }
