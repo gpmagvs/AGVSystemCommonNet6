@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using RosSharp.RosBridgeClient;
+using System.Runtime.InteropServices;
 
 namespace AGVSystemCommonNet6.Vehicle_Control
 {
@@ -60,12 +61,14 @@ namespace AGVSystemCommonNet6.Vehicle_Control
         }
 
 
-        public virtual void CheckStateDataContent()
+        public virtual async Task<bool> CheckStateDataContent()
         {
             if (_StateData == null)
             {
-                return;
+                return false;
             }
+            else
+                return true;
         }
     }
 }
