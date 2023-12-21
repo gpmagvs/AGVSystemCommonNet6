@@ -113,6 +113,7 @@ namespace AGVSystemCommonNet6.MAP
             get
             {
                 return StationType == STATION_TYPE.STK |
+                    StationType == STATION_TYPE.Charge_STK |
                     StationType == STATION_TYPE.EQ |
                     StationType == STATION_TYPE.EQ_LD |
                     StationType == STATION_TYPE.EQ_ULD |
