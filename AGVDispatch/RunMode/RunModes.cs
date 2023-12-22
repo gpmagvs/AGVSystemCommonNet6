@@ -33,4 +33,10 @@ namespace AGVSystemCommonNet6.AGVDispatch.RunMode
         LOCAL,
         REMOTE
     }
+
+    public enum TRANSFER_MODE
+    {
+        MANUAL,
+        LOCAL_AUTO,
+    }
 }

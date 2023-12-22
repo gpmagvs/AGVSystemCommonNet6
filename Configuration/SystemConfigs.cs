@@ -24,6 +24,7 @@ namespace AGVSystemCommonNet6.Configuration
         public clsMapConfigs MapConfigs { get; set; } = new clsMapConfigs();
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
         public clsAGVTaskControlConfigs TaskControlConfigs { get; set; } = new clsAGVTaskControlConfigs();
+        public clsAutoModeConfigs AutoModeConfigs { get; set; } = new clsAutoModeConfigs();
     }
     public class clsMapConfigs
     {
@@ -40,6 +41,14 @@ namespace AGVSystemCommonNet6.Configuration
         public bool UseEQEmu { get; set; } = false;
         public string EquipmentManagementConfigFolder { get; set; } = "C://AGVS//EquipmentManagement_MEC";
 
+    }
+
+    public class clsAutoModeConfigs
+    {
+        /// <summary>
+        /// AGV閒置多久後自動產生充電任務
+        /// </summary>
+        public int AGVIdleTimeUplimitToExecuteChargeTask { get; set; } = 3;
     }
 
     public class clsAGVTaskControlConfigs

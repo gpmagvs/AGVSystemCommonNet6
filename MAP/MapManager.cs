@@ -112,6 +112,21 @@ namespace AGVSystemCommonNet6.MAP
                     map.Segments.Remove(p);
                 }
             }
+
+            var errorPath = map.Segments.FindAll(path => IsEqLinkButPropertyError(path));
+            foreach (var path in errorPath)
+            {
+                path.IsEQLink = true;
+            }
+
+            bool IsEqLinkButPropertyError(MapPath path)
+            {
+                if (path.IsEQLink)
+                    return false;
+                bool isStartPtEQ = map.Points[path.StartPtIndex].IsEquipment || map.Points[path.StartPtIndex].IsCharge;
+                bool isEndPtEQ = map.Points[path.EndPtIndex].IsEquipment || map.Points[path.EndPtIndex].IsCharge;
+                return isStartPtEQ || isEndPtEQ;
+            }
             return map;
             bool IsPointExistAtMap(int pointIndex)
             {
