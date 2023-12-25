@@ -123,7 +123,9 @@ namespace AGVSystemCommonNet6.MAP
                     StationType == STATION_TYPE.Elevator_LD |
                     StationType == STATION_TYPE.TrayEQ |
                     StationType == STATION_TYPE.TrayEQ_LD |
-                    StationType == STATION_TYPE.TrayEQ_ULD;
+                    StationType == STATION_TYPE.TrayEQ_ULD|
+                    StationType == STATION_TYPE.Charge_STK|
+                    StationType == STATION_TYPE.Charge_Buffer;
             }
         }
 
