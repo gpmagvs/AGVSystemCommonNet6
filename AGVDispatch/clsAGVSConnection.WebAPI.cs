@@ -5,6 +5,7 @@ using AGVSystemCommonNet6.Log;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             LogMsgToAGVS($"(Post) {api_route},body json = {status.ToJson()}");
             var response = await VMSWebAPIHttp.PostAsync<Dictionary<string, object>, clsRunningStatus>(api_route, status);
             LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
-            var returnCode = int.Parse(response["ReturnCode"].ToString());
+            var returnCode = int.Parse(response["ReturnCode"].ToString());          
             return new SimpleRequestResponse
             {
                 ReturnCode = Enum.GetValues(typeof(RETURN_CODE)).Cast<RETURN_CODE>().First(code => ((int)code) == returnCode),

@@ -226,6 +226,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             try
             {
+                Thread.Sleep(10);
                 if (UseWebAPI)
                 {
                     var response = await GetOnlineMode();
