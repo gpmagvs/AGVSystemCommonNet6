@@ -169,10 +169,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             _ = Task.Factory.StartNew(async () =>
             {
+                int _delay = UseWebAPI ? 50 : 300;
                 while (true)
                 {
-                    GC.Collect();
-                    await Task.Delay(300);
+                    //GC.Collect();
+                    await Task.Delay(_delay);
                     CheckAndClearOlderMessageStored();
                     try
                     {
@@ -192,7 +193,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         IsGetOnlineModeTrying = false;
                         while (!result.Item1)
                         {
-                            Thread.Sleep(1000);
+                            Thread.Sleep(10);
                             retryCnt += 1;
                             if (retryCnt > 10)
                                 break;
@@ -202,6 +203,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (!result.Item1)
                             {
                                 LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/10", false);
+                                Thread.Sleep(1000);
                             }
                         }
 

@@ -69,7 +69,7 @@ namespace AGVSystemCommonNet6.HttpTools
         public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data)
         {
             string contentDataJson = string.Empty;
-            string url = this.baseUrl + api_route;
+            string url = this.baseUrl + (this.baseUrl.Last() == '/' ? "" : "/") + api_route;
             if (data != null)
                 contentDataJson = JsonConvert.SerializeObject(data);
             StringContent content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
@@ -102,7 +102,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tout> GetAsync<Tout>(string api_route)
+        public async Task<Tin> GetAsync<Tin>(string api_route)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     jsonContent = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<Tout>(jsonContent);
+                    var result = JsonConvert.DeserializeObject<Tin>(jsonContent);
                     return result;
                 }
                 else
