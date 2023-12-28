@@ -32,7 +32,7 @@ namespace AGVSystemCommonNet6.MAP.Converter
             {
                 Name = subMap.MapName,
                 Bays = new Dictionary<string, Bay>(),
-                Note = $"This is created from YunTechMap( Maptxt={subMap.Maptxt} , MapName= {subMap.MapName})",
+                Note = $"{DateTime.Now.ToString("yyyyMMdd")}.87",
                 Points = subMap.Mapsub.ToDictionary(sub => subMap.Mapsub.ToList().IndexOf(sub), sub => new MapPoint()
                 {
                     Enable = true,
