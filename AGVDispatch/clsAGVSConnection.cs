@@ -167,13 +167,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task<bool> Start()
         {
-            _ = Task.Factory.StartNew(async () =>
+            _ = Task.Run(async () =>
             {
-                int _delay = UseWebAPI ? 50 : 300;
+                int _delay = UseWebAPI ? 150 : 1000;
                 while (true)
                 {
-                    //GC.Collect();
-                    await Task.Delay(_delay);
+                    Thread.Sleep(_delay);
                     CheckAndClearOlderMessageStored();
                     try
                     {
