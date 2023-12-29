@@ -55,6 +55,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         public virtual string[] CSTID { get; set; } = new string[0];
         public virtual double Odometry { get; set; } = 0;
         public virtual double[] Electric_Volume { get; set; } = new double[2] { 0, 0 };
+        public virtual double[] Electric_Temperatures { get; set; } = new double[2] { 23.0, 23.0 };
 
         public virtual clsAlarmCode[] Alarm_Code { get; set; } = new clsAlarmCode[0];
         public virtual double Fork_Height { get; set; }
