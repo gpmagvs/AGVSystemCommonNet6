@@ -40,7 +40,11 @@ namespace AGVSystemCommonNet6.MAP
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<string, Bay> Bays { get; set; } = new Dictionary<string, Bay>();
 
-
+        public int GetPointIndexByGraphDisplayName(string name)
+        {
+            var pt = Points.FirstOrDefault(pt => pt.Value.Graph.Display == name);
+            return pt.Value == null ? -1 : pt.Key;
+        }
         public IEnumerable<int> GetStationTags()
         {
             return Points.Where(pt => pt.Value.StationType != STATION_TYPE.Normal).Select(pt => pt.Value.TagNumber).ToList();
