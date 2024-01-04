@@ -48,7 +48,7 @@ namespace AGVSystemCommonNet6.MAP
         }
         public static Map LoadMapFromFile()
         {
-            return LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string msg, false, false);
+            return LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string msg, false, true);
 
         }
         public static List<MapPath> CreateSegments(Map map)
