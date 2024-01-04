@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AGVSystemCommonNet6.Log;
+using Newtonsoft.Json;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -8,10 +9,13 @@ namespace AGVSystemCommonNet6.HttpTools
     {
         public delegate object DataFetchDelegate(string ws_path);
         public DataFetchDelegate OnDataFetching;
-        public clsWebsocktClientHandler(WebSocket webSocket, string path)
+        public event EventHandler<string> OnClientLeve;
+        public string UserID = "";
+        public clsWebsocktClientHandler(WebSocket webSocket, string path, string UserID = "")
         {
             WebSocket = webSocket;
             Path = path;
+            this.UserID = UserID;
         }
 
         public WebSocket WebSocket { get; }
@@ -64,6 +68,10 @@ namespace AGVSystemCommonNet6.HttpTools
                 {
                     break;
                 }
+            }
+            if (UserID != "")
+            {
+                OnClientLeve?.Invoke(this, UserID);
             }
             closeFlag = true;
             WebSocket.Dispose();

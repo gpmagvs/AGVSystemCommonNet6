@@ -181,7 +181,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         {
                             if (!UseWebAPI)
                             {
-                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{VMSPort})", false);
+                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP({IP}:{VMSPort})", false);
                                 bool Reconnected = await Connect();
                                 Connected = Reconnected;
                                 continue;
