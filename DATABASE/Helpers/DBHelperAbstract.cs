@@ -21,19 +21,24 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             connection_str = AGVSConfigulator.SysConfigs.DBConnection;
             dbhelper = new DbContextHelper(connection_str);
         }
-
+        public static object lockObj = new object();
         public async Task<int> SaveChanges()
         {
-            try
+            lock (lockObj)
             {
-                return dbhelper._context.SaveChanges();
+                try
+                {
+                    return dbhelper._context.SaveChanges();
+
+                }
+                catch (Exception ex)
+                {
+                    LOG.ERROR(ex);
+                    return 0;
+                }
 
             }
-            catch (Exception ex)
-            {
-                LOG.ERROR(ex);
-                return 0;
-            }
+            
         }
 
         protected virtual void Dispose(bool disposing)
