@@ -36,7 +36,7 @@ namespace AGVSystemCommonNet6.Log
         {
             if (WriteLogToFileTask == null)
             {
-                WriteLogToFileTask = Task.Factory.StartNew(() => WriteLogWorker());
+                WriteLogToFileTask = Task.Run(() => WriteLogWorker());
             }
             logItem.Caller = caller_class_name;
             logItem.Time = DateTime.Now;
@@ -48,7 +48,7 @@ namespace AGVSystemCommonNet6.Log
 
             while (true)
             {
-                await Task.Delay(1);
+                Thread.Sleep(1);
 
                 if (logItemQueue.TryDequeue(out var logItem))
                 {
