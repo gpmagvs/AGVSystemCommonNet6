@@ -101,7 +101,7 @@ namespace AGVSystemCommonNet6.Alarm
         }
         static object AlarmLockObject = new object();
 
-        public static async Task AddAlarmAsync(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
+        public static async Task<clsAlarmDto> AddAlarmAsync(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
         {
             if (!Initialized)
                 Initialize();
@@ -139,10 +139,12 @@ namespace AGVSystemCommonNet6.Alarm
                 }
                 
                 await AddAlarmAsync(alarmDto);
+                return alarmDto;
             }
             catch (Exception ex)
             {
                 LOG.ERROR("AddAlarmAsync", ex);
+                return null;
             }
         }
 
