@@ -43,7 +43,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         AGV_Need_Park_Above_Tag = 412,
         Cannot_Switch_Remote_Mode_When_Task_Executing = 413,
         AGV_Not_Initialized = 414,
-        Busy = 415
+        Busy = 415,
+        Current_Tag_Cannot_Online_In_Equipment = 416,
     }
     public enum PROCESS_RESULT
     {

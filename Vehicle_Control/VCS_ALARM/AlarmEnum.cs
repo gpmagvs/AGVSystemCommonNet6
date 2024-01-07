@@ -76,6 +76,7 @@
         Fork_Bumper_Error_Down = 712,
         Fork_Height_Setting_Error = 713,
         Fork_Pose_Change_Too_Large = 714,
+        Fork_Pose_Change_Fail_When_Reach_Secondary = 715,
         Ground_Hole_Sensor_Error = 800,
         Ground_Hole_Sensor_Error_Left_Front = 801,
         Ground_Hole_Sensor_Error_Right_Front = 802,
@@ -117,6 +118,7 @@
         Monitor_Switch_Error_ = 1060,
         Cant_Online_Without_Tag = 1070,
         Cant_Online_With_Forbid_Tag = 1071,
+        Cant_Online_In_Equipment = 1072,
         /// <summary>
         /// 前方遠處障礙物
         /// </summary>
@@ -441,6 +443,7 @@
         Exception_When_AGVC_AGVS_Task_Reset_CycleStop,
         GetVirtualIDFail,
         AGV_BarcodeReader_Not_Match_Tag_of_Destination,
-        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042
+        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042,
+
     }
 }
