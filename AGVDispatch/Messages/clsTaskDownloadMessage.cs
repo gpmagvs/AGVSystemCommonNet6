@@ -201,6 +201,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         {
             public string DestineName { get; set; } = "";
             public string SourceName { get; set; } = "";
+
+            public int DestineTag { get; set; } = 0;
+            public int SourceTag { get; set; } = 0;
             public bool IsTransferTask { get; set; } = false;
             public ACTION_TYPE ActionName { get; set; } = ACTION_TYPE.NoAction;
 
