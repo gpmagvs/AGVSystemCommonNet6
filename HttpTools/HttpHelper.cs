@@ -20,7 +20,24 @@ namespace AGVSystemCommonNet6.HttpTools
         public HttpClient http_client { get; private set; }
         public LogBase Logger;
         public readonly string baseUrl;
-        public int timeout_sec { get; set; } = 5;
+        private int _timeout_sec = 5;
+        public int timeout_sec
+        {
+            get => _timeout_sec;
+            set
+            {
+                if (_timeout_sec != value)
+                {
+                    _timeout_sec = value;
+                    http_client?.Dispose();
+                    http_client = new HttpClient()
+                    {
+                        Timeout = TimeSpan.FromSeconds(value),
+                        BaseAddress = new Uri(baseUrl)
+                    };
+                }
+            }
+        }
         public HttpHelper(string baseUrl, int timeout_sec = 3)
         {
             this.baseUrl = baseUrl;
@@ -41,7 +58,7 @@ namespace AGVSystemCommonNet6.HttpTools
             try
             {
                 Stopwatch sw = Stopwatch.StartNew();
-                http_client.Timeout = TimeSpan.FromSeconds(timeout);
+                timeout_sec = timeout;
                 var response = await http_client.PostAsync(api_route, content);
                 if (response.IsSuccessStatusCode)
                 {
@@ -76,8 +93,7 @@ namespace AGVSystemCommonNet6.HttpTools
             StringContent content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
             try
             {
-                Stopwatch sw = Stopwatch.StartNew();
-                http_client.Timeout = TimeSpan.FromSeconds(timeout);
+                timeout_sec = timeout;
                 var response = await http_client.PostAsync(api_route, content);
                 if (response.IsSuccessStatusCode)
                 {
@@ -104,14 +120,14 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tin> GetAsync<Tin>(string api_route,int timeout = 3)
+        public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 3)
         {
             try
             {
                 string jsonContent = "";
                 string url = this.baseUrl + $"{api_route}";
                 HttpResponseMessage response = null;
-                http_client.Timeout = TimeSpan.FromSeconds(timeout);
+                timeout_sec =timeout;
                 response = await http_client.GetAsync(api_route);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
