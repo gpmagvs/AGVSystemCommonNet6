@@ -225,11 +225,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     }
                     else if (ActionName == ACTION_TYPE.Load)
                     {
-                        return !IsTransferTask ? $"{DestineName}放貨" : $"[{DestineName}] 放貨中(來源-{SourceName})";
+                        return !IsTransferTask ? $"{DestineName}放貨" : $"[{DestineName}] 放貨(來源-{SourceName})";
                     }
                     else if (ActionName == ACTION_TYPE.Unload)
                     {
-                        return !IsTransferTask ? $"{DestineName}取貨" : $"[{SourceName}] 取貨中(目的地-{DestineName})";
+                        return !IsTransferTask ? $"{DestineName}取貨" : $"[{SourceName}] 取貨(目的地-{DestineName})";
                     }
                     else if (ActionName == ACTION_TYPE.Charge)
                     {

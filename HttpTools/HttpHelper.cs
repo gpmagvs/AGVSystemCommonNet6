@@ -31,7 +31,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 BaseAddress = new Uri(baseUrl)
             };
         }
-        public async Task<(bool success, string json)> PostAsync(string api_route, object data)
+        public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 3)
         {
             string contentDataJson = string.Empty;
             string url = this.baseUrl + api_route;
@@ -41,6 +41,7 @@ namespace AGVSystemCommonNet6.HttpTools
             try
             {
                 Stopwatch sw = Stopwatch.StartNew();
+                http_client.Timeout = TimeSpan.FromSeconds(timeout);
                 var response = await http_client.PostAsync(api_route, content);
                 if (response.IsSuccessStatusCode)
                 {
@@ -66,7 +67,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data)
+        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 3)
         {
             string contentDataJson = string.Empty;
             string url = this.baseUrl + (this.baseUrl.Last() == '/' ? "" : "/") + api_route;
@@ -76,6 +77,7 @@ namespace AGVSystemCommonNet6.HttpTools
             try
             {
                 Stopwatch sw = Stopwatch.StartNew();
+                http_client.Timeout = TimeSpan.FromSeconds(timeout);
                 var response = await http_client.PostAsync(api_route, content);
                 if (response.IsSuccessStatusCode)
                 {
@@ -102,13 +104,14 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tin> GetAsync<Tin>(string api_route)
+        public async Task<Tin> GetAsync<Tin>(string api_route,int timeout = 3)
         {
             try
             {
                 string jsonContent = "";
                 string url = this.baseUrl + $"{api_route}";
                 HttpResponseMessage response = null;
+                http_client.Timeout = TimeSpan.FromSeconds(timeout);
                 response = await http_client.GetAsync(api_route);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

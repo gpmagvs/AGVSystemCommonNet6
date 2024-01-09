@@ -37,7 +37,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 return null;
             }
         }
-        public static void SaveVMSVehicleGroupSetting(string Vehicle_Json_file,string json)
+        public static void SaveVMSVehicleGroupSetting(string Vehicle_Json_file, string json)
         {
             File.WriteAllText(Vehicle_Json_file, json);
         }
@@ -48,7 +48,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         /// <returns></returns>
         public static async Task AliveCheckWorker()
         {
-            _ = Task.Factory.StartNew(async () =>
+            _ = Task.Run(async () =>
             {
                 IsAlive = true;
                 Stopwatch sw = Stopwatch.StartNew();
@@ -67,7 +67,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
 
                 while (true)
                 {
-                    await Task.Delay(1000);
+                    Thread.Sleep(5000);
                     try
                     {
                         bool hasVmsDisconnectAlarm = alarm != null;
@@ -133,7 +133,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 return null;
             }
         }
-        public static async Task<(bool confirm, string message)> RunModeSwitch(RUN_MODE mode, bool forecing_change=false)
+        public static async Task<(bool confirm, string message)> RunModeSwitch(RUN_MODE mode, bool forecing_change = false)
         {
             //confirm = confirm, message
             try
@@ -154,7 +154,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             try
             {
                 HttpHelper http = new HttpHelper(VMSHostUrl);
-                bool alive = await http.GetAsync<bool>($"/api/System/VMSAliveCheck");
+                bool alive = await http.GetAsync<bool>($"/api/System/VMSAliveCheck", 5);
                 return (alive, "");
             }
             catch (Exception ex)
