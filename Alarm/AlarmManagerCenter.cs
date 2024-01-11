@@ -137,8 +137,9 @@ namespace AGVSystemCommonNet6.Alarm
                 {
                     alarmDto.Time = DateTime.Now;
                 }
-                
+
                 await AddAlarmAsync(alarmDto);
+                LOG.INFO($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
                 return alarmDto;
             }
             catch (Exception ex)

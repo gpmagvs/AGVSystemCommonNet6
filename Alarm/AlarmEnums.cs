@@ -89,7 +89,8 @@ namespace AGVSystemCommonNet6.Alarm
         Destine_Normal_Station_Has_Task_To_Reach = 70,
         Destine_Eq_Station_Has_Task_To_Park = 71,
         Destine_Charge_Station_Has_AGV = 72,
-        PING_CHECK_FAIL = 73
+        PING_CHECK_FAIL = 73,
+        Download_Task_To_AGV_Fail = 74
     }
 
 }
