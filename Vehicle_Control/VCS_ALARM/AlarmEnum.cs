@@ -267,6 +267,9 @@
         AGVS_ALIVE_CHECK_TIMEOUT = 3501,
         AGVs_Disconnected = 3502,
         AGVS_PING_FAIL = 3503,
+        Task_Feedback_T1_Timeout = 3504,
+        OnlineModeQuery_T1_Timeout = 3505,
+        RunningStatusReport_T1_Timeout = 3506,
         Under_voltage_protection = 4010,
         Under_voltage_protection_Action = 4011,
         Under_voltage_protection_1 = 4012,
@@ -400,6 +403,7 @@
         Under_Temperature = 5080,
         Under_Temperature_1_ = 5081,
         Under_Temperature_2_ = 5082,
+        EQP_PORT_HAS_OBSTACLE_BY_LSR = 7000,
         License_Error = 9990,
         License_Error_0x0000NOF3E7 = 9991,
         License_Error_0x0000NRD3E7 = 9992,
@@ -412,7 +416,6 @@
         ROS_Bridge_server_Disconnect = 860005,
         AGV_Pose_Angle_Not_Match_To_Sick_Angle = 860006,
         USER_Press_SoftwareEMO_But_Exception_Occur = 860007,
-        Task_Feedback_T1_Timeout = 860010,
         EQP_LOAD_BUT_EQP_HAS_OBSTACLE = 860011,
         EQP_UNLOAD_BUT_EQP_HAS_NO_CARGO = 860012,
         Cant_Change_Online_Mode_Code_Error = 860013,
@@ -444,6 +447,5 @@
         GetVirtualIDFail,
         AGV_BarcodeReader_Not_Match_Tag_of_Destination,
         AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042,
-
     }
 }
