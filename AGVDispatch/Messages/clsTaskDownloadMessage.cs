@@ -166,7 +166,19 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         public clsOrderInfo OrderInfo { get; set; } = new clsOrderInfo();
 
-        public bool IsActionFinishReported = true;
+        private bool _IsActionFinishReported = true;
+        public bool IsActionFinishReported
+        {
+            get => _IsActionFinishReported;
+            set
+            {
+                if (_IsActionFinishReported != value)
+                {
+                    _IsActionFinishReported = value;
+                    LOG.INFO($"{Task_Name} Action Finish 上報狀態:{(value ? "已上報派車完成" : "未上報派車完成")}");
+                }
+            }
+        }
         public bool IsEQHandshake = false;
 
         /// <summary>

@@ -166,7 +166,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return string.Format("{0}*{1}", json, "\r");
         }
 
-        internal static byte[] CreateTaskFeedbackMessageData(string EQName, string SID, clsTaskDownloadData taskData, int PointIndex, TASK_RUN_STATUS task_status, int tag, clsCoordination coordination, out clsTaskFeedbackMessage taskFeedbackMessage)
+        internal static byte[] CreateTaskFeedbackMessageData(string EQName, string SID, string TaskName,string TaskSimplex,int TaskSequence, int PointIndex, TASK_RUN_STATUS task_status, int tag, clsCoordination coordination, out clsTaskFeedbackMessage taskFeedbackMessage)
         {
             taskFeedbackMessage = new clsTaskFeedbackMessage()
             {
@@ -177,9 +177,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                    {
                        {"0303", new FeedbackData
                         {
-                           TaskName = taskData.Task_Name,
-                           TaskSimplex = taskData.Task_Simplex,
-                           TaskSequence = taskData.Task_Sequence,
+                           TaskName =TaskName,
+                           TaskSimplex = TaskSimplex,
+                           TaskSequence =TaskSequence,
                            PointIndex = PointIndex,
                            TaskStatus = task_status,
                            LastVisitedNode= tag,

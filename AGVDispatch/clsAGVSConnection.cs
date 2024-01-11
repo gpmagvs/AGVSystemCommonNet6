@@ -33,9 +33,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public GetRunningDataUseWebAPIProtocolDelegate OnWebAPIProtocolGetRunningStatus;
         public GetRunningDataUseTCPIPProtocolDelegate OnTcpIPProtocolGetRunningStatus;
 
-        public event EventHandler OnOnlineStateQueryFail;
         public event EventHandler<clsTaskDownloadData> OnTaskDownloadFeekbackDone;
         public event EventHandler OnConnectionRestored;
+
+        public event EventHandler OnOnlineModeQuery_T1Timeout;
+        public event EventHandler OnRunningStatusReport_T1Timeout;
+        public event EventHandler<FeedbackData> OnTaskFeedBack_T1Timeout;
+
         public taskDonwloadExecuteDelage OnTaskDownload;
         public onlineModeChangeDelelage OnRemoteModeChanged;
         public taskResetReqDelegate OnTaskResetReq;
@@ -55,8 +59,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     if (value)
                         OnConnectionRestored?.Invoke(this, EventArgs.Empty);
-                    else
+                    else if (!IsGetOnlineModeTrying)
+                    {
                         OnDisconnected?.Invoke(this, EventArgs.Empty);
+                    }
                     _Connected = value;
                 }
             }
@@ -190,9 +196,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         (bool, OnlineModeQueryResponse onlineModeQuAck) result = (false, new OnlineModeQueryResponse());
                         int retryCnt = 0;
                         IsGetOnlineModeTrying = false;
+                        CancellationTokenSource onlineMode_query_t1_timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
                         while (!result.Item1)
                         {
                             Thread.Sleep(10);
+                            if (onlineMode_query_t1_timeout.IsCancellationRequested)
+                            {
+                                OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
+                                Current_Warning_Code = AlarmCodes.OnlineModeQuery_T1_Timeout;
+                                break;
+                            }
                             retryCnt += 1;
                             if (retryCnt > 10)
                                 break;
@@ -202,17 +215,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (!result.Item1)
                             {
                                 LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/10", false);
-                                Thread.Sleep(1000);
+                                Thread.Sleep(200);
                             }
                         }
 
                         if (!result.Item1)
                         {
                             LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
-                            OnOnlineStateQueryFail?.Invoke(this, EventArgs.Empty);
                             if (!UseWebAPI)
                                 Disconnect();
-                            Current_Warning_Code = AlarmCodes.AGVS_ALIVE_CHECK_TIMEOUT;
                             continue;
                         }
                         else
@@ -223,13 +234,23 @@ namespace AGVSystemCommonNet6.AGVDispatch
                                 VMS_API_Call_Fail_Flag = false;
                             Current_Warning_Code = AlarmCodes.None;
                         }
+                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = new(false, null);
 
-                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
-                        if (!runningStateReport_result.Item1)
+                        CancellationTokenSource runningStatusReport_t1_timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                        while (!runningStateReport_result.Item1)
                         {
-                            LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                            Thread.Sleep(1);
+                            if (runningStatusReport_t1_timeout.IsCancellationRequested)
+                            {
+                                Current_Warning_Code = AlarmCodes.RunningStatusReport_T1_Timeout;
+                                LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                                OnRunningStatusReport_T1Timeout?.Invoke(this, EventArgs.Empty);
+                                break;
+                            }
+                            runningStateReport_result = TryRnningStateReportAsync().Result;
                         }
 
+                        Current_Warning_Code = AlarmCodes.None;
                     }
                     catch (Exception ex)
                     {

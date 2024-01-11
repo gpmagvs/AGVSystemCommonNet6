@@ -16,7 +16,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSConnection
     {
-
         private bool TryTaskDownloadReqAckAsync(bool accept_task, int system_byte)
         {
             if (AGVSMessageStoreDictionary.TryRemove(system_byte, out MessageBase _retMsg))
@@ -30,29 +29,40 @@ namespace AGVSystemCommonNet6.AGVDispatch
             else
                 return false;
         }
+        public class clsActionFinishFeedback
+        {
 
-        public async Task TryTaskFeedBackAsync(clsTaskDownloadData taskData, int point_index, TASK_RUN_STATUS task_status, int currentTAg, clsCoordination coordination, bool isTaskCancel = false, CancellationTokenSource cts = null)
+        }
+        public async Task TryTaskFeedBackAsync(string TaskName, string TaskSimplex, int TaskSequence, int point_index, TASK_RUN_STATUS task_status, int currentTAg, clsCoordination coordination, bool isTaskCancel = false, CancellationTokenSource cts = null)
         {
             await Task.Factory.StartNew(async () =>
             {
-                cts = cts == null ? new CancellationTokenSource(TimeSpan.FromSeconds(10)) : cts;
+                cts = cts == null ? new CancellationTokenSource(TimeSpan.FromSeconds(5)) : cts;
+                var _T1TimeoutCancelToskSource = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(EQName, SID,
+                    TaskName, TaskSimplex, TaskSequence, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
+                FeedbackData _FeedbackData = msg.Header.Values.First();
+                LOG.INFO($"Try Task Feedback to AGVS_Looping start::: {task_status},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}");
                 while (true)
                 {
                     Thread.Sleep(1);
-                    if (cts.IsCancellationRequested)
+                    if (_T1TimeoutCancelToskSource.IsCancellationRequested)
                     {
-                        LOG.INFO($"Try Task Feedback to AGVS {task_status},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")} => Canceled");
+                        OnTaskFeedBack_T1Timeout?.Invoke(this, _FeedbackData);
                         break;
                     }
-                    LOG.INFO($"Try Task Feedback to AGVS {task_status},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}");
+                    if (cts.IsCancellationRequested)
+                    {
+                        LOG.WARN($"Task Feedback to AGVS({task_status})=> Canceled because process process canceled");
+                        break;
+                    }
                     try
                     {
-                        byte[] data = AGVSMessageFactory.CreateTaskFeedbackMessageData(EQName, SID, taskData, point_index, task_status, currentTAg, coordination, out clsTaskFeedbackMessage msg);
 
                         if (UseWebAPI)
                         {
-                            SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(msg.Header.Values.First()));
-                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
+                            SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(_FeedbackData));
+                            LOG.INFO($" Task Feedback to AGVS RESULT(Task:{TaskName}_{TaskSimplex},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
                             return;
                         }
                         else
@@ -61,7 +71,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase _retMsg))
                             {
                                 clsSimpleReturnMessage msg_return = (clsSimpleReturnMessage)_retMsg;
-                                LOG.INFO($" Task Feedback to AGVS RESULT(Task:{taskData.Task_Name}_{taskData.Task_Simplex}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {msg_return.ReturnData.ReturnCode}");
+                                LOG.INFO($"Task Feedback to AGVS RESULT" +
+                                    $"(\r\nTaskName   :{TaskName}" +
+                                    $"\r\nTaskSimplex :{TaskSimplex}" +
+                                    $"\r\nPoint Index :{point_index}(Tag:{currentTAg})" +
+                                    $"\r\nStatus      :{task_status.ToString()})" +
+                                    $"\r\nResult      :{msg_return.ReturnData.ReturnCode}", color: msg_return.ReturnData.ReturnCode == RETURN_CODE.OK ? ConsoleColor.White : ConsoleColor.Yellow);
                                 _retMsg.Dispose();
                                 msg.Dispose();
                                 break;
@@ -69,8 +84,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             else
                             {
                                 LOG.ERROR($"TryTaskFeedBackAsync FAIL>.>>");
+
                             }
                             msg.Dispose();
+                            Thread.Sleep(200);
                         }
                     }
                     catch (Exception ex)

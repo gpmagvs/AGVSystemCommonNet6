@@ -45,7 +45,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             LogMsgToAGVS($"(Post) {api_route},body json = {status.ToJson()}");
             var response = await VMSWebAPIHttp.PostAsync<Dictionary<string, object>, clsRunningStatus>(api_route, status);
             LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
-            var returnCode = int.Parse(response["ReturnCode"].ToString());          
+            var returnCode = int.Parse(response["ReturnCode"].ToString());
             return new SimpleRequestResponse
             {
                 ReturnCode = Enum.GetValues(typeof(RETURN_CODE)).Cast<RETURN_CODE>().First(code => ((int)code) == returnCode),
@@ -59,7 +59,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
                 var api_route = $"/api/AGV/TaskFeedback?AGVName={EQName}&Model={AGV_Model}";
                 LogMsgToAGVS($"(Post) {api_route},body json ={feedback.ToJson()}");
-                var response = await VMSWebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData>(api_route, feedback);
+                var response = await VMSWebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData>(api_route, feedback, 1);
                 LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
                 var returnCode = int.Parse(response["ReturnCode"].ToString());
                 return new SimpleRequestResponse
