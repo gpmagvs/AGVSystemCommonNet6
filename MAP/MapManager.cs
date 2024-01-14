@@ -61,7 +61,7 @@ namespace AGVSystemCommonNet6.MAP
                 Dictionary<int, double> targets = point.Target.ToList().FindAll(kp => Points.ContainsKey(kp.Key)).ToDictionary(kp => kp.Key, kp => kp.Value);
                 return targets.Select(kp => new MapPath()
                 {
-                    IsEQLink = point.StationType != STATION_TYPE.Normal | Points[kp.Key].StationType != STATION_TYPE.Normal,
+                    IsEQLink = point.StationType != STATION_TYPE.Normal || Points[kp.Key].StationType != STATION_TYPE.Normal,
                     StartPtIndex = index,
                     EndPtIndex = kp.Key,
                     StartCoordination = new double[2] { point.X, point.Y },
@@ -104,9 +104,9 @@ namespace AGVSystemCommonNet6.MAP
         }
         private static Map CheckMapSettingAndFix(Map map)
         {
-            if (map.Segments.Any(path => !IsPointExistAtMap(path.StartPtIndex) | !IsPointExistAtMap(path.EndPtIndex)))
+            if (map.Segments.Any(path => !IsPointExistAtMap(path.StartPtIndex) || !IsPointExistAtMap(path.EndPtIndex)))
             {
-                var error_path = map.Segments.FindAll(path => !IsPointExistAtMap(path.StartPtIndex) | !IsPointExistAtMap(path.EndPtIndex));
+                var error_path = map.Segments.FindAll(path => !IsPointExistAtMap(path.StartPtIndex) || !IsPointExistAtMap(path.EndPtIndex));
                 foreach (var p in error_path)
                 {
                     map.Segments.Remove(p);

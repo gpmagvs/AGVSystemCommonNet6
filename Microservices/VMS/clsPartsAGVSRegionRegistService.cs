@@ -110,7 +110,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                     byte[] buffer = new byte[ClientSocket.Available];
                     ClientSocket.Receive(buffer);
                     ReceiveDataString += Encoding.ASCII.GetString(buffer);
-                    if (ReceiveDataString == "OK" | ReceiveDataString == "NG")
+                    if (ReceiveDataString == "OK" || ReceiveDataString == "NG")
                     {
                         break;
                     }

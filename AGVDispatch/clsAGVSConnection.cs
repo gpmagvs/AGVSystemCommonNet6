@@ -302,7 +302,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
                     foreach (var str in splited)
                     {
-                        if (str == "" | str == null | str == "\r")
+                        if (str == "" || str == null || str == "\r")
                             continue;
                         string _json = str.TrimEnd(new char[] { '*' });
                         HandleAGVSJsonMsg(_json);

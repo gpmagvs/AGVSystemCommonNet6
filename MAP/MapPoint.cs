@@ -103,7 +103,7 @@ namespace AGVSystemCommonNet6.MAP
         {
             get
             {
-                return StationType == STATION_TYPE.Charge | StationType == STATION_TYPE.Charge_STK | StationType == STATION_TYPE.Charge_Buffer;
+                return StationType == STATION_TYPE.Charge || StationType == STATION_TYPE.Charge_STK || StationType == STATION_TYPE.Charge_Buffer;
             }
         }
 
@@ -112,20 +112,20 @@ namespace AGVSystemCommonNet6.MAP
         {
             get
             {
-                return StationType == STATION_TYPE.STK |
-                    StationType == STATION_TYPE.Charge_STK |
-                    StationType == STATION_TYPE.EQ |
-                    StationType == STATION_TYPE.EQ_LD |
-                    StationType == STATION_TYPE.EQ_ULD |
-                    StationType == STATION_TYPE.STK_LD |
-                    StationType == STATION_TYPE.STK_ULD |
-                    StationType == STATION_TYPE.Fire_EQ |
-                    StationType == STATION_TYPE.Elevator |
-                    StationType == STATION_TYPE.Elevator_LD |
-                    StationType == STATION_TYPE.TrayEQ |
-                    StationType == STATION_TYPE.TrayEQ_LD |
-                    StationType == STATION_TYPE.TrayEQ_ULD|
-                    StationType == STATION_TYPE.Charge_STK|
+                return StationType == STATION_TYPE.STK ||
+                    StationType == STATION_TYPE.Charge_STK ||
+                    StationType == STATION_TYPE.EQ ||
+                    StationType == STATION_TYPE.EQ_LD ||
+                    StationType == STATION_TYPE.EQ_ULD ||
+                    StationType == STATION_TYPE.STK_LD ||
+                    StationType == STATION_TYPE.STK_ULD ||
+                    StationType == STATION_TYPE.Fire_EQ ||
+                    StationType == STATION_TYPE.Elevator ||
+                    StationType == STATION_TYPE.Elevator_LD ||
+                    StationType == STATION_TYPE.TrayEQ ||
+                    StationType == STATION_TYPE.TrayEQ_LD ||
+                    StationType == STATION_TYPE.TrayEQ_ULD ||
+                    StationType == STATION_TYPE.Charge_STK ||
                     StationType == STATION_TYPE.Charge_Buffer;
             }
         }
@@ -135,7 +135,7 @@ namespace AGVSystemCommonNet6.MAP
         {
             get
             {
-                return StationType == STATION_TYPE.STK | StationType == STATION_TYPE.STK_LD | StationType == STATION_TYPE.STK_ULD | StationType == STATION_TYPE.Charge_STK;
+                return StationType == STATION_TYPE.STK || StationType == STATION_TYPE.STK_LD || StationType == STATION_TYPE.STK_ULD || StationType == STATION_TYPE.Charge_STK;
             }
         }
         /// <summary>
@@ -146,19 +146,19 @@ namespace AGVSystemCommonNet6.MAP
         {
             get
             {
-                return StationType == STATION_TYPE.EQ |
-                   StationType == STATION_TYPE.EQ_ULD |
-                   StationType == STATION_TYPE.Charge_Buffer |
-                   StationType == STATION_TYPE.EQ_LD |
-                   StationType == STATION_TYPE.Charge_STK |
-                   StationType == STATION_TYPE.Charge |
-                   StationType == STATION_TYPE.STK |
-                   StationType == STATION_TYPE.STK_LD |
-                   StationType == STATION_TYPE.STK_ULD |
-                   StationType == STATION_TYPE.Elevator |
-                   StationType == STATION_TYPE.Elevator_LD |
-                   StationType == STATION_TYPE.TrayEQ |
-                   StationType == STATION_TYPE.TrayEQ_LD |
+                return StationType == STATION_TYPE.EQ ||
+                   StationType == STATION_TYPE.EQ_ULD ||
+                   StationType == STATION_TYPE.Charge_Buffer ||
+                   StationType == STATION_TYPE.EQ_LD ||
+                   StationType == STATION_TYPE.Charge_STK ||
+                   StationType == STATION_TYPE.Charge ||
+                   StationType == STATION_TYPE.STK ||
+                   StationType == STATION_TYPE.STK_LD ||
+                   StationType == STATION_TYPE.STK_ULD ||
+                   StationType == STATION_TYPE.Elevator ||
+                   StationType == STATION_TYPE.Elevator_LD ||
+                   StationType == STATION_TYPE.TrayEQ ||
+                   StationType == STATION_TYPE.TrayEQ_LD ||
                    StationType == STATION_TYPE.TrayEQ_ULD
                    ;
             }

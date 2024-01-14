@@ -137,7 +137,7 @@ namespace AGVSystemCommonNet6.Log
                 {
                     bool isLineContain0301 = line.Contains("Header\": {\"0301\"");
 
-                    if (line.Contains("TCP/IP") | isLineContain0301)
+                    if (line.Contains("TCP/IP") || isLineContain0301)
                     {
                         if (isLineContain0301)
                         {

@@ -64,7 +64,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         {
             get
             {
-                return Station_Type == STATION_TYPE.EQ | Station_Type == STATION_TYPE.STK | Station_Type == STATION_TYPE.Charge_STK;
+                return Station_Type == STATION_TYPE.EQ || Station_Type == STATION_TYPE.STK || Station_Type == STATION_TYPE.Charge_STK;
             }
         }
         public bool HasCargo { get; set; } = false;
@@ -144,7 +144,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// <returns></returns>
         private static GUIDE_TYPE DetermineGuideType(ACTION_TYPE _Action_Type)
         {
-            if (_Action_Type == ACTION_TYPE.None | _Action_Type == ACTION_TYPE.Measure | _Action_Type == ACTION_TYPE.Escape)
+            if (_Action_Type == ACTION_TYPE.None || _Action_Type == ACTION_TYPE.Measure || _Action_Type == ACTION_TYPE.Escape)
                 return GUIDE_TYPE.SLAM;
             else
                 return GUIDE_TYPE.Color_Tap_Forward;
@@ -247,7 +247,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     {
                         return $"前往[{DestineName}] 充電";
                     }
-                    else if (ActionName == ACTION_TYPE.Unpark | ActionName == ACTION_TYPE.Discharge)
+                    else if (ActionName == ACTION_TYPE.Unpark || ActionName == ACTION_TYPE.Discharge)
                     {
                         return $"退出充電站前往[{(IsTransferTask ? SourceName : DestineName)}]";
                     }

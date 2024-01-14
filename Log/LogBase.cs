@@ -86,12 +86,10 @@ namespace AGVSystemCommonNet6.Log
 
                         ConsoleColor foreColor = ConsoleColor.White;
                         ConsoleColor backColor = ConsoleColor.Black;
-
-
                         switch (logItem.level)
                         {
                             case LogLevel.Trace:
-                                foreColor = ConsoleColor.White;
+                                foreColor = ConsoleColor.Gray;
                                 break;
                             case LogLevel.Debug:
                                 break;
@@ -120,9 +118,9 @@ namespace AGVSystemCommonNet6.Log
                         Console.BackgroundColor = backColor;
                         Console.WriteLine(logItem.logFullLine);
                         Console.WriteLine(" ");
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.BackgroundColor = ConsoleColor.Black;
                     }
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black;
                 }
             }
         }

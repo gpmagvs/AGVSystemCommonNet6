@@ -29,7 +29,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         public List<clsTaskDto> GetALLInCompletedTask(bool notracking = false)
         {
-            var _incomplete_tasks = TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.WAIT | tsk.State == TASK_RUN_STATUS.NAVIGATING).OrderByDescending(t => t.RecieveTime);
+            var _incomplete_tasks = TaskSet.Where(tsk => tsk.State == TASK_RUN_STATUS.WAIT || tsk.State == TASK_RUN_STATUS.NAVIGATING).OrderByDescending(t => t.RecieveTime);
             if (notracking)
                 return _incomplete_tasks.AsNoTracking().ToList();
             return _incomplete_tasks.ToList();

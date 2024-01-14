@@ -113,7 +113,7 @@ namespace AGVSystemCommonNet6
         public static bool IsChargeAble(this MapPoint map_station)
         {
             STATION_TYPE station_type = map_station.StationType;
-            return station_type == STATION_TYPE.Charge | station_type == STATION_TYPE.Charge_Buffer | station_type == STATION_TYPE.Charge_STK;
+            return station_type == STATION_TYPE.Charge || station_type == STATION_TYPE.Charge_Buffer || station_type == STATION_TYPE.Charge_STK;
         }
 
         /// <summary>
@@ -124,9 +124,9 @@ namespace AGVSystemCommonNet6
         public static bool IsLoadAble(this MapPoint map_station)
         {
             STATION_TYPE station_type = map_station.StationType;
-            return station_type == STATION_TYPE.EQ | station_type == STATION_TYPE.EQ_LD
-                    | station_type == STATION_TYPE.STK | station_type == STATION_TYPE.STK_LD
-                    | station_type == STATION_TYPE.Charge_STK;
+            return station_type == STATION_TYPE.EQ || station_type == STATION_TYPE.EQ_LD
+                    || station_type == STATION_TYPE.STK || station_type == STATION_TYPE.STK_LD
+                    || station_type == STATION_TYPE.Charge_STK;
         }
         /// <summary>
         /// 該站點是否可供AGV Load/Unload
@@ -136,9 +136,9 @@ namespace AGVSystemCommonNet6
         public static bool IsUnloadAble(this MapPoint map_station)
         {
             STATION_TYPE station_type = map_station.StationType;
-            return station_type == STATION_TYPE.EQ | station_type == STATION_TYPE.EQ_ULD
-                    | station_type == STATION_TYPE.STK | station_type == STATION_TYPE.STK_ULD
-                    | station_type == STATION_TYPE.Charge_STK;
+            return station_type == STATION_TYPE.EQ || station_type == STATION_TYPE.EQ_ULD
+                    || station_type == STATION_TYPE.STK || station_type == STATION_TYPE.STK_ULD
+                    || station_type == STATION_TYPE.Charge_STK;
         }
         /// <summary>
         /// 計算與站點的距離

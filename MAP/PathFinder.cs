@@ -128,7 +128,7 @@ namespace AGVSystemCommonNet6.MAP
                 int startIndex = staions_ordered.FindIndex(v => v.Key == startPtIndex);
                 int finalIndex = staions_ordered.FindIndex(v => v.Key == endPtIndex);
 
-                if (startIndex == -1 | finalIndex == -1)
+                if (startIndex == -1 || finalIndex == -1)
                 {
                     return null;
                 }

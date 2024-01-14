@@ -30,7 +30,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 FileInfo fiinfo = new FileInfo(default_alarm_json_file_path);
                 FileInfo fiinfo_on_param_folder = new FileInfo(alarm_JsonFile);
                 bool isAlarmDefaultUpdated = fiinfo.LastWriteTime > fiinfo_on_param_folder.LastWriteTime;
-                if (!alarm_json_file_exist | isAlarmDefaultUpdated)
+                if (!alarm_json_file_exist || isAlarmDefaultUpdated)
                 {
                     File.Copy(default_alarm_json_file_path, alarm_JsonFile, true);
                     LOG.TRACE($"Copy New AlarmList.json file to {alarm_JsonFile}");

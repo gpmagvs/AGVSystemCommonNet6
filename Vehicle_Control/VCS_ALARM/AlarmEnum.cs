@@ -119,6 +119,7 @@
         Cant_Online_Without_Tag = 1070,
         Cant_Online_With_Forbid_Tag = 1071,
         Cant_Online_In_Equipment = 1072,
+        Cant_Online_At_Virtual_Point = 1073,
         /// <summary>
         /// 前方遠處障礙物
         /// </summary>
@@ -447,5 +448,7 @@
         GetVirtualIDFail,
         AGV_BarcodeReader_Not_Match_Tag_of_Destination,
         AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042,
+        Fork_Arm_Action_Timeout = 860043,
+        Fork_Arm_Action_Error = 860044,
     }
 }

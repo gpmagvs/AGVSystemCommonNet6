@@ -50,7 +50,7 @@ namespace AGVSystemCommonNet6.Log
         public static void ERROR(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
-            _logger.Log(new LogItem(LogLevel.Error, string.Format("{0}", info, ErrorShow && show_console, color, NewLogFileEndStr)), caller_class_name);
+            _logger.Log(new LogItem(LogLevel.Error, info, ErrorShow && show_console, color, NewLogFileEndStr), caller_class_name);
         }
 
         public static void ERROR(Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
