@@ -10,6 +10,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         [JsonProperty("System Bytes")]
         public int SystemBytes { get; set; }
+
+        [NonSerialized]
         public string OriJsonString;
         private bool disposedValue;
 

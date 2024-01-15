@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.HttpTools
 {
-    public class HttpHelper:IDisposable
+    public class HttpHelper : IDisposable
     {
 
         public class clsInternalError
@@ -124,12 +124,12 @@ namespace AGVSystemCommonNet6.HttpTools
         }
         public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 3)
         {
+            string jsonContent = "";
             try
             {
-                string jsonContent = "";
                 string url = this.baseUrl + $"{api_route}";
                 HttpResponseMessage response = null;
-                timeout_sec =timeout;
+                timeout_sec = timeout;
                 response = await http_client.GetAsync(api_route);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -148,9 +148,34 @@ namespace AGVSystemCommonNet6.HttpTools
             {
                 throw;
             }
-
-
         }
+        public async Task<string> GetStringAsync(string api_route, int timeout = 3)
+        {
+            string str_result = "";
+            try
+            {
+                string url = this.baseUrl + $"{api_route}";
+                HttpResponseMessage response = null;
+                timeout_sec = timeout;
+                response = await http_client.GetAsync(api_route);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    str_result = await response.Content.ReadAsStringAsync();
+                    return str_result;
+                }
+                else
+                    throw new HttpRequestException($"Failed to GET to {url}({response.StatusCode})");
+            }
+            catch (TaskCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
 
         protected virtual void Dispose(bool disposing)
         {

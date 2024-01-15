@@ -56,12 +56,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             try
             {
+                var _VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{VMSPort}", 3);
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
                 var api_route = $"/api/AGV/TaskFeedback?AGVName={EQName}&Model={AGV_Model}";
-                LogMsgToAGVS($"(Post) {api_route},body json ={feedback.ToJson()}");
-                var response = await VMSWebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData>(api_route, feedback, 1);
-                LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                _ = LogMsgToAGVS($"(Post) {api_route},body json ={feedback.ToJson()}");
+
+                var response = await _VMSWebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData>(api_route, feedback, 1);
+                _ = LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
                 var returnCode = int.Parse(response["ReturnCode"].ToString());
+                _VMSWebAPIHttp.Dispose();
                 return new SimpleRequestResponse
                 {
                     ReturnCode = Enum.GetValues(typeof(RETURN_CODE)).Cast<RETURN_CODE>().First(code => ((int)code) == returnCode),
@@ -70,7 +73,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                throw ex;
+                LOG.Critical($"PostTaskFeedBack Exception:{ex.Message}", ex);
+                return new SimpleRequestResponse
+                {
+                    Message = ex.Message,
+                    ReturnCode = RETURN_CODE.System_Error
+                };
             }
         }
 

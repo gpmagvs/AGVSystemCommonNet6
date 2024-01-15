@@ -34,5 +34,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         [JsonProperty("Last Visited Node")]
         public int LastVisitedNode { get; set; } = -1;
+
+        [NonSerialized]
+        public bool IsFeedbackBecauseTaskCancel;
     }
 }
