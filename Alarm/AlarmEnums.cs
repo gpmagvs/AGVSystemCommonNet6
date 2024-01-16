@@ -90,7 +90,11 @@ namespace AGVSystemCommonNet6.Alarm
         Destine_Eq_Station_Has_Task_To_Park = 71,
         Destine_Charge_Station_Has_AGV = 72,
         PING_CHECK_FAIL = 73,
-        Download_Task_To_AGV_Fail = 74
+        Download_Task_To_AGV_Fail = 74,
+        EQ_LOAD_REQUEST_ON_BUT_HAS_CARGO = 75,
+        EQ_UNLOAD_REQUEST_ON_BUT_NO_CARGO = 76,
+        EQ_UNLOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 77,
+        EQ_LOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 78
     }
 
 }
