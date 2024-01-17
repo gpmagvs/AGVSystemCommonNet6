@@ -35,22 +35,10 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
         }
         protected override void OnGoalReceived()
         {
-            Thread.Sleep(400);
             TaskCommandGoal? goal = this.action.action_goal.goal;
             if (OnGoalReceived != null)
             {
-                if (goal.planPath.poses.Length == 0)
-                {
-                    Console.WriteLine("goal.planPath.poses.Length == 0");
-                    SetAborted();
-                    SetSucceeded();
-                }
-                else
-                {
-                    Console.WriteLine("OnNAVGoalReceived?.Invoke(this, goal);");
-                    SetAccepted();
-                    OnNAVGoalReceived?.Invoke(this, goal);
-                };
+                OnNAVGoalReceived?.Invoke(this, goal);
             }
             else
             {
@@ -63,7 +51,14 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
             SetSucceeded();
 
         }
-
+        public void SetActiveInvoke()
+        {
+            UpdateAndPublishStatus(ActionStatus.ACTIVE);
+        }
+        public void SetPeddingInvoke()
+        {
+            UpdateAndPublishStatus(ActionStatus.PENDING);
+        }
         public void AcceptedInvoke()
         {
             SetAccepted();
