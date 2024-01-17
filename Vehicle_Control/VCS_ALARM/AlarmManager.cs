@@ -102,7 +102,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
         /// 新增一筆Alarm (可復歸)
         /// </summary>
         /// <param name="Alarm_code"></param>
-        public static void AddAlarm(AlarmCodes Alarm_code)
+        public static void RecordAlarm(AlarmCodes Alarm_code)
         {
             if (!Active)
                 return;
