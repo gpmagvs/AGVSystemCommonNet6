@@ -90,11 +90,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
         [Required]
         public string From_Station { get; set; } = "-1";
 
+        public int From_Station_Tag => int.TryParse(From_Station, out int tag) ? tag : -1;
+
         [Required]
         public string From_Slot { get; set; } = "-1";
 
         [Required]
         public string To_Station { get; set; } = "-1";
+        public int To_Station_Tag => int.TryParse(To_Station, out int tag) ? tag : -1;
 
         [Required]
         public int Height { get; set; } = 0;
