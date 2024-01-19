@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,9 @@ namespace AGVSystemCommonNet6
         public ACTION_TYPE CurrentAction { get; set; }
         public double Theta { get; set; }
         public TRANSFER_PROCESS TransferProcess { get; set; }
+
+        [NotMapped] // 此欄位不會寫入資料表
+        public DateTime TaskETA { get; set; } = DateTime.MaxValue;
 
         public void Update(clsAGVStateDto entity)
         {
