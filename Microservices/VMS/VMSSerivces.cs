@@ -112,7 +112,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             {
                 while (true)
                 {
-                    await Task.Delay(100);
+                    Thread.Sleep(50);
                     if (!IsAlive)
                         continue;
 
