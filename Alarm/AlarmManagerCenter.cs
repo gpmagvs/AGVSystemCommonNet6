@@ -216,19 +216,25 @@ namespace AGVSystemCommonNet6.Alarm
 
         }
 
-        public static void RemoveAlarm(clsAlarmDto alarmDto)
+        private static object _lockObj = new object();
+
+        public static int RemoveAlarm(clsAlarmDto alarmDto)
         {
-            try
+            lock (_lockObj)
             {
-                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+                try
                 {
-                    dbhelper._context.Set<clsAlarmDto>().Remove(alarmDto);
-                    dbhelper._context.SaveChanges();
+                    using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+                    {
+                        dbhelper._context.Set<clsAlarmDto>().Remove(alarmDto);
+                        return dbhelper._context.SaveChanges();
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
+                catch (Exception ex)
+                {
+                    LOG.ERROR(ex);
+                    return -1;
+                }
             }
         }
         public static void SqlSelect(clsAlarmDto alarmquery)
