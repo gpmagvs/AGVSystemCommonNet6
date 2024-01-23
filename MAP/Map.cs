@@ -21,6 +21,7 @@ namespace AGVSystemCommonNet6.MAP
         /// V1:設定接設定在點上,路徑(線段)不可設定屬性; V2 : 路徑(線段)可設定屬性
         /// </summary>
         public virtual MAP_VERSION Version { get; set; } = MAP_VERSION.V1;
+        public clsMapOptions Options { get; set; } = new clsMapOptions();
         public string Name { get; set; }
         public string Note { get; set; }
         public int PointIndex { get; set; }

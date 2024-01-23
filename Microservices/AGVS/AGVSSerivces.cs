@@ -54,10 +54,18 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             {
                 using (agvs_http)
                 {
-                    var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&action={action}";
-                    string response = await agvs_http.GetStringAsync(route);
-                    LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response}");
+                    try
+                    {
 
+                        var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&action={action}";
+                        string response = await agvs_http.GetStringAsync(route);
+                        LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response}");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.Critical($"LoadUnload Task Start Feedback to AGVS FAIL,{ex.Message}", ex);
+                    }
                 }
             }
 

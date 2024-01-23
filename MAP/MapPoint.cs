@@ -79,6 +79,7 @@ namespace AGVSystemCommonNet6.MAP
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Bay { get; set; } = "";
         public Graph Graph { get; set; } = new Graph();
+
         /// <summary>
         /// Key Point Index, value:權重
         /// </summary>

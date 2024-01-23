@@ -33,12 +33,12 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 }
                 catch (Exception ex)
                 {
-                    LOG.ERROR(ex);
+                    LOG.Critical(ex.InnerException.Message, ex.InnerException);
                     return 0;
                 }
 
             }
-            
+
         }
 
         protected virtual void Dispose(bool disposing)

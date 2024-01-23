@@ -11,6 +11,7 @@ namespace AGVSystemCommonNet6.MAP
         public string Display { get; set; } = "";
         public double X { get; set; }
         public double Y { get; set; }
+        public string ImageName { get; set; } = "";
         public bool IsBezierCurvePoint { get; set; } = false;
         public string BezierCurveID { get; set; } = "";
 

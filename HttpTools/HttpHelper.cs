@@ -140,13 +140,13 @@ namespace AGVSystemCommonNet6.HttpTools
                 else
                     throw new HttpRequestException($"Failed to GET to {url}({response.StatusCode})");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException ex)
             {
-                throw;
+                throw ex;
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
         public async Task<string> GetStringAsync(string api_route, int timeout = 3)
@@ -166,13 +166,13 @@ namespace AGVSystemCommonNet6.HttpTools
                 else
                     throw new HttpRequestException($"Failed to GET to {url}({response.StatusCode})");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException ex)
             {
-                throw;
+                throw ex;
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 

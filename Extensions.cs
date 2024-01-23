@@ -152,7 +152,7 @@ namespace AGVSystemCommonNet6
             if (map_station == null)
                 return -1;
             double distance = Math.Sqrt(Math.Pow(map_station.X - from_loc_x, 2) + Math.Pow(map_station.Y - from_loc_y, 2));
-            Console.WriteLine($"Distance from ({map_station.X},{map_station.Y}) (Tag:{map_station.TagNumber}) to ({from_loc_x},{from_loc_y})(Tag:{tag}) is {distance}");
+            //Console.WriteLine($"Distance from ({map_station.X},{map_station.Y}) (Tag:{map_station.TagNumber}) to ({from_loc_x},{from_loc_y})(Tag:{tag}) is {distance}");
             return distance;
         }
 

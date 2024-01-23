@@ -36,7 +36,14 @@ namespace AGVSystemCommonNet6.MAP
                 {
                     CheckMapSettingAndFix(map, mapfile);
                 }
+                if (map.Options.EQIcons.Count == 0)
+                {
+                    map.Options.EQIcons = new List<string>() {
+                        "/images/eq-icon.png",
+                        "/images/rack.png",
+                    };
 
+                }
                 return map;
             }
             catch (Exception ex)
@@ -46,9 +53,9 @@ namespace AGVSystemCommonNet6.MAP
                 return new Map();
             }
         }
-        public static Map LoadMapFromFile()
+        public static Map LoadMapFromFile(bool auto_create_segment = true, bool auto_check_path_error = true)
         {
-            return LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string msg, true, true);
+            return LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string msg, auto_create_segment, auto_check_path_error);
 
         }
         public static List<MapPath> CreateSegments(Map map)
