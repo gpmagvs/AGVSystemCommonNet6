@@ -48,7 +48,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                  bool _success = false;
                  while (!_success)
                  {
-                     Thread.Sleep(500);
+                     Thread.Sleep(50);
                      // 检查取消标记，如果已经取消则立即退出循环
                      if (_T1TimeoutCancelToskSource.Token.IsCancellationRequested)
                      {

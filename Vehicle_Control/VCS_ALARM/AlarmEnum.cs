@@ -450,5 +450,6 @@
         AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042,
         Fork_Arm_Action_Timeout = 860043,
         Fork_Arm_Action_Error = 860044,
+        Replan = 860045,
     }
 }
