@@ -20,7 +20,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         TcpClient? tcpClient;
         clsSocketState socketState = new clsSocketState();
-        ConcurrentDictionary<int, ManualResetEvent> WaitAGVSReplyMREDictionary = new ConcurrentDictionary<int, ManualResetEvent>();
+        public ConcurrentDictionary<int, ManualResetEvent> WaitAGVSReplyMREDictionary = new ConcurrentDictionary<int, ManualResetEvent>();
         ConcurrentDictionary<int, MessageBase> AGVSMessageStoreDictionary = new ConcurrentDictionary<int, MessageBase>();
         bool VMS_API_Call_Fail_Flag = true;
 
@@ -72,11 +72,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public enum MESSAGE_TYPE
         {
             REQ_0101_ONLINE_MODE_QUERY = 0101,
-            ACK_0102 = 0102,
+            OnlineMode_Query_ACK_0102 = 0102,
             REQ_0103_ONLINE_MODE_REQUEST = 0103,
-            ACK_0104 = 0104,
+            OnlineMode_Change_ACK_0104 = 0104,
             REQ_0105_RUNNING_STATUS_REPORT = 0105,
-            ACK_0106 = 0106,
+            RunningStateReport_ACK_0106 = 0106,
             REQ_0107_AGVS_Online_Req = 0107,
             ACK_0107_AGVS_Online_Req = 0108,
             REQ_0301_TASK_DOWNLOAD = 0301,
@@ -85,7 +85,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
             ACK_0304_TASK_FEEDBACK_REPORT_ACK = 0304,
             REQ_0305_TASK_CANCEL = 0305,
             ACK_0306_TASK_CANCEL_ACK = 0306,
-            ACK_0322 = 0322,
+            Carrier_Remove_Request_0321 = 0321,
+            Carrier_Remove_Request_ACK_0322 = 0322,
             REQ_0323_VirtualID_Query = 0323,
             ACK_0324_VirtualID_ACK = 0324,
             UNKNOWN = 9999,
@@ -99,8 +100,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             LocalIP = null;
             VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
             VMSWebAPIHttp.Logger = this.Logger;
-
-
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
             AGVsWebAPIHttp.Logger = this.Logger;
         }
@@ -116,6 +115,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
             AGVsWebAPIHttp.Logger = this.Logger;
             AutoPingServerCheck = true;
             PingServerCheckProcess();
+            AGVSMessageFactory.OnCylicSystemByteCreate += (_crteated_systemByte) =>
+            {
+                bool _is_systembyte_used = WaitAGVSReplyMREDictionary.ContainsKey(_crteated_systemByte);
+                return !_is_systembyte_used;
+            };
         }
         public void Setup(string _SID, string _EQName)
         {
@@ -182,7 +186,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     CheckAndClearOlderMessageStored();
                     try
                     {
-
                         if (!IsConnected())
                         {
                             if (!UseWebAPI)
@@ -193,64 +196,20 @@ namespace AGVSystemCommonNet6.AGVDispatch
                                 continue;
                             }
                         }
-                        (bool, OnlineModeQueryResponse onlineModeQuAck) result = (false, new OnlineModeQueryResponse());
-                        int retryCnt = 0;
                         IsGetOnlineModeTrying = false;
-                        CancellationTokenSource onlineMode_query_t1_timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-                        while (!result.Item1)
-                        {
-                            Thread.Sleep(10);
-                            if (onlineMode_query_t1_timeout.IsCancellationRequested)
-                            {
-                                OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
-                                Current_Warning_Code = AlarmCodes.OnlineModeQuery_T1_Timeout;
-                                break;
-                            }
-                            retryCnt += 1;
-                            if (retryCnt > 10)
-                                break;
-                            if (retryCnt > 3)
-                                IsGetOnlineModeTrying = true;
-                            result = TryOnlineModeQueryAsync().Result;
-                            if (!result.Item1)
-                            {
-                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/10", false);
-                                Thread.Sleep(200);
-                            }
-                        }
 
-                        if (!result.Item1)
+                        if (OnlineModeQueryOut())
                         {
-                            LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
-                            if (!UseWebAPI)
-                                Disconnect();
-                            continue;
+                            if (UseWebAPI)
+                                VMS_API_Call_Fail_Flag = false;
+                            RunningStatusReport();
                         }
                         else
                         {
-                            IsGetOnlineModeTrying = false;
-                            Connected = true;
-                            if (UseWebAPI)
-                                VMS_API_Call_Fail_Flag = false;
-                            Current_Warning_Code = AlarmCodes.None;
-                        }
-                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = new(false, null);
-
-                        CancellationTokenSource runningStatusReport_t1_timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-                        while (!runningStateReport_result.Item1)
-                        {
-                            Thread.Sleep(1);
-                            if (runningStatusReport_t1_timeout.IsCancellationRequested)
-                            {
-                                Current_Warning_Code = AlarmCodes.RunningStatusReport_T1_Timeout;
-                                LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
-                                OnRunningStatusReport_T1Timeout?.Invoke(this, EventArgs.Empty);
-                                break;
-                            }
-                            runningStateReport_result = TryRnningStateReportAsync().Result;
+                            if (!UseWebAPI)
+                                Disconnect();
                         }
 
-                        Current_Warning_Code = AlarmCodes.None;
                     }
                     catch (Exception ex)
                     {
@@ -261,6 +220,39 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return true;
         }
 
+
+        private bool OnlineModeQueryOut()
+        {
+            (bool, OnlineModeQueryResponse onlineModeQuAck) _OnlineModeQueryResult = TryOnlineModeQueryAsync().Result;
+            if (!_OnlineModeQueryResult.Item1)
+            {
+                Current_Warning_Code = AlarmCodes.OnlineModeQuery_T1_Timeout;
+                OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
+                LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
+                return false;
+            }
+            else
+            {
+                IsGetOnlineModeTrying = false;
+                Connected = true;
+
+                Current_Warning_Code = AlarmCodes.None;
+                return true;
+            }
+        }
+
+        private void RunningStatusReport()
+        {
+            (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) _runningStateReport_result = TryRnningStateReportAsync(8).Result;
+            if (!_runningStateReport_result.Item1)
+            {
+                Current_Warning_Code = AlarmCodes.RunningStatusReport_T1_Timeout;
+                LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                OnRunningStatusReport_T1Timeout?.Invoke(this, EventArgs.Empty);
+            }
+            else
+                Current_Warning_Code = AlarmCodes.None;
+        }
         private void CheckAndClearOlderMessageStored()
         {
             try
@@ -340,16 +332,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 if (_CurrentREMOTE_MODE_Downloaded != value)
                 {
-                    OnRemoteModeChanged?.Invoke(value, true);
+                    Task.Factory.StartNew(() => { OnRemoteModeChanged?.Invoke(value, true); });
                     _CurrentREMOTE_MODE_Downloaded = value;
                 }
             }
         }
         private RETURN_CODE AGVOnlineReturnCode;
-        public Task CarrierRemovedRequestAsync(string v, string[] vs)
-        {
-            throw new NotImplementedException();
-        }
 
         public static MESSAGE_TYPE GetMESSAGE_TYPE(string message_json)
         {
@@ -372,15 +360,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
             if (firstHeaderKey.Contains("0101"))
                 return MESSAGE_TYPE.REQ_0101_ONLINE_MODE_QUERY;
             if (firstHeaderKey.Contains("0102"))
-                return MESSAGE_TYPE.ACK_0102;
+                return MESSAGE_TYPE.OnlineMode_Query_ACK_0102;
             if (firstHeaderKey.Contains("0103"))
                 return MESSAGE_TYPE.REQ_0103_ONLINE_MODE_REQUEST;
             if (firstHeaderKey.Contains("0104"))
-                return MESSAGE_TYPE.ACK_0104;
+                return MESSAGE_TYPE.OnlineMode_Change_ACK_0104;
             if (firstHeaderKey.Contains("0105"))
                 return MESSAGE_TYPE.REQ_0105_RUNNING_STATUS_REPORT;
             if (firstHeaderKey.Contains("0106"))
-                return MESSAGE_TYPE.ACK_0106;
+                return MESSAGE_TYPE.RunningStateReport_ACK_0106;
             if (firstHeaderKey.Contains("0107"))
                 return MESSAGE_TYPE.REQ_0107_AGVS_Online_Req;
             if (firstHeaderKey.Contains("0301"))
@@ -400,7 +388,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             if (firstHeaderKey.Contains("0306"))
                 return MESSAGE_TYPE.ACK_0306_TASK_CANCEL_ACK;
             if (firstHeaderKey.Contains("0322"))
-                return MESSAGE_TYPE.ACK_0322;
+                return MESSAGE_TYPE.Carrier_Remove_Request_ACK_0322;
             if (firstHeaderKey.Contains("0323"))
                 return MESSAGE_TYPE.REQ_0323_VirtualID_Query;
             if (firstHeaderKey.Contains("0324"))
@@ -435,8 +423,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return tcpClient.Connected;
         }
 
-
-
         public bool WriteDataOut(byte[] dataByte)
         {
             if (!IsConnected())
@@ -447,15 +433,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 socketState.stream.Write(dataByte, 0, dataByte.Length);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                throw ex;
             }
 
         }
 
-
-        public async Task<bool> SendMsgToAGVSAndWaitReply(byte[] dataByte, int systemBytes)
+        public async Task<bool> SendMsgToAGVSAndWaitReply(byte[] dataByte, int systemBytes, MESSAGE_TYPE ack_msg_type, int timeout_sec = 8)
         {
             if (!IsConnected())
                 return false;
@@ -463,21 +448,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
              {
                  try
                  {
-                     ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+                     ManualResetEvent manualResetEvent = WaitAckResetEvents[ack_msg_type];
+                     manualResetEvent.Reset();
                      WriteDataOut(dataByte);
-                     //socketState.stream.Write(dataByte, 0, dataByte.Length);
-                     bool addsucess = WaitAGVSReplyMREDictionary.TryAdd(systemBytes, manualResetEvent);
-                     if (addsucess)
-                     {
-                         manualResetEvent.WaitOne(2000);
-                         return true;
-                     }
-                     else
-                     {
-                         LOG.Critical($"[WriteDataOut] 將 'ManualResetEvent' 加入 'WaitAGVSReplyMREDictionary' 失敗");
-                         WaitAGVSReplyMREDictionary.TryRemove(systemBytes, out manualResetEvent);
-                         return false;
-                     }
+                     bool _recieve_signal = manualResetEvent.WaitOne(TimeSpan.FromSeconds(timeout_sec));
+                     //if (ack_msg_type == MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK)
+                     //    LOG.TRACE($"[SendMsgToAGVSAndWaitReply] manualResetEvent.WaitOne(2000), 因收到回應而停止等待 ACK_0304_TASK_FEEDBACK_REPORT_ACK? {_recieve_signal}");
+                     return _recieve_signal;
                  }
                  catch (IOException ioex)
                  {
@@ -488,7 +465,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
                  catch (Exception ex)
                  {
                      LOG.ERROR($"[AGVS] 發送訊息的過程中發生未知的錯誤 : {ex.Message}", ex);
-                     //Disconnect();
                      return false;
                  }
 

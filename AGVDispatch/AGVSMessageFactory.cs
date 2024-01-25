@@ -12,15 +12,32 @@ namespace AGVSystemCommonNet6.AGVDispatch
     {
 
         public static Encoding Encoder = Encoding.UTF8;
-        private static int SystemByteStored = 8790;
+        private static int SystemByteStored = 2;
+        public delegate bool OnCylicSystemByteCreateDelegate(int _byte);
+        public static OnCylicSystemByteCreateDelegate? OnCylicSystemByteCreate = null;
+        private static object _lock = new object();
         private static int System_Byte_Cyclic
         {
             get
             {
-                SystemByteStored = SystemByteStored + 2;
-                if (SystemByteStored >= int.MaxValue)
-                    SystemByteStored = 1;
-                return int.Parse(SystemByteStored.ToString());
+                lock (_lock)
+                {
+                    SystemByteStored = SystemByteStored + 1;
+                    if (SystemByteStored >= int.MaxValue)
+                        SystemByteStored = 1;
+
+                    if (OnCylicSystemByteCreate != null)
+                    {
+                        bool confirmed = OnCylicSystemByteCreate(SystemByteStored);
+                        if (!confirmed)
+                        {
+                            var _old = SystemByteStored;
+                            SystemByteStored = SystemByteStored + 1;
+                            Console.WriteLine($"System Byte Cyclic as {SystemByteStored} , because {_old}  used");
+                        }
+                    }
+                    return int.Parse(SystemByteStored.ToString());
+                }
             }
         }
 
@@ -147,7 +164,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             });
 
-            return Encoder.GetBytes(FormatSendOutString(mesg.ToJson(Formatting.None )));
+            return Encoder.GetBytes(FormatSendOutString(mesg.ToJson(Formatting.None)));
         }
 
 
@@ -166,7 +183,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return string.Format("{0}*{1}", json, "\r");
         }
 
-        internal static byte[] CreateTaskFeedbackMessageData(string EQName, string SID, string TaskName,string TaskSimplex,int TaskSequence, int PointIndex, TASK_RUN_STATUS task_status, int tag, clsCoordination coordination, out clsTaskFeedbackMessage taskFeedbackMessage)
+        internal static byte[] CreateTaskFeedbackMessageData(string EQName, string SID, string TaskName, string TaskSimplex, int TaskSequence, int PointIndex, TASK_RUN_STATUS task_status, int tag, clsCoordination coordination, out clsTaskFeedbackMessage taskFeedbackMessage)
         {
             taskFeedbackMessage = new clsTaskFeedbackMessage()
             {

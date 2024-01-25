@@ -175,7 +175,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 if (_IsActionFinishReported != value)
                 {
                     _IsActionFinishReported = value;
-                    LOG.INFO($"{Task_Name} Action Finish 上報狀態:{(value ? "已上報派車完成" : "未上報派車完成")}");
+                    LOG.INFO($"{Task_Name} Action Finish 上報狀態:{(value ? "已上報派車完成" : "未上報派車完成")}", false);
                 }
             }
         }

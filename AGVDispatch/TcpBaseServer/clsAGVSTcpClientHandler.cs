@@ -3,6 +3,8 @@ using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Log;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -14,8 +16,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
     {
         public override string alarm_locate_in_name => "AGVS_TCP_Serverb";
 
-        public class clsAGVSTcpClientHandler
+        public class clsAGVSTcpClientHandler : IDisposable
         {
+            public clsAGVSTcpClientHandler()
+            {
+
+            }
             public class clsMsgSendEventArg : EventArgs
             {
                 public string Json { get; internal set; }
@@ -66,6 +72,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     ClientIP = endpoint.Split(':')[0];
                     ClientSocketState = new clsSocketState { socket = value };
                     PingServerCheckProcess();
+                    SendMsgWorker();
                     try
                     {
                         Task.Factory.StartNew(() =>
@@ -82,6 +89,31 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     }
                 }
             }
+
+            private void SendMsgWorker()
+            {
+                Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        Thread.Sleep(1);
+                        if (send_out_queue.TryDequeue(out string json))
+                        {
+                            try
+                            {
+                                SocketClient.Send(Encoding.UTF8.GetBytes(json + "*\r"));
+                            }
+                            catch (Exception ex)
+                            {
+                                OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
+                                AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
+                                LOG.ERROR($"{ClientIP} {ex.Message}", ex);
+                            }
+                        }
+                    }
+                });
+            }
+
             protected void PingServerCheckProcess()
             {
                 Task.Factory.StartNew(async () =>
@@ -138,16 +170,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     if (ClientSocketState.TryFindEndChar(out int index))
                     {
                         int remaindData = ClientSocketState.revedDataLen - (index + 1);
-                        //0 =>整包都是完整資料
-                        //if (remaindData != 1)
-                        //{
-                        //    var newBuffer = new byte[clsSocketState.BufferSize];
-                        //    Array.Copy(ClientSocketState.buffer, index + 1, newBuffer, 0, remaindData);
-                        //    ClientSocketState.buffer = newBuffer;
-                        //    ClientSocketState.revedDataLen = remaindData;
-                        //}
-                        //else
-                        //{
                         await HandleClientMsg(ClientSocketState.revedString);
                         ClientSocketState.buffer = new byte[clsSocketState.BufferSize];
                         ClientSocketState.revedDataLen = 0;
@@ -217,6 +239,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
                         if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0303_TASK_FEEDBACK_REPORT) //任務狀態上報
                         {
+                            Console.WriteLine(json);
                             clsTaskFeedbackMessage taskFeedback = JsonConvert.DeserializeObject<clsTaskFeedbackMessage>(json);
                             OnClientTaskFeedback?.Invoke(this, taskFeedback);
                         }
@@ -237,22 +260,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 });
             }
 
+            ConcurrentQueue<string> send_out_queue = new ConcurrentQueue<string>();
             public void SendJsonReply(string json)
             {
-                try
-                {
-                    SocketClient.Send(Encoding.UTF8.GetBytes(json + "*\r"));
-                }
-                catch (Exception ex)
-                {
-                    OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                    AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
-                    LOG.ERROR($"{ClientIP} {ex.Message}", ex);
-                }
+                send_out_queue.Enqueue(json);
             }
             private RETURN_CODE taskDownload_AGV_ReturnCode;
             private ManualResetEvent TaskDownloadWaitMRE = new ManualResetEvent(false);
             private clsTaskDownloadMessage TaskDownloadMsg;
+            private bool disposedValue;
+
             public TaskDownloadRequestResponse SendTaskMessage(clsTaskDownloadData downloadData)
             {
                 SystemBytes += 1;
@@ -293,6 +310,35 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         };
                     }
                 }
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        // TODO: 處置受控狀態 (受控物件)
+                    }
+
+                    // TODO: 釋出非受控資源 (非受控物件) 並覆寫完成項
+                    // TODO: 將大型欄位設為 Null
+                    disposedValue = true;
+                }
+            }
+
+            // // TODO: 僅有當 'Dispose(bool disposing)' 具有會釋出非受控資源的程式碼時，才覆寫完成項
+            // ~clsAGVSTcpClientHandler()
+            // {
+            //     // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
+            //     Dispose(disposing: false);
+            // }
+
+            public void Dispose()
+            {
+                // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
             }
         }
     }

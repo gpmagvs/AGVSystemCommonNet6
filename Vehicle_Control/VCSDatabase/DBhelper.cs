@@ -89,6 +89,13 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         {
             try
             {
+                var _exist_status = db.Table<clsAGVStatusTrack>().FirstOrDefault(d => d.Time == status.Time);
+                bool _already_added = _exist_status != null;
+
+                if (_already_added)
+                {
+                    db.Delete(_exist_status);
+                }
                 db.Insert(status);
             }
             catch (SQLite.SQLiteException ex)
