@@ -48,7 +48,12 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public List<int> TagsOfTrajectory => ExecutingTrajecory.Select(pt => pt.Point_ID).ToList();
         public string OriTaskDataJson = "";
         public bool GoTOHomePoint = false;
-
+        public bool IsLDULDAction()
+        {
+            return Action_Type == ACTION_TYPE.Load ||
+                Action_Type == ACTION_TYPE.LoadAndPark ||
+                Action_Type == ACTION_TYPE.Unload;
+        }
         /// <summary>
         /// 送給車控CommandActionClient的 TaskCommandGoal
         /// </summary>
