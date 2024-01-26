@@ -27,29 +27,29 @@ namespace AGVSystemCommonNet6.Log
         }
         public static void TRACE(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             TRACE(info, caller_class_name, TraceShow && show_console, color, NewLogFileEndStr: NewLogFileEndStr);
         }
         public static void INFO(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             _logger.Log(new LogItem(LogLevel.Information, info, InfoShow && show_console, color, NewLogFileEndStr), caller_class_name);
         }
 
         public static void WARN(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; 
             _logger.Log(new LogItem(LogLevel.Warning, info, WarningShow && show_console, color, NewLogFileEndStr), caller_class_name);
         }
         public static void ERROR(string info, Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             string msg = string.Format("{0}。Exception Message:{1}", info, ex.Message + "\r\n" + ex.StackTrace);
             _logger.Log(new LogItem(LogLevel.Error, msg, ErrorShow && show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
         }
         public static void ERROR(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             _logger.Log(new LogItem(LogLevel.Error, info, ErrorShow && show_console, color, NewLogFileEndStr), caller_class_name);
         }
 
@@ -62,21 +62,21 @@ namespace AGVSystemCommonNet6.Log
 
         public static void Critical(string msg, Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             string _msg = string.Format("{0}。Exception Message:{1}", msg, ex.Message + "\r\n" + ex.StackTrace);
             TRACE(_msg, caller_class_name);
             _logger.Log(new LogItem(LogLevel.Critical, _msg, CriticalShow && show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
         }
         public static void Critical(Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             string _msg = string.Format("Message:{0}。StackTrace:{1}", ex.Message, ex.StackTrace);
             _logger.Log(new LogItem(LogLevel.Critical, _msg, CriticalShow && show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
         }
 
         public static void Critical(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             _logger.Log(new LogItem(LogLevel.Critical, info, CriticalShow && show_console, color, NewLogFileEndStr), caller_class_name);
         }
 
