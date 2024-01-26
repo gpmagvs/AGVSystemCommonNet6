@@ -11,6 +11,7 @@ namespace AGVSystemCommonNet6.Log
 {
     public class LogBase : IDisposable
     {
+
         public string LogFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), LogFolderName);
         private string _LogFolderName = "GPM_AGV_LOG";
         internal string LogFolderName
@@ -23,6 +24,16 @@ namespace AGVSystemCommonNet6.Log
                     Directory.CreateDirectory(LogFolder);
             }
         }
+
+        private Dictionary<LogLevel, clsLogConsoleStyle> StyleMap = new Dictionary<LogLevel, clsLogConsoleStyle>()
+        {
+            { LogLevel.Information, new clsLogConsoleStyle( ConsoleColor.Cyan, ConsoleColor.Black) },
+            { LogLevel.Warning, new clsLogConsoleStyle( ConsoleColor.Yellow, ConsoleColor.Black) },
+            { LogLevel.Error, new clsLogConsoleStyle( ConsoleColor.Red, ConsoleColor.Black) },
+            { LogLevel.Critical, new clsLogConsoleStyle( ConsoleColor.White, ConsoleColor.Red) },
+            { LogLevel.Trace, new clsLogConsoleStyle( ConsoleColor.Gray, ConsoleColor.Black) },
+        };
+
         private ConcurrentQueue<LogItem> logItemQueue = new ConcurrentQueue<LogItem>();
         private Task WriteLogToFileTask;
         private bool disposedValue;
@@ -49,12 +60,23 @@ namespace AGVSystemCommonNet6.Log
 
             while (!disposedValue)
             {
-                Thread.Sleep(1);
-
-                if (logItemQueue.TryDequeue(out LogItem? logItem))
+                await Task.Delay(20);
+                try
                 {
-                    WriteLog(logItem);
+                    if (logItemQueue.TryDequeue(out LogItem? logItem))
+                    {
+                        WriteLog(logItem);
+                        logItem.Dispose();
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine(ex.Message);
+
+                }
+                
             }
         }
         public void WriteLog(LogItem logItem)
@@ -110,23 +132,44 @@ namespace AGVSystemCommonNet6.Log
                         foreColor = ConsoleColor.Red;
                         break;
                     case LogLevel.Critical:
-                        foreColor = ConsoleColor.Red;
+                        foreColor = ConsoleColor.White;
+                        backColor = ConsoleColor.Red;
                         break;
                     case LogLevel.None:
                         break;
                     default:
                         break;
                 }
+
+                void SetTimeStyle(LogLevel level)
+                {
+                    if (level != LogLevel.Critical)
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Red;
+                    }
+                }
+
+                SetTimeStyle(logItem.level);
                 Console.Write("[");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(logItem.Time.ToString("yy-MM-dd HH:mm:ss.ffff") + "] ");
-                Console.ForegroundColor = logItem.Color != ConsoleColor.White ? logItem.Color : foreColor;
-                Console.BackgroundColor = backColor;
+                Console.Write(logItem.Time.ToString("MM/dd HH:mm:ss.ff") + "] ");
+
+                clsLogConsoleStyle styles = StyleMap[logItem.level];
+
+                Console.ForegroundColor = styles.ForeColor;
+                Console.BackgroundColor = styles.BgColor;
+
                 Console.WriteLine(logItem.logFullLine);
                 Console.WriteLine(" ");
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.BackgroundColor = ConsoleColor.Black;
             }
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.BackgroundColor = ConsoleColor.Black;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -156,5 +199,19 @@ namespace AGVSystemCommonNet6.Log
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+
+        public class clsLogConsoleStyle
+        {
+            public ConsoleColor ForeColor { get; set; } = ConsoleColor.White;
+            public ConsoleColor BgColor { get; set; } = ConsoleColor.Black;
+
+            public clsLogConsoleStyle(ConsoleColor foreColor, ConsoleColor bgColor)
+            {
+                this.ForeColor = foreColor;
+                this.BgColor = bgColor;
+            }
+        }
+
     }
 }

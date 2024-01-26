@@ -82,8 +82,8 @@ namespace AGVSystemCommonNet6.Log
         public static string GetCallerClassName()
         {
             var caller_class_declaring = new StackTrace().GetFrame(2).GetMethod().DeclaringType;
-            if (caller_class_declaring == null || caller_class_declaring.DeclaringType == null)
-                return "Unknown class";
+            if (caller_class_declaring == null || caller_class_declaring.DeclaringType == null|| caller_class_declaring.DeclaringType.Name.Contains("<>c__DisplayClass"))
+                return "ClassClass";
             return caller_class_declaring.DeclaringType.Name;
         }
     }
