@@ -118,7 +118,6 @@ namespace AGVSystemCommonNet6.Log
                         break;
                 }
                 Console.Write("[");
-                //Console.BackgroundColor = ConsoleColor.Gray;
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(logItem.Time.ToString("yy-MM-dd HH:mm:ss.ffff") + "] ");
                 Console.ForegroundColor = logItem.Color != ConsoleColor.White ? logItem.Color : foreColor;

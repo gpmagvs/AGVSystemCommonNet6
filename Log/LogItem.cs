@@ -16,7 +16,7 @@ namespace AGVSystemCommonNet6.Log
 
         public string WriteToNewFileLogName { get; set; } = "";
 
-        public LogItem(LogLevel level, string logMsg, bool show_console = true, ConsoleColor color = ConsoleColor.White,string WriteToNewFileLogName="")
+        public LogItem(LogLevel level, string logMsg, bool show_console = true, ConsoleColor color = ConsoleColor.White, string WriteToNewFileLogName = "")
         {
             this.level = level;
             this.logMsg = logMsg;
@@ -29,7 +29,16 @@ namespace AGVSystemCommonNet6.Log
             this.logMsg = logMsg;
         }
 
-        public string logFullLine => $" |{level}|{Caller}|{logMsg}{(exception != null ? exception.StackTrace + (exception.InnerException == null ? "" : "\r\nInner exception:" + exception.InnerException.StackTrace) : "")}";
+        public string logFullLine
+        {
+            get
+            {
+                string msg = $"{logMsg}{(exception != null ? exception.StackTrace + (exception.InnerException == null ? "" : "\r\nInner exception:" + exception.InnerException.StackTrace) : "")}";
+                string logEntry = "|{0,-11}|{1,-15}| {2}";
+                string console_display = string.Format(logEntry, level, Caller, msg);
+                return console_display;
+            }
+        }
 
         public string Caller { get; internal set; }
 
