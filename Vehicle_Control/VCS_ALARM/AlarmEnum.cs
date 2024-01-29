@@ -451,7 +451,6 @@
         Fork_Arm_Action_Timeout = 860043,
         Fork_Arm_Action_Error = 860044,
         Replan = 860045,
-        Limit_Switch_Sensor_Left = 860046,
-        Limit_Switch_Sensor_Right = 860047,
+        Limit_Switch_Sensor = 860046,
     }
 }
