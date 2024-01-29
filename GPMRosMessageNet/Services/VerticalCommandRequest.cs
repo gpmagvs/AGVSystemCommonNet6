@@ -15,7 +15,11 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Services
             stop,
             resum,
             up_search,
-            down_search
+            down_search,
+            lock1,
+            lock2,
+            unlock1,
+            unlock2,
         }
         public const string RosMessageName = "gpm_msgs/VerticalCommand";
 
