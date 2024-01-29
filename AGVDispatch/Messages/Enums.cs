@@ -46,6 +46,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         Busy = 415,
         Current_Tag_Cannot_Online_In_Equipment = 416,
         Current_Tag_Cannot_Online_At_Virtual_Point = 417,
+        AGV_HasIDBut_No_Cargo = 418,
     }
     public enum PROCESS_RESULT
     {
