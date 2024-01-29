@@ -303,6 +303,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 LOG.ERROR($"Try Get OnlineMode Fail{ex.Message}");
                 VMS_API_Call_Fail_Flag = true;
+                Thread.Sleep(3000);
                 return (false, null);
             }
         }
