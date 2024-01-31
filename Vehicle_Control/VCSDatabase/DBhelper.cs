@@ -10,7 +10,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 {
     public class DBhelper
     {
-        public static SQLiteConnection db;
+        public static SQLiteConnection? db;
+        public static bool IsDatabaseCreated => db != null;
         public static string databasePath { get; private set; } = "database.db";
         public static Action<string> OnDataBaseChanged;
         public static void Initialize(string dbName = "VMS")
@@ -27,6 +28,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             }
             catch (Exception ex)
             {
+                db = null;
                 LOG.Critical($"初始化資料庫時發生錯誤＿{ex.Message}");
             }
         }
@@ -38,6 +40,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 
         public static void InsertAlarm(clsAlarmCode alarm)
         {
+            if (!IsDatabaseCreated)
+                return;
             Task.Factory.StartNew(() =>
             {
                 try
@@ -53,6 +57,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 
         public static void InsertParkingAccuracy(clsParkingAccuracy parkingAccuracy)
         {
+            if (!IsDatabaseCreated)
+                return;
             Task.Factory.StartNew(() =>
             {
                 try
@@ -69,6 +75,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 
         public static void InsertUser(UserEntity user)
         {
+            if (!IsDatabaseCreated)
+                return;
             try
             {
                 if (db.Table<UserEntity>().FirstOrDefault(user_ => user_.UserName == user.UserName) != null)
@@ -87,6 +95,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         /// <param name="status"></param>
         public static void AddAgvStatusData(clsAGVStatusTrack status)
         {
+            if (!IsDatabaseCreated)
+                return;
             try
             {
                 db.Insert(status);
@@ -108,6 +118,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         /// <param name="status"></param>
         public static void AddVibrationStatusRecord(clsVibrationStatusWhenAGVMoving status)
         {
+            if (!IsDatabaseCreated)
+                return;
             try
             {
                 db.Insert(status);
@@ -124,6 +136,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         }
         public static int AlarmsTotalNum(DateTime from, DateTime to, string alarm_type = "All", int code = 0)
         {
+            if (!IsDatabaseCreated)
+                return -1;
             try
             {
 
@@ -143,11 +157,13 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         }
         public static int AddUDULDRecord(LDULDRecord record)
         {
+            if (!IsDatabaseCreated)
+                return -1;
             try
             {
                 return db.Insert(record);
             }
-            catch (SQLite.SQLiteException ex)
+            catch (SQLiteException ex)
             {
                 db.CreateTable(typeof(LDULDRecord));
                 return db.Insert(record);
@@ -160,6 +176,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         }
         public static int ModifyUDLUDRecord(LDULDRecord reoc)
         {
+            if (!IsDatabaseCreated)
+                return -1;
             try
             {
                 var exist_record = db.Table<LDULDRecord>().FirstOrDefault(rd => rd.StartTime == reoc.StartTime);
@@ -177,6 +195,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         }
         public static int ClearAllAlarm()
         {
+            if (!IsDatabaseCreated)
+                return -1;
             try
             {
                 return db.Table<clsAlarmCode>().Delete(a => a.Time != null);
