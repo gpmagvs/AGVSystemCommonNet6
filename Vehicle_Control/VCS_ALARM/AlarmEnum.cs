@@ -398,6 +398,7 @@
         Under_Temperature = 5080,
         Under_Temperature_1_ = 5081,
         Under_Temperature_2_ = 5082,
+        EQP_PORT_HAS_OBSTACLE_BY_LSR = 7000,
         License_Error = 9990,
         License_Error_0x0000NOF3E7 = 9991,
         License_Error_0x0000NRD3E7 = 9992,
