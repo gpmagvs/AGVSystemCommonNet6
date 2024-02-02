@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Drawing;
 using WebSocketSharp;
@@ -14,7 +15,13 @@ namespace AGVSystemCommonNet6.Log
         public static bool WarningShow = true;
         public static bool ErrorShow = true;
         public static bool CriticalShow = true;
-
+        public static bool ShowClassName
+        {
+            set
+            {
+                LogItem.ShowClassName = value;
+            }
+        }
         private static LogBase _logger = new LogBase();
         public static string LogFolder => _logger.LogFolder;
         public static void SetLogFolderName(string logFolderName)
@@ -82,7 +89,7 @@ namespace AGVSystemCommonNet6.Log
         public static string GetCallerClassName()
         {
             var caller_class_declaring = new StackTrace().GetFrame(2).GetMethod().DeclaringType;
-            if (caller_class_declaring == null || caller_class_declaring.DeclaringType == null|| caller_class_declaring.DeclaringType.Name.Contains("<>c__DisplayClass"))
+            if (caller_class_declaring == null || caller_class_declaring.DeclaringType == null || caller_class_declaring.DeclaringType.Name.Contains("<>c__DisplayClass"))
                 return "ClassClass";
             return caller_class_declaring.DeclaringType.Name;
         }

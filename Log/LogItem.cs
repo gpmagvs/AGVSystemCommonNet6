@@ -26,10 +26,12 @@ namespace AGVSystemCommonNet6.Log
 
         public ConsoleColor Color { get; set; } = ConsoleColor.White;
 
+        public static bool ShowClassName = true;
         public string WriteToNewFileLogName { get; set; } = "";
 
         public LogItem(LogLevel level, string logMsg, bool show_console = true, ConsoleColor color = ConsoleColor.White, string WriteToNewFileLogName = "")
         {
+            this.Time = DateTime.Now;
             this.level = level;
             this.logMsg = logMsg;
             this.show_console = show_console;
@@ -46,8 +48,8 @@ namespace AGVSystemCommonNet6.Log
             get
             {
                 string msg = $"{logMsg}{(exception != null ? exception.StackTrace + (exception.InnerException == null ? "" : "\r\nInner exception:" + exception.InnerException.StackTrace) : "")}";
-                string logEntry = "|{0,-5}|{1,-15}| {2}";
-                string console_display = string.Format(logEntry, LevelDisplayTextMap[level], Caller, msg);
+                string logEntry = ShowClassName ? "|{0,-5}|{1,-15}| {2}" : "|{0,-5}|{1}{2}";
+                string console_display = string.Format(logEntry, LevelDisplayTextMap[level], ShowClassName ? Caller : "", msg);
                 return console_display;
             }
         }
