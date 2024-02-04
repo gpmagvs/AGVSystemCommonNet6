@@ -42,6 +42,7 @@ namespace AGVSystemCommonNet6.Alarm
                     alarm.Checked = true;
                 }
                 int num = await db.SaveChanges();
+                LOG.TRACE($"{num} alarms set as checked");
             }
             catch (Exception ex)
             {
@@ -285,7 +286,7 @@ namespace AGVSystemCommonNet6.Alarm
 
                 using (var dbhelper = new AGVSDatabase())
                 {
-                    var alarms = dbhelper.tables.SystemAlarms.Where(alarm => alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
+                    var alarms = dbhelper.tables.SystemAlarms.Where(alarm => !alarm.Checked && alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
                     foreach (var item in alarms)
                     {
                         item.Checked = true;
