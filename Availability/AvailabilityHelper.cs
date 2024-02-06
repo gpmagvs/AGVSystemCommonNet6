@@ -73,14 +73,19 @@ namespace AGVSystemCommonNet6.Availability
                 StartTime = DateTime.Now,
                 AGVName = agv_name
             };
-            RestoreDataFromDatabase();
-            SyncAvaliabilityDataWorker();
+            Task.Factory.StartNew(async () =>
+            {
+                await Task.Delay(3000);
+                RestoreDataFromDatabase();
+                SyncAvaliabilityDataWorker();
+            });
         }
         int lastDay = -1;
         private void SyncAvaliabilityDataWorker()
         {
             Task.Factory.StartNew(async () =>
             {
+                await Task.Delay(1000);
                 Stopwatch write_db_stopwatch = Stopwatch.StartNew();
                 while (true)
                 {

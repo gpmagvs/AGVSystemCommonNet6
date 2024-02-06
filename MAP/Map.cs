@@ -38,6 +38,8 @@ namespace AGVSystemCommonNet6.MAP
 
         public List<MapPath> Segments { get; set; } = new List<MapPath>();
 
+        public List<MapRegion>Regions { get; set; } = new List<MapRegion>();
+
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<string, Bay> Bays { get; set; } = new Dictionary<string, Bay>();
 
