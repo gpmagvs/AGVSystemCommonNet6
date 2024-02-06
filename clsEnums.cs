@@ -39,6 +39,7 @@ namespace AGVSystemCommonNet6
             /// 巡檢AGV
             /// </summary>
             INSPECTION_AGV,
+            SUBMERGED_SHIELD,
             UNKNOWN = 999
         }
 
