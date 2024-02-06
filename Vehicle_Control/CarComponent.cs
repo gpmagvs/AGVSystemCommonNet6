@@ -19,7 +19,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control
             CST_READER,
             NAVIGATION,
             VERTIVAL_DRIVER,
-            SICK
+            SICK,
+            PIN
         }
         public enum STATE
         {
