@@ -55,7 +55,7 @@ namespace AGVSystemCommonNet6.Alarm
             try
             {
                 var dbhelper = new AGVSDatabase();
-                var alarmExist = dbhelper.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
+                var alarmExist = dbhelper.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time || alarm.AlarmCode == alarmDto.AlarmCode);
                 if (alarmExist != null)
                 {
                     foreach (var prop in alarmDto.GetType().GetProperties())
@@ -140,7 +140,7 @@ namespace AGVSystemCommonNet6.Alarm
                 }
 
                 await AddAlarmAsync(alarmDto);
-                LOG.INFO($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
+                LOG.WARN($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
                 return alarmDto;
             }
             catch (Exception ex)
@@ -191,26 +191,26 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        public static void ResetAlarm(clsAlarmDto alarm, bool resetAllSameCode = false)
+        public static async Task ResetAlarmAsync(clsAlarmDto alarm, bool resetAllSameCode = false)
         {
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 if (resetAllSameCode)
                 {
-                    var alarms_same_code = dbhelper._context.SystemAlarms.Where(_alarm => _alarm.AlarmCode == alarm.AlarmCode && _alarm.Checked == false);
+                    var alarms_same_code = dbhelper._context.SystemAlarms.Where(_alarm => _alarm.Checked == false && _alarm.AlarmCode == alarm.AlarmCode);
                     foreach (clsAlarmDto? alarm_ in alarms_same_code)
                     {
                         alarm_.Checked = true;
                         alarm_.ResetAalrmMemberName = alarm.ResetAalrmMemberName;
-                        UpdateAlarmAsync(alarm_);
+                        await UpdateAlarmAsync(alarm_);
                     }
                 }
                 else
                 {
-                    if (dbhelper._context.Set<clsAlarmDto>().FirstOrDefault(a => a == alarm && a.Checked == false) != null)
+                    if (dbhelper._context.Set<clsAlarmDto>().FirstOrDefault(a => a.Checked == false && (a == alarm || a.AlarmCode == alarm.AlarmCode)) != null)
                     {
                         alarm.Checked = true;
-                        UpdateAlarmAsync(alarm);
+                        await UpdateAlarmAsync(alarm);
                     }
                 }
             }
