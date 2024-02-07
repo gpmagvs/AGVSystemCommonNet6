@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.AGVDispatch
 {
@@ -93,10 +94,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public int From_Station_Tag => int.TryParse(From_Station, out int tag) ? tag : -1;
 
         [Required]
+        public AGV_TYPE From_Station_AGV_Type { get; set; } = AGV_TYPE.Any;
+        [Required]
         public string From_Slot { get; set; } = "-1";
 
         [Required]
         public string To_Station { get; set; } = "-1";
+        [Required]
+        public AGV_TYPE To_Station_AGV_Type { get; set; } = AGV_TYPE.Any;
         public int To_Station_Tag => int.TryParse(To_Station, out int tag) ? tag : -1;
 
         [Required]

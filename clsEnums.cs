@@ -11,7 +11,8 @@ namespace AGVSystemCommonNet6
             FORK,
             SUBMERGED_SHIELD,
             INSPECTION_AGV,
-            UNKNOWN
+            UNKNOWN,
+            Any = 999
         }
         public enum OPERATOR_MODE
         {
