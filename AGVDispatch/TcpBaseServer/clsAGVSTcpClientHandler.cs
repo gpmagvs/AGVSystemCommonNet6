@@ -255,6 +255,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
                                 TaskDownloadWaitMRE.Set();
                             }
                         }
+
+
+                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.ACK_0306_TASK_CANCEL_ACK)
+                        {
+                            clsSimpleReturnWithTimestampMessage taskDownloadFeedback = JsonConvert.DeserializeObject<clsSimpleReturnWithTimestampMessage>(json);
+                            if (TaskCancelMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
+                            {
+                                var response = taskDownloadFeedback.Header.First().Value;
+                                LOG.INFO($"Task Cancel To {AGV_Name}, AGV Response={response.ToJson()}");
+                                taskCancel_AGV_ReturnCode = response.ReturnCode;
+                                TaskCancelWaitMRE.Set();
+                            }
+                        }
                     }
 
                 });
@@ -266,9 +279,42 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 send_out_queue.Enqueue(json);
             }
             private RETURN_CODE taskDownload_AGV_ReturnCode;
+            private RETURN_CODE taskCancel_AGV_ReturnCode;
+
             private ManualResetEvent TaskDownloadWaitMRE = new ManualResetEvent(false);
+            private ManualResetEvent TaskCancelWaitMRE = new ManualResetEvent(false);
             private clsTaskDownloadMessage TaskDownloadMsg;
+            private clsTaskResetReqMessage TaskCancelMsg;
+
             private bool disposedValue;
+
+            public SimpleRequestResponse SendTaskCancelMessage(Model.clsCancelTaskCmd reset_cmd)
+            {
+                SystemBytes += 1;
+                TaskCancelMsg = new clsTaskResetReqMessage()
+                {
+                    SystemBytes = SystemBytes,
+                    EQName = AGV_Name,
+                    Header = new Dictionary<string, TaskResetDto> {
+                         {"0305", new TaskResetDto
+                         {
+                              ResetMode = reset_cmd.ResetMode,
+                               Time_Stamp = DateTime.Now.ToAGVSTimeFormat()
+                         } }
+                     }
+                };
+                TaskCancelWaitMRE.Reset();
+                SendJsonReply(JsonConvert.SerializeObject(TaskCancelMsg));
+                bool timeout = !TaskCancelWaitMRE.WaitOne(TimeSpan.FromSeconds(3));
+                if (timeout)
+                {
+                    LOG.WARN($"Task Cancel To {AGV_Name}, Timeout!");
+                }
+                else
+                {
+                }
+                return new SimpleRequestResponse { ReturnCode = taskCancel_AGV_ReturnCode };
+            }
 
             public TaskDownloadRequestResponse SendTaskMessage(clsTaskDownloadData downloadData)
             {
