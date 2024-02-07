@@ -22,6 +22,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             //optionsBuilder.UseSqlite(_connectionString);
             optionsBuilder.UseSqlServer(_connectionString);
             _context = new AGVSDbContext(optionsBuilder.Options);
+            _context.Database.EnsureCreated();
         }
 
         protected virtual void Dispose(bool disposing)

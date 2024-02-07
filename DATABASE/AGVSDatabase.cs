@@ -1,9 +1,12 @@
 ﻿using AGVSystemCommonNet6.Alarm;
+using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.User;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,13 +22,48 @@ namespace AGVSystemCommonNet6.DATABASE
 
         public static void Initialize()
         {
-            using (var database = new AGVSDatabase())
+            try
             {
-                _DefaultUsersCreate(database.tables.Users);
+                using (AGVSDatabase database = new AGVSDatabase())
+                {
+                    DatabaseVersionCheck(database);
+                    _DefaultUsersCreate(database.tables.Users);
+                    _UnCheckedAlarmsSetAsCheckes(database.tables.SystemAlarms);
+                    _ = database.SaveChanges().Result;
+                }
+            }
+            catch (Exceptions.DataBaseVersionNotMatchException)
+            {
+                DataBaseMirgration();
+                Task.Factory.StartNew(Initialize).Wait();
+            }
+        }
 
-                _UnCheckedAlarmsSetAsCheckes(database.tables.SystemAlarms);
+        private static void DataBaseMirgration()
+        {
 
-                _ = database.SaveChanges().Result;
+            var ori_database_name = AGVSConfigulator.SysConfigs.DBConnection.Split(';');
+            AGVSConfigulator.SysConfigs.DBConnection = AGVSConfigulator.SysConfigs.DBConnection.Replace(ori_database_name[1], $"Database=GPMAGVs_V{DateTime.Now.ToString("yyMMddHHmmssff")}");
+            AGVSConfigulator.Save(AGVSConfigulator.SysConfigs);
+        }
+
+        private static void DatabaseVersionCheck(AGVSDatabase databse)
+        {
+            try
+            {
+                databse.tables.Tasks.FirstOrDefault();
+                databse.tables.Users.FirstOrDefault();
+                databse.tables.AgvStates.FirstOrDefault();
+                databse.tables.SystemAlarms.FirstOrDefault();
+                databse.tables.Availabilitys.FirstOrDefault();
+                databse.tables.RealTimeAvailabilitys.FirstOrDefault();
+                databse.tables.TaskTrajecotroyStores.FirstOrDefault();
+                databse.tables.InstrumentMeasureResult.FirstOrDefault();
+                databse.tables.StopRegionData.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw new Exceptions.DataBaseVersionNotMatchException();
             }
         }
 
