@@ -9,12 +9,12 @@ namespace AGVSystemCommonNet6.Configuration
 {
     public class SystemConfigs
     {
-        public string DBConnection = "Server=127.0.0.1;Database=GPMAGVs;User Id=sa;Password=12345678;Encrypt=False";
-        public string VMSHost = "http://localhost:5036";
-        public string AGVSHost = "http://localhost:5216";
+        public string DBConnection { get; set; } = "Server=127.0.0.1;Database=GPMAGVs;User Id=sa;Password=12345678;Encrypt=False";
+        public string VMSHost { get; set; } = "http://localhost:5036";
+        public string AGVSHost { get; set; } = "http://localhost:5216";
 
-        public string VMSTcpServerIP = "127.0.0.1";
-        public int VMSTcpServerPort = 5500;
+        public string VMSTcpServerIP { get; set; } = "127.0.0.1";
+        public int VMSTcpServerPort { get; set; } = 5500;
 
         /// <summary>
         /// 前端用戶閒置超過此秒數後自動登出。

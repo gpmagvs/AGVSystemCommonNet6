@@ -34,6 +34,11 @@ namespace AGVSystemCommonNet6.Configuration
         {
             SysConfigs = LoadConfig("C:\\AGVS\\SystemConfigs.json");
         }
+
+        internal static void Save(SystemConfigs config)
+        {
+            File.WriteAllText(_configFilePath, JsonConvert.SerializeObject(config, Formatting.Indented));
+        }
     }
 }
 
