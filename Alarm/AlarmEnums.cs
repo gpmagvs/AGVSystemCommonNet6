@@ -96,7 +96,8 @@ namespace AGVSystemCommonNet6.Alarm
         EQ_UNLOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 77,
         EQ_LOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 78,
         AGV_Type_Is_Not_Allow_To_Execute_Task_At_Source_Equipment = 79,
-        AGV_Type_Is_Not_Allow_To_Execute_Task_At_Destine_Equipment = 80
+        AGV_Type_Is_Not_Allow_To_Execute_Task_At_Destine_Equipment = 80,
+        EQ_Input_Data_Not_Enough = 81
     }
 
 }
