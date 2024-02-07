@@ -64,14 +64,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     MSG = taskDownloadReq;
                     AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
                     taskDownloadReq.TaskDownload.OriTaskDataJson = _json;
-                    var return_code = OnTaskDownload(taskDownloadReq.TaskDownload);
-                    if (TryTaskDownloadReqAckAsync(return_code == TASK_DOWNLOAD_RETURN_CODES.OK, taskDownloadReq.SystemBytes))
+                    _is_task_cancel_recieved = _is_delay_invoke_task_downed = false;
+                    Thread _wait_thred = new Thread((download_data) =>
                     {
-                        _is_delay_invoke_task_downed = true;
-                        Thread _wait_thred = new Thread((download_data) =>
+                        clsTaskDownloadData data = (clsTaskDownloadData)download_data;
+                        var return_code = OnTaskDownload(data);
+                        if (TryTaskDownloadReqAckAsync(return_code == TASK_DOWNLOAD_RETURN_CODES.OK, taskDownloadReq.SystemBytes))
                         {
-                            clsTaskDownloadData data = (clsTaskDownloadData)download_data;
-
+                            _is_delay_invoke_task_downed = true;
                             Stopwatch _stopwatch = Stopwatch.StartNew();
                             while (_stopwatch.ElapsedMilliseconds < 500)
                             {
@@ -84,13 +84,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                                     return;
                                 }
                             }
-                            _is_task_cancel_recieved = _is_delay_invoke_task_downed = false;
                             OnTaskDownloadFeekbackDone?.Invoke(this, data);
+                            _is_task_cancel_recieved = _is_delay_invoke_task_downed = false;
                             LOG.WARN($"0301 TaskDownload  invoked.");
-                        });
-                        _wait_thred.IsBackground = true;
-                        _wait_thred.Start(taskDownloadReq.TaskDownload);
-                    }
+                        }
+
+                    });
+                    _wait_thred.Start(taskDownloadReq.TaskDownload);
+
                 }
                 else if (msgType == MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK)  //TASK Feedback的回傳
                 {
@@ -103,18 +104,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     clsTaskResetReqMessage? taskResetMsg = JsonConvert.DeserializeObject<clsTaskResetReqMessage>(_json);
                     MSG = taskResetMsg;
                     AGVSMessageStoreDictionary.TryAdd(taskResetMsg.SystemBytes, MSG);
+                    _is_task_cancel_recieved = true;
+                    bool _is_task_invoked = !_is_delay_invoke_task_downed;
+                    Thread _handleThread = new Thread((_taskResetMsg) =>
+                    {
+                        var task_reset_msg = (clsTaskResetReqMessage)_taskResetMsg;
+                        LOG.WARN($"0305 TASK_CANCEL Request Recieved. ");
+                        OnTaskResetReq(task_reset_msg.ResetData.ResetMode, false);
+                        LOG.WARN($"0306 TaskCancel invoked.");
+                        TrySimpleReply("0306", true, task_reset_msg.SystemBytes);
+                    });
 
-                    if (_is_delay_invoke_task_downed)
-                    {
-                        _is_task_cancel_recieved = true;
-                        LOG.WARN($"0305 TASK_CANCEL not invoked. because 0301 not invoked yet");
-                        TrySimpleReply("0306", true, taskResetMsg.SystemBytes);
-                    }
-                    else
-                    {
-                        bool reset_accept = await OnTaskResetReq(taskResetMsg.ResetData.ResetMode, false);
-                        TrySimpleReply("0306", reset_accept, taskResetMsg.SystemBytes);
-                    }
+                    _handleThread.Start(taskResetMsg);
                 }
                 else if (msgType == MESSAGE_TYPE.ACK_0322)
                 {
