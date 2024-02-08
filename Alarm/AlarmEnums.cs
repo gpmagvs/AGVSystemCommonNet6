@@ -18,6 +18,7 @@ namespace AGVSystemCommonNet6.Alarm
 
     public enum ALARMS
     {
+        NONE = 0,
         VMS_DISCONNECT = 2,
         AGV_DISCONNECT = 3,
         GET_ONLINE_REQ_BUT_AGV_DISCONNECT = 4,
@@ -29,7 +30,6 @@ namespace AGVSystemCommonNet6.Alarm
         GET_CHARGE_TASK_BUT_AGV_CHARGING_ALREADY = 10,
         CST_STATUS_CHECK_FAIL = 11,
         Endpoint_EQ_NOT_CONNECTED = 12,
-        NONE = 13,
         EQ_LOAD_REQUEST_IS_NOT_ON = 14,
         EQ_UNLOAD_REQUEST_IS_NOT_ON = 15,
         TRANSFER_TASK_TO_VMS_BUT_ERROR_OCCUR = 16,
@@ -97,7 +97,10 @@ namespace AGVSystemCommonNet6.Alarm
         EQ_LOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 78,
         AGV_Type_Is_Not_Allow_To_Execute_Task_At_Source_Equipment = 79,
         AGV_Type_Is_Not_Allow_To_Execute_Task_At_Destine_Equipment = 80,
-        EQ_Input_Data_Not_Enough = 81
+        EQ_Input_Data_Not_Enough = 81,
+        AGV_Already_Has_Charge_Task = 82,
+        Charge_Station_Already_Has_Task_Assigned = 83,
+        Charge_Station_Already_Has_AGV_Parked = 84,
     }
 
 }
