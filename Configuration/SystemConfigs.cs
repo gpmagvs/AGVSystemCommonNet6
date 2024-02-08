@@ -39,7 +39,7 @@ namespace AGVSystemCommonNet6.Configuration
     public class clsEquipmentManagementConfigs
     {
         public bool UseEQEmu { get; set; } = false;
-        public string EquipmentManagementConfigFolder { get; set; } = "C://AGVS//EquipmentManagement_MEC";
+        public string EquipmentManagementConfigFolder { get; set; } = "C://AGVS//EquipmentManagement";
 
     }
 

@@ -23,19 +23,32 @@ namespace AGVSystemCommonNet6.Microservices.VMS
 
         public static Dictionary<VMS_GROUP, VMSConfig>? ReadVMSVehicleGroupSetting(string Vehicle_Json_file)
         {
+            Dictionary<VMS_GROUP, VMSConfig> config = new Dictionary<VMS_GROUP, VMSConfig>();
             if (File.Exists(Vehicle_Json_file))
             {
                 var json = File.ReadAllText(Vehicle_Json_file);
-                if (json == null)
-                {
-                    return null;
-                }
-                return JsonConvert.DeserializeObject<Dictionary<VMS_GROUP, VMSConfig>>(json);
+                config = JsonConvert.DeserializeObject<Dictionary<VMS_GROUP, VMSConfig>>(json);
             }
             else
             {
-                return null;
+                config.Add(VMS_GROUP.GPM_FORK, new VMSConfig()
+                {
+                    AGV_List = new Dictionary<string, clsAGVOptions>()
+                     {
+                         { "AGV_001", new clsAGVOptions(){
+                             Enabled = true,
+                             HostIP="127.0.0.1",
+                             HostPort=7025 ,
+                             InitTag=50,
+                             Protocol = clsAGVOptions.PROTOCOL.RESTFulAPI,
+                             Simulation=false
+                            }
+                         }
+                    }
+                });
             }
+            SaveVMSVehicleGroupSetting(Vehicle_Json_file, JsonConvert.SerializeObject(config, Formatting.Indented));
+            return config;
         }
         public static void SaveVMSVehicleGroupSetting(string Vehicle_Json_file, string json)
         {
