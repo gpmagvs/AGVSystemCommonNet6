@@ -101,6 +101,7 @@ namespace AGVSystemCommonNet6.Alarm
         AGV_Already_Has_Charge_Task = 82,
         Charge_Station_Already_Has_Task_Assigned = 83,
         Charge_Station_Already_Has_AGV_Parked = 84,
+        Station_Disabled = 85,
     }
 
 }

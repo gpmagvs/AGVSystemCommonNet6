@@ -18,8 +18,18 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         protected AGVSDbContext dbContext => dbhelper._context;
         public DBHelperAbstract()
         {
-            connection_str = AGVSConfigulator.SysConfigs.DBConnection;
-            dbhelper = new DbContextHelper(connection_str);
+            if (AGVSConfigulator.SysConfigs == null)
+                return;
+            try
+            {
+
+                connection_str = AGVSConfigulator.SysConfigs.DBConnection;
+                dbhelper = new DbContextHelper(connection_str);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         public static object lockObj = new object();
         public async Task<int> SaveChanges()

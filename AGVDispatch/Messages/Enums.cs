@@ -108,19 +108,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         CANCEL
     }
 
-    public enum TRANSFER_PROCESS : int
-    {
-        NOT_START_YET,
-        GO_TO_SOURCE_EQ,
-        WORKING_AT_SOURCE_EQ,
-        GO_TO_DESTINE_EQ,
-        WORKING_AT_DESTINE_EQ,
-        LEAVE_WORKSTATION,
-        MOVING,
-        GO_TO_CHARGE_STATION,
-        PARK_IN_CHARGE_STATION,
-        FINISH
-    }
     public enum ACTION_TYPE
     {
         None,

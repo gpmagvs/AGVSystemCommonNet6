@@ -1,10 +1,12 @@
 ﻿using AGVSystemCommonNet6;
+using AGVSystemCommonNet6.AGVDispatch;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,11 +42,16 @@ namespace AGVSystemCommonNet6
         /// </summary>
         public ACTION_TYPE CurrentAction { get; set; }
         public double Theta { get; set; }
-        public TRANSFER_PROCESS TransferProcess { get; set; }
+        public VehicleMovementStage TransferProcess { get; set; }
 
         [NotMapped] // 此欄位不會寫入資料表
         public DateTime TaskETA { get; set; } = DateTime.MaxValue;
-
+        [NotMapped]// 此欄位不會寫入資料表
+        public bool IsExecutingOrder { get; set; } = false;
+        [NotMapped]// 此欄位不會寫入資料表
+        public double VehicleLength { get; set; } = 145.0;
+        [NotMapped]// 此欄位不會寫入資料表
+        public double VehicleWidth { get; set; } = 70;
         public void Update(clsAGVStateDto entity)
         {
             AGV_Description = entity.AGV_Description;

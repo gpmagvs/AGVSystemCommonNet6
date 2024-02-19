@@ -63,10 +63,14 @@ namespace AGVSystemCommonNet6.MAP
         /// 是否為消防設備
         /// </summary>
         public bool IsExtinguishing { get; set; }
+
+        /// <summary>
+        /// 是否為交通檢查點
+        /// </summary>
+        public bool IsTrafficCheckPoint { get; set; }
         /// <summary>
         /// 註冊點(,逗點分隔)
         /// </summary>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? InvolvePoint { get; set; } = "";
         /// <summary>
         /// 新版的註冊點屬性
@@ -76,7 +80,6 @@ namespace AGVSystemCommonNet6.MAP
         public int LsrMode { get; set; }
         public double Speed { get; set; }
 
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Bay { get; set; } = "";
         public Graph Graph { get; set; } = new Graph();
 
@@ -84,20 +87,13 @@ namespace AGVSystemCommonNet6.MAP
         /// Key Point Index, value:權重
         /// </summary>
         public Dictionary<int, double>? Target { get; set; } = new Dictionary<int, double>();
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int? DodgeMode { get; set; } = 0;
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int? SpinMode { get; set; } = 0;
         public string? SubMap { get; set; } = "";
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public AutoDoor? AutoDoor { get; set; } = new AutoDoor();
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public MotionInfo? MotionInfo { get; set; } = new MotionInfo();
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 
         public string? Region { get; set; } = "";
-
-
 
         [JsonIgnore]
         public bool IsCharge

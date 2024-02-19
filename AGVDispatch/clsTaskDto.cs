@@ -10,6 +10,20 @@ using static AGVSystemCommonNet6.clsEnums;
 namespace AGVSystemCommonNet6.AGVDispatch
 {
 
+    public enum VehicleMovementStage
+    {
+        Not_Start_Yet = 0,
+        Traveling = 1,
+        Traveling_To_Source = 2,
+        Traveling_To_Destine = 3,
+        WorkingAtSource = 4,
+        WorkingAtDestination = 5,
+        WorkingAtChargeStation = 6,
+        LeaveFrom_WorkStation = 7,
+        LeaveFrom_ChargeStation = 8,
+        ParkAtWorkStation = 9,
+        Completed = 500,
+    }
     public class clsTaskDto
     {
         public DateTime RecieveTime { get; set; }
