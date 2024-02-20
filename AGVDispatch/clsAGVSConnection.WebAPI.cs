@@ -19,7 +19,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public HttpHelper AGVsWebAPIHttp;
         public async Task<OnlineModeQueryResponse> GetOnlineMode()
         {
-            string api_route = $"/api/AGV/OnlineMode?AGVName={EQName}&Model={AGV_Model}";
+            string api_route = $"/api/AGV/OnlineMode?AGVName={EQName}&Model={AGV_Type}";
             LogMsgToAGVS($"(Get) {api_route}");
             var response = await VMSWebAPIHttp.GetAsync<Dictionary<string, object>>(api_route);
 
@@ -41,7 +41,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
         public async Task<SimpleRequestResponse> PostRunningStatus(clsRunningStatus status)
         {
-            string api_route = $"/api/AGV/AGVStatus?AGVName={EQName}&Model={AGV_Model}";
+            string api_route = $"/api/AGV/AGVStatus?AGVName={EQName}&Model={AGV_Type}";
             LogMsgToAGVS($"(Post) {api_route},body json = {status.ToJson()}");
             var response = await VMSWebAPIHttp.PostAsync<Dictionary<string, object>, clsRunningStatus>(api_route, status);
             LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
@@ -58,7 +58,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 var _VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{VMSPort}", 3);
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
-                var api_route = $"/api/AGV/TaskFeedback?AGVName={EQName}&Model={AGV_Model}";
+                var api_route = $"/api/AGV/TaskFeedback?AGVName={EQName}&Model={AGV_Type}";
                 _ = LogMsgToAGVS($"(Post) {api_route},body json ={feedback.ToJson()}");
 
                 var response = await _VMSWebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData>(api_route, feedback, 1);
@@ -93,7 +93,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
 
-                var api_route = $"/api/AGV/ReportMeasure?AGVName={EQName}&Model={AGV_Model}";
+                var api_route = $"/api/AGV/ReportMeasure?AGVName={EQName}&Model={AGV_Type}";
                 LogMsgToAGVS($"(Post){api_route},body json ={measure_reuslt.ToJson()}");
                 var response = await VMSWebAPIHttp.PostAsync<Dictionary<object, string>, clsMeasureResult>(api_route, measure_reuslt);
                 LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
@@ -115,7 +115,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
-                var api_route = $"/api/AGV/CarrierVirtualID?AGVName={EQName}&Model={AGV_Model}";
+                var api_route = $"/api/AGV/CarrierVirtualID?AGVName={EQName}&Model={AGV_Type}";
                 LogMsgToAGVS($"(GET){api_route},body json =");
                 clsCarrierVirtualIDResponseWebAPI response = await VMSWebAPIHttp.GetAsync<clsCarrierVirtualIDResponseWebAPI>(api_route);
                 return response;

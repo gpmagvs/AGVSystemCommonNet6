@@ -92,7 +92,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             UNKNOWN = 9999,
         }
         public string LocalIP { get; set; }
-        public AGV_MODEL AGV_Model { get; }
+        public AGV_TYPE AGV_Type { get; }
         public clsAGVSConnection(string IP, int Port, bool AutoPingServerCheck = true) : base(IP, Port, AutoPingServerCheck)
         {
             this.IP = IP;
@@ -103,12 +103,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
             AGVsWebAPIHttp.Logger = this.Logger;
         }
-        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_MODEL AGV_Model = AGV_MODEL.FORK_AGV)
+        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_TYPE AGV_TYPE = AGV_TYPE.FORK)
         {
             this.IP = HostIP;
             this.VMSPort = HostPort;
             this.LocalIP = localIP;
-            this.AGV_Model = AGV_Model;
+            this.AGV_Type = AGV_TYPE;
             VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{VMSPort}");
             VMSWebAPIHttp.Logger = this.Logger;
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");

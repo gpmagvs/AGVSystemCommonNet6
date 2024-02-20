@@ -8,10 +8,10 @@ namespace AGVSystemCommonNet6
     {
         public enum AGV_TYPE
         {
-            FORK,
-            SUBMERGED_SHIELD,
-            INSPECTION_AGV,
-            UNKNOWN,
+            FORK = 0,
+            YUNTECH_FORK_AGV = 1,
+            INSPECTION_AGV = 2,
+            SUBMERGED_SHIELD = 3,
             Any = 999
         }
         public enum OPERATOR_MODE
@@ -31,17 +31,6 @@ namespace AGVSystemCommonNet6
             WARNING = 7,
             STOP,
             UNKNOWN
-        }
-        public enum AGV_MODEL
-        {
-            FORK_AGV,
-            YUNTECH_FORK_AGV,
-            /// <summary>
-            /// 巡檢AGV
-            /// </summary>
-            INSPECTION_AGV,
-            SUBMERGED_SHIELD,
-            UNKNOWN = 999
         }
 
         public enum ONLINE_STATE

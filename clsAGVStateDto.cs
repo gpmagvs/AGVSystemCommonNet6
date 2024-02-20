@@ -24,7 +24,7 @@ namespace AGVSystemCommonNet6
         /// 所屬車隊
         /// </summary>
         public VMS_GROUP Group { get; set; }
-        public AGV_MODEL Model { get; set; }
+        public AGV_TYPE Model { get; set; }
         public MAIN_STATUS MainStatus { get; set; }
         public ONLINE_STATE OnlineStatus { get; set; }
         public string CurrentLocation { get; set; } = "";
