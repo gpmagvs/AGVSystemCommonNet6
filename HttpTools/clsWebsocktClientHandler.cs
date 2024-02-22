@@ -42,10 +42,10 @@ namespace AGVSystemCommonNet6.HttpTools
                         try
                         {
                             byte[] _datBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data));
-                            if (!_datBytes.SequenceEqual(datBytes))
-                                await WebSocket.SendAsync(new ArraySegment<byte>(_datBytes), WebSocketMessageType.Text, true, CancellationToken.None);
-                            else
+                            bool _isDataNotChanged = _datBytes.SequenceEqual(datBytes);
+                            if (_isDataNotChanged)
                                 await Task.Delay(200);
+                            await WebSocket.SendAsync(new ArraySegment<byte>(_datBytes), WebSocketMessageType.Text, true, CancellationToken.None);
                             data = null;
                             datBytes = _datBytes;
                         }
