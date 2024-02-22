@@ -36,5 +36,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public PROCESS_RESULT ProcessResult { get; set; }
         public string Message { get; set; }
 
+        internal string SystemMessage { get; set; } = "";
+
     }
 }

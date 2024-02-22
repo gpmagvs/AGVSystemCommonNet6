@@ -127,9 +127,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 if (UseWebAPI)
                 {
-                    clsRunningStatus runnginStatus = OnWebAPIProtocolGetRunningStatus();
-                    SimpleRequestResponse response = await PostRunningStatus(runnginStatus);
-                    previousRunningStatusReport_via_WEBAPI = runnginStatus;
+                    (bool report_allow, clsRunningStatus data) feedbackDto = OnWebAPIProtocolGetRunningStatus();
+
+                    if (!feedbackDto.report_allow)
+                        return (false, new SimpleRequestResponseWithTimeStamp() { SystemMessage = "Running Status Report Not Allowed : Agv Running Status data not ready yet" });
+
+                    SimpleRequestResponse response = await PostRunningStatus(feedbackDto.data);
+                    previousRunningStatusReport_via_WEBAPI = feedbackDto.data;
                     return (response.ReturnCode == RETURN_CODE.OK | response.ReturnCode == RETURN_CODE.NG, new SimpleRequestResponseWithTimeStamp
                     {
                         ReturnCode = response.ReturnCode,
@@ -138,8 +142,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 }
                 else
                 {
-                    RunningStatus runningStatus = OnTcpIPProtocolGetRunningStatus();
-                    byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(EQName, SID, runningStatus, out clsRunningStatusReportMessage msg);
+                    (bool report_allow, RunningStatus data) feedbackDto = OnTcpIPProtocolGetRunningStatus();
+                    if (!feedbackDto.report_allow)
+                        return (false, new SimpleRequestResponseWithTimeStamp() { SystemMessage = "Running Status Report Not Allowed : Agv Running Status data not ready yet" });
+
+                    byte[] data = AGVSMessageFactory.CreateRunningStateReportQueryData(EQName, SID, feedbackDto.data, out clsRunningStatusReportMessage msg);
                     bool success = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes);
                     if (!success)
                     {

@@ -24,8 +24,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         ConcurrentDictionary<int, MessageBase> AGVSMessageStoreDictionary = new ConcurrentDictionary<int, MessageBase>();
         bool VMS_API_Call_Fail_Flag = true;
 
-        public delegate clsRunningStatus GetRunningDataUseWebAPIProtocolDelegate();
-        public delegate RunningStatus GetRunningDataUseTCPIPProtocolDelegate();
+        public delegate (bool report_allow, clsRunningStatus running_status) GetRunningDataUseWebAPIProtocolDelegate();
+        public delegate (bool report_allow, RunningStatus running_status) GetRunningDataUseTCPIPProtocolDelegate();
         public delegate TASK_DOWNLOAD_RETURN_CODES taskDonwloadExecuteDelage(clsTaskDownloadData taskDownloadData);
         public delegate bool onlineModeChangeDelelage(REMOTE_MODE mode, bool isAGVSRequest);
         public delegate Task<bool> taskResetReqDelegate(RESET_MODE reset_data, bool isNormal);
@@ -227,7 +227,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
                         if (!runningStateReport_result.Item1)
                         {
-                            LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                            if (runningStateReport_result.runningStateReportAck == null)
+                                LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                            else
+                                LOG.WARN(runningStateReport_result.runningStateReportAck.SystemMessage);
                         }
 
                     }
