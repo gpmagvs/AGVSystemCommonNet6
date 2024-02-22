@@ -106,7 +106,6 @@ namespace AGVSystemCommonNet6.Alarm
         {
             if (!Initialized)
                 Initialize();
-
             try
             {
 

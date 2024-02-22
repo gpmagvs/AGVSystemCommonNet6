@@ -14,6 +14,7 @@ namespace AGVSystemCommonNet6.Alarm
         public ALARM_LEVEL Level { get; set; }
         public ALARM_SOURCE Source { get; set; }
         public int AlarmCode { get; set; }
+        public string Description => $"{Description_En}({Description_Zh})";
         public string Description_Zh { get; set; } = "";
         public string Description_En { get; set; } = "";
         public string OccurLocation { get; set; } = "";
