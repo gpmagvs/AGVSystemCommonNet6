@@ -33,12 +33,13 @@ namespace AGVSystemCommonNet6
         }
         public enum AGV_MODEL
         {
-            FORK_AGV,
-            YUNTECH_FORK_AGV,
+            FORK = 0,
+            YUNTECH_FORK_AGV = 1,
             /// <summary>
             /// 巡檢AGV
             /// </summary>
-            INSPECTION_AGV,
+            INSPECTION_AGV = 2,
+            SUBMERGED_SHIELD = 3,
             UNKNOWN = 999
         }
 

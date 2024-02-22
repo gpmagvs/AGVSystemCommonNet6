@@ -98,7 +98,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
             AGVsWebAPIHttp.Logger = this.Logger;
         }
-        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_MODEL AGV_Model = AGV_MODEL.FORK_AGV)
+        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_MODEL AGV_Model = AGV_MODEL.FORK)
         {
             this.IP = HostIP;
             this.VMSPort = HostPort;
