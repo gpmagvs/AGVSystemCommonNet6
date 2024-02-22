@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSConnection
     {
+        private bool _is_delay_invoke_task_downed = false;
+        private bool _is_task_cancel_recieved = false;
         public async void HandleAGVSJsonMsg(string _json)
         {
             MessageBase? MSG = null;
@@ -61,11 +64,34 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     MSG = taskDownloadReq;
                     AGVSMessageStoreDictionary.TryAdd(MSG.SystemBytes, MSG);
                     taskDownloadReq.TaskDownload.OriTaskDataJson = _json;
-                    var return_code = OnTaskDownload(taskDownloadReq.TaskDownload);
-                    if (TryTaskDownloadReqAckAsync(return_code == TASK_DOWNLOAD_RETURN_CODES.OK, taskDownloadReq.SystemBytes))
+                    _is_task_cancel_recieved = _is_delay_invoke_task_downed = false;
+                    Thread _wait_thred = new Thread((download_data) =>
                     {
-                        OnTaskDownloadFeekbackDone?.Invoke(this, taskDownloadReq.TaskDownload);
-                    }
+                        clsTaskDownloadData data = (clsTaskDownloadData)download_data;
+                        var return_code = OnTaskDownload(data);
+                        if (TryTaskDownloadReqAckAsync(return_code == TASK_DOWNLOAD_RETURN_CODES.OK, taskDownloadReq.SystemBytes))
+                        {
+                            _is_delay_invoke_task_downed = true;
+                            Stopwatch _stopwatch = Stopwatch.StartNew();
+                            while (_stopwatch.ElapsedMilliseconds < 500)
+                            {
+                                Thread.Sleep(1);
+                                if (_is_task_cancel_recieved)
+                                {
+                                    _stopwatch.Stop();
+                                    _is_task_cancel_recieved = _is_delay_invoke_task_downed = false;
+                                    LOG.WARN($"0301 TaskDownload Task not invoked. because recieve task cancle after {_stopwatch.ElapsedMilliseconds} ms");
+                                    return;
+                                }
+                            }
+                            OnTaskDownloadFeekbackDone?.Invoke(this, data);
+                            _is_task_cancel_recieved = _is_delay_invoke_task_downed = false;
+                            LOG.WARN($"0301 TaskDownload  invoked.");
+                        }
+
+                    });
+                    _wait_thred.Start(taskDownloadReq.TaskDownload);
+
                 }
                 else if (msgType == MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK)  //TASK Feedback的回傳
                 {
@@ -78,8 +104,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     clsTaskResetReqMessage? taskResetMsg = JsonConvert.DeserializeObject<clsTaskResetReqMessage>(_json);
                     MSG = taskResetMsg;
                     AGVSMessageStoreDictionary.TryAdd(taskResetMsg.SystemBytes, MSG);
-                    bool reset_accept = await OnTaskResetReq(taskResetMsg.ResetData.ResetMode, false);
-                    TrySimpleReply("0306", reset_accept, taskResetMsg.SystemBytes);
+                    _is_task_cancel_recieved = true;
+                    bool _is_task_invoked = !_is_delay_invoke_task_downed;
+                    Thread _handleThread = new Thread((_taskResetMsg) =>
+                    {
+                        var task_reset_msg = (clsTaskResetReqMessage)_taskResetMsg;
+                        LOG.WARN($"0305 TASK_CANCEL Request Recieved. ");
+                        OnTaskResetReq(task_reset_msg.ResetData.ResetMode, false);
+                        LOG.WARN($"0306 TaskCancel invoked.");
+                        TrySimpleReply("0306", true, task_reset_msg.SystemBytes);
+                    });
+
+                    _handleThread.Start(taskResetMsg);
                 }
                 else if (msgType == MESSAGE_TYPE.ACK_0322)
                 {
