@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static AGVSystemCommonNet6.AGVDispatch.Messages.clsVirtualIDQu;
+using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.AGVDispatch
 {
@@ -33,6 +34,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task TryTaskFeedBackAsync(clsTaskDownloadData taskData, int point_index, TASK_RUN_STATUS task_status, int currentTAg, clsCoordination coordination, bool isTaskCancel = false, CancellationTokenSource cts = null)
         {
+            bool _IsActionFinishFeedback = task_status == TASK_RUN_STATUS.ACTION_FINISH;
+            if (_IsActionFinishFeedback)
+            {
+                LOG.WARN("Action Finish Feedback, Wait Main Status should not equal 'RUN' start");
+
+                (bool confirmed, string message) _main_status_not_run_now = await WaitMainStatusNotRUNRepoted();
+                if (!_main_status_not_run_now.confirmed)
+                {
+                    LOG.Critical(_main_status_not_run_now.message);
+                    return;
+                }
+            }
             await Task.Factory.StartNew(async () =>
             {
                 cts = cts == null ? new CancellationTokenSource(TimeSpan.FromSeconds(10)) : cts;
@@ -80,10 +93,32 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     }
                 }
             });
-
         }
 
+        private async Task<(bool confirmed, string message)> WaitMainStatusNotRUNRepoted()
+        {
+            return await Task.Run(() =>
+            {
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                while (_GetLastMainStatusReported() == MAIN_STATUS.RUN)
+                {
+                    if (cts.IsCancellationRequested)
+                        return (false, "Wait Main Status of running status report should not equal 'RUN' Timeout!");
+                    Thread.Sleep(1);
+                }
+                return (true, "");
 
+                //取得前次上報狀態
+                MAIN_STATUS _GetLastMainStatusReported()
+                {
+                    if (UseWebAPI)
+                        return previousRunningStatusReport_via_WEBAPI.AGV_Status;
+                    else
+                        return previousRunningStatusReport_via_TCPIP.AGV_Status;
+                }
+
+            });
+        }
         public RunningStatus previousRunningStatusReport_via_TCPIP = new RunningStatus();
         public clsRunningStatus previousRunningStatusReport_via_WEBAPI = new clsRunningStatus();
         private async Task<(bool, SimpleRequestResponseWithTimeStamp runningStateReportAck)> TryRnningStateReportAsync()
