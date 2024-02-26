@@ -157,6 +157,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
     public enum CST_TYPE
     {
         None = 0,
-        Tray = 200
+        Tray = 200,
+        Rack = 201
     }
 }
