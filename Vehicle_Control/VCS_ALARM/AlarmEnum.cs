@@ -212,6 +212,7 @@
         F0GPM_Motion_control_RunMove_Abort = 2400,
         Can_not_Pass_Task_to_Motion_Control = 2401,
         F1Action_Server_Not_Ready0F1Action = 2410,
+        Motion_control_Disconnected = 2411,
         Task_Path_Road_Closed = 2500,
         AGV_Alive_Check_Fail = 3000,
         Registration_Reject = 3040,
@@ -442,6 +443,6 @@
         Exception_When_AGVC_AGVS_Task_Reset_CycleStop,
         GetVirtualIDFail,
         AGV_BarcodeReader_Not_Match_Tag_of_Destination,
-        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042
+        AGV_Park_Position_Too_Far_From_Tag_Of_Destination = 860042,
     }
 }
