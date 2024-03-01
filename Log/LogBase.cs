@@ -45,87 +45,86 @@ namespace AGVSystemCommonNet6.Log
 
         private async void WriteLogWorker()
         {
+            StreamWriter currentWriter = null;
+            string currentFileName = "";
+            string currentLogFolder = "";
 
             while (true)
             {
-                await Task.Delay(1);
-
-                if (logItemQueue.TryDequeue(out var logItem))
+                if (!logItemQueue.TryDequeue(out var logItem))
                 {
-                    string subFolder = Path.Combine(LogFolder, DateTime.Now.ToString("yyyy-MM-dd"));
+                    await Task.Delay(100); // Reduce CPU usage by increasing delay
+                    continue;
+                }
 
-                    if (!Directory.Exists(subFolder))
-                        Directory.CreateDirectory(subFolder);
+                string subFolder = Path.Combine(LogFolder, DateTime.Now.ToString("yyyy-MM-dd"));
+                if (!Directory.Exists(subFolder))
+                    Directory.CreateDirectory(subFolder);
 
-                    string fileName = Path.Combine(subFolder, $"{DateTime.Now.ToString("yyyy-MM-dd HH")}.log");
-                    if (logItem.WriteToNewFileLogName != "")
-                    {
-                        string NewLogfileName = Path.Combine(subFolder, $"{DateTime.Now.ToString("yyyy-MM-dd HH")}_{logItem.WriteToNewFileLogName}.log");
-                        try
-                        {
-                            using StreamWriter writer = new StreamWriter(NewLogfileName, true);
-                            writer.WriteLine(string.Format("{0} {1}", logItem.Time.ToString("yyyy/MM/dd HH:mm:ss.ffff"), logItem.logFullLine));
-                        }
-                        catch (Exception)
-                        {
-                            continue;
-                        }
-                    }
-                    try
-                    {
-                        using StreamWriter writer = new StreamWriter(fileName, true);
-                        writer.WriteLine(string.Format("{0} {1}", logItem.Time.ToString("yyyy/MM/dd HH:mm:ss.ffff"), logItem.logFullLine));
-                    }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
+                string fileName = Path.Combine(subFolder, $"{DateTime.Now.ToString("yyyy-MM-dd HH")}.log");
+                if (logItem.WriteToNewFileLogName != "")
+                {
+                    fileName = Path.Combine(subFolder, $"{DateTime.Now.ToString("yyyy-MM-dd HH")}_{logItem.WriteToNewFileLogName}.log");
+                }
 
-                    if (logItem.show_console)
-                    {
+                if (currentFileName != fileName || currentLogFolder != subFolder)
+                {
+                    currentWriter?.Dispose();
+                    currentWriter = new StreamWriter(fileName, true);
+                    currentFileName = fileName;
+                    currentLogFolder = subFolder;
+                }
 
-                        ConsoleColor foreColor = ConsoleColor.White;
-                        ConsoleColor backColor = ConsoleColor.Black;
+                try
+                {
+                    currentWriter.WriteLine($"{logItem.Time:yyyy/MM/dd HH:mm:ss.ffff} {logItem.logFullLine}");
+                    currentWriter.Flush(); // Ensure log is written even if the app crashes
+                }
+                catch (Exception)
+                {
+                    // Consider adding some logging for this exception.
+                    continue;
+                }
 
-
-                        switch (logItem.level)
-                        {
-                            case LogLevel.Trace:
-                                foreColor = ConsoleColor.White;
-                                break;
-                            case LogLevel.Debug:
-                                break;
-                            case LogLevel.Information:
-                                foreColor = ConsoleColor.Cyan;
-                                break;
-                            case LogLevel.Warning:
-                                foreColor = ConsoleColor.Yellow;
-                                break;
-                            case LogLevel.Error:
-                                foreColor = ConsoleColor.Red;
-                                break;
-                            case LogLevel.Critical:
-                                foreColor = ConsoleColor.Red;
-                                break;
-                            case LogLevel.None:
-                                break;
-                            default:
-                                break;
-                        }
-                        Console.Write("[");
-                        //Console.BackgroundColor = ConsoleColor.Gray;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(logItem.Time.ToString("yy-MM-dd HH:mm:ss.ffff") + "] ");
-                        Console.ForegroundColor = logItem.Color != ConsoleColor.White ? logItem.Color : foreColor;
-                        Console.BackgroundColor = backColor;
-                        Console.WriteLine(logItem.logFullLine);
-                        Console.WriteLine(" ");
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.BackgroundColor = ConsoleColor.Black;
-                    }
+                if (logItem.show_console)
+                {
+                    DisplayLogInConsole(logItem);
                 }
             }
         }
+
+        private void DisplayLogInConsole(LogItem logItem)
+        {
+            ConsoleColor foreColor = ConsoleColor.White;
+            switch (logItem.level)
+            {
+                case LogLevel.Trace:
+                    foreColor = ConsoleColor.Gray;
+                    break;
+                case LogLevel.Debug:
+                    foreColor = ConsoleColor.White;
+                    break;
+                case LogLevel.Information:
+                    foreColor = ConsoleColor.Cyan;
+                    break;
+                case LogLevel.Warning:
+                    foreColor = ConsoleColor.Yellow;
+                    break;
+                case LogLevel.Error:
+                    foreColor = ConsoleColor.Red;
+                    break;
+                case LogLevel.Critical:
+                    foreColor = ConsoleColor.Magenta;
+                    break;
+            }
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"[{logItem.Time:yy-MM-dd HH:mm:ss.ffff}] ");
+            Console.ForegroundColor = logItem.Color != ConsoleColor.White ? logItem.Color : foreColor;
+            Console.WriteLine(logItem.logFullLine);
+            Console.ResetColor(); // Reset to default colors to avoid color pollution
+        }
+
 
     }
 }
