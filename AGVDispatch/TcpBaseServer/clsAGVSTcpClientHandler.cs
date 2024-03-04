@@ -205,72 +205,64 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             private async Task HandleClientMsg(string clientMsg)
             {
-                //"55688abc*\r"
-                if (clientMsg.Contains("0105"))
-                {
 
-                }
-                _ = Task.Factory.StartNew(() =>
-                {
-                    string[] splited = clientMsg.Replace("*\r", "$").Split('$');
-                    List<string> jsonMsgLs = splited.ToList().FindAll(x => x != "");
+                string[] splited = clientMsg.Replace("*\r", "$").Split('$');
+                List<string> jsonMsgLs = splited.ToList().FindAll(x => x != "");
 
-                    foreach (var json in jsonMsgLs)
+                foreach (var json in jsonMsgLs)
+                {
+                    clsAGVSConnection.MESSAGE_TYPE msgType = clsAGVSConnection.GetMESSAGE_TYPE(json);
+
+                    if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0101_ONLINE_MODE_QUERY) //詢問上線狀態
                     {
-                        clsAGVSConnection.MESSAGE_TYPE msgType = clsAGVSConnection.GetMESSAGE_TYPE(json);
+                        clsOnlineModeQueryMessage? onlineModeQu = JsonConvert.DeserializeObject<clsOnlineModeQueryMessage>(json);
+                        AGV_Name = onlineModeQu.EQName;
+                        OnClientOnlineModeQuery?.Invoke(this, onlineModeQu);
+                    }
+                    if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0103_ONLINE_MODE_REQUEST) //要求上/下線
+                    {
+                        clsOnlineModeRequestMessage onlineRequest = JsonConvert.DeserializeObject<clsOnlineModeRequestMessage>(json);
+                        OnClientOnlineRequesting?.Invoke(this, onlineRequest);
+                    }
 
-                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0101_ONLINE_MODE_QUERY) //詢問上線狀態
-                        {
-                            clsOnlineModeQueryMessage? onlineModeQu = JsonConvert.DeserializeObject<clsOnlineModeQueryMessage>(json);
-                            AGV_Name = onlineModeQu.EQName;
-                            OnClientOnlineModeQuery?.Invoke(this, onlineModeQu);
-                        }
-                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0103_ONLINE_MODE_REQUEST) //要求上/下線
-                        {
-                            clsOnlineModeRequestMessage onlineRequest = JsonConvert.DeserializeObject<clsOnlineModeRequestMessage>(json);
-                            OnClientOnlineRequesting?.Invoke(this, onlineRequest);
-                        }
+                    if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0105_RUNNING_STATUS_REPORT) //狀態上報
+                    {
+                        clsRunningStatusReportMessage runningStatus = JsonConvert.DeserializeObject<clsRunningStatusReportMessage>(json);
+                        OnClientRunningStatusReport?.Invoke(this, runningStatus);
+                    }
 
-                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0105_RUNNING_STATUS_REPORT) //狀態上報
-                        {
-                            clsRunningStatusReportMessage runningStatus = JsonConvert.DeserializeObject<clsRunningStatusReportMessage>(json);
-                            OnClientRunningStatusReport?.Invoke(this, runningStatus);
-                        }
+                    if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0303_TASK_FEEDBACK_REPORT) //任務狀態上報
+                    {
+                        Console.WriteLine(json);
+                        clsTaskFeedbackMessage taskFeedback = JsonConvert.DeserializeObject<clsTaskFeedbackMessage>(json);
+                        OnClientTaskFeedback?.Invoke(this, taskFeedback);
+                    }
 
-                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0303_TASK_FEEDBACK_REPORT) //任務狀態上報
+                    if (msgType == clsAGVSConnection.MESSAGE_TYPE.ACK_0302_TASK_DOWNLOADED_ACK)
+                    {
+                        clsTaskDownloadAckMessage taskDownloadFeedback = JsonConvert.DeserializeObject<clsTaskDownloadAckMessage>(json);
+                        if (TaskDownloadMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
                         {
-                            Console.WriteLine(json);
-                            clsTaskFeedbackMessage taskFeedback = JsonConvert.DeserializeObject<clsTaskFeedbackMessage>(json);
-                            OnClientTaskFeedback?.Invoke(this, taskFeedback);
-                        }
-
-                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.ACK_0302_TASK_DOWNLOADED_ACK)
-                        {
-                            clsTaskDownloadAckMessage taskDownloadFeedback = JsonConvert.DeserializeObject<clsTaskDownloadAckMessage>(json);
-                            if (TaskDownloadMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
-                            {
-                                var response = taskDownloadFeedback.Header.First().Value;
-                                LOG.INFO($"Task Download To {AGV_Name}, AGV Response={response.ToJson()}");
-                                taskDownload_AGV_ReturnCode = response.ReturnCode;
-                                TaskDownloadWaitMRE.Set();
-                            }
-                        }
-
-
-                        if (msgType == clsAGVSConnection.MESSAGE_TYPE.ACK_0306_TASK_CANCEL_ACK)
-                        {
-                            clsSimpleReturnWithTimestampMessage taskDownloadFeedback = JsonConvert.DeserializeObject<clsSimpleReturnWithTimestampMessage>(json);
-                            if (TaskCancelMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
-                            {
-                                var response = taskDownloadFeedback.Header.First().Value;
-                                LOG.INFO($"Task Cancel To {AGV_Name}, AGV Response={response.ToJson()}");
-                                taskCancel_AGV_ReturnCode = response.ReturnCode;
-                                TaskCancelWaitMRE.Set();
-                            }
+                            var response = taskDownloadFeedback.Header.First().Value;
+                            LOG.INFO($"Task Download To {AGV_Name}, AGV Response={response.ToJson()}");
+                            taskDownload_AGV_ReturnCode = response.ReturnCode;
+                            TaskDownloadWaitMRE.Set();
                         }
                     }
 
-                });
+
+                    if (msgType == clsAGVSConnection.MESSAGE_TYPE.ACK_0306_TASK_CANCEL_ACK)
+                    {
+                        clsSimpleReturnWithTimestampMessage taskDownloadFeedback = JsonConvert.DeserializeObject<clsSimpleReturnWithTimestampMessage>(json);
+                        if (TaskCancelMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
+                        {
+                            var response = taskDownloadFeedback.Header.First().Value;
+                            LOG.INFO($"Task Cancel To {AGV_Name}, AGV Response={response.ToJson()}");
+                            taskCancel_AGV_ReturnCode = response.ReturnCode;
+                            TaskCancelWaitMRE.Set();
+                        }
+                    }
+                }
             }
 
             ConcurrentQueue<string> send_out_queue = new ConcurrentQueue<string>();
