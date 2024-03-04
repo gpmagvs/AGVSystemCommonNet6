@@ -60,13 +60,16 @@ namespace AGVSystemCommonNet6.Log
 
             while (!disposedValue)
             {
-                await Task.Delay(20);
                 try
                 {
                     if (logItemQueue.TryDequeue(out LogItem? logItem))
                     {
                         WriteLog(logItem);
                         logItem.Dispose();
+                    }
+                    else
+                    {
+                        await Task.Delay(100);
                     }
                 }
                 catch (Exception ex)
@@ -112,66 +115,40 @@ namespace AGVSystemCommonNet6.Log
 
             if (logItem.show_console)
             {
-
-                ConsoleColor foreColor = ConsoleColor.White;
-                ConsoleColor backColor = ConsoleColor.Black;
-                switch (logItem.level)
-                {
-                    case LogLevel.Trace:
-                        foreColor = ConsoleColor.Gray;
-                        break;
-                    case LogLevel.Debug:
-                        break;
-                    case LogLevel.Information:
-                        foreColor = ConsoleColor.Cyan;
-                        break;
-                    case LogLevel.Warning:
-                        foreColor = ConsoleColor.Yellow;
-                        break;
-                    case LogLevel.Error:
-                        foreColor = ConsoleColor.Red;
-                        break;
-                    case LogLevel.Critical:
-                        foreColor = ConsoleColor.White;
-                        backColor = ConsoleColor.Red;
-                        break;
-                    case LogLevel.None:
-                        break;
-                    default:
-                        break;
-                }
-
-                void SetTimeStyle(LogLevel level)
-                {
-                    if (level != LogLevel.Critical)
-                    {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.BackgroundColor = ConsoleColor.Black;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.BackgroundColor = ConsoleColor.Red;
-                    }
-                }
-
-                SetTimeStyle(logItem.level);
-                Console.Write("[");
-                Console.Write(logItem.Time.ToString("MM/dd HH:mm:ss.ff") + "] ");
-
-                clsLogConsoleStyle styles = StyleMap[logItem.level];
-
-                Console.ForegroundColor = styles.ForeColor;
-                Console.BackgroundColor = styles.BgColor;
-
-                Console.WriteLine(logItem.logFullLine);
-                Console.WriteLine(" ");
-
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.BackgroundColor = ConsoleColor.Black;
+                DisplayLogInConsole(logItem);
             }
         }
+        private void DisplayLogInConsole(LogItem logItem)
+        {
+            ConsoleColor foreColor = ConsoleColor.White;
+            switch (logItem.level)
+            {
+                case LogLevel.Trace:
+                    foreColor = ConsoleColor.Gray;
+                    break;
+                case LogLevel.Debug:
+                    foreColor = ConsoleColor.White;
+                    break;
+                case LogLevel.Information:
+                    foreColor = ConsoleColor.Cyan;
+                    break;
+                case LogLevel.Warning:
+                    foreColor = ConsoleColor.Yellow;
+                    break;
+                case LogLevel.Error:
+                    foreColor = ConsoleColor.Red;
+                    break;
+                case LogLevel.Critical:
+                    foreColor = ConsoleColor.Magenta;
+                    break;
+            }
 
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"[{logItem.Time:yy-MM-dd HH:mm:ss.ffff}] ");
+            Console.ForegroundColor = logItem.Color != ConsoleColor.White ? logItem.Color : foreColor;
+            Console.WriteLine(logItem.logFullLine);
+            Console.ResetColor(); // Reset to default colors to avoid color pollution
+        }
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
