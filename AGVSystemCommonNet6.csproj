@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyVersion>10.31.34</AssemblyVersion>
+	<NoWarn>4014</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

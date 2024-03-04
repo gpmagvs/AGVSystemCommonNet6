@@ -165,82 +165,78 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-        public async Task<bool> Start()
+        public async Task Start()
         {
-            _ = Task.Run(async () =>
+            int _delay = UseWebAPI ? 150 : 200;
+            while (true)
             {
-                int _delay = UseWebAPI ? 150 : 1000;
-                while (true)
+                CheckAndClearOlderMessageStored();
+                try
                 {
-                    Thread.Sleep(_delay);
-                    CheckAndClearOlderMessageStored();
-                    try
+
+                    if (!IsConnected())
                     {
-
-                        if (!IsConnected())
+                        if (!UseWebAPI)
                         {
-                            if (!UseWebAPI)
-                            {
-                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{VMSPort})", false);
-                                bool Reconnected = await Connect();
-                                Connected = Reconnected;
-                                continue;
-                            }
-                        }
-                        (bool, OnlineModeQueryResponse onlineModeQuAck) result = (false, new OnlineModeQueryResponse());
-                        int retryCnt = 0;
-                        IsGetOnlineModeTrying = false;
-                        while (!result.Item1)
-                        {
-                            Thread.Sleep(10);
-                            retryCnt += 1;
-                            if (retryCnt > 10)
-                                break;
-                            if (retryCnt > 3)
-                                IsGetOnlineModeTrying = true;
-                            result = TryOnlineModeQueryAsync().Result;
-                            if (!result.Item1)
-                            {
-                                LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/10", false);
-                                Thread.Sleep(1000);
-                            }
-                        }
-
-                        if (!result.Item1)
-                        {
-                            LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
-                            OnOnlineStateQueryFail?.Invoke(this, EventArgs.Empty);
-                            if (!UseWebAPI)
-                                Disconnect();
-                            Current_Warning_Code = AlarmCodes.AGVS_ALIVE_CHECK_TIMEOUT;
+                            LOG.WARN($"Try Connect TO AGVS Via TCP/IP(${IP}:{VMSPort})", false);
+                            bool Reconnected = await Connect();
+                            Connected = Reconnected;
                             continue;
                         }
-                        else
-                        {
-                            IsGetOnlineModeTrying = false;
-                            Connected = true;
-                            if (UseWebAPI)
-                                VMS_API_Call_Fail_Flag = false;
-                            Current_Warning_Code = AlarmCodes.None;
-                        }
-
-                        (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
-                        if (!runningStateReport_result.Item1)
-                        {
-                            if (runningStateReport_result.runningStateReportAck == null)
-                                LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
-                            else
-                                LOG.WARN(runningStateReport_result.runningStateReportAck.SystemMessage);
-                        }
-
                     }
-                    catch (Exception ex)
+                    (bool, OnlineModeQueryResponse onlineModeQuAck) result = (false, new OnlineModeQueryResponse());
+                    int retryCnt = 0;
+                    IsGetOnlineModeTrying = false;
+                    while (!result.Item1)
                     {
-                        GC.Collect();
+                        await Task.Delay(10);
+                        retryCnt += 1;
+                        if (retryCnt > 10)
+                            break;
+                        if (retryCnt > 3)
+                            IsGetOnlineModeTrying = true;
+                        result = TryOnlineModeQueryAsync().Result;
+                        if (!result.Item1)
+                        {
+                            LOG.WARN($"Can't Get OnlineMode From AGVS..Try-{retryCnt}/10", false);
+                            await Task.Delay(1000);
+                        }
                     }
+
+                    if (!result.Item1)
+                    {
+                        LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
+                        OnOnlineStateQueryFail?.Invoke(this, EventArgs.Empty);
+                        if (!UseWebAPI)
+                            Disconnect();
+                        Current_Warning_Code = AlarmCodes.AGVS_ALIVE_CHECK_TIMEOUT;
+                        continue;
+                    }
+                    else
+                    {
+                        IsGetOnlineModeTrying = false;
+                        Connected = true;
+                        if (UseWebAPI)
+                            VMS_API_Call_Fail_Flag = false;
+                        Current_Warning_Code = AlarmCodes.None;
+                    }
+
+                    (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) runningStateReport_result = TryRnningStateReportAsync().Result;
+                    if (!runningStateReport_result.Item1)
+                    {
+                        if (runningStateReport_result.runningStateReportAck == null)
+                            LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                        else
+                            LOG.WARN(runningStateReport_result.runningStateReportAck.SystemMessage);
+                    }
+
                 }
-            });
-            return true;
+                catch (Exception ex)
+                {
+                    GC.Collect();
+                }
+                await Task.Delay(_delay);
+            }
         }
 
         private void CheckAndClearOlderMessageStored()
@@ -482,20 +478,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             if (Logger == null)
                 return;
-            await Task.Factory.StartNew(() =>
-            {
-
-                Logger.Log(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
-            });
+            await Logger.LogAsync(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
         }
-        public async Task LogMsgFromAGVS(string msg)
+        public async Task LogMsgFromAGVSAsync(string msg)
         {
             if (Logger == null)
                 return;
-            await Task.Factory.StartNew(() =>
-            {
-                Logger.Log(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
-            });
+            await Logger.LogAsync(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
         }
 
     }
