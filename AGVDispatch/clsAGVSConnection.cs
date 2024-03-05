@@ -479,7 +479,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             await Task.Factory.StartNew(() =>
             {
 
-                Logger.Log(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
+                Logger.LogAsync(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
             });
         }
         public async Task LogMsgFromAGVS(string msg)
@@ -488,7 +488,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return;
             await Task.Factory.StartNew(() =>
             {
-                Logger.Log(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
+                Logger.LogAsync(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
             });
         }
 

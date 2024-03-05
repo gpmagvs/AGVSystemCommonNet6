@@ -44,7 +44,7 @@ namespace AGVSystemCommonNet6.Log
             this.LogFolderName = LogFolderName;
         }
 
-        public void Log(LogItem logItem, string caller_class_name = "")
+        public async Task LogAsync(LogItem logItem, string caller_class_name = "")
         {
             if (WriteLogToFileTask == null)
             {

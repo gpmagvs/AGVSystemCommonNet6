@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Drawing;
 using WebSocketSharp;
@@ -10,88 +9,70 @@ namespace AGVSystemCommonNet6.Log
 {
     public class LOG
     {
-        public static bool TraceShow = true;
-        public static bool InfoShow = true;
-        public static bool WarningShow = true;
-        public static bool ErrorShow = true;
-        public static bool CriticalShow = true;
-        public static bool ShowClassName
-        {
-            set
-            {
-                LogItem.ShowClassName = value;
-            }
-        }
         private static LogBase _logger = new LogBase();
         public static string LogFolder => _logger.LogFolder;
         public static void SetLogFolderName(string logFolderName)
         {
             _logger.LogFolderName = logFolderName;
         }
-        public static void TRACE(string info, string caller_class_name, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task TRACE(string info, string caller_class_name, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            _logger.Log(new LogItem(LogLevel.Trace, info, TraceShow && show_console, color, NewLogFileEndStr), caller_class_name);
+            await _logger.LogAsync(new LogItem(LogLevel.Trace, info, show_console, color, NewLogFileEndStr), caller_class_name);
         }
-        public static void TRACE(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task TRACE(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = GetCallerClassName();
-            TRACE(info, caller_class_name, TraceShow && show_console, color, NewLogFileEndStr: NewLogFileEndStr);
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            await TRACE(info, caller_class_name, show_console, color);
         }
-        public static void INFO(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task INFO(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White,string NewLogFileEndStr="")
         {
-            var caller_class_name = GetCallerClassName();
-            _logger.Log(new LogItem(LogLevel.Information, info, InfoShow && show_console, color, NewLogFileEndStr), caller_class_name);
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            await _logger.LogAsync(new LogItem(LogLevel.Information, info, show_console, color, NewLogFileEndStr), caller_class_name);
         }
 
-        public static void WARN(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task WARN(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = GetCallerClassName();
-            _logger.Log(new LogItem(LogLevel.Warning, info, WarningShow && show_console, color, NewLogFileEndStr), caller_class_name);
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            await _logger.LogAsync(new LogItem(LogLevel.Warning, info, show_console, color, NewLogFileEndStr), caller_class_name);
         }
-        public static void ERROR(string info, Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task ERROR(string info, Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = GetCallerClassName();
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             string msg = string.Format("{0}。Exception Message:{1}", info, ex.Message + "\r\n" + ex.StackTrace);
-            _logger.Log(new LogItem(LogLevel.Error, msg, ErrorShow && show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
+            await _logger.LogAsync(new LogItem(LogLevel.Error, msg, show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
         }
-        public static void ERROR(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task ERROR(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = GetCallerClassName();
-            _logger.Log(new LogItem(LogLevel.Error, info, ErrorShow && show_console, color, NewLogFileEndStr), caller_class_name);
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            await _logger.LogAsync(new LogItem(LogLevel.Error, string.Format("{0}", info, show_console, color, NewLogFileEndStr)), caller_class_name);
         }
 
-        public static void ERROR(Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task ERROR(Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = GetCallerClassName();
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
             string msg = string.Format("Message:{0}。StackTrace:{1}", ex.Message, ex.StackTrace);
-            _logger.Log(new LogItem(LogLevel.Error, msg, ErrorShow && show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
+            await _logger.LogAsync(new LogItem(LogLevel.Error, msg, show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
         }
 
-        public static void Critical(string msg, Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task Critical(string msg, Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = GetCallerClassName();
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             string _msg = string.Format("{0}。Exception Message:{1}", msg, ex.Message + "\r\n" + ex.StackTrace);
             TRACE(_msg, caller_class_name);
-            _logger.Log(new LogItem(LogLevel.Critical, _msg, CriticalShow && show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
+            await _logger.LogAsync(new LogItem(LogLevel.Critical, _msg, show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
         }
-        public static void Critical(Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task Critical(Exception ex, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = GetCallerClassName();
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             string _msg = string.Format("Message:{0}。StackTrace:{1}", ex.Message, ex.StackTrace);
-            _logger.Log(new LogItem(LogLevel.Critical, _msg, CriticalShow && show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
+            await _logger.LogAsync(new LogItem(LogLevel.Critical, _msg, show_console, color, NewLogFileEndStr) { exception = ex }, caller_class_name);
         }
 
-        public static void Critical(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
+        public static async Task Critical(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
-            var caller_class_name = GetCallerClassName();
-            _logger.Log(new LogItem(LogLevel.Critical, info, CriticalShow && show_console, color, NewLogFileEndStr), caller_class_name);
+            var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
+            await _logger.LogAsync(new LogItem(LogLevel.Critical, info, show_console, color, NewLogFileEndStr), caller_class_name);
         }
-        public static string GetCallerClassName()
-        {
-            var caller_class_declaring = new StackTrace().GetFrame(2).GetMethod().DeclaringType;
-            if (caller_class_declaring == null || caller_class_declaring.DeclaringType == null || caller_class_declaring.DeclaringType.Name.Contains("<>c__DisplayClass"))
-                return "ClassClass";
-            return caller_class_declaring.DeclaringType.Name;
-        }
+
     }
 }
