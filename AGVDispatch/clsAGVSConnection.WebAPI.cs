@@ -19,37 +19,64 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public HttpHelper AGVsWebAPIHttp;
         public async Task<OnlineModeQueryResponse> GetOnlineMode()
         {
-            string api_route = $"/api/AGV/OnlineMode?AGVName={EQName}&Model={AGV_Type}";
-            LogMsgToAGVS($"(Get) {api_route}");
-            var response = await VMSWebAPIHttp.GetAsync<Dictionary<string, object>>(api_route);
-
-            LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
-            return new OnlineModeQueryResponse
+            try
             {
-                RemoteMode = int.Parse(response["RemoteMode"].ToString()) == 0 ? REMOTE_MODE.OFFLINE : REMOTE_MODE.ONLINE,
-                TimeStamp = response["TimeStamp"].ToString()
-            };
+
+                string api_route = $"/api/AGV/OnlineMode?AGVName={EQName}&Model={AGV_Type}";
+                LogMsgToAGVS($"(Get) {api_route}");
+                var response = await VMSWebAPIHttp.GetAsync<Dictionary<string, object>>(api_route);
+
+                LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                return new OnlineModeQueryResponse
+                {
+                    RemoteMode = int.Parse(response["RemoteMode"].ToString()) == 0 ? REMOTE_MODE.OFFLINE : REMOTE_MODE.ONLINE,
+                    TimeStamp = response["TimeStamp"].ToString()
+                };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task<SimpleRequestResponse> PostOnlineModeChangeRequset(int currentTag, REMOTE_MODE mode)
         {
-            string api_route = mode == REMOTE_MODE.ONLINE ? $"/api/AGV/OnlineReq?AGVName={EQName}&tag={currentTag}" : $"/api/AGV/OfflineReq?AGVName={EQName}&";
-            LogMsgToAGVS($"(Post) {api_route},body json =");
-            var response = await VMSWebAPIHttp.PostAsync<SimpleRequestResponse, object>(api_route, null);
-            LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
-            return response;
+            try
+            {
+
+                string api_route = mode == REMOTE_MODE.ONLINE ? $"/api/AGV/OnlineReq?AGVName={EQName}&tag={currentTag}" : $"/api/AGV/OfflineReq?AGVName={EQName}&";
+                LogMsgToAGVS($"(Post) {api_route},body json =");
+                var response = await VMSWebAPIHttp.PostAsync<SimpleRequestResponse, object>(api_route, null);
+                LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                return response;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public async Task<SimpleRequestResponse> PostRunningStatus(clsRunningStatus status)
         {
-            string api_route = $"/api/AGV/AGVStatus?AGVName={EQName}&Model={AGV_Type}";
-            LogMsgToAGVS($"(Post) {api_route},body json = {status.ToJson()}");
-            var response = await VMSWebAPIHttp.PostAsync<Dictionary<string, object>, clsRunningStatus>(api_route, status);
-            LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
-            var returnCode = int.Parse(response["ReturnCode"].ToString());
-            return new SimpleRequestResponse
+            try
             {
-                ReturnCode = Enum.GetValues(typeof(RETURN_CODE)).Cast<RETURN_CODE>().First(code => ((int)code) == returnCode),
-            };
+
+                string api_route = $"/api/AGV/AGVStatus?AGVName={EQName}&Model={AGV_Type}";
+                LogMsgToAGVS($"(Post) {api_route},body json = {status.ToJson()}");
+                var response = await VMSWebAPIHttp.PostAsync<Dictionary<string, object>, clsRunningStatus>(api_route, status);
+                LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                var returnCode = int.Parse(response["ReturnCode"].ToString());
+                return new SimpleRequestResponse
+                {
+                    ReturnCode = Enum.GetValues(typeof(RETURN_CODE)).Cast<RETURN_CODE>().First(code => ((int)code) == returnCode),
+                };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task<SimpleRequestResponse> PostTaskFeedback(clsFeedbackData feedback)

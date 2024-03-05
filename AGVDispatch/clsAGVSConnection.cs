@@ -175,49 +175,46 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-        public async Task<bool> Start()
+        public async Task Start()
         {
-            _ = Task.Run(async () =>
+            int _delay = 150;
+            await Task.Delay(1);
+            while (true)
             {
-                int _delay = UseWebAPI ? 150 : 1000;
-                while (true)
+                CheckAndClearOlderMessageStored();
+                try
                 {
-                    Thread.Sleep(_delay);
-                    CheckAndClearOlderMessageStored();
-                    try
+                    if (!IsConnected())
                     {
-                        if (!IsConnected())
+                        if (!UseWebAPI)
                         {
-                            if (!UseWebAPI)
-                            {
-                                LOG.WARN($"Try Connect TO AGVS Via TCP/IP({IP}:{VMSPort})", false);
-                                bool Reconnected = await Connect();
-                                Connected = Reconnected;
-                                continue;
-                            }
+                            LOG.WARN($"Try Connect TO AGVS Via TCP/IP({IP}:{VMSPort})", false);
+                            bool Reconnected = await Connect();
+                            Connected = Reconnected;
+                            continue;
                         }
-                        IsGetOnlineModeTrying = false;
-
-                        if (OnlineModeQueryOut())
-                        {
-                            if (UseWebAPI)
-                                VMS_API_Call_Fail_Flag = false;
-                            RunningStatusReport();
-                        }
-                        else
-                        {
-                            if (!UseWebAPI)
-                                Disconnect();
-                        }
-
                     }
-                    catch (Exception ex)
+                    IsGetOnlineModeTrying = false;
+
+                    if (OnlineModeQueryOut())
                     {
-                        GC.Collect();
+                        if (UseWebAPI)
+                            VMS_API_Call_Fail_Flag = false;
+                        RunningStatusReport();
                     }
+                    else
+                    {
+                        if (!UseWebAPI)
+                            Disconnect();
+                    }
+
                 }
-            });
-            return true;
+                catch (Exception ex)
+                {
+                    GC.Collect();
+                }
+               await Task.Delay(_delay);
+            }
         }
 
 
@@ -375,16 +372,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return MESSAGE_TYPE.REQ_0301_TASK_DOWNLOAD;
             if (firstHeaderKey.Contains("0302"))
                 return MESSAGE_TYPE.ACK_0302_TASK_DOWNLOADED_ACK;
-
             if (firstHeaderKey.Contains("0303"))
                 return MESSAGE_TYPE.REQ_0303_TASK_FEEDBACK_REPORT;
-
             if (firstHeaderKey.Contains("0304"))
                 return MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK;
-
             if (firstHeaderKey.Contains("0305"))
                 return MESSAGE_TYPE.REQ_0305_TASK_CANCEL;
-
             if (firstHeaderKey.Contains("0306"))
                 return MESSAGE_TYPE.ACK_0306_TASK_CANCEL_ACK;
             if (firstHeaderKey.Contains("0322"))
@@ -444,52 +437,39 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             if (!IsConnected())
                 return false;
-            return await Task.Factory.StartNew(() =>
-             {
-                 try
-                 {
-                     ManualResetEvent manualResetEvent = WaitAckResetEvents[ack_msg_type];
-                     manualResetEvent.Reset();
-                     WriteDataOut(dataByte);
-                     bool _recieve_signal = manualResetEvent.WaitOne(TimeSpan.FromSeconds(timeout_sec));
-                     //if (ack_msg_type == MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK)
-                     //    LOG.TRACE($"[SendMsgToAGVSAndWaitReply] manualResetEvent.WaitOne(2000), 因收到回應而停止等待 ACK_0304_TASK_FEEDBACK_REPORT_ACK? {_recieve_signal}");
-                     return _recieve_signal;
-                 }
-                 catch (IOException ioex)
-                 {
-                     LOG.ERROR($"[AGVS] 發送訊息的過程中發生 IOException : {ioex.Message}", ioex);
-                     Disconnect();
-                     return false;
-                 }
-                 catch (Exception ex)
-                 {
-                     LOG.ERROR($"[AGVS] 發送訊息的過程中發生未知的錯誤 : {ex.Message}", ex);
-                     return false;
-                 }
 
-             });
-
+            try
+            {
+                ManualResetEvent manualResetEvent = WaitAckResetEvents[ack_msg_type];
+                manualResetEvent.Reset();
+                WriteDataOut(dataByte);
+                bool _recieve_signal = manualResetEvent.WaitOne(TimeSpan.FromSeconds(timeout_sec));
+                return _recieve_signal;
+            }
+            catch (IOException ioex)
+            {
+                LOG.ERROR($"[AGVS] 發送訊息的過程中發生 IOException : {ioex.Message}", ioex);
+                Disconnect();
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR($"[AGVS] 發送訊息的過程中發生未知的錯誤 : {ex.Message}", ex);
+                return false;
+            }
         }
         private string AGVSServerUrl => UseWebAPI ? VMSWebAPIHttp.baseUrl : $"{IP}:{VMSPort}";
         public async Task LogMsgToAGVS(string msg)
         {
             if (Logger == null)
                 return;
-            await Task.Factory.StartNew(() =>
-            {
-
-                Logger.LogAsync(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
-            });
+            await Logger.LogAsync(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
         }
         public async Task LogMsgFromAGVS(string msg)
         {
             if (Logger == null)
                 return;
-            await Task.Factory.StartNew(() =>
-            {
-                Logger.LogAsync(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
-            });
+            await Logger.LogAsync(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
         }
 
     }
