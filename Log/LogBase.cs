@@ -64,7 +64,7 @@ namespace AGVSystemCommonNet6.Log
                 {
                     if (logItemQueue.TryDequeue(out LogItem? logItem))
                     {
-                        WriteLog(logItem);
+                        await WriteLogAsync(logItem);
                         logItem.Dispose();
                     }
                     else
@@ -79,10 +79,10 @@ namespace AGVSystemCommonNet6.Log
                     Console.WriteLine(ex.Message);
 
                 }
-                
+
             }
         }
-        public void WriteLog(LogItem logItem)
+        public async Task WriteLogAsync(LogItem logItem)
         {
             string subFolder = Path.Combine(LogFolder, DateTime.Now.ToString("yyyy-MM-dd"));
 
