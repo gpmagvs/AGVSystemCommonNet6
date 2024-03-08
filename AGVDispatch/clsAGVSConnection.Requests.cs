@@ -97,27 +97,23 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         private async Task<(bool confirmed, string message)> WaitMainStatusNotRUNRepoted()
         {
-            return await Task.Run(() =>
+            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            while (_GetLastMainStatusReported() == MAIN_STATUS.RUN)
             {
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-                while (_GetLastMainStatusReported() == MAIN_STATUS.RUN)
-                {
-                    if (cts.IsCancellationRequested)
-                        return (false, "Wait Main Status of running status report should not equal 'RUN' Timeout!");
-                    Thread.Sleep(1);
-                }
-                return (true, "");
+                await Task.Delay(1);
+                if (cts.IsCancellationRequested)
+                    return (false, "Wait Main Status of running status report should not equal 'RUN' Timeout!");
+            }
+            return (true, "");
 
-                //取得前次上報狀態
-                MAIN_STATUS _GetLastMainStatusReported()
-                {
-                    if (UseWebAPI)
-                        return previousRunningStatusReport_via_WEBAPI.AGV_Status;
-                    else
-                        return previousRunningStatusReport_via_TCPIP.AGV_Status;
-                }
-
-            });
+            //取得前次上報狀態
+            MAIN_STATUS _GetLastMainStatusReported()
+            {
+                if (UseWebAPI)
+                    return previousRunningStatusReport_via_WEBAPI.AGV_Status;
+                else
+                    return previousRunningStatusReport_via_TCPIP.AGV_Status;
+            }
         }
         public RunningStatus previousRunningStatusReport_via_TCPIP = new RunningStatus();
         public clsRunningStatus previousRunningStatusReport_via_WEBAPI = new clsRunningStatus();
