@@ -48,7 +48,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 clientHander.OnClientDisconnect += ClientHander_OnClientDisconnect;
                 if (user_id != "")
                 {
-                    LOG.TRACE($"User-{user_id} Broswer AGVS Website.Online-Client={OnlineClientNumber}");
+                    LOG.TRACE($"User-{user_id} Broswer AGVS Website  | Online-Client={OnlineClientNumber}");
                 }
                 await clientHander.ListenConnection();
             }
@@ -63,7 +63,7 @@ namespace AGVSystemCommonNet6.HttpTools
             {
                 group.Value.Remove(e);
                 if (e.UserID != "")
-                    LOG.TRACE($"User-{e.UserID} Leave AGVS Website.");
+                    LOG.TRACE($"User-{e.UserID} Leave AGVS Website. | Online-Client={OnlineClientNumber}");
             }
             _ClientConnectionChanging.Release();
         }

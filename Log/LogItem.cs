@@ -47,10 +47,8 @@ namespace AGVSystemCommonNet6.Log
         {
             get
             {
-                string msg = $"{logMsg}{(exception != null ? exception.StackTrace + (exception.InnerException == null ? "" : "\r\nInner exception:" + exception.InnerException.StackTrace) : "")}";
-                string logEntry = ShowClassName ? "|{0,-5}|{1,-15}| {2}" : "|{0,-5}|{1}{2}";
-                string console_display = string.Format(logEntry, LevelDisplayTextMap[level], ShowClassName ? Caller : "", msg);
-                return console_display;
+                string msg = $"|{level}|{logMsg}{(exception != null ? exception.StackTrace + (exception.InnerException == null ? "" : "\r\nInner exception:" + exception.InnerException.StackTrace) : "")}";
+                return msg;
             }
         }
 
