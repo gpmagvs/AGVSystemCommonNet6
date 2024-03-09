@@ -7,9 +7,7 @@ namespace AGVSystemCommonNet6.HttpTools
 {
     public class clsWebsocktClientHandler
     {
-        public delegate object DataFetchDelegate(string ws_path);
-        public DataFetchDelegate OnDataFetching;
-        public event EventHandler<string> OnClientLeve;
+        public event EventHandler<clsWebsocktClientHandler> OnClientDisconnect;
         public string UserID = "";
         public clsWebsocktClientHandler(WebSocket webSocket, string path, string UserID = "")
         {
@@ -21,42 +19,9 @@ namespace AGVSystemCommonNet6.HttpTools
         public WebSocket WebSocket { get; }
         public string Path { get; }
 
-        private byte[] datBytes = new byte[0];
-        public async Task StartBrocast()
+        internal async Task ListenConnection()
         {
-            if (Path == null)
-                return;
-
             var buff = new ArraySegment<byte>(new byte[10]);
-            bool closeFlag = false;
-            _ = Task.Factory.StartNew(async () =>
-            {
-                while (!closeFlag)
-                {
-                    await Task.Delay(10);
-                    var data = OnDataFetching(Path);
-                    if (data == null)
-                        continue;
-                    if (data != null)
-                    {
-                        try
-                        {
-                            byte[] _datBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data));
-                            bool _isDataNotChanged = _datBytes.SequenceEqual(datBytes);
-                            if (_isDataNotChanged)
-                                await Task.Delay(200);
-                            await WebSocket.SendAsync(new ArraySegment<byte>(_datBytes), WebSocketMessageType.Text, true, CancellationToken.None);
-                            data = null;
-                            datBytes = _datBytes;
-                        }
-                        catch (Exception)
-                        {
-                            return;
-                        }
-                    }
-                }
-            });
-
             while (true)
             {
                 try
@@ -69,13 +34,7 @@ namespace AGVSystemCommonNet6.HttpTools
                     break;
                 }
             }
-            if (UserID != "")
-            {
-                OnClientLeve?.Invoke(this, UserID);
-            }
-            closeFlag = true;
-            WebSocket.Dispose();
-            GC.Collect();
+            OnClientDisconnect?.Invoke(this, this);
         }
     }
 }
