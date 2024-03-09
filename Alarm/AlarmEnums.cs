@@ -113,6 +113,7 @@ namespace AGVSystemCommonNet6.Alarm
         TASK_DOWNLOAD_TO_AGV_FAIL_NO_PATH_FOR_NAVIGATION = 94,
         TASK_DOWNLOAD_TO_AGV_FAIL_TASK_CANCEL = 95,
         TASK_DOWNLOAD_TO_AGV_FAIL_TASK_DOWN_LOAD_TIMEOUT = 96,
+        Task_Canceled = 97,
     }
 
 }
