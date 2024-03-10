@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static AGVSystemCommonNet6.clsEnums;
+using static AGVSystemCommonNet6.Microservices.VMS.clsAGVOptions;
 
 namespace AGVSystemCommonNet6
 {
@@ -52,6 +53,7 @@ namespace AGVSystemCommonNet6
         public double VehicleLength { get; set; } = 145.0;
         [NotMapped]// 此欄位不會寫入資料表
         public double VehicleWidth { get; set; } = 70;
+
         public void Update(clsAGVStateDto entity)
         {
             AGV_Description = entity.AGV_Description;
