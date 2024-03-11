@@ -34,7 +34,18 @@ namespace AGVSystemCommonNet6.HttpTools
                     break;
                 }
             }
-            OnClientDisconnect?.Invoke(this, this);
+            try
+            {
+                await WebSocket.CloseAsync(WebSocketCloseStatus.ProtocolError, "", CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                OnClientDisconnect?.Invoke(this, this);
+            }
         }
     }
 }

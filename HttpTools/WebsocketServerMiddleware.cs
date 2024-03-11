@@ -64,6 +64,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 group.Value.Remove(e);
                 if (e.UserID != "")
                     LOG.TRACE($"User-{e.UserID} Leave AGVS Website. | Online-Client={OnlineClientNumber}");
+                GC.Collect();
             }
             _ClientConnectionChanging.Release();
         }
@@ -104,7 +105,7 @@ namespace AGVSystemCommonNet6.HttpTools
                             }
                         }
                     }
-                    catch (Exception ex )
+                    catch (Exception ex)
                     {
                     }
                     finally
