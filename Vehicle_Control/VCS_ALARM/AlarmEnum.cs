@@ -263,6 +263,7 @@
         Handshake_Fail_BAT_EXG_EQ_COMPT_NOT_ON,
         Handshake_Fail_BAT_EXG_EQ_COMPT_NOT_OFF,
         Handshake_Fail_BAT_Remove_Timeout,
+        Handshake_Fail_BAT_EXG_EQ_VALID_OFF_WHEN_HANDSHAKING,
         AAsk_Remote_Cst_Status_Fail = 3300,
         BAsk_Remote_Cst_Status_Timeout = 3310,
         AGVs_Abort_Task = 3500,
@@ -453,6 +454,6 @@
         Fork_Arm_Action_Error = 860044,
         Replan = 860045,
         Limit_Switch_Sensor = 860046,
-        Send_Goal_to_AGV_But_AGVS_Cancel_Req_Raised = 860047,
+        Send_Goal_to_AGV_But_AGVS_Cancel_Req_Raised = 860047
     }
 }
