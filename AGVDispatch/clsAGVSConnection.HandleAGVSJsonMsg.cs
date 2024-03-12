@@ -72,18 +72,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         if (TryTaskDownloadReqAckAsync(return_code == TASK_DOWNLOAD_RETURN_CODES.OK, taskDownloadReq.SystemBytes))
                         {
                             _is_delay_invoke_task_downed = true;
-                            Stopwatch _stopwatch = Stopwatch.StartNew();
-                            while (_stopwatch.ElapsedMilliseconds < 500)
-                            {
-                                Thread.Sleep(1);
-                                if (_is_task_cancel_recieved)
-                                {
-                                    _stopwatch.Stop();
-                                    _is_task_cancel_recieved = _is_delay_invoke_task_downed = false;
-                                    LOG.WARN($"0301 TaskDownload Task not invoked. because recieve task cancle after {_stopwatch.ElapsedMilliseconds} ms");
-                                    return;
-                                }
-                            }
                             OnTaskDownloadFeekbackDone?.Invoke(this, data);
                             _is_task_cancel_recieved = _is_delay_invoke_task_downed = false;
                             LOG.WARN($"0301 TaskDownload  invoked.");
