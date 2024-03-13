@@ -37,8 +37,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             bool _IsActionFinishFeedback = task_status == TASK_RUN_STATUS.ACTION_FINISH;
             if (_IsActionFinishFeedback)
             {
-                LOG.WARN("Action Finish Feedback, Wait Main Status should not equal 'RUN' start");
-
                 (bool confirmed, string message) _main_status_not_run_now = await WaitMainStatusNotRUNRepoted();
                 if (!_main_status_not_run_now.confirmed)
                 {
@@ -97,6 +95,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         private async Task<(bool confirmed, string message)> WaitMainStatusNotRUNRepoted()
         {
+            LOG.WARN("Wait Main Status should not equal 'RUN' before 'Action Finish' Feedback");
             CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             while (_GetLastMainStatusReported() == MAIN_STATUS.RUN)
             {
@@ -104,6 +103,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 if (cts.IsCancellationRequested)
                     return (false, "Wait Main Status of running status report should not equal 'RUN' Timeout!");
             }
+            LOG.INFO("Main Status 'RUN' is reoported!");
             return (true, "");
 
             //取得前次上報狀態
