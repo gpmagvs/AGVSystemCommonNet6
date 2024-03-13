@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -22,7 +23,7 @@ namespace AGVSystemCommonNet6.HttpTools
 
         public int OnlineClientNumber => ClientsOfAllChannel.First().Value.Count;
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             ClientsOfAllChannel = channelMaps.ToDictionary(str => str, str => new List<clsWebsocktClientHandler>());
             CurrentViewModelDataOfAllChannel = channelMaps.ToDictionary(str => str, str => new object());
@@ -40,18 +41,22 @@ namespace AGVSystemCommonNet6.HttpTools
 
             WebSocket client = await _context.WebSockets.AcceptWebSocketAsync();
             clsWebsocktClientHandler clientHander = new clsWebsocktClientHandler(client, path, user_id);
+
+            await _ClientConnectionChanging.WaitAsync();
             if (ClientsOfAllChannel.TryGetValue(path, out var clientCollection))
             {
-                await _ClientConnectionChanging.WaitAsync();
                 clientCollection.Add(clientHander);
-                _ClientConnectionChanging.Release();
                 clientHander.OnClientDisconnect += ClientHander_OnClientDisconnect;
                 if (user_id != "")
                 {
                     LOG.TRACE($"User-{user_id} Broswer AGVS Website  | Online-Client={OnlineClientNumber}");
                 }
+
+                _ClientConnectionChanging.Release();
                 await clientHander.ListenConnection();
             }
+
+            _ClientConnectionChanging.Release();
 
         }
 
@@ -64,6 +69,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 group.Value.Remove(e);
                 if (e.UserID != "")
                     LOG.TRACE($"User-{e.UserID} Leave AGVS Website. | Online-Client={OnlineClientNumber}");
+                e.Close();
                 GC.Collect();
             }
             _ClientConnectionChanging.Release();
@@ -73,6 +79,7 @@ namespace AGVSystemCommonNet6.HttpTools
         {
             await Task.Run(async () =>
             {
+                Stopwatch _stopwatch = Stopwatch.StartNew();
                 while (true)
                 {
                     await Task.Delay(100);
@@ -84,14 +91,14 @@ namespace AGVSystemCommonNet6.HttpTools
 
                         foreach (var item in CurrentViewModelDataOfAllChannel)
                         {
-                            var Data = item.Value;
                             var ChannelName = item.Key;
                             var clientsInThisChannel = ClientsOfAllChannel[ChannelName];
 
-                            var datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
-
                             if (clientsInThisChannel.Count == 0)
                                 continue;
+
+                            var Data = item.Value;
+                            var datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
 
                             foreach (var client in clientsInThisChannel)
                             {
@@ -99,8 +106,15 @@ namespace AGVSystemCommonNet6.HttpTools
                                 {
                                     await client.WebSocket.SendAsync(datPublishOut, WebSocketMessageType.Text, true, CancellationToken.None);
                                 }
-                                catch (Exception)
+                                catch (Exception ex)
                                 {
+                                    client.Close();
+                                    continue;
+                                }
+                                finally
+                                {
+                                    datPublishOut = null;
+
                                 }
                             }
                         }
@@ -110,6 +124,11 @@ namespace AGVSystemCommonNet6.HttpTools
                     }
                     finally
                     {
+                        if (_stopwatch.ElapsedMilliseconds > 10000)
+                        {
+                            GC.Collect();
+                            _stopwatch.Restart();
+                        }
                         _ClientConnectionChanging.Release();
                     }
                 }

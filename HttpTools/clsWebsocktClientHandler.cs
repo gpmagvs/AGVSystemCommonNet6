@@ -26,8 +26,8 @@ namespace AGVSystemCommonNet6.HttpTools
             {
                 try
                 {
-                    await Task.Delay(100);
-                    WebSocketReceiveResult result = await WebSocket.ReceiveAsync(buff, CancellationToken.None);
+                    await Task.Delay(1).ConfigureAwait(false);
+                    WebSocketReceiveResult result = await WebSocket.ReceiveAsync(buff, CancellationToken.None).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -36,7 +36,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
             try
             {
-                await WebSocket.CloseAsync(WebSocketCloseStatus.ProtocolError, "", CancellationToken.None);
+                Close();
             }
             catch (Exception ex)
             {
@@ -45,6 +45,20 @@ namespace AGVSystemCommonNet6.HttpTools
             finally
             {
                 OnClientDisconnect?.Invoke(this, this);
+            }
+        }
+        internal async void Close()
+        {
+            try
+            {
+                await WebSocket.CloseAsync(WebSocketCloseStatus.ProtocolError, "", CancellationToken.None);
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                WebSocket.Dispose();
             }
         }
     }
