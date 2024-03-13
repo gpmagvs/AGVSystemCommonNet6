@@ -32,6 +32,7 @@ namespace AGVSystemCommonNet6.HttpTools
         private SemaphoreSlim _ClientConnectionChanging = new SemaphoreSlim(1, 1);
         public async Task HandleWebsocketClientConnectIn(HttpContext _context, string user_id = "")
         {
+            await _ClientConnectionChanging.WaitAsync();
             string path = _context.Request.Path.Value;
             if (path == null || !_context.WebSockets.IsWebSocketRequest)
             {
@@ -42,7 +43,6 @@ namespace AGVSystemCommonNet6.HttpTools
             WebSocket client = await _context.WebSockets.AcceptWebSocketAsync();
             clsWebsocktClientHandler clientHander = new clsWebsocktClientHandler(client, path, user_id);
 
-            await _ClientConnectionChanging.WaitAsync();
             if (ClientsOfAllChannel.TryGetValue(path, out var clientCollection))
             {
                 clientCollection.Add(clientHander);
@@ -55,9 +55,6 @@ namespace AGVSystemCommonNet6.HttpTools
                 _ClientConnectionChanging.Release();
                 await clientHander.ListenConnection();
             }
-
-            _ClientConnectionChanging.Release();
-
         }
 
         private async void ClientHander_OnClientDisconnect(object? sender, clsWebsocktClientHandler e)
@@ -108,13 +105,12 @@ namespace AGVSystemCommonNet6.HttpTools
                                 }
                                 catch (Exception ex)
                                 {
-                                    client.Close();
+                                    client.InvokeOnClientDisconnect();
+                                    Console.WriteLine(ex.Message + "\r\n" + ex.StackTrace);
                                     continue;
                                 }
                                 finally
                                 {
-                                    datPublishOut = null;
-
                                 }
                             }
                         }
@@ -129,7 +125,13 @@ namespace AGVSystemCommonNet6.HttpTools
                             GC.Collect();
                             _stopwatch.Restart();
                         }
-                        _ClientConnectionChanging.Release();
+                        try
+                        {
+                            _ClientConnectionChanging.Release();
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
             });

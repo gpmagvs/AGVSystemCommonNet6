@@ -61,5 +61,10 @@ namespace AGVSystemCommonNet6.HttpTools
                 WebSocket.Dispose();
             }
         }
+
+        internal void InvokeOnClientDisconnect()
+        {
+            OnClientDisconnect(this, this);
+        }
     }
 }
