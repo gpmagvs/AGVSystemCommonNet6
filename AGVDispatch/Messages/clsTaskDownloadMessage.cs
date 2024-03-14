@@ -317,6 +317,10 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// 車控用雷射
         /// </summary>
         public int Dodge { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public int Spin { get; set; }
     }
 
