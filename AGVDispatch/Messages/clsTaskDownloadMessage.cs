@@ -5,6 +5,7 @@ using AGVSystemCommonNet6.Vehicle_Control.Models;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient.Actionlib;
 using RosSharp.RosBridgeClient.MessageTypes.Geometry;
+using System.Runtime.CompilerServices;
 using static AGVSystemCommonNet6.GPMRosMessageNet.Actions.TaskCommandGoal;
 using static AGVSystemCommonNet6.MAP.PathFinder;
 
@@ -85,6 +86,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             {
                 clsMapPoint[] _ExecutingTrajecory = new clsMapPoint[0];
                 _ExecutingTrajecory = taskData.ExecutingTrajecory;
+
                 if (taskData.ExecutingTrajecory.Length == 0)
                 {
                     throw new Exception("一般移動任務但是路徑長度為0");
@@ -125,12 +127,20 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
                 if (taskData.GoTOHomePoint) //Loading 結束
                 {
+
                     poses = poses.Reverse().ToArray();
                     pathInfo = pathInfo.Reverse().ToArray();
+
+
                     goal.finalGoalID = (ushort)taskData.Homing_Trajectory.First().Point_ID;
                     goal.mobilityModes = (ushort)DetermineGuideType(taskData.Action_Type);
                 }
 
+                if (taskData.Action_Type == ACTION_TYPE.ExchangeBattery)
+                {
+                    poses = poses.Skip(1).ToArray();
+                    pathInfo = pathInfo.Skip(1).ToArray();
+                }
                 goal.planPath.poses = poses;
                 goal.pathInfo = pathInfo;
                 return goal;
@@ -152,7 +162,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             if (_Action_Type == ACTION_TYPE.None || _Action_Type == ACTION_TYPE.Measure || _Action_Type == ACTION_TYPE.Escape)
                 return GUIDE_TYPE.SLAM;
             else
-                return GUIDE_TYPE.Color_Tap_Forward;
+            {
+                return _Action_Type == ACTION_TYPE.ExchangeBattery ? GUIDE_TYPE.AR_TAG : GUIDE_TYPE.Color_Tap;
+            }
         }
         /// <summary>
         /// 回Home點的任務 (mobility=2)

@@ -139,6 +139,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         Buffer = 4,
         Charge_Buffer = 5,
         Charge_STK = 6,
+        Exchange = 7,
         Escape = 8,
         EQ_LD = 11,
         STK_LD = 12,

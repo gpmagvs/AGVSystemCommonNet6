@@ -22,6 +22,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         LeaveFrom_WorkStation = 7,
         LeaveFrom_ChargeStation = 8,
         ParkAtWorkStation = 9,
+        MeasureInBay = 10,
         Completed = 500,
     }
     public class clsTaskDto

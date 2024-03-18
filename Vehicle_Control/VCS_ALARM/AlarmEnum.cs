@@ -443,6 +443,7 @@
         Laser_Mode_Switch_Fail_DO_Write_Fail,
         Laser_Mode_Switch_Fail_Exception,
         Laser_Mode_Switch_Fail_Timeout,
+        Laser_Mode_Switch_But_SICK_OUPUT_NOT_UPDATE,
         Localization_Fail,
         Measure_Result_Data_Report_Fail,
         Exception_When_AGVC_AGVS_Task_Reset_Abort,
