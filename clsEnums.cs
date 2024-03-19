@@ -12,6 +12,7 @@ namespace AGVSystemCommonNet6
             YUNTECH_FORK_AGV = 1,
             INSPECTION_AGV = 2,
             SUBMERGED_SHIELD = 3,
+            SUBMERGED_SHIELD_Parts = 4,
             Any = 999
         }
         public enum OPERATOR_MODE
