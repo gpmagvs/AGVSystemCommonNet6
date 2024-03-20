@@ -21,12 +21,12 @@ namespace AGVSystemCommonNet6.HttpTools
 
         internal async Task ListenConnection()
         {
-            var buff = new ArraySegment<byte>(new byte[10]);
-            while (true)
+            var buff = new ArraySegment<byte>(new byte[32]);
+            while (WebSocket.State == WebSocketState.Open)
             {
                 try
                 {
-                    await Task.Delay(1).ConfigureAwait(false);
+                    await Task.Delay(1000).ConfigureAwait(false);
                     WebSocketReceiveResult result = await WebSocket.ReceiveAsync(buff, CancellationToken.None).ConfigureAwait(false);
                 }
                 catch (Exception ex)
@@ -34,6 +34,7 @@ namespace AGVSystemCommonNet6.HttpTools
                     break;
                 }
             }
+            Console.WriteLine(WebSocket.State);
             try
             {
                 Close();
