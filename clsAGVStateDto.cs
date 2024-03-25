@@ -53,6 +53,11 @@ namespace AGVSystemCommonNet6
         public double VehicleLength { get; set; } = 145.0;
         [NotMapped]// 此欄位不會寫入資料表
         public double VehicleWidth { get; set; } = 70;
+        public string IP { get; set; } = "127.0.0.1";
+        public int Port { get; set; }
+        public bool Simulation { get; set; }
+        public PROTOCOL Protocol { get; set; }
+        public int InitTag { get; set; }
 
         public void Update(clsAGVStateDto entity)
         {
