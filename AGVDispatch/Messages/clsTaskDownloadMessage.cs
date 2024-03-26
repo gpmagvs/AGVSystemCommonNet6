@@ -130,8 +130,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
                     poses = poses.Reverse().ToArray();
                     pathInfo = pathInfo.Reverse().ToArray();
-
-
                     goal.finalGoalID = (ushort)taskData.Homing_Trajectory.First().Point_ID;
                     goal.mobilityModes = (ushort)DetermineGuideType(taskData.Action_Type);
                 }
