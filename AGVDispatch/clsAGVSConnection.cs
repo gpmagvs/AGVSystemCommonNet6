@@ -196,11 +196,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     }
                     IsGetOnlineModeTrying = false;
 
-                    if (OnlineModeQueryOut())
+                    if (await OnlineModeQueryOut())
                     {
                         if (UseWebAPI)
                             VMS_API_Call_Fail_Flag = false;
-                        RunningStatusReport();
+                        await RunningStatusReport();
                     }
                     else
                     {
@@ -213,14 +213,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     GC.Collect();
                 }
-               await Task.Delay(_delay);
+                await Task.Delay(_delay);
             }
         }
 
 
-        private bool OnlineModeQueryOut()
+        private async Task<bool> OnlineModeQueryOut()
         {
-            (bool, OnlineModeQueryResponse onlineModeQuAck) _OnlineModeQueryResult = TryOnlineModeQueryAsync().Result;
+            (bool, OnlineModeQueryResponse onlineModeQuAck) _OnlineModeQueryResult = await TryOnlineModeQueryAsync();
             if (!_OnlineModeQueryResult.Item1)
             {
                 Current_Warning_Code = AlarmCodes.OnlineModeQuery_T1_Timeout;
@@ -238,9 +238,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-        private void RunningStatusReport()
+        private async Task RunningStatusReport()
         {
-            (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) _runningStateReport_result = TryRnningStateReportAsync(8).Result;
+            (bool, SimpleRequestResponseWithTimeStamp runningStateReportAck) _runningStateReport_result = await TryRnningStateReportAsync(8);
             if (!_runningStateReport_result.Item1)
             {
                 Current_Warning_Code = AlarmCodes.RunningStatusReport_T1_Timeout;

@@ -45,16 +45,13 @@ namespace AGVSystemCommonNet6.Abstracts
         public abstract bool IsConnected();
 
 
-        protected void PingServerCheckProcess()
+        protected async void PingServerCheckProcess()
         {
-            Task.Run(async () =>
+            while (AutoPingServerCheck)
             {
-                while (AutoPingServerCheck)
-                {
-                    await Task.Delay(1000);
-                    ping_success = await PingServer();
-                }
-            });
+                await Task.Delay(1000);
+                ping_success = await PingServer();
+            }
         }
 
         public async Task<bool> PingServer()
