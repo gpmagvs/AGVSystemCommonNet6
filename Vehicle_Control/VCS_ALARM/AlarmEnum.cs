@@ -184,6 +184,7 @@
         Load_But_Occupy = 1800,
         Read_Cst_ID_Fail = 1850,
         Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID = 1851,
+        Read_Cst_ID_But_Cargo_Type_Known = 1852,
         Cst_ID_Not_Match = 1860,
         Instrument_Error = 1900,
         Instrument_IO_Error_ = 1901,
