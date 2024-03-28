@@ -24,7 +24,20 @@ namespace AGVSystemCommonNet6.MAP
                 return null;
             try
             {
-                var data_obj = JsonConvert.DeserializeObject<Dictionary<string, Map>>(json);
+                var data_obj = new Dictionary<string, Map>();
+
+                try
+                {
+                    data_obj = JsonConvert.DeserializeObject<Dictionary<string, Map>>(json, new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Map _map = JsonConvert.DeserializeObject<Map>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    data_obj.Add("Map", _map);
+                }
                 var map = data_obj["Map"];
                 if (auto_create_segment && map.Points.Count != 0 && map.Segments.Count == 0)
                 {
