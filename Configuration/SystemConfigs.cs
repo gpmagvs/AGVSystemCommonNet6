@@ -57,6 +57,6 @@ namespace AGVSystemCommonNet6.Configuration
     public class clsAGVTaskControlConfigs
     {
         public bool CheckAGVCargoStatusWhenLDULDAction { get; set; } = true;
-        public int SegmentTrajectoryPointNum { get; set; } = -1;
+        public int SegmentTrajectoryPointNum { get; set; } = 3;
     }
 }
