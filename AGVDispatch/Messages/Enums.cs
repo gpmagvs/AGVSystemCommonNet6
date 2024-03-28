@@ -93,7 +93,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         OK_AGV_ALREADY_THERE = 100,
         TASK_CANCEL = 101,
         TASK_DOWN_LOAD_TIMEOUT = 102,
-        TASK_DOWNLOAD_FAIL = 103
+        TASK_DOWNLOAD_FAIL = 103,
+        Parts_System_Not_Allow_Point_Regist = 104
     }
 
     public enum TASK_RUN_STATUS : int

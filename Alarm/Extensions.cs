@@ -39,6 +39,8 @@ namespace AGVSystemCommonNet6.Alarm
                     return ALARMS.TASK_DOWNLOAD_TO_AGV_FAIL_TASK_DOWN_LOAD_TIMEOUT;
                 case TASK_DOWNLOAD_RETURN_CODES.TASK_DOWNLOAD_FAIL:
                     return ALARMS.TASK_DOWNLOAD_TO_AGV_FAIL;
+                case TASK_DOWNLOAD_RETURN_CODES.Parts_System_Not_Allow_Point_Regist:
+                    return ALARMS.REGIST_REGIONS_TO_PARTS_SYSTEM_FAIL;
                 default:
                     return ALARMS.TASK_DOWNLOAD_TO_AGV_FAIL;
             }
