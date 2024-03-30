@@ -84,7 +84,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             {
                                 SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(_FeedbackData));
                                 _ = LOG.INFO($" Task Feedback to AGVS RESULT(Task:{TaskName}_{TaskSimplex},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
-                                _success = true;
+                                _success = response.ReturnCode == RETURN_CODE.OK;
                             }
                             else
                             {
