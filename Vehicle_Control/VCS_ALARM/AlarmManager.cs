@@ -15,6 +15,12 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
         public static ConcurrentDictionary<DateTime, clsAlarmCode> CurrentAlarms = new ConcurrentDictionary<DateTime, clsAlarmCode>()
         {
         };
+        public static List<AlarmCodes> AlwaysReoverableAlarms = new List<AlarmCodes>() {
+            AlarmCodes.Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID,
+            AlarmCodes.Cst_ID_Not_Match,
+            AlarmCodes.Read_Cst_ID_Fail
+        };
+
         private static SQLiteConnection db;
 
         internal static event EventHandler OnAllAlarmClear;
@@ -146,7 +152,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                         DBhelper.InsertAlarm(alarm_save);
                 }
 
-                if (!IsRecoverable && Alarm_code != AlarmCodes.Cst_ID_Not_Match && Alarm_code != AlarmCodes.Read_Cst_ID_Fail && Alarm_code != AlarmCodes.Read_Cst_ID_Fail_Service_Done_But_Topic_No_CSTID)
+                if (!IsRecoverable && !AlwaysReoverableAlarms.Contains(Alarm_code))
                     OnUnRecoverableAlarmOccur?.Invoke(Alarm_code, Alarm_code);
             }
             catch (Exception ex)
