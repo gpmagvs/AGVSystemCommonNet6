@@ -206,12 +206,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     {
                         if (!UseWebAPI)
                             Disconnect();
+                        await Task.Delay(1000);
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    GC.Collect();
+                    OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
+                    await Task.Delay(1000);
                 }
                 await Task.Delay(_delay);
             }
