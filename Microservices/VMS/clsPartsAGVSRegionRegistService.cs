@@ -76,7 +76,11 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             if (data_obj.RegistEventEnum != RegistEventObject.REGIST_ACTION.Query && data_obj.List_AreaName.Count == 0)
                 return (false, "Regist/Unregist Area Names can't empty");
 
-            var ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            var ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+            {
+                SendTimeout = 3000,
+                ReceiveTimeout = 3000
+            };
             ClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
             try
             {

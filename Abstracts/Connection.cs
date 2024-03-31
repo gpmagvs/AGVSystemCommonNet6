@@ -1,5 +1,9 @@
-﻿using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
+﻿#define ping_debug
+
+using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 
 namespace AGVSystemCommonNet6.Abstracts
 {
@@ -8,8 +12,9 @@ namespace AGVSystemCommonNet6.Abstracts
         public string IP;
         public int VMSPort;
         public int AGVsPort = 5216;
-        public event EventHandler OnPingFail;
-        public event EventHandler OnPingSuccess;
+        public Action OnPingFail;
+        public Action OnPingSuccess;
+
         public bool AutoPingServerCheck { get; set; } = true;
         private bool _ping_success = true;
         private bool ping_success
@@ -21,9 +26,9 @@ namespace AGVSystemCommonNet6.Abstracts
                 {
                     _ping_success = value;
                     if (!value)
-                        Task.Factory.StartNew(() => OnPingFail?.Invoke(this, EventArgs.Empty));
+                        OnPingFail();
                     else
-                        Task.Factory.StartNew(() => OnPingSuccess?.Invoke(this, EventArgs.Empty));
+                        OnPingSuccess();
                 }
             }
         }
@@ -45,35 +50,51 @@ namespace AGVSystemCommonNet6.Abstracts
         public abstract bool IsConnected();
 
 
-        protected async void PingServerCheckProcess()
+        protected async Task PingServerCheckProcess()
         {
             while (AutoPingServerCheck)
             {
-                await Task.Delay(1000);
-                ping_success = await PingServer();
+                try
+                {
+                    await Task.Delay(1000);
+                    ping_success = await PingServer();
+
+                }
+                catch (Exception ex)
+                {
+                    LOG.ERROR($"Ping-{IP} 的過程中發生例外-{ex.Message}", ex, false);
+                    ping_success = false;
+                }
             }
         }
 
         public async Task<bool> PingServer()
         {
+            const int timeout = 1000; // 1秒超時
+            byte[] buffer = new byte[32];
             PingOptions options = new PingOptions { Ttl = 128 };
-            Ping pingSender = new Ping();
-            string address = IP;
-            try
+
+            using (Ping pingSender = new Ping())
             {
-                PingReply reply = await pingSender.SendPingAsync(address, 5000, new byte[32], options);
-                if (reply.Status != IPStatus.Success)
+                try
                 {
-                    Console.WriteLine(reply.Status);
+#if ping_debug
+                    PingReply reply = await pingSender.SendPingAsync("192.168.23.23", timeout, buffer, options);
+#else
+                    PingReply reply = await pingSender.SendPingAsync(IP, timeout, buffer, options);
+#endif
+                    return reply.Status == IPStatus.Success;
                 }
-                return reply.Status == IPStatus.Success;
-            }
-            catch (PingException ex)
-            {
-                Console.WriteLine($"Ping Error: {ex.Message}");
-                return false;
+                catch (PingException ex)
+                {
+                    return false;
+                }
             }
         }
 
+        public virtual void ResetErrors()
+        {
+            _ping_success = true;
+        }
     }
 }

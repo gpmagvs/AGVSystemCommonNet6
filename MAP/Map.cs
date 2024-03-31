@@ -23,6 +23,7 @@ namespace AGVSystemCommonNet6.MAP
         public virtual MAP_VERSION Version { get; set; } = MAP_VERSION.V1;
         public clsMapOptions Options { get; set; } = new clsMapOptions();
         public string Name { get; set; }
+        public string ImageName { get; set; } = "";
         public string Note { get; set; }
         public int PointIndex { get; set; }
         /// <summary>
