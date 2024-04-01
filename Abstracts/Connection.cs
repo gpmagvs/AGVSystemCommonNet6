@@ -1,4 +1,4 @@
-﻿#define ping_debug
+﻿//#define ping_debug
 
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
@@ -70,7 +70,7 @@ namespace AGVSystemCommonNet6.Abstracts
 
         public async Task<bool> PingServer()
         {
-            const int timeout = 1000; // 1秒超時
+            const int timeout = 3000; // 1秒超時
             byte[] buffer = new byte[32];
             PingOptions options = new PingOptions { Ttl = 128 };
 
