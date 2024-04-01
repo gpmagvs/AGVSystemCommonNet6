@@ -9,6 +9,11 @@ namespace AGVSystemCommonNet6.MAP
     public class clsMapOptions
     {
         public string pathColor { get; set; } = "rgb(45,42,46)";
+        public string normalStationTextColor { get; set; } = "orange";
+        public string workStationTextColor { get; set; } = "lime";
+
+        public int normalStationTextFontSize { get; set; } = 12;
+        public int workStationTextFontSize { get; set; } = 18;
         public int fontSizeOfDisplayName { get; set; } = 12;
         public int fontSizeOfAsCandicates { get; set; } = 16;
 
