@@ -18,7 +18,7 @@ namespace AGVSystemCommonNet6.HttpTools
 
         public virtual List<string> channelMaps { get; set; } = new List<string>();
 
-        private Dictionary<string, List<clsWebsocktClientHandler>> ClientsOfAllChannel = new Dictionary<string, List<clsWebsocktClientHandler>>();
+        protected Dictionary<string, List<clsWebsocktClientHandler>> ClientsOfAllChannel = new Dictionary<string, List<clsWebsocktClientHandler>>();
         protected Dictionary<string, object> CurrentViewModelDataOfAllChannel = new Dictionary<string, object>();
 
         public int OnlineClientNumber => ClientsOfAllChannel.First().Value.Count;
@@ -72,7 +72,7 @@ namespace AGVSystemCommonNet6.HttpTools
             _ClientConnectionChanging.Release();
         }
 
-        private async void StartCollectViewModelDataAndPublishOutAsync()
+        protected async void StartCollectViewModelDataAndPublishOutAsync()
         {
             await Task.Run(async () =>
             {
@@ -101,8 +101,11 @@ namespace AGVSystemCommonNet6.HttpTools
                             if (clientsInThisChannel.Count == 0)
                                 return;
 
-                            var Data = item.Value;
-                            var datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
+                            object Data = item.Value;
+                            if (Data == null)
+                                return;
+
+                            byte[] datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
 
                             List<Task> clientTasks = new List<Task>();
 
