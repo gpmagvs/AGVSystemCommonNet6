@@ -37,7 +37,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control
         {
 
         }
-        private Message _StateData;
+        protected Message _StateData;
         public DateTime lastUpdateTime { get; set; } = DateTime.MinValue;
         public abstract COMPOENT_NAME component_name { get; }
 
@@ -62,7 +62,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control
         }
 
 
-        public virtual async Task<bool> CheckStateDataContent()
+        public virtual bool CheckStateDataContent()
         {
             if (_StateData == null)
             {

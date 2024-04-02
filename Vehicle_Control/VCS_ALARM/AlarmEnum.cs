@@ -274,6 +274,7 @@
         Task_Feedback_T1_Timeout = 3504,
         OnlineModeQuery_T1_Timeout = 3505,
         RunningStatusReport_T1_Timeout = 3506,
+        AGVS_Leave_Workstation_Response_Timeout = 3507,
         Under_voltage_protection = 4010,
         Under_voltage_protection_Action = 4011,
         Under_voltage_protection_1 = 4012,

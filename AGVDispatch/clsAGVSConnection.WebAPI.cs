@@ -3,6 +3,7 @@ using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Log;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -185,6 +186,27 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 throw;
             }
         }
+
+        public async Task<bool> LeaveWorkStationRequest(string vehicleName, int currentEQTag)
+        {
+            try
+            {
+                var api_route = $"/api/AGV/LeaveWorkStationRequest?AGVName={vehicleName}&EQTag={currentEQTag}";
+                LogMsgToAGVS($"(POST){api_route},body json =");
+                (bool success, string json) response = await VMSWebAPIHttp.PostAsync(api_route, null);
+                if (!response.success)
+                    return false;
+
+                var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.json);
+                return (bool)dict["confirm"];
+            }
+            catch (Exception ex)
+            {
+                LOG.Critical(ex);
+                return false;
+            }
+        }
+
         public class clsEQOptions
         {
             public int Tag { get; set; }
