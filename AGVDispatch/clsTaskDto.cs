@@ -120,12 +120,17 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public int To_Station_Tag => int.TryParse(To_Station, out int tag) ? tag : -1;
 
         [Required]
-        public int Height { get; set; } = 0;
-
-        [Required]
         public string To_Slot { get; set; } = "-1";
 
         public string Carrier_ID { get; set; } = "";
+
+        /// <summary>
+        /// 任務需要換車時的中繼站點Tag
+        /// </summary>
+        public int ChangeAGVMiddleStationTag { get; set; } = 0;
+
+        [Required]
+        public int Height { get; set; } = 0;
         /// <summary>
         /// 優先度
         /// </summary>
@@ -136,6 +141,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public bool IsTrafficControlTask { get; set; } = false;
         [NotMapped]
         public bool bypass_eq_status_check { get; set; } = false;
+
+        [Required]
+        public bool need_change_agv { get; set; } = false;
 
         public void Update(clsTaskDto dto)
         {
