@@ -93,7 +93,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
 
             string SendOutMessage = Newtonsoft.Json.JsonConvert.SerializeObject(data_obj);
-            ClientSocket.Send(Encoding.ASCII.GetBytes(SendOutMessage));
+            ClientSocket.Send(Encoding.GetEncoding("big5").GetBytes(SendOutMessage));
             CancellationTokenSource cancelwait = new CancellationTokenSource();
             cancelwait.CancelAfter(TimeSpan.FromSeconds(5));
             string ReceiveDataString = "";
