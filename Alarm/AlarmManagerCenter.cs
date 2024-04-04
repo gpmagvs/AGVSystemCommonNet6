@@ -262,11 +262,16 @@ namespace AGVSystemCommonNet6.Alarm
                 alarms = _alarms.Skip((currentpage - 1) * 19).Take(19).ToList();
             };
         }
-        public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName)
+        public static string SaveTocsv(DateTime startTime, DateTime endTime, string fileName)
         {
-            var folder = Path.Combine(Environment.CurrentDirectory, @"d:\\SaveLog\\Alarm");
+            return SaveTocsv(startTime, endTime, "ALL", null, fileName);
+        }
+        public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
+        {
+            var folder = Path.Combine(Environment.CurrentDirectory, @"SaveLog\\Alarm");
+            var _fileName = fileName is null ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
             Directory.CreateDirectory(folder);
-            string FilePath = Path.Combine(folder, "AlarmQuery_" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv");
+            string FilePath = Path.Combine(folder, "AlarmQuery_" + _fileName);
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 var _alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
@@ -274,7 +279,7 @@ namespace AGVSystemCommonNet6.Alarm
                 );
 
                 List<string> list = _alarms.Select(alarm => $"{alarm.Time},{alarm.Task_Name},{alarm.Equipment_Name},,{alarm.AlarmCode}{alarm.Description_En},{alarm.Description_Zh},{alarm.Duration},{alarm.OccurLocation},{alarm.Level}").ToList();
-                File.WriteAllLines(FilePath, list, Encoding.UTF8);
+                File.WriteAllLines(FilePath, list, Encoding.GetEncoding("big5"));
             };
             return FilePath;
         }
