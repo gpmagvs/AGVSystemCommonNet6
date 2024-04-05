@@ -38,10 +38,9 @@ namespace AGVSystemCommonNet6.DATABASE
                     _ = database.SaveChanges().Result;
                 }
             }
-            catch (Exceptions.DataBaseVersionNotMatchException)
+            catch (Exception ex )
             {
-                DataBaseMirgration();
-                Task.Factory.StartNew(Initialize).Wait();
+                throw;
             }
         }
         private static async Task<bool> DatabaseColumnCheck(AGVSDatabase database)
@@ -82,7 +81,7 @@ namespace AGVSystemCommonNet6.DATABASE
             }
             catch (Exception ex)
             {
-                throw new Exceptions.DataBaseVersionNotMatchException();
+                throw ex;
             }
         }
 
