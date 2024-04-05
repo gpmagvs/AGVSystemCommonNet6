@@ -1,6 +1,10 @@
-﻿using AGVSystemCommonNet6.Alarm;
+﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.AGVDispatch.Model;
+using AGVSystemCommonNet6.Alarm;
+using AGVSystemCommonNet6.Availability;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
+using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,12 +24,14 @@ namespace AGVSystemCommonNet6.DATABASE
         {
         }
 
-        public static void Initialize()
+        public static async Task Initialize()
         {
             try
             {
+
                 using (AGVSDatabase database = new AGVSDatabase())
                 {
+                    await DatabaseColumnCheck(database);
                     DatabaseVersionCheck(database);
                     _DefaultUsersCreate(database.tables.Users);
                     _UnCheckedAlarmsSetAsCheckes(database.tables.SystemAlarms);
@@ -38,7 +44,20 @@ namespace AGVSystemCommonNet6.DATABASE
                 Task.Factory.StartNew(Initialize).Wait();
             }
         }
-
+        private static async Task<bool> DatabaseColumnCheck(AGVSDatabase database)
+        {
+            SQLNativ.DatabaseSchemaUpdater schemaUpdater = new SQLNativ.DatabaseSchemaUpdater(AGVSConfigulator.SysConfigs.DBConnection);
+            await schemaUpdater.EnsureFieldExists<UserEntity>(nameof(database.tables.Users));
+            await schemaUpdater.EnsureFieldExists<clsTaskDto>(nameof(database.tables.Tasks));
+            await schemaUpdater.EnsureFieldExists<clsAGVStateDto>(nameof(database.tables.AgvStates));
+            await schemaUpdater.EnsureFieldExists<Alarm.clsAlarmDto>(nameof(database.tables.SystemAlarms));
+            await schemaUpdater.EnsureFieldExists<AvailabilityDto>(nameof(database.tables.Availabilitys));
+            await schemaUpdater.EnsureFieldExists<RTAvailabilityDto>(nameof(database.tables.RealTimeAvailabilitys));
+            await schemaUpdater.EnsureFieldExists<clsTaskTrajecotroyStore>(nameof(database.tables.TaskTrajecotroyStores));
+            await schemaUpdater.EnsureFieldExists<clsMeasureResult>(nameof(database.tables.InstrumentMeasureResult));
+            await schemaUpdater.EnsureFieldExists<clsStopRegionDto>(nameof(database.tables.StopRegionData));
+            return true;
+        }
         private static void DataBaseMirgration()
         {
 

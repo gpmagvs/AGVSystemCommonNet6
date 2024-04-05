@@ -16,5 +16,7 @@ namespace AGVSystemCommonNet6.StopRegion
         public DateTime EndTime { get; set; }
         public string RegionName { get; set; } = "";
         public MAIN_STATUS Main_Status { get; set; }
+        public string TaskName { get; set; } = "";
     }
+
 }
