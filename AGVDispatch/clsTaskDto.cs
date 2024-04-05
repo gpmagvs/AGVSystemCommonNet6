@@ -127,6 +127,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// <summary>
         /// 任務需要換車時的中繼站點Tag
         /// </summary>
+        [MaybeNull]
         public int ChangeAGVMiddleStationTag { get; set; } = 0;
 
         [Required]
@@ -142,7 +143,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         [NotMapped]
         public bool bypass_eq_status_check { get; set; } = false;
 
-        [Required]
+
+        [MaybeNull]
         public bool need_change_agv { get; set; } = false;
 
         public void Update(clsTaskDto dto)
