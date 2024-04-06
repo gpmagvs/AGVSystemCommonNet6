@@ -23,6 +23,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         LeaveFrom_ChargeStation = 8,
         ParkAtWorkStation = 9,
         MeasureInBay = 10,
+        LoadingAtTransferStation,
+        UnloadingAtTransferStation,
         Completed = 500,
     }
     public class clsTaskDto
@@ -74,6 +76,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public string DesignatedAGVName { get; set; } = "";
 
+        /// <summary>
+        /// 負責第二段搬運至終點(需轉運的搬運任務執行時)的AGV名稱
+        /// </summary>
+        [MaybeNull]
+        public string TransferToDestineAGVName { get; set; }
 
         [Required]
         public ACTION_TYPE Action { get; set; }
