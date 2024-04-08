@@ -116,6 +116,7 @@ namespace AGVSystemCommonNet6.MAP
                     StationType == STATION_TYPE.EQ_ULD ||
                     StationType == STATION_TYPE.STK_LD ||
                     StationType == STATION_TYPE.STK_ULD ||
+                    StationType == STATION_TYPE.Buffer ||
                     StationType == STATION_TYPE.Fire_EQ ||
                     StationType == STATION_TYPE.Elevator ||
                     StationType == STATION_TYPE.Elevator_LD ||
