@@ -70,7 +70,8 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
                     var columnExists = await CheckIfColumnExists(connection, tableName, columnName);
                     if (!columnExists)
                     {
-                        var commandText = $"ALTER TABLE {tableName} ADD {columnName} {columnType};";
+                        var defaultValue = GetDefaultValue(prop.PropertyType); // 需要实现这个方法
+                        var commandText = $"ALTER TABLE {tableName} ADD {columnName} {columnType} NOT NULL DEFAULT {defaultValue};";
                         using (var command = new SqlCommand(commandText, connection))
                         {
                             await command.ExecuteNonQueryAsync();
@@ -84,77 +85,37 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
             //await SetDefaultValuesForNulls<T>(tableName);
         }
 
-        public async Task SetDefaultValuesForNulls<T>(string tableName)
+        private object GetDefaultValue(Type type)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            // 为基本的数值类型设置默认值
+            if (type.IsValueType)
             {
-                await connection.OpenAsync();
-
-                // 检查表是否存在
-                if (!await CheckIfTableExists(connection, tableName))
+                if (type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(byte) ||
+                    type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort) || type == typeof(sbyte) ||
+                    type == typeof(float) || type == typeof(double) || type == typeof(decimal))
                 {
-                    Console.WriteLine($"Table {tableName} does not exist.");
-                    return;
+                    return "0";
                 }
-
-                var properties = typeof(T).GetProperties()
-                    .Where(p => p.GetGetMethod() != null && p.GetSetMethod() != null &&
-                                p.GetGetMethod().IsPublic && p.GetSetMethod().IsPublic &&
-                                !Attribute.IsDefined(p, typeof(NotMappedAttribute)))
-                    .ToArray();
-
-                foreach (var prop in properties)
+                else if (type == typeof(bool))
                 {
-                    var columnName = prop.GetCustomAttribute<ColumnAttribute>()?.Name ?? prop.Name;
-                    var columnExists = await CheckIfColumnExists(connection, tableName, columnName);
-                    if (!columnExists)
-                    {
-                        continue;
-                    }
-                    // 跳过时间类型字段
-                    if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTimeOffset) ||
-                        Nullable.GetUnderlyingType(prop.PropertyType) == typeof(DateTime) ||
-                        Nullable.GetUnderlyingType(prop.PropertyType) == typeof(DateTimeOffset))
-                    {
-                        continue;
-                    }
-                    // 构建适当的 UPDATE 语句，取决于属性的类型
-                    string updateCommandText;
-
-                    if (prop.PropertyType.IsEnum || (Nullable.GetUnderlyingType(prop.PropertyType)?.IsEnum ?? false))
-                    {
-                        // Enum 和 Nullable<Enum> 类型，将 null 值更新为 0
-                        updateCommandText = $"UPDATE {tableName} SET {columnName} = COALESCE({columnName}, 0) WHERE {columnName} IS NULL";
-                    }
-                    else if (prop.PropertyType.IsClass || Nullable.GetUnderlyingType(prop.PropertyType) != null)
-                    {
-                        // 引用类型和 Nullable<T>，仅更新 null 值
-                        updateCommandText = $"UPDATE {tableName} SET {columnName} = NULL WHERE {columnName} IS NULL";
-                    }
-                    else if (prop.PropertyType.IsValueType)
-                    {
-                        // 非枚举的值类型，使用默认构造器创建默认值
-                        var defaultValue = Activator.CreateInstance(prop.PropertyType);
-                        updateCommandText = $"UPDATE {tableName} SET {columnName} = COALESCE({columnName}, {defaultValue}) WHERE {columnName} IS NULL";
-                    }
-                    else
-                    {
-                        continue;  // 无法识别的类型，跳过处理
-                    }
-
-                    using (var updateCommand = new SqlCommand(updateCommandText, connection))
-                    {
-                        await updateCommand.ExecuteNonQueryAsync();
-                    }
+                    return "0"; // SQL Server中布尔型用bit表示，0为false
                 }
+                else if (type == typeof(DateTime))
+                {
+                    return "'1900-01-01 00:00:00'"; // 常用的默认日期
+                }
+                else if (type == typeof(Guid))
+                {
+                    return "'00000000-0000-0000-0000-000000000000'"; // GUID的默认值
+                }
+                // 可以添加更多的结构体或值类型的处理
             }
-        }
-
-
-        private object GetDefaultValue(Type t)
-        {
-            // 如果是值类型且不是 Nullable 类型，则返回默认值；否则返回 null。
-            return t.IsValueType && Nullable.GetUnderlyingType(t) == null ? Activator.CreateInstance(t) : null;
+            else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                var underlyingType = Nullable.GetUnderlyingType(type);
+                return GetDefaultValue(underlyingType); // 递归调用以获取底层类型的默认值
+            }
+            throw new NotImplementedException($"Default value for type {type.Name} is not defined.");
         }
 
         private string GetSqlDataType(string csharpTypeName, string baseTypeName)
