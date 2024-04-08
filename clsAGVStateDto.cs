@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -49,12 +50,26 @@ namespace AGVSystemCommonNet6
         public DateTime TaskETA { get; set; } = DateTime.MaxValue;
         [NotMapped]// 此欄位不會寫入資料表
         public bool IsExecutingOrder { get; set; } = false;
+
+        [MaybeNull]
         public double VehicleLength { get; set; } = 145.0;
+
+        [MaybeNull]
         public double VehicleWidth { get; set; } = 70;
+
+        [MaybeNull]
         public string IP { get; set; } = "127.0.0.1";
+
+        [MaybeNull]
         public int Port { get; set; }
+
+        [MaybeNull]
         public bool Simulation { get; set; }
+
+        [MaybeNull]
         public PROTOCOL Protocol { get; set; }
+
+        [MaybeNull]
         public int InitTag { get; set; }
 
         public void Update(clsAGVStateDto entity)

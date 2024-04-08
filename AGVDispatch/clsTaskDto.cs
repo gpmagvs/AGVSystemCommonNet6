@@ -79,8 +79,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// <summary>
         /// 負責第二段搬運至終點(需轉運的搬運任務執行時)的AGV名稱
         /// </summary>
-        [MaybeNull]
-        public string TransferToDestineAGVName { get; set; }
+        public string TransferToDestineAGVName { get; set; } = string.Empty;
 
         [Required]
         public ACTION_TYPE Action { get; set; }
@@ -134,7 +133,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// <summary>
         /// 任務需要換車時的中繼站點Tag
         /// </summary>
-        [MaybeNull]
+        [AllowNull]
         public int ChangeAGVMiddleStationTag { get; set; } = 0;
 
         [Required]
@@ -151,7 +150,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public bool bypass_eq_status_check { get; set; } = false;
 
 
-        [MaybeNull]
+        [AllowNull]
         public bool need_change_agv { get; set; } = false;
 
         public void Update(clsTaskDto dto)

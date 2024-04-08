@@ -80,8 +80,82 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
                     }
                 }
             }
+
+            //await SetDefaultValuesForNulls<T>(tableName);
         }
 
+        public async Task SetDefaultValuesForNulls<T>(string tableName)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                // 检查表是否存在
+                if (!await CheckIfTableExists(connection, tableName))
+                {
+                    Console.WriteLine($"Table {tableName} does not exist.");
+                    return;
+                }
+
+                var properties = typeof(T).GetProperties()
+                    .Where(p => p.GetGetMethod() != null && p.GetSetMethod() != null &&
+                                p.GetGetMethod().IsPublic && p.GetSetMethod().IsPublic &&
+                                !Attribute.IsDefined(p, typeof(NotMappedAttribute)))
+                    .ToArray();
+
+                foreach (var prop in properties)
+                {
+                    var columnName = prop.GetCustomAttribute<ColumnAttribute>()?.Name ?? prop.Name;
+                    var columnExists = await CheckIfColumnExists(connection, tableName, columnName);
+                    if (!columnExists)
+                    {
+                        continue;
+                    }
+                    // 跳过时间类型字段
+                    if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTimeOffset) ||
+                        Nullable.GetUnderlyingType(prop.PropertyType) == typeof(DateTime) ||
+                        Nullable.GetUnderlyingType(prop.PropertyType) == typeof(DateTimeOffset))
+                    {
+                        continue;
+                    }
+                    // 构建适当的 UPDATE 语句，取决于属性的类型
+                    string updateCommandText;
+
+                    if (prop.PropertyType.IsEnum || (Nullable.GetUnderlyingType(prop.PropertyType)?.IsEnum ?? false))
+                    {
+                        // Enum 和 Nullable<Enum> 类型，将 null 值更新为 0
+                        updateCommandText = $"UPDATE {tableName} SET {columnName} = COALESCE({columnName}, 0) WHERE {columnName} IS NULL";
+                    }
+                    else if (prop.PropertyType.IsClass || Nullable.GetUnderlyingType(prop.PropertyType) != null)
+                    {
+                        // 引用类型和 Nullable<T>，仅更新 null 值
+                        updateCommandText = $"UPDATE {tableName} SET {columnName} = NULL WHERE {columnName} IS NULL";
+                    }
+                    else if (prop.PropertyType.IsValueType)
+                    {
+                        // 非枚举的值类型，使用默认构造器创建默认值
+                        var defaultValue = Activator.CreateInstance(prop.PropertyType);
+                        updateCommandText = $"UPDATE {tableName} SET {columnName} = COALESCE({columnName}, {defaultValue}) WHERE {columnName} IS NULL";
+                    }
+                    else
+                    {
+                        continue;  // 无法识别的类型，跳过处理
+                    }
+
+                    using (var updateCommand = new SqlCommand(updateCommandText, connection))
+                    {
+                        await updateCommand.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+        }
+
+
+        private object GetDefaultValue(Type t)
+        {
+            // 如果是值类型且不是 Nullable 类型，则返回默认值；否则返回 null。
+            return t.IsValueType && Nullable.GetUnderlyingType(t) == null ? Activator.CreateInstance(t) : null;
+        }
 
         private string GetSqlDataType(string csharpTypeName, string baseTypeName)
         {
@@ -142,7 +216,7 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
             var commandText = $"CREATE TABLE {tableName} (";
             var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p.GetGetMethod().IsPublic && p.GetSetMethod().IsPublic &&
-                            !Attribute.IsDefined(p, typeof(NotMappedAttribute)) );
+                            !Attribute.IsDefined(p, typeof(NotMappedAttribute)));
 
             foreach (var prop in properties)
             {

@@ -28,17 +28,20 @@ namespace AGVSystemCommonNet6.DATABASE
         {
             try
             {
-
                 using (AGVSDatabase database = new AGVSDatabase())
                 {
                     await DatabaseColumnCheck(database);
+                }
+
+                using (AGVSDatabase database = new AGVSDatabase())
+                {
                     DatabaseVersionCheck(database);
                     _DefaultUsersCreate(database.tables.Users);
                     _UnCheckedAlarmsSetAsCheckes(database.tables.SystemAlarms);
                     _ = database.SaveChanges().Result;
                 }
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
                 throw;
             }
@@ -55,6 +58,8 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<clsTaskTrajecotroyStore>(nameof(database.tables.TaskTrajecotroyStores));
             await schemaUpdater.EnsureFieldExists<clsMeasureResult>(nameof(database.tables.InstrumentMeasureResult));
             await schemaUpdater.EnsureFieldExists<clsStopRegionDto>(nameof(database.tables.StopRegionData));
+
+
             return true;
         }
         private static void DataBaseMirgration()
@@ -69,6 +74,7 @@ namespace AGVSystemCommonNet6.DATABASE
         {
             try
             {
+                var nulls = databse.tables.Tasks.Where(t => t.TransferToDestineAGVName == null);
                 databse.tables.Tasks.FirstOrDefault();
                 databse.tables.Users.FirstOrDefault();
                 databse.tables.AgvStates.FirstOrDefault();
