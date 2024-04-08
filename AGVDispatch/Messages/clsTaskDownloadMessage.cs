@@ -39,6 +39,9 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
 
         public clsCST[] CST { get; set; } = new clsCST[0];
         public int Destination { get; set; }
+        /// <summary>
+        /// 在工作站(設備、Rack...)進行取放貨時，Z軸需上升至的層數(Zero-base, 0->第一層 ,1->第二層...)
+        /// </summary>
         public int Height { get; set; } = 0;
 
         [JsonProperty("Escape Flag")]
