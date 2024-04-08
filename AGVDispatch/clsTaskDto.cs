@@ -79,6 +79,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// <summary>
         /// 負責第二段搬運至終點(需轉運的搬運任務執行時)的AGV名稱
         /// </summary>
+
+        [AllowNull]
         public string TransferToDestineAGVName { get; set; } = string.Empty;
 
         [Required]
