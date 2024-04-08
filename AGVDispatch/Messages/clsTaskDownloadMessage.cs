@@ -49,6 +49,10 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public List<int> TagsOfTrajectory => ExecutingTrajecory.Select(pt => pt.Point_ID).ToList();
         public string OriTaskDataJson = "";
         public bool GoTOHomePoint = false;
+
+        public clsMapPoint MeasureInputPoint { get; set; } = new clsMapPoint();
+        public clsMapPoint MeasureOutPoint { get; set; } = new clsMapPoint();
+
         public bool IsLDULDAction()
         {
             return Action_Type == ACTION_TYPE.Load ||
@@ -171,11 +175,27 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public clsTaskDownloadData CreateGoHomeTaskDownloadData()
         {
             var taskData = JsonConvert.DeserializeObject<clsTaskDownloadData>(this.ToJson());
-            taskData.GoTOHomePoint = true;
+
+            bool isBackToEntryPoint = Action_Type != ACTION_TYPE.Measure ?
+                                        true : taskData.MeasureOutPoint.Point_ID == taskData.MeasureInputPoint.Point_ID;
+
             taskData.IsLocalTask = IsLocalTask;
             taskData.IsEQHandshake = IsEQHandshake;
             taskData.IsActionFinishReported = IsActionFinishReported;
-            taskData.Destination = Homing_Trajectory.First().Point_ID;
+            if (isBackToEntryPoint)
+            {
+                taskData.GoTOHomePoint = true;
+                taskData.Destination = Homing_Trajectory.First().Point_ID;
+            }
+            else
+            {
+                taskData.Destination = taskData.MeasureOutPoint.Point_ID;
+                taskData.Homing_Trajectory = new clsMapPoint[2]
+                {
+                     taskData.Homing_Trajectory.Last(),
+                     taskData.MeasureOutPoint,
+                };
+            }
             return taskData;
         }
 
