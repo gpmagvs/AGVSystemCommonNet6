@@ -50,8 +50,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         public string OriTaskDataJson = "";
         public bool GoTOHomePoint = false;
 
-        public clsMapPoint MeasureInputPoint { get; set; } = new clsMapPoint();
-        public clsMapPoint MeasureOutPoint { get; set; } = new clsMapPoint();
+        public clsMapPoint InpointOfEnterWorkStation { get; set; } = new clsMapPoint();
+        public clsMapPoint OutPointOfLeaveWorkstation { get; set; } = new clsMapPoint();
 
         public bool IsLDULDAction()
         {
@@ -176,8 +176,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         {
             var taskData = JsonConvert.DeserializeObject<clsTaskDownloadData>(this.ToJson());
 
-            bool isBackToEntryPoint = Action_Type != ACTION_TYPE.Measure ?
-                                        true : taskData.MeasureOutPoint.Point_ID == taskData.MeasureInputPoint.Point_ID;
+            bool isBackToEntryPoint = Action_Type != ACTION_TYPE.Measure && Action_Type != ACTION_TYPE.ExchangeBattery ?
+                                        true : taskData.OutPointOfLeaveWorkstation.Point_ID == taskData.InpointOfEnterWorkStation.Point_ID;
 
             taskData.IsLocalTask = IsLocalTask;
             taskData.IsEQHandshake = IsEQHandshake;
@@ -189,11 +189,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             }
             else
             {
-                taskData.Destination = taskData.MeasureOutPoint.Point_ID;
+                taskData.Destination = taskData.OutPointOfLeaveWorkstation.Point_ID;
                 taskData.Homing_Trajectory = new clsMapPoint[2]
                 {
                      taskData.Homing_Trajectory.Last(),
-                     taskData.MeasureOutPoint,
+                     taskData.OutPointOfLeaveWorkstation,
                 };
             }
             return taskData;

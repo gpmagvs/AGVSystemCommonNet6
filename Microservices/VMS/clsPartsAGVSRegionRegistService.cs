@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AGVSystemCommonNet6.Log;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -53,6 +54,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 List_AreaName = AreaNames,
                 RegistEventEnum = RegistEventObject.REGIST_ACTION.Unregist
             };
+            LOG.WARN($"Unregist request send to Parts System : {obj.ToJson()}");
             return await SendToPartsAGVS(obj);
         }
         public async Task<(bool accept, Dictionary<string, string>)> Query()
@@ -78,8 +80,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
 
             var ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
             {
-                SendTimeout = 3000,
-                ReceiveTimeout = 3000
+                SendTimeout = 8000,
+                ReceiveTimeout = 8000
             };
             ClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
             try
@@ -95,7 +97,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             string SendOutMessage = Newtonsoft.Json.JsonConvert.SerializeObject(data_obj);
             ClientSocket.Send(Encoding.GetEncoding("big5").GetBytes(SendOutMessage));
             CancellationTokenSource cancelwait = new CancellationTokenSource();
-            cancelwait.CancelAfter(TimeSpan.FromSeconds(5));
+            cancelwait.CancelAfter(TimeSpan.FromSeconds(8));
             string ReceiveDataString = "";
             while (true)
             {

@@ -93,6 +93,8 @@ namespace AGVSystemCommonNet6.MAP
         public AutoDoor? AutoDoor { get; set; } = new AutoDoor();
         public MotionInfo? MotionInfo { get; set; } = new MotionInfo();
 
+        public int TagOfInPoint { get; set; } = -1;
+        public int TagOfOutPoint { get; set; } = -1;
         public string? Region { get; set; } = "";
 
         [JsonIgnore]
