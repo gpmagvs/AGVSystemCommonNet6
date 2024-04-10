@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -178,5 +179,9 @@ namespace AGVSystemCommonNet6.MAP
         [JsonIgnore]
         public clsPointRegistInfo RegistInfo = new clsPointRegistInfo();
 
+        public PointF ToCoordination()
+        {
+            return new PointF((float)X, (float)Y);
+        }
     }
 }
