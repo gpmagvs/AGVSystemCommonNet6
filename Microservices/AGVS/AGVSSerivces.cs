@@ -5,6 +5,7 @@ using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Log;
 using Newtonsoft.Json;
+using RosSharp.RosBridgeClient;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -69,6 +70,28 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
             }
 
+            public static async Task StartLDULDOrderReport(int destineTag, ACTION_TYPE action)
+            {
+                await StartLDULDOrderReport(-1, destineTag, action);
+            }
+
+            public static async Task StartLDULDOrderReport(int from_Station_Tag, int to_Station_Tag, ACTION_TYPE action)
+            {
+                using (agvs_http)
+                {
+                    try
+                    {
+                        var route = $"/api/Task/LDULDOrderStart?from={from_Station_Tag}&to={to_Station_Tag}&action={action}";
+                        string response = await agvs_http.GetStringAsync(route);
+                        LOG.INFO($"LoadUnload Order Start Feedback to AGVS, AGVS Response = {response}");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.Critical($"LoadUnload Order Start Feedback to AGVS FAIL,{ex.Message}", ex);
+                    }
+                }
+            }
         }
     }
 }
