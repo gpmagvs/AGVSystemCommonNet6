@@ -58,6 +58,9 @@ namespace AGVSystemCommonNet6.Configuration
     public class clsAGVTaskControlConfigs
     {
         public bool CheckAGVCargoStatusWhenLDULDAction { get; set; } = true;
+
+        public bool UnLockEntryPointWhenParkAtEquipment { get; set; } = false;
+
         public int SegmentTrajectoryPointNum { get; set; } = 3;
     }
 }
