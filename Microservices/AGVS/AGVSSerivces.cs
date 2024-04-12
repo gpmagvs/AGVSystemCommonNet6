@@ -4,6 +4,7 @@ using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Microservices.ResponseModel;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
 using System;
@@ -29,12 +30,13 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             /// <param name="SourceTag"></param>
             /// <param name="DestineTag"></param>
             /// <returns></returns>
-            public static async Task StartTransferCargoReport(string AGVName, int SourceTag, int DestineTag)
+            public static async Task<clsAGVSTaskReportResponse> StartTransferCargoReport(string AGVName, int SourceTag, int DestineTag)
             {
                 using (agvs_http)
                 {
-                    string response = await agvs_http.GetStringAsync($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}");
-                    LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response}");
+                    clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}");
+                    LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
+                    return response;
                 }
             }
 
