@@ -66,6 +66,11 @@ namespace AGVSystemCommonNet6.MAP.Geometry
                 return corners.OrderByDescending(corner => CalculateAngleFromCentroid(corner, centroid)).ToArray();
             }
         }
+
+        public bool IsIntersectionTo(MapCircleArea rotaionRegion)
+        {
+            throw new NotImplementedException();
+        }
         public bool IsIntersectionTo(MapRectangle rectangle_compare_to)
         {
             
@@ -151,6 +156,7 @@ namespace AGVSystemCommonNet6.MAP.Geometry
         {
             return vector1.X * vector2.X + vector1.Y * vector2.Y;
         }
+
     }
 
 }
