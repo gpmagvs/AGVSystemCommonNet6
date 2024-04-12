@@ -8,6 +8,12 @@ namespace AGVSystemCommonNet6.Microservices.ResponseModel
 {
     public abstract class clsResponseBase
     {
+        public clsResponseBase() { }
+        public clsResponseBase(bool confirm, string message)
+        {
+            this.confirm = confirm;
+            this.message = message;
+        }
         public bool confirm { get; set; } = false;
         public string message { get; set; } = "";
     }
