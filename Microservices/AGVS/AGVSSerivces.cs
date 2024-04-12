@@ -21,6 +21,28 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
     {
         public static string AGVSHostUrl => "http://127.0.0.1:5216";
         private static HttpHelper agvs_http => new HttpHelper(AGVSHostUrl);
+
+        public struct TRAFFICS
+        {
+            public static async Task<clsAGVSBlockedPointsResponse> GetBlockedTagsByEqMaintain()
+            {
+                using (agvs_http)
+                {
+                    clsAGVSBlockedPointsResponse response = await agvs_http.GetAsync<clsAGVSBlockedPointsResponse>($"/api/Traffic/GetBlockedTagsByEqMaintain");
+                    return response;
+                }
+            }
+
+            public static async Task<clsGetUsableChargeStationTagResponse> GetUseableChargeStationTags(string agv_name)
+            {
+                using (agvs_http)
+                {
+                    clsGetUsableChargeStationTagResponse response = await agvs_http.GetAsync<clsGetUsableChargeStationTagResponse>($"/api/Traffic/GetUseableChargeStationTags?agv_name={agv_name}");
+                    return response;
+                }
+            }
+        }
+
         public struct TRANSFER_TASK
         {
             /// <summary>

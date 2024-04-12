@@ -110,8 +110,8 @@ namespace AGVSystemCommonNet6.MAP
 
                     if (options.ConstrainTags.Count != 0)
                     {
-
-                        staions_ordered = staions_ordered.FindAll(s => !options.ConstrainTags.Contains(s.Value.TagNumber));
+                        var constrainTags = options.ConstrainTags.Distinct();
+                        staions_ordered = staions_ordered.FindAll(s => !constrainTags.Contains(s.Value.TagNumber));
                     }
 
                 }
