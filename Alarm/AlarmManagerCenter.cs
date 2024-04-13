@@ -80,32 +80,29 @@ namespace AGVSystemCommonNet6.Alarm
                 throw ex;
             }
         }
+        private static SemaphoreSlim semaphoreSlim= new SemaphoreSlim(1,1);
         public static async Task AddAlarmAsync(clsAlarmDto alarmDto)
         {
-            if (!Initialized)
-                Initialize();
-
+            await semaphoreSlim.WaitAsync();
             try
             {
+                if (!Initialized)
+                    Initialize();
                 using var db = new AGVSDatabase();
                 db.tables.SystemAlarms.Add(alarmDto);
                 await db.SaveChanges();
             }
             catch (Exception ex)
             {
-                await Task.Factory.StartNew(async () =>
-                 {
-                     await Task.Delay(100);
-                     await AddAlarmAsync(alarmDto);
-                 });
+                Console.WriteLine(ex.Message);
             }
+            finally { semaphoreSlim.Release(); }
         }
         static object AlarmLockObject = new object();
 
         public static async Task<clsAlarmDto> AddAlarmAsync(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
         {
-            if (!Initialized)
-                Initialize();
+           
             try
             {
 
@@ -146,6 +143,9 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 LOG.ERROR("AddAlarmAsync", ex);
                 return null;
+            }finally
+            {
+               
             }
         }
 
