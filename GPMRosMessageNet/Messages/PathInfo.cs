@@ -5,6 +5,37 @@ using RosSharp.RosBridgeClient;
 
 namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
 {
+    public class AMCPathInfo : PathInfo
+    {
+        /// <summary>
+        /// 0: 一般區域
+        /// 1: 防火區
+        /// </summary>
+        public bool FireArea { get; set; } = false;
+        /// <summary>
+        /// 0: 一般區域
+        /// 1: 防火設備
+        /// </summary>  
+        public bool FirePoint { get; set; } = false;
+        public AMCPathInfo() : base()
+        {
+
+            this.FirePoint = false;
+            this.FireArea = false;
+        }
+        public AMCPathInfo(ushort tagid, ushort laserMode, ushort direction, string map, ushort changeMap, double speed, double ultrasonicDistance, bool FirePoint, bool FireArea)
+        {
+            this.tagid = tagid;
+            this.laserMode = laserMode;
+            this.direction = direction;
+            this.map = map;
+            this.changeMap = changeMap;
+            this.speed = speed;
+            this.ultrasonicDistance = ultrasonicDistance;
+            this.FireArea = FireArea;
+            this.FirePoint = FirePoint;
+        }
+    }
     public class PathInfo : Message
     {
         public const string RosMessageName = "gpm_msgs/PathInfo";
@@ -34,7 +65,6 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
         /// 超音波偵測設定距離(cm)
         /// </summary>
         public double ultrasonicDistance { get; set; }
-
         public PathInfo()
         {
             this.tagid = 0;

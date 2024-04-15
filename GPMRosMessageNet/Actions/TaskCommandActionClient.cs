@@ -63,7 +63,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
                 var _actionStatus = (ActionStatus)(goalStatus.status);
                 if (previousActionStatus != _actionStatus)
                 {
-                    Task.Factory.StartNew(() => OnActionStatusChanged?.Invoke(this, _actionStatus));
+                    OnActionStatusChanged?.Invoke(this, _actionStatus);
                 }
                 previousActionStatus = _actionStatus;
             }

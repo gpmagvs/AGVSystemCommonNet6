@@ -25,6 +25,9 @@ namespace AGVSystemCommonNet6.Configuration
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
         public clsAGVTaskControlConfigs TaskControlConfigs { get; set; } = new clsAGVTaskControlConfigs();
         public clsAutoModeConfigs AutoModeConfigs { get; set; } = new clsAutoModeConfigs();
+
+        public string AGVUpdateFileFolder { get; set; } = "C:\\AGVS\\AGV_Update";
+
     }
     public class clsMapConfigs
     {
@@ -54,5 +57,6 @@ namespace AGVSystemCommonNet6.Configuration
     public class clsAGVTaskControlConfigs
     {
         public bool CheckAGVCargoStatusWhenLDULDAction { get; set; } = true;
+        public int SegmentTrajectoryPointNum { get; set; } = 3;
     }
 }

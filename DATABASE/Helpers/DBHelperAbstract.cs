@@ -10,7 +10,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
     public abstract class DBHelperAbstract : IDisposable
     {
-
+        private static SemaphoreSlim saveChangeSemaphoreSlim = new SemaphoreSlim(1, 1);
         protected readonly string connection_str;
         protected DbContextHelper dbhelper;
         private bool disposedValue;
@@ -34,21 +34,20 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         public static object lockObj = new object();
         public async Task<int> SaveChanges()
         {
-            lock (lockObj)
+            await saveChangeSemaphoreSlim.WaitAsync();
+            try
             {
-                try
-                {
-                    return dbhelper._context.SaveChanges();
-
-                }
-                catch (Exception ex)
-                {
-                    LOG.Critical(ex.InnerException.Message, ex.InnerException);
-                    return 0;
-                }
-
+                return await dbhelper._context.SaveChangesAsync();
             }
-
+            catch (Exception ex)
+            {
+                LOG.Critical(ex.InnerException.Message, ex.InnerException);
+                return 0;
+            }
+            finally
+            {
+                saveChangeSemaphoreSlim.Release();
+            }
         }
 
         protected virtual void Dispose(bool disposing)

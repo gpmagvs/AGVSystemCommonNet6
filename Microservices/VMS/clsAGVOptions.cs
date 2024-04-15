@@ -10,8 +10,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
     {
         public enum PROTOCOL
         {
-            TCP,
-            RESTFulAPI,
+            TCP=0,
+            RESTFulAPI=1,
         }
 
         public string HostIP { get; set; }

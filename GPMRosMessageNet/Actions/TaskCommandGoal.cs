@@ -21,9 +21,9 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Actions
         public const string RosMessageName = "gpm_msgs/TaskCommandGoal";
         public enum GUIDE_TYPE : ushort
         {
-            SLAM,
-            Color_Tap_Forward,
-            Color_Tap_Backward,
+            SLAM = 0,
+            Color_Tap = 1,
+            AR_TAG = 2,
         }
         public RosSharp.RosBridgeClient.MessageTypes.Nav.Path planPath { get; set; }
         //  

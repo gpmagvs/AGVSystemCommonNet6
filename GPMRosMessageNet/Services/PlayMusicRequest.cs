@@ -23,4 +23,38 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Services
 
 
     }
+
+    public class UpdateMusicRequest : Message
+    {
+        public const string RosMessageName = "sound_play_adapter/UpdateMusic";
+
+        public string music_type { get; set; }
+
+        public UpdateMusicRequest()
+        {
+            this.music_type = "";
+        }
+
+        public UpdateMusicRequest(string music_type)
+        {
+            this.music_type = music_type;
+        }
+    }
+
+    public class UpdateMusicResponse : Message
+    {
+        public const string RosMessageName = "sound_play_adapter/UpdateMusic";
+
+        public bool success { get; set; }
+
+        public UpdateMusicResponse()
+        {
+            this.success = false;
+        }
+
+        public UpdateMusicResponse(bool success)
+        {
+            this.success = success;
+        }
+    }
 }

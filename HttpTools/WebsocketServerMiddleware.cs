@@ -76,7 +76,6 @@ namespace AGVSystemCommonNet6.HttpTools
         {
             await Task.Run(async () =>
             {
-                Stopwatch _stopwatch = Stopwatch.StartNew();
                 while (true)
                 {
                     await Task.Delay(100);
@@ -85,46 +84,55 @@ namespace AGVSystemCommonNet6.HttpTools
                     {
                         await CollectViewModelData();
 
+                        List<Task> channelTasks = new List<Task>();
 
-                        foreach (var item in CurrentViewModelDataOfAllChannel)
+                        foreach (KeyValuePair<string, object> item in CurrentViewModelDataOfAllChannel)
+                        {
+                            channelTasks.Add(ProcessChannelAsync(item));
+                        }
+
+                        await Task.WhenAll(channelTasks);
+
+                        async Task ProcessChannelAsync(KeyValuePair<string, object> item)
                         {
                             var ChannelName = item.Key;
                             var clientsInThisChannel = ClientsOfAllChannel[ChannelName];
 
                             if (clientsInThisChannel.Count == 0)
-                                continue;
+                                return;
 
                             var Data = item.Value;
                             var datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
 
-                            foreach (var client in clientsInThisChannel)
+                            List<Task> clientTasks = new List<Task>();
+
+                            foreach (clsWebsocktClientHandler client in clientsInThisChannel)
+                            {
+                                clientTasks.Add(SendMessageAsync(client, datPublishOut));
+                            }
+
+                            await Task.WhenAll(clientTasks);
+
+                            async Task SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
                             {
                                 try
                                 {
-                                    await client.WebSocket.SendAsync(datPublishOut, WebSocketMessageType.Text, true, CancellationToken.None);
+                                    await client.WebSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None).ConfigureAwait(false);
                                 }
                                 catch (Exception ex)
                                 {
                                     client.InvokeOnClientDisconnect();
                                     Console.WriteLine(ex.Message + "\r\n" + ex.StackTrace);
-                                    continue;
-                                }
-                                finally
-                                {
                                 }
                             }
                         }
+
                     }
                     catch (Exception ex)
                     {
                     }
                     finally
                     {
-                        if (_stopwatch.ElapsedMilliseconds > 10000)
-                        {
-                            GC.Collect();
-                            _stopwatch.Restart();
-                        }
                         try
                         {
                             _ClientConnectionChanging.Release();
