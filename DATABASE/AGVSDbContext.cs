@@ -25,6 +25,8 @@ namespace AGVSystemCommonNet6.DATABASE
         /// AGV 變成 Idle的地方、起始時間、結束時間
         /// </summary>
         public DbSet<clsStopRegionDto> StopRegionData { get; set; }
+
+        public DbSet<clsPointPassInfo> PointPassTime {  get; set; }
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options)
             : base(options)
         {
