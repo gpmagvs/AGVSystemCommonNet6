@@ -458,6 +458,7 @@
         Fork_Arm_Action_Error = 860044,
         Replan = 860045,
         Limit_Switch_Sensor = 860046,
-        Send_Goal_to_AGV_But_AGVS_Cancel_Req_Raised = 860047
+        Send_Goal_to_AGV_But_AGVS_Cancel_Req_Raised = 860047,
+        Fork_Slot_Teach_Data_ERROR = 860048,
     }
 }
