@@ -22,11 +22,11 @@ namespace AGVSystemCommonNet6.HttpTools
         internal async Task ListenConnection()
         {
             var buff = new ArraySegment<byte>(new byte[32]);
-            while (WebSocket.State == WebSocketState.Open)
+            while (true)
             {
                 try
                 {
-                    await Task.Delay(1000).ConfigureAwait(false);
+                    await Task.Delay(100);
                     WebSocketReceiveResult result = await WebSocket.ReceiveAsync(buff, CancellationToken.None).ConfigureAwait(false);
                 }
                 catch (Exception ex)
