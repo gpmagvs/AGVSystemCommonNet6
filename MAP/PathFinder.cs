@@ -17,6 +17,7 @@ namespace AGVSystemCommonNet6.MAP
         {
             public bool OnlyNormalPoint { get; set; } = false;
 
+            public bool ContainElevatorPoint { get; set; } = false;
             /// <summary>
             /// 要避開的TAG點位
             /// </summary>
@@ -79,7 +80,7 @@ namespace AGVSystemCommonNet6.MAP
                 throw ex;
             }
         }
-      
+
         public clsPathInfo FindShortestPath(Map map, MapPoint startStation, MapPoint endStation, PathFinderOption options = null)
         {
             int startIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == startStation.TagNumber).Key;
@@ -99,7 +100,11 @@ namespace AGVSystemCommonNet6.MAP
                 {
                     if (options.OnlyNormalPoint)
                     {
-                        List<KeyValuePair<int, MapPoint>> normal_pts = stations.ToList().FindAll(kp => kp.Value.StationType == 0);
+                        var normal_pts = stations.ToList().Where(kp => kp.Value.StationType == 0).ToList();
+                        if (options.ContainElevatorPoint)
+                        {
+                            normal_pts.AddRange(stations.Where(kp => kp.Value.StationType == STATION_TYPE.Elevator));
+                        }
                         staions_ordered = normal_pts.OrderBy(k => k.Key).ToList();
                     }
                     else
@@ -163,7 +168,7 @@ namespace AGVSystemCommonNet6.MAP
             catch (Exception ex)
             {
                 OnExceptionHappen?.Invoke(this, ex);
-                return null;    
+                return null;
                 //throw ex;
             }
 

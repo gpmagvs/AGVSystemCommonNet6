@@ -41,7 +41,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
             catch (Exception ex)
             {
-                LOG.Critical(ex.InnerException.Message, ex.InnerException);
+                LOG.Critical(ex.Message, ex);
                 return 0;
             }
             finally
@@ -58,7 +58,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 {
                     // TODO: 處置受控狀態 (受控物件)
                 }
-                dbhelper.Dispose();
+                dbhelper?.Dispose();
                 // TODO: 釋出非受控資源 (非受控物件) 並覆寫完成項
                 // TODO: 將大型欄位設為 Null
                 disposedValue = true;
