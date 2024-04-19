@@ -87,6 +87,7 @@ namespace AGVSystemCommonNet6.DATABASE
             }
             catch (Exception ex)
             {
+                // 如果出現 Data is Null的例外, 可能是資料庫規劃有改版造成的, 直接把DB刪掉就好  
                 throw ex;
             }
         }
