@@ -10,7 +10,7 @@ namespace AGVSystemCommonNet6.Configuration
     public class SystemConfigs
     {
         public string FieldName { get; set; } = "UMTC-AOI-2F";
-        public string DBConnection { get; set; } = "Server=127.0.0.1;Database=GPMAGVs;User Id=sa;Password=12345678;Encrypt=False";
+        public string DBConnection { get; set; } = "Server=127.0.0.1;Database=GPMAGVs;User Id=sa;Password=12345678;Encrypt=False;MultipleActiveResultSets=True";
         public string VMSHost { get; set; } = "http://localhost:5036";
         public string AGVSHost { get; set; } = "http://localhost:5216";
 
