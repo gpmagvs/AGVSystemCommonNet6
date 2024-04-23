@@ -114,6 +114,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
         [Required]
         public string From_Station { get; set; } = "-1";
 
+        [NotMapped]
+        public string From_Station_Display { get; set; } = string.Empty;
+
         public int From_Station_Tag => int.TryParse(From_Station, out int tag) ? tag : -1;
 
         [Required]
@@ -123,6 +126,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         [Required]
         public string To_Station { get; set; } = "-1";
+        [NotMapped]
+        public string To_Station_Display { get; set; } = string.Empty;
         [Required]
         public AGV_TYPE To_Station_AGV_Type { get; set; } = AGV_TYPE.Any;
         public int To_Station_Tag => int.TryParse(To_Station, out int tag) ? tag : -1;
