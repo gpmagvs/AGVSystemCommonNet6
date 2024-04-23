@@ -188,6 +188,31 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
         }
 
-
+        public async static Task<ResponseModel.clsResponseBase> AddPartsReplaceworkstationTag(int tagOfEQInPartsReplacing)
+        {
+            try
+            {
+                HttpHelper http = new HttpHelper(VMSHostUrl);
+                var response = await http.GetAsync<ResponseModel.clsResponseBase>($"/api/Navigation/AddPartsReplaceworkstationTag?workstationTag={tagOfEQInPartsReplacing}", 3);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel.clsResponseBase(false, ex.Message);
+            }
+        }
+        public async static Task<ResponseModel.clsResponseBase> RemovePartsReplaceworkstationTag(int tagOfEQInPartsReplacing)
+        {
+            try
+            {
+                HttpHelper http = new HttpHelper(VMSHostUrl);
+                var response = await http.GetAsync<ResponseModel.clsResponseBase>($"/api/Navigation/RemovePartsReplaceworkstationTag?workstationTag={tagOfEQInPartsReplacing}", 3);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel.clsResponseBase(false, ex.Message);
+            }
+        }
     }
 }
