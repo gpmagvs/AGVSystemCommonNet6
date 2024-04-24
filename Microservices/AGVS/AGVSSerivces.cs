@@ -13,7 +13,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static AGVSystemCommonNet6.clsEnums;
+using static System.Collections.Specialized.BitVector32;
 
 namespace AGVSystemCommonNet6.Microservices.AGVS
 {
@@ -117,6 +119,38 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         LOG.Critical($"LoadUnload Order Start Feedback to AGVS FAIL,{ex.Message}", ex);
                         return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
 
+                    }
+                }
+            }
+
+            public static async Task<Dictionary<int, int>> GetEQAcceptAGVTypeInfo(IEnumerable<int> tagsCollections)
+            {
+                using (agvs_http)
+                {
+                    try
+                    {
+                        var route = $"/api/Equipment/GetEQOptionsByTags";
+                        var response = await agvs_http.PostAsync<List<Dictionary<string, object>>, int[]>(route, tagsCollections.ToArray());
+
+                        return response.ToDictionary(obj => int.Parse(obj["Tag"].ToString()), obj => int.Parse(obj["Accept_AGV_Type"].ToString()));
+
+                        //[
+                        //  {
+                        //    Tag = option.TagID,
+                        //    EqName = option.Name,
+                        //    AGVModbusGatewayPort = option.ConnOptions.AGVModbusGatewayPort,
+                        //    Accept_AGV_Type = option.Accept_AGV_Type
+                        //  },
+                        //  {
+                        //      ...
+                        //  }
+                        //]
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.Critical($"LoadUnload Order Start Feedback to AGVS FAIL,{ex.Message}", ex);
+                        //return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
+                        return new Dictionary<int, int>();
                     }
                 }
             }
