@@ -110,7 +110,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 while (true)
                 {
                     await Task.Delay(100);
-                    await _ClientConnectionChanging.WaitAsync();
+                    //await _ClientConnectionChanging.WaitAsync();
                     Initializd = true;
                     try
                     {
@@ -120,10 +120,11 @@ namespace AGVSystemCommonNet6.HttpTools
 
                         foreach (KeyValuePair<string, object> item in CurrentViewModelDataOfAllChannel)
                         {
-                            channelTasks.Add(ProcessChannelAsync(item));
+                            //channelTasks.Add(ProcessChannelAsync(item));
+                            ProcessChannelAsync(item);
                         }
 
-                        await Task.WhenAll(channelTasks);
+                        //await Task.WhenAll(channelTasks);
                         async Task ProcessChannelAsync(KeyValuePair<string, object> item)
                         {
                             var ChannelName = item.Key;
@@ -142,10 +143,11 @@ namespace AGVSystemCommonNet6.HttpTools
 
                             foreach (clsWebsocktClientHandler client in clientsInThisChannel)
                             {
-                                clientTasks.Add(SendMessageAsync(client, datPublishOut));
+                                //clientTasks.Add(SendMessageAsync(client, datPublishOut));
+                                SendMessageAsync(client, datPublishOut);
                             }
 
-                            await Task.WhenAll(clientTasks);
+                            //await Task.WhenAll(clientTasks);
 
                             async Task SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
                             {
@@ -168,15 +170,15 @@ namespace AGVSystemCommonNet6.HttpTools
                     }
                     finally
                     {
-                        try
-                        {
-                            _ClientConnectionChanging.Release();
-                        }
-                        catch (Exception ex)
-                        {
-                            LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
-                            _ClientConnectionChanging = new SemaphoreSlim(1, 1);
-                        }
+                        //try
+                        //{
+                        //    _ClientConnectionChanging.Release();
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
+                        //    _ClientConnectionChanging = new SemaphoreSlim(1, 1);
+                        //}
                     }
                 }
             });
