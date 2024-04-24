@@ -96,6 +96,7 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
                 {
                     return "0";
                 }
+                
                 else if (type == typeof(bool))
                 {
                     return "0"; // SQL Server中布尔型用bit表示，0为false
@@ -114,6 +115,10 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
             {
                 var underlyingType = Nullable.GetUnderlyingType(type);
                 return GetDefaultValue(underlyingType); // 递归调用以获取底层类型的默认值
+            }
+            else if (type == typeof(string))
+            {
+                return "''";
             }
             throw new NotImplementedException($"Default value for type {type.Name} is not defined.");
         }
