@@ -13,7 +13,24 @@ namespace AGVSystemCommonNet6.Alarm
         public DateTime Time { get; set; }
         public ALARM_LEVEL Level { get; set; }
         public ALARM_SOURCE Source { get; set; }
-        public int AlarmCode { get; set; }
+        private int _Alarmcode = 0;
+        public int AlarmCode
+        {
+            get { return _Alarmcode; }
+            set
+            {
+                _Alarmcode = value;
+                if (AlarmManagerCenter.AGVsTrobleShootings.Keys.Count > 0)
+                {
+                    string TrobleShooting = ((ALARMS)_Alarmcode).ToString();
+                    if (AlarmManagerCenter.AGVsTrobleShootings.ContainsKey(TrobleShooting))
+                    {
+                        TrobleShootingMethod = AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].TrobleShootingDescription;
+                        TrobleShootingReference = AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].TrobleShootingFilePath;
+                    }
+                }
+            }
+        }
         public string Description => $"{Description_En}({Description_Zh})";
         public string Description_Zh { get; set; } = "";
         public string Description_En { get; set; } = "";
@@ -26,5 +43,25 @@ namespace AGVSystemCommonNet6.Alarm
         public int Duration { get; set; }
         public bool Checked { get; set; }
         public string ResetAalrmMemberName { get; set; } = "";
+
+        private string _TrobleShootingMethod = "Reboot System";
+        public string TrobleShootingMethod
+        {
+            get { return _TrobleShootingMethod; }
+            set
+            {
+                _TrobleShootingMethod = value;
+            }
+        }
+
+        private string _TrobleShootingReference = "/Reources/AOI_SOP_000_AGV 當機處理.pdf";
+        public string TrobleShootingReference
+        {
+            get { return _TrobleShootingReference; }
+            set
+            {
+                _TrobleShootingReference = value;
+            }
+        }
     }
 }

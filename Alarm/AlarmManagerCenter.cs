@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Text;
@@ -11,7 +12,9 @@ namespace AGVSystemCommonNet6.Alarm
     public class AlarmManagerCenter
     {
         public static string ALARM_CODE_FILE_PATH = @"C:\AGVS\AGVS_AlarmCodes.json";
+        public static string TROBLE_SHOOTING_FILE_PATH = @"C:\AGVS\AGVS_TrobleShooting.csv";
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
+        public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
         public static List<clsAlarmDto> uncheckedAlarms
         {
             get
@@ -28,6 +31,7 @@ namespace AGVSystemCommonNet6.Alarm
         public static void Initialize()
         {
             LoadAlarmCodes();
+            LoadTrobleShootingDescription();
             Initialized = true;
             SetAllAlarmChecked();
         }
@@ -80,7 +84,7 @@ namespace AGVSystemCommonNet6.Alarm
                 throw ex;
             }
         }
-        private static SemaphoreSlim semaphoreSlim= new SemaphoreSlim(1,1);
+        private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         public static async Task AddAlarmAsync(clsAlarmDto alarmDto)
         {
             await semaphoreSlim.WaitAsync();
@@ -102,7 +106,7 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static async Task<clsAlarmDto> AddAlarmAsync(ALARMS alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
         {
-           
+
             try
             {
 
@@ -128,7 +132,9 @@ namespace AGVSystemCommonNet6.Alarm
                     OccurLocation = location == null ? "" : location,
                     Task_Name = taskName == null ? "" : taskName,
                     Time = DateTime.Now,
-                    Source = source
+                    Source = source,
+                    //TrobleShootingMethod = AGVsTrobleShootings[alarm.ToString()].TrobleShootingDescription,
+                    //TrobleShootingReference = AGVsTrobleShootings[alarm.ToString()].TrobleShootingFilePath
                 };
                 lock (AlarmLockObject)
                 {
@@ -143,9 +149,10 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 LOG.ERROR("AddAlarmAsync", ex);
                 return null;
-            }finally
+            }
+            finally
             {
-               
+
             }
         }
 
@@ -167,6 +174,113 @@ namespace AGVSystemCommonNet6.Alarm
                     Description_Zh = "車載管理系統斷線"
                 });
                 File.WriteAllText(ALARM_CODE_FILE_PATH, JsonConvert.SerializeObject(AlarmCodes.Values.ToArray(), Formatting.Indented));
+            }
+        }
+
+        private static void LoadTrobleShootingDescription()
+        {
+            //if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
+            //{
+            //    string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH);
+            //    List<string>? _TrobleShootingDescription = _AllTrobleShootingDescription.Split("\r\n").ToList();
+            //    _TrobleShootingDescription.RemoveAt(0);
+            //    foreach (string TrobleShooting in _TrobleShootingDescription)
+            //    {
+            //        string[] TrobleShootingCase = TrobleShooting.Split(',');
+            //        string TrobleCaseName = TrobleShootingCase[0];
+            //        if (TrobleShootingCase.Count() < 3)
+            //            continue;
+            //        if (AGVsTrobleShootings.ContainsKey(TrobleShootingCase[0]))
+            //            continue;
+            //        AGVsTrobleShootings.Add(TrobleShootingCase[0], new clsAGVsTrobleShooting()
+            //        {
+            //            Alarm = TrobleShootingCase[0],
+            //            TrobleShootingDescription = TrobleShootingCase[1],
+            //            TrobleShootingFilePath = TrobleShootingCase[2]
+            //        });
+            //    }
+            //}
+            //else
+            //{
+            //    Directory.CreateDirectory(Path.GetDirectoryName(TROBLE_SHOOTING_FILE_PATH));
+
+            //    FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Append);
+
+            //    using (StreamWriter sr = new StreamWriter(fs))
+            //    {
+            //        sr.WriteLine("Alarm,TrobleShootingDescription,TrobleShootingFilePath");
+
+            //        var Alarms = Enum.GetValues(typeof(ALARMS)).Cast<ALARMS>();
+
+            //        foreach (var item in Alarms)
+            //        {
+            //            string AlarmDescription = item.ToString();
+            //            sr.WriteLine($"{AlarmDescription},,");
+            //            if (AGVsTrobleShootings.ContainsKey(AlarmDescription) == false)
+            //            {
+            //                AGVsTrobleShootings.Add(AlarmDescription, new clsAGVsTrobleShooting()
+            //                {
+            //                    Alarm = item.ToString(),
+            //                });
+            //            }
+            //        }
+            //    }
+            //}
+
+            UadateAGVsTrobleShootings(ref AGVsTrobleShootings);
+        }
+
+        public static void UadateAGVsTrobleShootings(ref Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings)
+        {
+            if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
+            {
+                string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH, Encoding.BigEndianUnicode);
+                List<string>? _TrobleShootingDescription = _AllTrobleShootingDescription.Split("\r\n").ToList();
+                _TrobleShootingDescription.RemoveAt(0);
+                foreach (string TrobleShooting in _TrobleShootingDescription)
+                {
+                    string[] TrobleShootingCase = TrobleShooting.Split(',');
+                    if (TrobleShootingCase.Count() != 3)
+                        continue;
+                    if (AGVsTrobleShootings.ContainsKey(TrobleShootingCase[0]))
+                        continue;
+                    AGVsTrobleShootings.Add(TrobleShootingCase[0], new clsAGVsTrobleShooting()
+                    {
+                        Alarm = TrobleShootingCase[0],
+                        TrobleShootingDescription = TrobleShootingCase[1],
+                        TrobleShootingFilePath = TrobleShootingCase[2]
+                    });
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(TROBLE_SHOOTING_FILE_PATH));
+            }
+
+            var Alarms = Enum.GetValues(typeof(ALARMS)).Cast<ALARMS>();
+
+            foreach (var item in Alarms)
+            {
+                string AlarmDescription = item.ToString();
+
+                if (AGVsTrobleShootings.ContainsKey(AlarmDescription))
+                    continue;
+
+                AGVsTrobleShootings.Add(AlarmDescription, new clsAGVsTrobleShooting()
+                {
+                    Alarm = item.ToString(),
+                });
+            }
+
+            FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);
+
+            using (StreamWriter sr = new StreamWriter(fs))
+            {
+                sr.WriteLine("Alarm,TrobleShootingDescription,TrobleShootingFilePath");
+                foreach (var item in AGVsTrobleShootings)
+                {
+                    sr.WriteLine($"{item.Value.Alarm},{item.Value.TrobleShootingDescription},{item.Value.TrobleShootingFilePath}");
+                }
             }
         }
 
@@ -260,6 +374,12 @@ namespace AGVSystemCommonNet6.Alarm
                 );
                 count = _alarms.Count();
                 alarms = _alarms.Skip((currentpage - 1) * 19).Take(19).ToList();
+
+                //foreach (var alarm in alarms)
+                //{
+                //    alarm.TrobleShootingMethod = AGVsTrobleShootings[((Alarm.ALARMS)alarm.AlarmCode).ToString()].TrobleShootingDescription;
+                //    alarm.TrobleShootingReference = AGVsTrobleShootings[((Alarm.ALARMS)alarm.AlarmCode).ToString()].TrobleShootingFilePath;
+                //}
             };
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string fileName)
