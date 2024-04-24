@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.Microservices.ResponseModel
 {
-    public abstract class clsResponseBase
+    public class clsResponseBase
     {
         public clsResponseBase() { }
         public clsResponseBase(bool confirm, string message)
