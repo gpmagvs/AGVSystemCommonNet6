@@ -9,7 +9,18 @@ using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.AGVDispatch
 {
-
+    public enum TransferStage
+    {
+        /// <summary>
+        /// 到轉運站放貨
+        /// </summary>
+        MoveToTransferStationLoad,
+        /// <summary>
+        /// 到轉運站取貨
+        /// </summary>
+        MoveToTransferStationUnload,
+        NO_Transfer
+    }
     public enum VehicleMovementStage
     {
         Not_Start_Yet = 0,
@@ -30,9 +41,25 @@ namespace AGVSystemCommonNet6.AGVDispatch
     public class clsTaskDto
     {
         public DateTime RecieveTime { get; set; }
+
+        [NotMapped]
+        public string RecieveTime_Formated
+        {
+            get
+            {
+                return RecieveTime.ToString("HH:mm:ss");
+            }
+        }
         public DateTime StartTime { get; set; }
         public DateTime FinishTime { get; set; }
-
+        [NotMapped]
+        public string FinishTime_Formated
+        {
+            get
+            {
+                return FinishTime.ToString("HH:mm:ss");
+            }
+        }
         [Key]
         public string TaskName { get; set; } = string.Empty;
 
@@ -131,6 +158,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
         [Required]
         public AGV_TYPE To_Station_AGV_Type { get; set; } = AGV_TYPE.Any;
         public int To_Station_Tag => int.TryParse(To_Station, out int tag) ? tag : -1;
+
+
+        public int TransferToTag { get; set; } = -1;
+        public int TransferFromTag { get; set; } = -1;
 
         [Required]
         public string To_Slot { get; set; } = "-1";
