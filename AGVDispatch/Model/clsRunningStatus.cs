@@ -68,6 +68,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         public bool IsCharging { get; set; } = false;
         public clsDriverStates[] DriversStatus { get; set; } = new clsDriverStates[0];
         public clsForkStates ForkStatus { get; set; } = new clsForkStates();
+        public double TotalTime { get; set; }
+        public double TotalDistance { get; set; }
     }
 
     public class clsDriverStates
