@@ -37,7 +37,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
         private AlarmCodes _current_alarm_code = AlarmCodes.None;
         private AlarmCodes _current_warning_code = AlarmCodes.None;
 
-        public AlarmCodes Current_Warning_Code
+        public virtual AlarmCodes Current_Warning_Code
         {
             set
             {

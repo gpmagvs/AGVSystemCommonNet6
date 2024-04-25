@@ -54,7 +54,6 @@ namespace AGVSystemCommonNet6.HttpTools
 
             if (ClientsOfAllChannel.TryGetValue(path, out var clientCollection))
             {
-                await _ClientConnectionChanging.WaitAsync();
                 try
                 {
                     clientCollection.Add(clientHander);
@@ -63,7 +62,6 @@ namespace AGVSystemCommonNet6.HttpTools
                     {
                         LOG.TRACE($"User-{user_id} Broswer AGVS Website  | Online-Client={OnlineClientNumber}");
                     }
-                    _ClientConnectionChanging.Release();
                     await clientHander.ListenConnection();
                 }
                 catch (Exception ex)
@@ -78,7 +76,6 @@ namespace AGVSystemCommonNet6.HttpTools
 
         private async void ClientHander_OnClientDisconnect(object? sender, clsWebsocktClientHandler e)
         {
-            await _ClientConnectionChanging.WaitAsync();
             try
             {
                 var group = ClientsOfAllChannel.FirstOrDefault(kp => kp.Value.Contains(e));
@@ -90,7 +87,6 @@ namespace AGVSystemCommonNet6.HttpTools
                     e.Close();
                     GC.Collect();
                 }
-
             }
             catch (Exception ex)
             {
@@ -98,7 +94,6 @@ namespace AGVSystemCommonNet6.HttpTools
             }
             finally
             {
-                _ClientConnectionChanging.Release();
             }
         }
 

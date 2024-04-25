@@ -460,5 +460,6 @@
         Limit_Switch_Sensor = 860046,
         Send_Goal_to_AGV_But_AGVS_Cancel_Req_Raised = 860047,
         Fork_Slot_Teach_Data_ERROR = 860048,
+        Battery_Low_Level_Auto_PC_Shutdown = 860049,
     }
 }
