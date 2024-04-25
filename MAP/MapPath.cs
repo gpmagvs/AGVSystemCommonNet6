@@ -45,5 +45,6 @@ namespace AGVSystemCommonNet6.MAP
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int? SpinMode { get; set; } = 0;
+        public double Weight { get; set; } = 0.0;
     }
 }
