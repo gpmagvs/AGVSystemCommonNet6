@@ -9,6 +9,7 @@ namespace AGVSystemCommonNet6.Configuration
 {
     public class AGVSConfigulator
     {
+        public static string ConfigsFilesFolder { get; set; } = @"C:\AGVS";
         public static string _configFilePath { get; private set; } = "";
         public static SystemConfigs SysConfigs { get; set; }
         public static void LoadConfig()
@@ -32,7 +33,7 @@ namespace AGVSystemCommonNet6.Configuration
         }
         public static void Init()
         {
-            SysConfigs = LoadConfig("C:\\AGVS\\SystemConfigs.json");
+            SysConfigs = LoadConfig(Path.Combine(ConfigsFilesFolder, "SystemConfigs.json"));
         }
 
         internal static void Save(SystemConfigs config)
