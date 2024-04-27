@@ -10,8 +10,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
     {
         public enum PROTOCOL
         {
-            TCP=0,
-            RESTFulAPI=1,
+            TCP = 0,
+            RESTFulAPI = 1,
         }
 
         public string HostIP { get; set; }
@@ -33,5 +33,15 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         public double VehicleWidth { get; set; } = 70;
 
         public List<int> List_ChargeStation { get; set; } = new List<int>();
+
+        public clsBatteryOptions BatteryOptions { get; set; } = new clsBatteryOptions();
+    }
+
+    public class clsBatteryOptions
+    {
+        public double HightLevel { get; set; } = 99;
+        public double MiddleLevel { get; set; } = 50;
+
+        public double LowLevel { get; set; } = 20;
     }
 }

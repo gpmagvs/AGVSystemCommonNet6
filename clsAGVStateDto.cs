@@ -72,6 +72,10 @@ namespace AGVSystemCommonNet6
         [MaybeNull]
         public int InitTag { get; set; }
 
+        public double LowBatLvThreshold { get; set; } = 20;
+        public double MiddleBatLvThreshold { get; set; } = 50;
+        public double HighBatLvThreshold { get; set; } = 99;
+
         public void Update(clsAGVStateDto entity)
         {
             AGV_Description = entity.AGV_Description;
@@ -90,6 +94,9 @@ namespace AGVSystemCommonNet6
             CurrentAction = entity.CurrentAction;
             TransferProcess = entity.TransferProcess;
             IsCharging = entity.IsCharging;
+            LowBatLvThreshold = entity.LowBatLvThreshold;
+            MiddleBatLvThreshold = entity.MiddleBatLvThreshold;
+            HighBatLvThreshold = entity.HighBatLvThreshold;
         }
 
         public bool HasChanged(clsAGVStateDto newState)
