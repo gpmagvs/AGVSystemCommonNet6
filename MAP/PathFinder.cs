@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using static AGVSystemCommonNet6.MAP.MapPoint;
 using static System.Collections.Specialized.BitVector32;
 
 namespace AGVSystemCommonNet6.MAP

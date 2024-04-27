@@ -1,17 +1,36 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.MAP
 {
     public class MapPoint
     {
+        public enum STATION_TYPE : int
+        {
+            Normal = 0,
+            EQ = 1,
+            STK = 2,
+            Charge = 3,
+            Buffer = 4,
+            Charge_Buffer = 5,
+            Charge_STK = 6,
+            Exchange = 7,
+            Escape = 8,
+            EQ_LD = 11,
+            STK_LD = 12,
+            EQ_ULD = 21,
+            STK_ULD = 22,
+            Fire_Door = 31,
+            Fire_EQ = 32,
+            Auto_Door = 33,
+            Elevator = 100,
+            Elevator_LD = 201,
+            TrayEQ = 202,
+            TrayEQ_LD = 211,
+            TrayEQ_ULD = 221,
+            Unknown = 9999
+        }
         public MapPoint() { }
         public MapPoint(string Name, int TagNumber)
         {

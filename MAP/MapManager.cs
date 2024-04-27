@@ -3,6 +3,7 @@ using AGVSystemCommonNet6.Configuration;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
 using System.IO.Compression;
+using static AGVSystemCommonNet6.MAP.MapPoint;
 
 namespace AGVSystemCommonNet6.MAP
 {

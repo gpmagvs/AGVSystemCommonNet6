@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using static AGVSystemCommonNet6.clsEnums;
+using static AGVSystemCommonNet6.MAP.MapPoint;
 
 namespace AGVSystemCommonNet6
 {
