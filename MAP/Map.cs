@@ -40,10 +40,14 @@ namespace AGVSystemCommonNet6.MAP
 
         public List<MapPath> Segments { get; set; } = new List<MapPath>();
 
-        public List<MapRegion>Regions { get; set; } = new List<MapRegion>();
+        public List<MapRegion> Regions { get; set; } = new List<MapRegion>();
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<string, Bay> Bays { get; set; } = new Dictionary<string, Bay>();
+
+
+        public List<int> TagNoStopOfSubmarineAGV { get; set; } = new List<int>();
+        public List<int> TagNoStopOfForkAGV { get; set; } = new List<int>();
 
         public int GetPointIndexByGraphDisplayName(string name)
         {

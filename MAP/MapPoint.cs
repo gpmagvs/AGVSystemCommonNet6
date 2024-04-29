@@ -88,6 +88,8 @@ namespace AGVSystemCommonNet6.MAP
         /// 是否為交通檢查點
         /// </summary>
         public bool IsTrafficCheckPoint { get; set; }
+
+        public bool IsNarrowPath { get; set; }
         /// <summary>
         /// 註冊點(,逗點分隔)
         /// </summary>
@@ -116,6 +118,8 @@ namespace AGVSystemCommonNet6.MAP
         public int TagOfInPoint { get; set; } = -1;
         public int TagOfOutPoint { get; set; } = -1;
         public string? Region { get; set; } = "";
+
+        
 
         [JsonIgnore]
         public bool IsCharge

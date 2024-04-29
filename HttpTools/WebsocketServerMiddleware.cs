@@ -26,6 +26,13 @@ namespace AGVSystemCommonNet6.HttpTools
 
         protected bool Initializd = false;
 
+        public readonly int publish_duration = 0;
+
+        public WebsocketServerMiddleware(int publish_duration = 100)
+        {
+            this.publish_duration = publish_duration;
+        }
+
         public virtual void Initialize()
         {
             ClientsOfAllChannel = channelMaps.ToDictionary(str => str, str => new List<clsWebsocktClientHandler>());
@@ -104,7 +111,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 LOG.WARN($"Start Websocket data publish");
                 while (true)
                 {
-                    await Task.Delay(100);
+                    await Task.Delay(publish_duration);
                     //await _ClientConnectionChanging.WaitAsync();
                     Initializd = true;
                     try

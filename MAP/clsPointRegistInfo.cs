@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,16 @@ namespace AGVSystemCommonNet6.MAP
         public bool IsRegisted { get; set; } = false;
         public DateTime RegistTime { get; } = DateTime.MinValue;
         public string RegisterAGVName { get; set; } = "";
+
+
+        public clsNearRegistInfo NearRegistInfo = new clsNearRegistInfo();
+
+        public class clsNearRegistInfo
+        {
+            public bool IsRegisted = false;
+
+            public int RegistByPointTag = 0;
+        }
         public clsPointRegistInfo(string Name)
         {
             IsRegisted = true;

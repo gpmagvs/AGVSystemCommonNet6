@@ -71,49 +71,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 return (false, ex.Message);
             }
         }
-
-        private static bool dbBusyFlag = false;
-        public async Task<(bool confirm, string errorMesg)> Update(IEnumerable<clsAGVStateDto> AGVStateDtos)
-        {
-            foreach (var AGVStateDto in AGVStateDtos)
-            {
-                clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
-                if (agvState != null)
-                {
-
-                    agvState.AGV_Description = AGVStateDto.AGV_Description;
-                    agvState.Model = AGVStateDto.Model;
-                    agvState.MainStatus = AGVStateDto.MainStatus;
-                    agvState.OnlineStatus = AGVStateDto.OnlineStatus;
-                    agvState.CurrentLocation = AGVStateDto.CurrentLocation;
-                    agvState.CurrentCarrierID = AGVStateDto.CurrentCarrierID;
-                    agvState.BatteryLevel_1 = AGVStateDto.BatteryLevel_1;
-                    agvState.BatteryLevel_2 = AGVStateDto.BatteryLevel_2;
-                    agvState.TaskName = AGVStateDto.TaskName;
-                    agvState.TaskRunStatus = AGVStateDto.TaskRunStatus;
-                    agvState.TaskRunAction = AGVStateDto.TaskRunAction;
-                    agvState.Theta = AGVStateDto.Theta;
-                    agvState.Connected = AGVStateDto.Connected;
-                    agvState.CurrentAction = AGVStateDto.CurrentAction;
-                    agvState.TransferProcess = AGVStateDto.TransferProcess;
-                    agvState.IsCharging = AGVStateDto.IsCharging;
-                    int ret = await SaveChanges();
-                }
-                else
-                {
-                    AGVStateDto.Enabled = true;
-                    Add(AGVStateDto);
-                }
-            }
-            return (true, "");
-        }
         public async Task<(bool confirm, string errorMesg)> Update(clsAGVStateDto AGVStateDto)
         {
-            if (dbBusyFlag)
-            {
-                return (false, "");
-            }
-            dbBusyFlag = true;
             try
             {
                 clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == AGVStateDto.AGV_Name);
@@ -139,48 +98,17 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 else
                 {
                     AGVStateDto.Enabled = true;
-                    Add(AGVStateDto);
+                    await Add(AGVStateDto);
                 }
                 int ret = await SaveChanges();
 
-                dbBusyFlag = false;
                 return (true, "");
             }
             catch (Exception ex)
             {
-                dbBusyFlag = false;
                 return (false, ex.Message);
             }
         }
 
-        public bool IsExist(string AGVName)
-        {
-
-            clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == AGVName);
-            return agvState != null;
-
-        }
-
-        public void UpdateConnected(string name, bool value)
-        {
-
-            clsAGVStateDto? agvState = AGVStatusSet.FirstOrDefault(dto => dto.AGV_Name == name);
-            if (agvState != null)
-            {
-
-                agvState.Connected = value;
-                dbhelper._context.SaveChangesAsync();
-            }
-        }
-
-        internal void ChangeAllOffline()
-        {
-            foreach (var agv_status in AGVStatusSet)
-            {
-                agv_status.OnlineStatus = clsEnums.ONLINE_STATE.OFFLINE;
-                agv_status.Connected = false;
-            }
-            SaveChanges();
-        }
     }
 }
