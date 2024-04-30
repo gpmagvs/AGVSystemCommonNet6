@@ -25,7 +25,7 @@ namespace AGVSystemCommonNet6.MAP
             var index = mapPointCollection.ToList().FindIndex(pt => pt.TagNumber == tag);
             return mapPointCollection.Skip(index);
         }
-        public static MapRegion GetRegion(this double[] coordination,  Map map)
+        public static MapRegion GetRegion(this double[] coordination, Map map)
         {
             //取出所有區域集合
             var checkResults = map.Regions.ToDictionary(region => region, region => isInRegion(region.PolygonCoordinations, coordination));
@@ -51,13 +51,37 @@ namespace AGVSystemCommonNet6.MAP
                 return result;
             }
         }
-        public static MapRegion GetRegion(this MapPoint mapPoint,  Map map)
+        public static MapRegion GetRegion(this MapPoint mapPoint, Map map)
         {
-            return new double[2] { mapPoint.X, mapPoint.Y }.GetRegion( map);
+            return new double[2] { mapPoint.X, mapPoint.Y }.GetRegion(map);
         }
-        public static MapRegion GetRegion(this clsCoordination coordinaiton,  Map map)
+        public static MapRegion GetRegion(this clsCoordination coordinaiton, Map map)
         {
-            return new double[2] { coordinaiton.X, coordinaiton.Y }.GetRegion( map);
+            return new double[2] { coordinaiton.X, coordinaiton.Y }.GetRegion(map);
+        }
+
+        public static IEnumerable<MapRegion> GetRegions(this IEnumerable<MapPoint> paths, Map map)
+        {
+            return paths.Select(point => point.GetRegion(map));
+        }
+
+        public static MapPoint GetNearEntryPoint(this MapRegion region, Map refMap, MapPoint currentCoordination)
+        {
+
+            if (region == null || !region.EnteryTags.Any())
+                return null;
+
+            var mapPoints = region.EnteryTags.Select(tag => refMap.Points.Values.FirstOrDefault(pt => pt.TagNumber == tag));
+            return mapPoints.OrderBy(pt => pt.CalculateDistance(currentCoordination)).FirstOrDefault();
+        }
+        public static MapPoint GetNearLeavingPoint(this MapRegion region, Map refMap, MapPoint currentCoordination)
+        {
+
+            if (region == null || !region.LeavingTags.Any())
+                return null;
+
+            var mapPoints = region.LeavingTags.Select(tag => refMap.Points.Values.FirstOrDefault(pt => pt.TagNumber == tag));
+            return mapPoints.OrderBy(pt => pt.CalculateDistance(currentCoordination)).FirstOrDefault();
         }
     }
 }
