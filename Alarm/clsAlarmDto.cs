@@ -25,7 +25,7 @@ namespace AGVSystemCommonNet6.Alarm
                     string TrobleShooting = ((ALARMS)_Alarmcode).ToString();
                     if (AlarmManagerCenter.AGVsTrobleShootings.ContainsKey(TrobleShooting))
                     {
-                        TrobleShootingMethod = AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].TrobleShootingDescription;
+                        TrobleShootingMethod = $"{AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].EN_TrobleShootingDescription}({AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].ZH_TrobleShootingDescription})" ;
                         TrobleShootingReference = AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].TrobleShootingFilePath;
                     }
                 }
@@ -44,7 +44,7 @@ namespace AGVSystemCommonNet6.Alarm
         public bool Checked { get; set; }
         public string ResetAalrmMemberName { get; set; } = "";
 
-        private string _TrobleShootingMethod = "Reboot System";
+        private string _TrobleShootingMethod = "Reboot System(重啟系統)";
         public string TrobleShootingMethod
         {
             get { return _TrobleShootingMethod; }
