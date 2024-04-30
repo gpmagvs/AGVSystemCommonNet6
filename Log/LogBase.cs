@@ -139,7 +139,7 @@ namespace AGVSystemCommonNet6.Log
                     foreColor = ConsoleColor.Red;
                     break;
                 case LogLevel.Critical:
-                    foreColor = ConsoleColor.Magenta;
+                    foreColor = ConsoleColor.Red;
                     break;
             }
 

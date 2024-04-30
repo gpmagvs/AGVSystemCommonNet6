@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static AGVSystemCommonNet6.MAP.MapPoint;
 
 namespace AGVSystemCommonNet6.MAP.GeoJson
 {

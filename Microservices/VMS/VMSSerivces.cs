@@ -1,7 +1,9 @@
-﻿using AGVSystemCommonNet6.AGVDispatch.RunMode;
+﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.AGVDispatch.RunMode;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
+using AGVSystemCommonNet6.Microservices.ResponseModel;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static AGVSystemCommonNet6.clsEnums;
+using clsAlarmCode = AGVSystemCommonNet6.Alarm.clsAlarmCode;
 
 namespace AGVSystemCommonNet6.Microservices.VMS
 {
@@ -212,6 +215,25 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             catch (Exception ex)
             {
                 return new ResponseModel.clsResponseBase(false, ex.Message);
+            }
+        }
+
+        public struct TASK_DISPATCH
+        {
+            public async static Task<clsResponseBase> CheckOutAGVBatteryAndChargeStatus(string agvName, ACTION_TYPE orderAction)
+            {
+                try
+                {
+
+                    using (HttpHelper http = new HttpHelper(VMSHostUrl))
+                    {
+                        return await http.GetAsync<clsResponseBase>($"/api/Task/CheckOrderExecutableByBatStatus?agvName={agvName}&orderAction={orderAction}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new clsResponseBase(false, $"服務器內部失敗:{ex.Message}");
+                }
             }
         }
     }

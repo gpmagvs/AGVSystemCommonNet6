@@ -63,6 +63,14 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 CurrentAlarms.TryRemove(exist_al);
             }
         }
+
+        public static void ClearAlarm(AlarmCodes[] Alarm_codes)
+        {
+            foreach (AlarmCodes al in Alarm_codes)
+            {
+                ClearAlarm(al);
+            }
+        }
         public static void ClearAlarm(int alarm_code)
         {
             var exist_al = CurrentAlarms.FirstOrDefault(al => al.Value.Code == alarm_code);
@@ -80,7 +88,13 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 ClearAlarm(alarm_code);
             }
         }
-
+        public static void AddWarning(IEnumerable<AlarmCodes> Alarm_codes)
+        {
+            foreach (var item in Alarm_codes)
+            {
+                AddWarning(item);
+            }
+        }
         public static void AddWarning(AlarmCodes Alarm_code)
         {
             if (!Active)
@@ -116,6 +130,13 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
             if (!Active)
                 return;
             AddAlarm(Alarm_code, true);
+        }
+        public static void AddAlarm(IEnumerable<Tuple<AlarmCodes, bool>> Alarm_codes)
+        {
+            foreach (var item in Alarm_codes)
+            {
+                AddAlarm(item.Item1, item.Item2);
+            }
         }
         public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
         {

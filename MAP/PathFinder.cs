@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using static AGVSystemCommonNet6.MAP.MapPoint;
 using static System.Collections.Specialized.BitVector32;
 
 namespace AGVSystemCommonNet6.MAP
@@ -238,7 +239,14 @@ namespace AGVSystemCommonNet6.MAP
                     int weight = 0;
                     if (near_stationIndexs.Contains(ele_station_index))
                     {
-                        weight = CalculationDistance(ele_station.Value, start_station.Value);
+                        var pathID = start_station_index + "_" + ele_station_index;
+                        var pathFound = pathes.FirstOrDefault(path => path.PathID == pathID);
+                        double weightOfPath = 1.0;
+                        if (pathFound != null)
+                        {
+                            weightOfPath = pathFound.Weight <= 0 ? 1.0 : pathFound.Weight;
+                        }
+                        weight = CalculationDistance(ele_station.Value, start_station.Value, weightOfPath);
                     }
                     else
                     {
@@ -249,9 +257,9 @@ namespace AGVSystemCommonNet6.MAP
             }
             return graph;
         }
-        private int CalculationDistance(MapPoint value1, MapPoint value2)
+        private int CalculationDistance(MapPoint value1, MapPoint value2, double weight = 1)
         {
-            double distance = Math.Sqrt(Math.Pow(value1.X - value2.X, 2) + Math.Pow(value1.Y - value2.Y, 2));
+            double distance = Math.Sqrt(Math.Pow(value1.X - value2.X, 2) + Math.Pow(value1.Y - value2.Y, 2)) / weight;
             return int.Parse(Math.Round(distance * 10000, 0).ToString());
         }
 

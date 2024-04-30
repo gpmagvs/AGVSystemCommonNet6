@@ -7,6 +7,7 @@ using RosSharp.RosBridgeClient.Actionlib;
 using RosSharp.RosBridgeClient.MessageTypes.Geometry;
 using System.Runtime.CompilerServices;
 using static AGVSystemCommonNet6.GPMRosMessageNet.Actions.TaskCommandGoal;
+using static AGVSystemCommonNet6.MAP.MapPoint;
 using static AGVSystemCommonNet6.MAP.PathFinder;
 
 namespace AGVSystemCommonNet6.AGVDispatch.Messages

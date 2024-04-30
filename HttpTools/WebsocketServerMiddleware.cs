@@ -26,6 +26,13 @@ namespace AGVSystemCommonNet6.HttpTools
 
         protected bool Initializd = false;
 
+        public readonly int publish_duration = 0;
+
+        public WebsocketServerMiddleware(int publish_duration = 100)
+        {
+            this.publish_duration = publish_duration;
+        }
+
         public virtual void Initialize()
         {
             ClientsOfAllChannel = channelMaps.ToDictionary(str => str, str => new List<clsWebsocktClientHandler>());
@@ -54,7 +61,6 @@ namespace AGVSystemCommonNet6.HttpTools
 
             if (ClientsOfAllChannel.TryGetValue(path, out var clientCollection))
             {
-                await _ClientConnectionChanging.WaitAsync();
                 try
                 {
                     clientCollection.Add(clientHander);
@@ -63,7 +69,6 @@ namespace AGVSystemCommonNet6.HttpTools
                     {
                         LOG.TRACE($"User-{user_id} Broswer AGVS Website  | Online-Client={OnlineClientNumber}");
                     }
-                    _ClientConnectionChanging.Release();
                     await clientHander.ListenConnection();
                 }
                 catch (Exception ex)
@@ -78,7 +83,6 @@ namespace AGVSystemCommonNet6.HttpTools
 
         private async void ClientHander_OnClientDisconnect(object? sender, clsWebsocktClientHandler e)
         {
-            await _ClientConnectionChanging.WaitAsync();
             try
             {
                 var group = ClientsOfAllChannel.FirstOrDefault(kp => kp.Value.Contains(e));
@@ -90,7 +94,6 @@ namespace AGVSystemCommonNet6.HttpTools
                     e.Close();
                     GC.Collect();
                 }
-
             }
             catch (Exception ex)
             {
@@ -98,7 +101,6 @@ namespace AGVSystemCommonNet6.HttpTools
             }
             finally
             {
-                _ClientConnectionChanging.Release();
             }
         }
 
@@ -109,7 +111,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 LOG.WARN($"Start Websocket data publish");
                 while (true)
                 {
-                    await Task.Delay(100);
+                    await Task.Delay(publish_duration);
                     //await _ClientConnectionChanging.WaitAsync();
                     Initializd = true;
                     try

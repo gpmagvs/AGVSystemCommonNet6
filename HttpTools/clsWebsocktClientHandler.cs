@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.Log;
 using Newtonsoft.Json;
+using System;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -21,16 +22,21 @@ namespace AGVSystemCommonNet6.HttpTools
 
         internal async Task ListenConnection()
         {
-            var buff = new ArraySegment<byte>(new byte[32]);
-            while (true)
+            var buff = new ArraySegment<byte>(new byte[4]);
+            while (WebSocket.State == WebSocketState.Open)
             {
                 try
                 {
-                    await Task.Delay(100);
-                    WebSocketReceiveResult result = await WebSocket.ReceiveAsync(buff, CancellationToken.None).ConfigureAwait(false);
+                    var result = await WebSocket.ReceiveAsync(buff, CancellationToken.None).ConfigureAwait(false);
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        Close();
+                        break;
+                    }
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     break;
                 }
             }
