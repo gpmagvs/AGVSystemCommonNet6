@@ -133,7 +133,7 @@ namespace AGVSystemCommonNet6.Alarm
                     Task_Name = taskName == null ? "" : taskName,
                     Time = DateTime.Now,
                     Source = source,
-                    //TrobleShootingMethod = AGVsTrobleShootings[alarm.ToString()].TrobleShootingDescription,
+                    //TrobleShootingMethod = AGVsTrobleShootings[alarm.ToString()].EN_TrobleShootingDescription,
                     //TrobleShootingReference = AGVsTrobleShootings[alarm.ToString()].TrobleShootingFilePath
                 };
                 lock (AlarmLockObject)
@@ -195,7 +195,7 @@ namespace AGVSystemCommonNet6.Alarm
             //        AGVsTrobleShootings.Add(TrobleShootingCase[0], new clsAGVsTrobleShooting()
             //        {
             //            Alarm = TrobleShootingCase[0],
-            //            TrobleShootingDescription = TrobleShootingCase[1],
+            //            EN_TrobleShootingDescription = TrobleShootingCase[1],
             //            TrobleShootingFilePath = TrobleShootingCase[2]
             //        });
             //    }
@@ -208,7 +208,7 @@ namespace AGVSystemCommonNet6.Alarm
 
             //    using (StreamWriter sr = new StreamWriter(fs))
             //    {
-            //        sr.WriteLine("Alarm,TrobleShootingDescription,TrobleShootingFilePath");
+            //        sr.WriteLine("Alarm,EN_TrobleShootingDescription,TrobleShootingFilePath");
 
             //        var Alarms = Enum.GetValues(typeof(ALARMS)).Cast<ALARMS>();
 
@@ -234,21 +234,22 @@ namespace AGVSystemCommonNet6.Alarm
         {
             if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
             {
-                string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH, Encoding.BigEndianUnicode);
+                string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH, Encoding.GetEncoding("big5"));
                 List<string>? _TrobleShootingDescription = _AllTrobleShootingDescription.Split("\r\n").ToList();
                 _TrobleShootingDescription.RemoveAt(0);
                 foreach (string TrobleShooting in _TrobleShootingDescription)
                 {
                     string[] TrobleShootingCase = TrobleShooting.Split(',');
-                    if (TrobleShootingCase.Count() != 3)
+                    if (TrobleShootingCase.Count() != 4)
                         continue;
                     if (AGVsTrobleShootings.ContainsKey(TrobleShootingCase[0]))
                         continue;
                     AGVsTrobleShootings.Add(TrobleShootingCase[0], new clsAGVsTrobleShooting()
                     {
                         Alarm = TrobleShootingCase[0],
-                        TrobleShootingDescription = TrobleShootingCase[1],
-                        TrobleShootingFilePath = TrobleShootingCase[2]
+                        EN_TrobleShootingDescription = TrobleShootingCase[1],
+                        ZH_TrobleShootingDescription = TrobleShootingCase[2],
+                        TrobleShootingFilePath = TrobleShootingCase[3]
                     });
                 }
             }
@@ -274,12 +275,12 @@ namespace AGVSystemCommonNet6.Alarm
 
             FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);
 
-            using (StreamWriter sr = new StreamWriter(fs))
+            using (StreamWriter sr = new StreamWriter(fs, Encoding.GetEncoding("big5")))
             {
-                sr.WriteLine("Alarm,TrobleShootingDescription,TrobleShootingFilePath");
+                sr.WriteLine("Alarm,En_TrobleShootingDescription,ZH_TrobleShootingDescription,TrobleShootingFilePath");
                 foreach (var item in AGVsTrobleShootings)
                 {
-                    sr.WriteLine($"{item.Value.Alarm},{item.Value.TrobleShootingDescription},{item.Value.TrobleShootingFilePath}");
+                    sr.WriteLine($"{item.Value.Alarm},{item.Value.EN_TrobleShootingDescription},{item.Value.ZH_TrobleShootingDescription},{item.Value.TrobleShootingFilePath}");
                 }
             }
         }
@@ -377,7 +378,7 @@ namespace AGVSystemCommonNet6.Alarm
 
                 //foreach (var alarm in alarms)
                 //{
-                //    alarm.TrobleShootingMethod = AGVsTrobleShootings[((Alarm.ALARMS)alarm.AlarmCode).ToString()].TrobleShootingDescription;
+                //    alarm.TrobleShootingMethod = AGVsTrobleShootings[((Alarm.ALARMS)alarm.AlarmCode).ToString()].EN_TrobleShootingDescription;
                 //    alarm.TrobleShootingReference = AGVsTrobleShootings[((Alarm.ALARMS)alarm.AlarmCode).ToString()].TrobleShootingFilePath;
                 //}
             };
