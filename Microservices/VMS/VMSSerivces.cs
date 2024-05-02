@@ -20,10 +20,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
     {
         public static string VMSHostUrl => "http://127.0.0.1:5036";
         public static event EventHandler OnVMSReconnected;
-        public static List<clsAGVStateDto> AgvStatesData = new List<clsAGVStateDto>();
-        public static bool IsAlive = false;
-
-
+        public static bool IsAlive { get; private set; } = false;
         public static Dictionary<VMS_GROUP, VMSConfig>? ReadVMSVehicleGroupSetting(string Vehicle_Json_file)
         {
             Dictionary<VMS_GROUP, VMSConfig> config = new Dictionary<VMS_GROUP, VMSConfig>();
@@ -117,21 +114,6 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 {
                 }
             }
-        }
-
-        public static void AgvStateFetchWorker()
-        {
-            Task.Factory.StartNew(async () =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(50);
-                    if (!IsAlive)
-                        continue;
-
-                    AgvStatesData = await GetAGV_StatesData_FromVMS();
-                }
-            });
         }
 
         public static async Task<List<clsAGVStateDto>> GetAGV_StatesData_FromVMS()

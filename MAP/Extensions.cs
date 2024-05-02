@@ -31,8 +31,8 @@ namespace AGVSystemCommonNet6.MAP
             //取出所有區域集合
             var checkResults = map.Regions.ToDictionary(region => region, region => isInRegion(region.PolygonCoordinations, coordination));
             var pari = checkResults.FirstOrDefault(region => region.Value);
-            if (pari.Value == null)
-                return new MapRegion();
+            if (pari.Key == null)
+                return null;
             return pari.Key;
             bool isInRegion(List<double[]> polygon, double[] testPoint)
             {
