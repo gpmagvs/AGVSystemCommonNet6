@@ -10,7 +10,9 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
     {
         public string Alarm { get; set; } = "";
 
-        public string TrobleShootingDescription { get; set; } = "";
+        public string EN_TrobleShootingDescription { get; set; } = "";
+
+        public string ZH_TrobleShootingDescription { get; set; } = "";
 
         public string TrobleShootingFilePath { get; set; } = "";
     }

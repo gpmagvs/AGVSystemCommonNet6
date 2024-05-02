@@ -179,54 +179,6 @@ namespace AGVSystemCommonNet6.Alarm
 
         private static void LoadTrobleShootingDescription()
         {
-            //if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
-            //{
-            //    string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH);
-            //    List<string>? _TrobleShootingDescription = _AllTrobleShootingDescription.Split("\r\n").ToList();
-            //    _TrobleShootingDescription.RemoveAt(0);
-            //    foreach (string TrobleShooting in _TrobleShootingDescription)
-            //    {
-            //        string[] TrobleShootingCase = TrobleShooting.Split(',');
-            //        string TrobleCaseName = TrobleShootingCase[0];
-            //        if (TrobleShootingCase.Count() < 3)
-            //            continue;
-            //        if (AGVsTrobleShootings.ContainsKey(TrobleShootingCase[0]))
-            //            continue;
-            //        AGVsTrobleShootings.Add(TrobleShootingCase[0], new clsAGVsTrobleShooting()
-            //        {
-            //            Alarm = TrobleShootingCase[0],
-            //            EN_TrobleShootingDescription = TrobleShootingCase[1],
-            //            TrobleShootingFilePath = TrobleShootingCase[2]
-            //        });
-            //    }
-            //}
-            //else
-            //{
-            //    Directory.CreateDirectory(Path.GetDirectoryName(TROBLE_SHOOTING_FILE_PATH));
-
-            //    FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Append);
-
-            //    using (StreamWriter sr = new StreamWriter(fs))
-            //    {
-            //        sr.WriteLine("Alarm,EN_TrobleShootingDescription,TrobleShootingFilePath");
-
-            //        var Alarms = Enum.GetValues(typeof(ALARMS)).Cast<ALARMS>();
-
-            //        foreach (var item in Alarms)
-            //        {
-            //            string AlarmDescription = item.ToString();
-            //            sr.WriteLine($"{AlarmDescription},,");
-            //            if (AGVsTrobleShootings.ContainsKey(AlarmDescription) == false)
-            //            {
-            //                AGVsTrobleShootings.Add(AlarmDescription, new clsAGVsTrobleShooting()
-            //                {
-            //                    Alarm = item.ToString(),
-            //                });
-            //            }
-            //        }
-            //    }
-            //}
-
             UadateAGVsTrobleShootings(ref AGVsTrobleShootings);
         }
 

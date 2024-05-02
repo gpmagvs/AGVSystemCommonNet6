@@ -4,6 +4,7 @@ using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using Newtonsoft.Json;
 using SQLite;
 using System.Collections.Concurrent;
+using System.Text;
 
 namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 {
@@ -188,53 +189,6 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
         public static void LoadVCSTrobleShootings()
         {
-            //if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
-            //{
-            //    string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH);
-            //    List<string>? _TrobleShootingDescription = _AllTrobleShootingDescription.Split("\r\n").ToList();
-            //    _TrobleShootingDescription.RemoveAt(0);
-            //    foreach (string TrobleShooting in _TrobleShootingDescription)
-            //    {
-            //        string[] TrobleShootingCase = TrobleShooting.Split(',');
-            //        if (TrobleShootingCase.Count() < 3)
-            //            continue;
-            //        if (VCSTrobleShootings.ContainsKey(TrobleShootingCase[0]))
-            //            continue;
-            //        VCSTrobleShootings.Add(TrobleShootingCase[0], new clsVCSTrobleShooting()
-            //        {
-            //            Alarm = TrobleShootingCase[0],
-            //            TrobleShootingDescription = TrobleShootingCase[1],
-            //            TrobleShootingFilePath = TrobleShootingCase[2]
-            //        });
-            //    }
-            //}
-            //else
-            //{
-            //    Directory.CreateDirectory(Path.GetDirectoryName(TROBLE_SHOOTING_FILE_PATH));
-
-            //    FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Append);
-
-            //    using (StreamWriter sr = new StreamWriter(fs))
-            //    {
-            //        sr.WriteLine("Alarm,TrobleShootingDescription,TrobleShootingFilePath");
-
-            //        var Alarms = Enum.GetValues(typeof(AlarmCodes)).Cast<AlarmCodes>();
-
-            //        foreach (var item in Alarms)
-            //        {
-            //            string AlarmDescription = item.ToString();
-            //            sr.WriteLine($"{AlarmDescription},,");
-            //            if (VCSTrobleShootings.ContainsKey(AlarmDescription) == false)
-            //            {
-            //                VCSTrobleShootings.Add(AlarmDescription, new clsVCSTrobleShooting()
-            //                {
-            //                    Alarm = item.ToString(),
-            //                });
-            //            }
-            //        }
-            //    }
-            //}
-
             UpdateVCSTrobleShootings(ref VCSTrobleShootings);
         }
 
@@ -242,21 +196,22 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
         {
             if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
             {
-                string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH);
+                string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH, Encoding.GetEncoding("big5"));
                 List<string>? _TrobleShootingDescription = _AllTrobleShootingDescription.Split("\r\n").ToList();
                 _TrobleShootingDescription.RemoveAt(0);
                 foreach (string TrobleShooting in _TrobleShootingDescription)
                 {
                     string[] TrobleShootingCase = TrobleShooting.Split(',');
-                    if (TrobleShootingCase.Count() < 3)
+                    if (TrobleShootingCase.Count() != 4)
                         continue;
                     if (VCSTrobleShootings.ContainsKey(TrobleShootingCase[0]))
                         continue;
                     VCSTrobleShootings.Add(TrobleShootingCase[0], new clsVCSTrobleShooting()
                     {
                         Alarm = TrobleShootingCase[0],
-                        TrobleShootingDescription = TrobleShootingCase[1],
-                        TrobleShootingFilePath = TrobleShootingCase[2]
+                        EN_TrobleShootingDescription = TrobleShootingCase[1],
+                        ZH_TrobleShootingDescription = TrobleShootingCase[2],
+                        TrobleShootingFilePath = TrobleShootingCase[3]
                     });
                 }
             }
@@ -282,12 +237,12 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
             FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);
 
-            using (StreamWriter sr = new StreamWriter(fs))
+            using (StreamWriter sr = new StreamWriter(fs, Encoding.GetEncoding("big5")))
             {
-                sr.WriteLine("Alarm,TrobleShootingDescription,TrobleShootingFilePath");
+                sr.WriteLine("Alarm,En_TrobleShootingDescription,ZH_TrobleShootingDescription,TrobleShootingFilePath");
                 foreach (var item in VCSTrobleShootings)
                 {
-                    sr.WriteLine($"{item.Value.Alarm},{item.Value.TrobleShootingDescription},{item.Value.TrobleShootingFilePath}");
+                    sr.WriteLine($"{item.Value.Alarm},{item.Value.EN_TrobleShootingDescription},{item.Value.ZH_TrobleShootingDescription},{item.Value.TrobleShootingFilePath}");
                 }
             }
         }
