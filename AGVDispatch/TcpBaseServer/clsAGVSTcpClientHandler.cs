@@ -121,7 +121,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
                     while (_SocketClient != null)
                     {
-                        Thread.Sleep(1000);
+                        await Task.Delay(1000);
                         _ping_success = await PingServer();
                         if (!_ping_success)
                         {

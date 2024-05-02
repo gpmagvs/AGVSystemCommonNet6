@@ -4,6 +4,7 @@ using RosSharp.RosBridgeClient.MessageTypes.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,10 @@ namespace AGVSystemCommonNet6.MAP
         {
             //取出所有區域集合
             var checkResults = map.Regions.ToDictionary(region => region, region => isInRegion(region.PolygonCoordinations, coordination));
-            return checkResults.FirstOrDefault(region => region.Value).Key;
+            var pari = checkResults.FirstOrDefault(region => region.Value);
+            if (pari.Key == null)
+                return null;
+            return pari.Key;
             bool isInRegion(List<double[]> polygon, double[] testPoint)
             {
                 bool result = false;
@@ -82,6 +86,14 @@ namespace AGVSystemCommonNet6.MAP
 
             var mapPoints = region.LeavingTags.Select(tag => refMap.Points.Values.FirstOrDefault(pt => pt.TagNumber == tag));
             return mapPoints.OrderBy(pt => pt.CalculateDistance(currentCoordination)).FirstOrDefault();
+        }
+
+        public static int GetCurrentVehicleNum(this MapRegion region, Map refMap, IEnumerable<MapPoint> vehiclePoints)
+        {
+            var allRegionMatch = vehiclePoints.Where(pt => pt.GetRegion(refMap)?.Name == region.Name);
+            if (!allRegionMatch.Any())
+                return 0;
+            return allRegionMatch.Count();
         }
     }
 }
