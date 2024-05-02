@@ -154,9 +154,9 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 using HttpHelper http = new HttpHelper(VMSHostUrl);
                 await http.GetStringAsync($"/api/Task/Cancel?task_name={taskName}");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw  ex;
             }
         }
         private static async Task<(bool alive, string message)> VMSAliveCheck()

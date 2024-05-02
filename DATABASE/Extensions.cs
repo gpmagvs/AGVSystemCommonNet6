@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.DATABASE
     {
         public static clsAGVStateDto GetAGVState(this AGVSDatabase db, string agvName)
         {
-            return db.tables.AgvStates.FirstOrDefault(dto => dto.AGV_Name == agvName);
+            return db.tables.AgvStates.ToList().FirstOrDefault(dto => dto.AGV_Name == agvName);
         }
     }
 }

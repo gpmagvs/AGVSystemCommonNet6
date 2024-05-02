@@ -122,11 +122,11 @@ namespace AGVSystemCommonNet6.HttpTools
 
                         foreach (KeyValuePair<string, object> item in CurrentViewModelDataOfAllChannel)
                         {
-                            //channelTasks.Add(ProcessChannelAsync(item));
-                            ProcessChannelAsync(item);
+                            channelTasks.Add(ProcessChannelAsync(item));
+                            //ProcessChannelAsync(item);
                         }
 
-                        //await Task.WhenAll(channelTasks);
+                        await Task.WhenAll(channelTasks);
                         async Task ProcessChannelAsync(KeyValuePair<string, object> item)
                         {
                             var ChannelName = item.Key;
@@ -145,11 +145,11 @@ namespace AGVSystemCommonNet6.HttpTools
 
                             foreach (clsWebsocktClientHandler client in clientsInThisChannel)
                             {
-                                //clientTasks.Add(SendMessageAsync(client, datPublishOut));
-                                SendMessageAsync(client, datPublishOut);
+                                clientTasks.Add(SendMessageAsync(client, datPublishOut));
+                                //SendMessageAsync(client, datPublishOut);
                             }
 
-                            //await Task.WhenAll(clientTasks);
+                            await Task.WhenAll(clientTasks);
 
                             async Task SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
                             {
