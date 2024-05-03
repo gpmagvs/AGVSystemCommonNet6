@@ -14,7 +14,8 @@ namespace AGVSystemCommonNet6.MAP
     {
         public enum MAP_REGION_TYPE
         {
-            FORBID, PASSIBLE
+            FORBID, PASSIBLE,
+            UNKNOWN
         }
 
         public string Name { get; set; }
