@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
+using AGVSystemCommonNet6.MAP.Geometry;
 using RosSharp.RosBridgeClient.MessageTypes.Geometry;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,13 @@ namespace AGVSystemCommonNet6.MAP
             return mapPointCollection.Select(pt => pt.Point_ID);
         }
 
+
+        public static IEnumerable<MapPath> GetPathes(this MapPoint mapPoint,ref Map refMap)
+        {
+            int pointIndex= refMap.Points.First(pair => pair.Value == mapPoint).Key;
+            return refMap.Segments.Where(path => path.StartPtIndex == pointIndex || path.EndPtIndex == pointIndex);
+        }
+
         public static IEnumerable<MapPoint> SkipByTagNumber(this IEnumerable<MapPoint> mapPointCollection, int tag)
         {
             var index = mapPointCollection.ToList().FindIndex(pt => pt.TagNumber == tag);
@@ -32,7 +40,12 @@ namespace AGVSystemCommonNet6.MAP
             var checkResults = map.Regions.ToDictionary(region => region, region => isInRegion(region.PolygonCoordinations, coordination));
             var pari = checkResults.FirstOrDefault(region => region.Value);
             if (pari.Key == null)
-                return null;
+                return new MapRegion
+                {
+                    IsNarrowPath = false,
+                    RegionType = MapRegion.MAP_REGION_TYPE.UNKNOWN,
+                    Name = MapRegion.MAP_REGION_TYPE.UNKNOWN + ""
+                };
             return pari.Key;
             bool isInRegion(List<double[]> polygon, double[] testPoint)
             {

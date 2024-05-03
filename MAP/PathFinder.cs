@@ -13,6 +13,7 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class PathFinder
     {
+        public static Map defaultMap = new Map();
         public static event EventHandler<Exception> OnExceptionHappen;
         public class PathFinderOption
         {
@@ -81,7 +82,6 @@ namespace AGVSystemCommonNet6.MAP
                 throw ex;
             }
         }
-
         public clsPathInfo FindShortestPath(Map map, MapPoint startStation, MapPoint endStation, PathFinderOption options = null)
         {
             int startIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == startStation.TagNumber).Key;
@@ -89,7 +89,10 @@ namespace AGVSystemCommonNet6.MAP
 
             return FindShortestPath(map, startIndex, endIndex, options);
         }
-
+        public clsPathInfo FindShortestPath(int startTag, int goalTag, PathFinderOption options = null)
+        {
+            return FindShortestPathByTagNumber(defaultMap, startTag, goalTag, options);
+        }
         public clsPathInfo FindShortestPath(Map map, int startPtIndex, int endPtIndex, PathFinderOption options = null)
         {
             var stations = map.Points.ToList().FindAll(st => st.Value.Enable).ToDictionary(pt => pt.Key, pt => pt.Value);
