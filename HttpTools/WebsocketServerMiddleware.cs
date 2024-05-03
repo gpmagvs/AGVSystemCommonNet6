@@ -39,46 +39,57 @@ namespace AGVSystemCommonNet6.HttpTools
             CurrentViewModelDataOfAllChannel = channelMaps.ToDictionary(str => str, str => new object());
             StartCollectViewModelDataAndPublishOutAsync();
         }
-        private SemaphoreSlim _ClientConnectionChanging = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim _ClientConnectionChanging = new SemaphoreSlim(1, 2);
         public async Task HandleWebsocketClientConnectIn(HttpContext _context, string user_id = "")
         {
-            string path = _context.Request.Path.Value;
-            if (path == null || !_context.WebSockets.IsWebSocketRequest)
+            try
             {
-                _context.Response.StatusCode = 400;
-                return;
-            }
-
-            LOG.TRACE($"User-{path} ");
-            if (!this.Initializd)
-            {
-                _context.Response.StatusCode = 400;
-                return;
-            }
-            WebSocket client = await _context.WebSockets.AcceptWebSocketAsync();
-            clsWebsocktClientHandler clientHander = new clsWebsocktClientHandler(client, path, user_id);
-            LOG.TRACE($"User Broswer AGVS Website {ClientsOfAllChannel.Keys.ToJson()}");
-
-            if (ClientsOfAllChannel.TryGetValue(path, out var clientCollection))
-            {
-                try
+                string path = _context.Request.Path.Value;
+                if (path == null || !_context.WebSockets.IsWebSocketRequest)
                 {
-                    clientCollection.Add(clientHander);
-                    clientHander.OnClientDisconnect += ClientHander_OnClientDisconnect;
-                    if (user_id != "")
+                    _context.Response.StatusCode = 400;
+                    return;
+                }
+
+                LOG.TRACE($"User-{path} ");
+                if (!this.Initializd)
+                {
+                    _context.Response.StatusCode = 400;
+                    return;
+                }
+                WebSocket client = await _context.WebSockets.AcceptWebSocketAsync();
+                clsWebsocktClientHandler clientHander = new clsWebsocktClientHandler(client, path, user_id);
+                LOG.TRACE($"User Broswer AGVS Website {ClientsOfAllChannel.Keys.ToJson()}");
+
+                if (ClientsOfAllChannel.TryGetValue(path, out var clientCollection))
+                {
+                    try
                     {
-                        LOG.TRACE($"User-{user_id} Broswer AGVS Website  | Online-Client={OnlineClientNumber}");
+                        clientCollection.Add(clientHander);
+                        clientHander.OnClientDisconnect += ClientHander_OnClientDisconnect;
+                        if (user_id != "")
+                        {
+                            LOG.TRACE($"User-{user_id} Broswer AGVS Website  | Online-Client={OnlineClientNumber}");
+                        }
+                        await clientHander.ListenConnection();
                     }
-                    await clientHander.ListenConnection();
-                }
-                catch (Exception ex)
-                {
-                    LOG.WARN(ex.Message);
-                }
-                finally
-                {
+                    catch (Exception ex)
+                    {
+                        LOG.WARN(ex.Message);
+                    }
+                    finally
+                    {
+                    }
                 }
             }
+            catch (Exception)
+            {
+
+            }
+            finally
+            {
+            }
+           
         }
 
         private async void ClientHander_OnClientDisconnect(object? sender, clsWebsocktClientHandler e)
@@ -92,7 +103,6 @@ namespace AGVSystemCommonNet6.HttpTools
                     if (e.UserID != "")
                         LOG.TRACE($"User-{e.UserID} Leave AGVS Website. | Online-Client={OnlineClientNumber}");
                     e.Close();
-                    GC.Collect();
                 }
             }
             catch (Exception ex)
@@ -101,6 +111,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
             finally
             {
+
             }
         }
 
@@ -111,6 +122,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 LOG.WARN($"Start Websocket data publish");
                 while (true)
                 {
+                    //await _ClientConnectionChanging.WaitAsync();
                     await Task.Delay(publish_duration);
                     //await _ClientConnectionChanging.WaitAsync();
                     Initializd = true;
@@ -129,40 +141,48 @@ namespace AGVSystemCommonNet6.HttpTools
                         await Task.WhenAll(channelTasks);
                         async Task ProcessChannelAsync(KeyValuePair<string, object> item)
                         {
-                            var ChannelName = item.Key;
-                            var clientsInThisChannel = ClientsOfAllChannel[ChannelName];
-
-                            if (clientsInThisChannel.Count == 0)
-                                return;
-
-                            object Data = item.Value;
-                            if (Data == null)
-                                return;
-
-                            byte[] datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
-
-                            List<Task> clientTasks = new List<Task>();
-
-                            foreach (clsWebsocktClientHandler client in clientsInThisChannel)
+                            try
                             {
-                                clientTasks.Add(SendMessageAsync(client, datPublishOut));
-                                //SendMessageAsync(client, datPublishOut);
+                                var ChannelName = item.Key;
+                                var clientsInThisChannel = ClientsOfAllChannel[ChannelName];
+
+                                if (clientsInThisChannel.Count == 0)
+                                    return;
+                                var clients = clientsInThisChannel.ToArray();
+                                object Data = item.Value;
+                                if (Data == null)
+                                    return;
+
+                                byte[] datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
+
+                                List<Task> clientTasks = new List<Task>();
+
+                                foreach (clsWebsocktClientHandler client in clients.Where(c=>c.WebSocket.State== System.Net.WebSockets.WebSocketState.Open))
+                                {
+                                    clientTasks.Add(SendMessageAsync(client, datPublishOut));
+                                    //SendMessageAsync(client, datPublishOut);
+                                }
+
+                                await Task.WhenAll(clientTasks);
+
+                                async Task SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
+                                {
+                                    try
+                                    {
+
+                                        await client.WebSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        client.InvokeOnClientDisconnect();
+                                        Console.WriteLine(ex.Message + "\r\n" + ex.StackTrace);
+                                    }
+                                }
                             }
-
-                            await Task.WhenAll(clientTasks);
-
-                            async Task SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
+                            catch (Exception ex)
                             {
-                                try
-                                {
-                                    await client.WebSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None).ConfigureAwait(false);
-                                }
-                                catch (Exception ex)
-                                {
-                                    client.InvokeOnClientDisconnect();
-                                    Console.WriteLine(ex.Message + "\r\n" + ex.StackTrace);
-                                }
                             }
+                            
                         }
 
                     }
@@ -172,9 +192,10 @@ namespace AGVSystemCommonNet6.HttpTools
                     }
                     finally
                     {
+                        //_ClientConnectionChanging.Release();
                         //try
                         //{
-                        //    _ClientConnectionChanging.Release();
+                        //  
                         //}
                         //catch (Exception ex)
                         //{
