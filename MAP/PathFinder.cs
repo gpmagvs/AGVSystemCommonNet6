@@ -87,7 +87,7 @@ namespace AGVSystemCommonNet6.MAP
             int startIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == startStation.TagNumber).Key;
             int endIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == endStation.TagNumber).Key;
 
-            return FindShortestPath(map, startIndex, endIndex, options);
+             return FindShortestPath(map, startIndex, endIndex, options);
         }
         public clsPathInfo FindShortestPath(int startTag, int goalTag, PathFinderOption options = null)
         {

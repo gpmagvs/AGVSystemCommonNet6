@@ -168,7 +168,7 @@ namespace AGVSystemCommonNet6.HttpTools
                                 async Task SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
                                 {
                                     int offset = 0;
-                                    int chunkSize = 1024;
+                                    int chunkSize = 512;
 
                                   
                                     try
