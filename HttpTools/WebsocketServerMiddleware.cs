@@ -167,10 +167,24 @@ namespace AGVSystemCommonNet6.HttpTools
 
                                 async Task SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
                                 {
+                                    int offset = 0;
+                                    int chunkSize = 1024;
+
+                                  
                                     try
                                     {
+                                        while (offset < data.Length)
+                                        {
+                                            int remainingBytes = data.Length - offset;
+                                            int bytesToSend = Math.Min(remainingBytes, chunkSize);
 
-                                        await client.WebSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
+                                            byte[] chunk = new byte[bytesToSend];
+                                            Array.Copy(data, offset, chunk, 0, bytesToSend);
+
+                                            await client.WebSocket.SendAsync(new ArraySegment<byte>(chunk), WebSocketMessageType.Text, offset + bytesToSend >= data.Length, CancellationToken.None);
+
+                                            offset += bytesToSend;
+                                        }
                                     }
                                     catch (Exception ex)
                                     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -21,8 +22,8 @@ namespace AGVSystemCommonNet6.MAP
         public string Name { get; set; }
         public MAP_REGION_TYPE RegionType { get; set; } = MAP_REGION_TYPE.FORBID;
         public List<double[]> PolygonCoordinations { get; set; } = new List<double[]>();
-        public bool IsOpend { get; set; } = false; 
-        public bool IsNarrowPath { get; set; } = true; 
+        public bool IsOpend { get; set; } = false;
+        public bool IsNarrowPath { get; set; } = true;
         /// <summary>
         /// 最多可容納車輛數
         /// </summary>
@@ -44,5 +45,11 @@ namespace AGVSystemCommonNet6.MAP
         /// </summary>
         public double ThetaLimitWhenAGVIdling { get; set; } = 0;
 
+        [JsonIgnore]
+        public List<string> InRegionVehicles = new List<string>();
+
+
+        [JsonIgnore]
+        public List<string> ReserveRegionVehicles = new List<string>();
     }
 }
