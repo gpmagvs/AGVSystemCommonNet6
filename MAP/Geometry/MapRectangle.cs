@@ -35,6 +35,13 @@ namespace AGVSystemCommonNet6.MAP.Geometry
             }
         }
 
+        public double Width
+        {
+            get
+            {
+                return Length / 2.0 * Math.Atan(Theta);
+            }
+        }
 
         public double Theta
         {
@@ -69,7 +76,18 @@ namespace AGVSystemCommonNet6.MAP.Geometry
 
         public bool IsIntersectionTo(MapCircleArea rotaionRegion)
         {
-            throw new NotImplementedException();
+            float minX = CornersSet.Select(pt => pt.X).Min();
+            float maxX = CornersSet.Select(pt => pt.X).Max();
+            float minY = CornersSet.Select(pt => pt.Y).Min();
+            float maxY = CornersSet.Select(pt => pt.Y).Max();
+
+            float closestX = Math.Max(minX, Math.Min(rotaionRegion.Center.X, maxX));
+            float closestY = Math.Max(minY, Math.Min(rotaionRegion.Center.Y, maxY));
+
+            float distanceX = rotaionRegion.Center.X - closestX;
+            float distanceY = rotaionRegion.Center.Y - closestY;
+
+            return distanceX * distanceX + distanceY * distanceY <= rotaionRegion.RotationRadius* rotaionRegion.RotationRadius;
         }
         public bool IsIntersectionTo(MapRectangle rectangle_compare_to)
         {
