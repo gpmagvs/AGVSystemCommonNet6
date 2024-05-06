@@ -17,6 +17,11 @@ namespace AGVSystemCommonNet6.MAP
         public static event EventHandler<Exception> OnExceptionHappen;
         public class PathFinderOption
         {
+            public enum STRATEGY
+            {
+                SHORST_DISTANCE,
+                MINIMAL_ROTATION_ANGLE
+            }
             public bool OnlyNormalPoint { get; set; } = false;
 
             public bool ContainElevatorPoint { get; set; } = false;
@@ -24,6 +29,8 @@ namespace AGVSystemCommonNet6.MAP
             /// 要避開的TAG點位
             /// </summary>
             public List<int> ConstrainTags { get; set; } = new List<int>();
+
+            public STRATEGY Strategy { get; set; } = STRATEGY.MINIMAL_ROTATION_ANGLE;
 
         }
 
@@ -44,7 +51,6 @@ namespace AGVSystemCommonNet6.MAP
                         // 取得當前座標和下一個座標
                         MapPoint currentStation = stations[i];
                         MapPoint nextStation = stations[i + 1];
-
                         // 計算兩點之間的距離
                         double distance = Math.Sqrt(Math.Pow(nextStation.X - currentStation.X, 2) + Math.Pow(nextStation.Y - currentStation.Y, 2));
 
@@ -54,6 +60,44 @@ namespace AGVSystemCommonNet6.MAP
                     return totalDistance;
                 }
             }
+
+            public double total_rotation_angle
+            {
+                get
+                {
+                    return CalculateTotalRotation(stations);
+                }
+            }
+
+
+            private double CalculateTotalRotation(List<MapPoint> Stations)
+            {
+                double totalRotation = 0;
+
+                for (int i = 0; i < Stations.Count - 1; i++)
+                {
+                    MapPoint currentPoint = Stations[i];
+                    MapPoint nextPoint = Stations[i + 1];
+
+                    double angle = CalculateAngle(currentPoint, nextPoint);
+                    totalRotation += angle;
+                }
+
+                return totalRotation;
+            }
+
+            private double CalculateAngle(MapPoint point1, MapPoint point2)
+            {
+                double deltaX = point2.X - point1.X;
+                double deltaY = point2.Y - point1.Y;
+                double angle = Math.Atan2(deltaY, deltaX) * (180 / Math.PI);
+
+                // Convert angle to range [0, 360]
+                angle = (angle + 360) % 360;
+
+                return angle;
+            }
+
         }
         public clsPathInfo FindShortestPathByTagNumber(Map map, int startTag, int endTag, PathFinderOption options = null)
         {
@@ -87,13 +131,19 @@ namespace AGVSystemCommonNet6.MAP
             int startIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == startStation.TagNumber).Key;
             int endIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == endStation.TagNumber).Key;
 
-             return FindShortestPath(map, startIndex, endIndex, options);
+            return FindShortestPath(map, startIndex, endIndex, options);
         }
         public clsPathInfo FindShortestPath(int startTag, int goalTag, PathFinderOption options = null)
         {
             return FindShortestPathByTagNumber(defaultMap, startTag, goalTag, options);
         }
-        public clsPathInfo FindShortestPath(Map map, int startPtIndex, int endPtIndex, PathFinderOption options = null)
+        public List<clsPathInfo> FindPathes(Map map, MapPoint startPt, MapPoint endPt, PathFinderOption options = null)
+        {
+            int startIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == startPt.TagNumber).Key;
+            int endIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == endPt.TagNumber).Key;
+            return FindPathes(map, startIndex, endIndex, options);
+        }
+        public List<clsPathInfo> FindPathes(Map map, int startPtIndex, int endPtIndex, PathFinderOption options = null)
         {
             var stations = map.Points.ToList().FindAll(st => st.Value.Enable).ToDictionary(pt => pt.Key, pt => pt.Value);
             try
@@ -147,27 +197,14 @@ namespace AGVSystemCommonNet6.MAP
 
                 var source = startIndex;
                 DijkstraAlgorithm(graph, source, out int[] distance, out int[] parent);
-
-                var dist = distance[finalIndex];
-                if (dist < 0)
+                var allPathes = FindAllPaths(graph, source, finalIndex);
+                var pathWithStations = allPathes.Select(path => path.Select(index => staions_ordered[index].Value).ToList()).ToList();
+                return pathWithStations.Select(path => new clsPathInfo()
                 {
+                    stations = path,
 
-                }
-                clsPathInfo pathinfo = new clsPathInfo();
+                }).ToList();
 
-                int node = finalIndex;
-                while (node != source)
-                {
-                    if (node == -1)
-                    {
-                        throw new NoPathForNavigatorException();
-                    }
-                    pathinfo.stations.Insert(0, staions_ordered[node].Value);
-
-                    node = parent[node];
-                }
-                pathinfo.stations.Insert(0, staions_ordered[source].Value);
-                return pathinfo;
             }
             catch (Exception ex)
             {
@@ -176,6 +213,14 @@ namespace AGVSystemCommonNet6.MAP
                 //throw ex;
             }
 
+        }
+        public clsPathInfo FindShortestPath(Map map, int startPtIndex, int endPtIndex, PathFinderOption options)
+        {
+            var pathes = FindPathes(map, startPtIndex, endPtIndex, options);
+            if (options != null && options.Strategy == PathFinderOption.STRATEGY.SHORST_DISTANCE)
+                return pathes.OrderBy(path => path.total_travel_distance).FirstOrDefault();
+            else
+                return pathes.OrderBy(path => path.total_rotation_angle).FirstOrDefault();
         }
         public static clsMapPoint[] GetTrajectory(string MapName, List<MapPoint> stations)
         {
@@ -306,6 +351,44 @@ namespace AGVSystemCommonNet6.MAP
                 }
             }
         }
+        // 使用 DFS 來找到所有可能路徑
+        static void FindAllPathsDFS(int[,] graph, int source, int target, List<int> currentPath, List<List<int>> allPaths, bool[] visited)
+        {
+            visited[source] = true;
+            currentPath.Add(source);
 
+            if (source == target)
+            {
+                // 如果到達目標節點，記錄當前路徑
+                allPaths.Add(new List<int>(currentPath));
+            }
+            else
+            {
+                // 遍歷所有相鄰節點
+                for (int v = 0; v < graph.GetLength(0); v++)
+                {
+                    if (!visited[v] && graph[source, v] != 0 && graph[source, v] != int.MaxValue)
+                    {
+                        FindAllPathsDFS(graph, v, target, currentPath, allPaths, visited);
+                    }
+                }
+            }
+
+            // 回溯：取消當前節點的訪問狀態
+            visited[source] = false;
+            currentPath.RemoveAt(currentPath.Count - 1);
+        }
+
+        static List<List<int>> FindAllPaths(int[,] graph, int source, int target)
+        {
+            int n = graph.GetLength(0);
+            bool[] visited = new bool[n];
+            List<int> currentPath = new List<int>();
+            List<List<int>> allPaths = new List<List<int>>();
+
+            FindAllPathsDFS(graph, source, target, currentPath, allPaths, visited);
+
+            return allPaths;
+        }
     }
 }
