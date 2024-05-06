@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
 {
     public class IOlistsMsg : Message
     {
-        public const string RosMessageName = "agvstate/IOlists";
+        public const string RosMessageName = "gpm_msgs/IOlists";
 
         public IOlistMsg[] IOtable;
 
