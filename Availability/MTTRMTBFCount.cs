@@ -1,6 +1,8 @@
 ﻿using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
+using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
+using RosSharp.RosBridgeClient.MessageTypes.Std;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,7 @@ namespace AGVSystemCommonNet6.Availability
         public static List<int> Mttr_data = new List<int>();
         public static List<DateTime> MttrMtbf_date = new List<DateTime>();
         public static List<int> Mtbf_data = new List<int>();
+        public static List<int> MissTagcount = new List<int>();
 
         public static void MTTRMTBF_TimeCount(DateTime startTime, DateTime endTime, string AGV_Name)
         {
@@ -25,7 +28,6 @@ namespace AGVSystemCommonNet6.Availability
             List<clsAlarmDto> alarms = new List<clsAlarmDto>();
             for (DateTime time = startTime; time <= endTime; time.AddDays(1))
             {
-                
                 using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     alarms = new List<clsAlarmDto>();
@@ -33,16 +35,16 @@ namespace AGVSystemCommonNet6.Availability
                                         && (AGV_Name == "AGV_001" ? (true) : (alarm.Equipment_Name == AGV_Name))
                     );
                     count = _alarms.Count();
-                    if (count == 0) 
-                    { 
-                        count = 1; 
+                    if (count == 0)
+                    {
+                        count = 1;
                     }
-                    List<string> MTTRMTBF_Duration_Tostring  = _alarms.Select(alarm => $"{alarm.Duration}").ToList();
+                    List<string> MTTRMTBF_Duration_Tostring = _alarms.Select(alarm => $"{alarm.Duration}").ToList();
                     List<string> alarmstime_Tostring = _alarms.Select(alarm => $"{alarm.Time}").ToList();
                     List<int> MTTRMTBF_DurationToint = new List<int>();
                     List<DateTime> MTTRMTBF_TimeToDateTime = new List<DateTime>();
                     List<DateTime> AlarmEndTimeList = new List<DateTime>();
-                    DateTime AlarmEndTime =new DateTime();
+                    DateTime AlarmEndTime = new DateTime();
                     TimeSpan RunUntilAlarmTime = new TimeSpan();
                     List<TimeSpan> RunUntilAlarmTimeList = new List<TimeSpan>();
                     int RunUntilAlarmTimeTotal = new int();
@@ -90,8 +92,27 @@ namespace AGVSystemCommonNet6.Availability
                         throw ex;
                     }
                 }
-                
+
             }
+        }
+        public static void MissTagCount(DateTime startTime, DateTime endTime, string AGV_Name)
+        {
+            MissTagcount.Clear();
+            List<clsAlarmDto> alarms = new List<clsAlarmDto>();
+            for (DateTime time = startTime; time <= endTime; time.AddDays(1))
+            {
+                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+                {
+                    alarms = new List<clsAlarmDto>();
+                    var _alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= time && alarm.Time <= time.AddDays(1)
+                                        && (AGV_Name == "AGV_001" ? (true) : (alarm.Equipment_Name == AGV_Name) && alarm.AlarmCode == 23)
+                    );
+                    MissTagcount.Add(_alarms.Count());
+                }
+                time = time.AddDays(1);
+            }
+            
+            
         }
     }
 }
