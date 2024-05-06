@@ -23,9 +23,9 @@ namespace AGVSystemCommonNet6.MAP
         }
 
 
-        public static IEnumerable<MapPath> GetPathes(this MapPoint mapPoint,ref Map refMap)
+        public static IEnumerable<MapPath> GetPathes(this MapPoint mapPoint, ref Map refMap)
         {
-            int pointIndex= refMap.Points.First(pair => pair.Value == mapPoint).Key;
+            int pointIndex = refMap.Points.First(pair => pair.Value == mapPoint).Key;
             return refMap.Segments.Where(path => path.StartPtIndex == pointIndex || path.EndPtIndex == pointIndex);
         }
 
@@ -68,6 +68,7 @@ namespace AGVSystemCommonNet6.MAP
                 return result;
             }
         }
+
         public static MapRegion GetRegion(this MapPoint mapPoint, Map map)
         {
             return new double[2] { mapPoint.X, mapPoint.Y }.GetRegion(map);
