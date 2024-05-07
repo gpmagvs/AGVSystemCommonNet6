@@ -15,14 +15,12 @@ namespace AGVSystemCommonNet6.Alarm
         public static string TROBLE_SHOOTING_FILE_PATH = @"C:\AGVS\AGVS_TrobleShooting.csv";
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
+        private static AGVSDatabase database;
         public static List<clsAlarmDto> uncheckedAlarms
         {
             get
             {
-                using (var dbhelper = new AGVSDatabase())
-                {
-                    return dbhelper.tables.SystemAlarms.AsNoTracking().Where(al => !al.Checked).ToList();
-                }
+                return database.tables.SystemAlarms.AsNoTracking().Where(al => !al.Checked).ToList();
             }
         }
         private static bool Initialized = false;
@@ -30,6 +28,7 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static void Initialize()
         {
+            database = new AGVSDatabase();
             LoadAlarmCodes();
             LoadTrobleShootingDescription();
             Initialized = true;
@@ -92,9 +91,8 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 if (!Initialized)
                     Initialize();
-                using var db = new AGVSDatabase();
-                db.tables.SystemAlarms.Add(alarmDto);
-                await db.SaveChanges();
+                database.tables.SystemAlarms.Add(alarmDto);
+                await database.SaveChanges();
             }
             catch (Exception ex)
             {

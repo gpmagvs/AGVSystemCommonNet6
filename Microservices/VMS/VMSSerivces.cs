@@ -59,61 +59,64 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         /// 請求VMS回覆
         /// </summary>
         /// <returns></returns>
-        public static async Task AliveCheckWorker()
+        public static async void AliveCheckWorker()
         {
-            IsAlive = true;
-            Stopwatch sw = Stopwatch.StartNew();
-            bool previous_alive_state = true;
-            clsAlarmCode alarm = AlarmManagerCenter.GetAlarmCode(ALARMS.VMS_DISCONNECT);
-            clsAlarmDto disconnectAlarm = new clsAlarmDto()
+            _ = Task.Run(async () =>
             {
-                AlarmCode = (int)alarm.AlarmCode,
-                Description_En = alarm.Description_En,
-                Description_Zh = alarm.Description_Zh,
-                Equipment_Name = "VMS",
-                Level = ALARM_LEVEL.ALARM,
-                Source = ALARM_SOURCE.AGVS,
 
-            };
-
-            while (true)
-            {
-                await Task.Delay(1000);
-                try
+                IsAlive = true;
+                Stopwatch sw = Stopwatch.StartNew();
+                bool previous_alive_state = true;
+                clsAlarmCode alarm = AlarmManagerCenter.GetAlarmCode(ALARMS.VMS_DISCONNECT);
+                clsAlarmDto disconnectAlarm = new clsAlarmDto()
                 {
-                    bool hasVmsDisconnectAlarm = alarm != null;
-                    (bool alive, string message) response = await VMSAliveCheck();
-                    if (previous_alive_state != response.alive)
-                    {
-                        if (!response.alive)
-                        {
-                            IsAlive = false;
-                            sw.Restart();
-                            disconnectAlarm.Checked = false;
-                            disconnectAlarm.Time = DateTime.Now;
-                            AlarmManagerCenter.AddAlarmAsync(ALARMS.VMS_DISCONNECT, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
-                        }
-                        else
-                        {
-                            IsAlive = true;
-                            OnVMSReconnected?.Invoke("", EventArgs.Empty);
-                            sw.Restart();
-                            await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", ALARMS.VMS_DISCONNECT, "SystemAuto");
-                        }
-                    }
-                    else if (!response.alive)
-                    {
-                        disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
-                        AlarmManagerCenter.UpdateAlarmAsync(disconnectAlarm);
-                        continue;
-                    }
+                    AlarmCode = (int)alarm.AlarmCode,
+                    Description_En = alarm.Description_En,
+                    Description_Zh = alarm.Description_Zh,
+                    Equipment_Name = "VMS",
+                    Level = ALARM_LEVEL.ALARM,
+                    Source = ALARM_SOURCE.AGVS,
 
-                    previous_alive_state = response.alive;
-                }
-                catch (Exception ex)
+                };
+                while (true)
                 {
+                    await Task.Delay(1000);
+                    try
+                    {
+                        bool hasVmsDisconnectAlarm = alarm != null;
+                        (bool alive, string message) response = await VMSAliveCheck();
+                        if (previous_alive_state != response.alive)
+                        {
+                            if (!response.alive)
+                            {
+                                IsAlive = false;
+                                sw.Restart();
+                                disconnectAlarm.Checked = false;
+                                disconnectAlarm.Time = DateTime.Now;
+                                AlarmManagerCenter.AddAlarmAsync(ALARMS.VMS_DISCONNECT, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
+                            }
+                            else
+                            {
+                                IsAlive = true;
+                                OnVMSReconnected?.Invoke("", EventArgs.Empty);
+                                sw.Restart();
+                                await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", ALARMS.VMS_DISCONNECT, "SystemAuto");
+                            }
+                        }
+                        else if (!response.alive)
+                        {
+                            disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
+                            AlarmManagerCenter.UpdateAlarmAsync(disconnectAlarm);
+                            continue;
+                        }
+
+                        previous_alive_state = response.alive;
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                 }
-            }
+            });
         }
 
         public static async Task<List<clsAGVStateDto>> GetAGV_StatesData_FromVMS()
@@ -156,7 +159,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
             catch (Exception ex)
             {
-                throw  ex;
+                throw ex;
             }
         }
         private static async Task<(bool alive, string message)> VMSAliveCheck()
