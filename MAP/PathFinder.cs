@@ -93,7 +93,7 @@ namespace AGVSystemCommonNet6.MAP
                 double angle = Math.Atan2(deltaY, deltaX) * (180 / Math.PI);
 
                 // Convert angle to range [0, 360]
-                angle = (angle + 360) % 360;
+                angle = Math.Abs((angle + 360) % 360);
 
                 return angle;
             }
