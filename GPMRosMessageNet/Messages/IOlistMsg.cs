@@ -10,7 +10,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
 {
     public class IOlistMsg:Message
     {
-        public const string RosMessageName = "agvstate/IOlist";
+        public const string RosMessageName = "gpm_msgs/IOlist";
 
         public string Key;
         public int Coil;

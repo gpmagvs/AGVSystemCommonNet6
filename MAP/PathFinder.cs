@@ -1,4 +1,4 @@
-﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Exceptions;
 using System;
 using System.Collections.Concurrent;
@@ -69,21 +69,44 @@ namespace AGVSystemCommonNet6.MAP
                 }
             }
 
-
             private double CalculateTotalRotation(List<MapPoint> Stations)
             {
                 double totalRotation = 0;
 
-                for (int i = 0; i < Stations.Count - 1; i++)
+                // 如果站点数量少于2，无法计算角度
+                if (Stations.Count < 2)
+                    return totalRotation;
+
+                // 初始朝向从第一个点到第二个点的方位角
+                double previousAngle = CalculateAngle(Stations[0], Stations[1]);
+
+                for (int i = 1; i < Stations.Count - 1; i++)
                 {
                     MapPoint currentPoint = Stations[i];
                     MapPoint nextPoint = Stations[i + 1];
 
-                    double angle = CalculateAngle(currentPoint, nextPoint);
-                    totalRotation += angle;
+                    double currentAngle = CalculateAngle(currentPoint, nextPoint);
+                    double angleDifference = CalculateRelativeAngle(previousAngle, currentAngle);
+
+                    // 累积相对旋转角度
+                    totalRotation += Math.Abs(angleDifference);
+
+                    // 更新前一个角度为当前角度
+                    previousAngle = currentAngle;
                 }
 
                 return totalRotation;
+            }
+
+            // 计算从一个方位角度到另一个的相对旋转角度
+            private double CalculateRelativeAngle(double fromAngle, double toAngle)
+            {
+                double angleDifference = toAngle - fromAngle;
+
+                // 将角度转换到 [-180, 180] 范围
+                angleDifference = (angleDifference + 180) % 360 - 180;
+
+                return angleDifference;
             }
 
             private double CalculateAngle(MapPoint point1, MapPoint point2)
@@ -92,8 +115,8 @@ namespace AGVSystemCommonNet6.MAP
                 double deltaY = point2.Y - point1.Y;
                 double angle = Math.Atan2(deltaY, deltaX) * (180 / Math.PI);
 
-                // Convert angle to range [0, 360]
-                angle = Math.Abs((angle + 360) % 360);
+                // 将角度转换到 [0, 360] 范围
+                angle = (angle + 360) % 360;
 
                 return angle;
             }
