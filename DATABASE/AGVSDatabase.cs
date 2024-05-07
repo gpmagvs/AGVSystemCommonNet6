@@ -31,6 +31,7 @@ namespace AGVSystemCommonNet6.DATABASE
                 using (AGVSDatabase database = new AGVSDatabase())
                 {
                     await DatabaseColumnCheck(database);
+                    database.dbContext.Database.EnsureCreated();
                 }
 
                 using (AGVSDatabase database = new AGVSDatabase())
