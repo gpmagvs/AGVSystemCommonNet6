@@ -213,7 +213,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             if (!string.IsNullOrWhiteSpace(dto.FailureReason))
                 FailureReason = dto.FailureReason;
 
-            if (!string.IsNullOrWhiteSpace(dto.DesignatedAGVName))
+            if (dto.DesignatedAGVName != null)
                 DesignatedAGVName = dto.DesignatedAGVName;
 
             Action = dto.Action;
@@ -235,6 +235,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
             Priority = dto.Priority;
             IsTrafficControlTask = dto.IsTrafficControlTask;
             bypass_eq_status_check = dto.bypass_eq_status_check;
+
+            need_change_agv = dto.need_change_agv;
         }
 
     }
