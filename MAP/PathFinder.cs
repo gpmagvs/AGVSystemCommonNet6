@@ -90,7 +90,10 @@ namespace AGVSystemCommonNet6.MAP
 
                     // 累积相对旋转角度
                     totalRotation += Math.Abs(angleDifference);
+                    if(angleDifference < 10)
+                    {
 
+                    }
                     // 更新前一个角度为当前角度
                     previousAngle = currentAngle;
                 }
@@ -115,8 +118,15 @@ namespace AGVSystemCommonNet6.MAP
                 double deltaY = point2.Y - point1.Y;
                 double angle = Math.Atan2(deltaY, deltaX) * (180 / Math.PI);
 
-                // 将角度转换到 [0, 360] 范围
-                angle = (angle + 360) % 360;
+                // 將角度轉換到 [-180, 180] 范圍
+                if (angle > 180)
+                {
+                    angle -= 360;
+                }
+                else if (angle < -180)
+                {
+                    angle += 360;
+                }
 
                 return angle;
             }
@@ -243,7 +253,11 @@ namespace AGVSystemCommonNet6.MAP
             if (options != null && options.Strategy == PathFinderOption.STRATEGY.SHORST_DISTANCE)
                 return pathes.OrderBy(path => path.total_travel_distance).FirstOrDefault();
             else
-                return pathes.OrderBy(path => path.total_rotation_angle).FirstOrDefault();
+            {
+
+                var ordered = pathes.OrderBy(path => path.total_rotation_angle);
+                return ordered.FirstOrDefault();
+            }
         }
         public static clsMapPoint[] GetTrajectory(string MapName, List<MapPoint> stations)
         {

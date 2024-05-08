@@ -89,7 +89,7 @@ namespace AGVSystemCommonNet6.HttpTools
             finally
             {
             }
-           
+
         }
 
         private async void ClientHander_OnClientDisconnect(object? sender, clsWebsocktClientHandler e)
@@ -157,7 +157,8 @@ namespace AGVSystemCommonNet6.HttpTools
 
                                 List<Task> clientTasks = new List<Task>();
 
-                                foreach (clsWebsocktClientHandler client in clients.Where(c=>c.WebSocket.State== System.Net.WebSockets.WebSocketState.Open))
+                                var aliveclients = clients.Where(c => c != null).Where(c => c.WebSocket.CloseStatus == null).Where(c => c.WebSocket.State == System.Net.WebSockets.WebSocketState.Open).ToList();
+                                foreach (clsWebsocktClientHandler client in aliveclients)
                                 {
                                     clientTasks.Add(SendMessageAsync(client, datPublishOut));
                                     //SendMessageAsync(client, datPublishOut);
@@ -170,7 +171,7 @@ namespace AGVSystemCommonNet6.HttpTools
                                     int offset = 0;
                                     int chunkSize = 512;
 
-                                  
+
                                     try
                                     {
                                         while (offset < data.Length)
@@ -196,7 +197,7 @@ namespace AGVSystemCommonNet6.HttpTools
                             catch (Exception ex)
                             {
                             }
-                            
+
                         }
 
                     }
