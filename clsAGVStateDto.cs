@@ -57,11 +57,8 @@ namespace AGVSystemCommonNet6
         [MaybeNull]
         public double VehicleWidth { get; set; } = 70;
 
-        [NotMapped]// 此欄位不會寫入資料表
         public string TaskSourceStationName { get; set; } = "AS";
-        [NotMapped]// 此欄位不會寫入資料表
         public string TaskDestineStationName { get; set; } = "BB";
-        [NotMapped]// 此欄位不會寫入資料表
         public string StationName { get; set; } = "";
         [MaybeNull]
         public string IP { get; set; } = "127.0.0.1";
@@ -103,6 +100,11 @@ namespace AGVSystemCommonNet6
             LowBatLvThreshold = entity.LowBatLvThreshold;
             MiddleBatLvThreshold = entity.MiddleBatLvThreshold;
             HighBatLvThreshold = entity.HighBatLvThreshold;
+            TaskSourceStationName = entity.TaskSourceStationName;
+            TaskDestineStationName = entity.TaskDestineStationName;
+            StationName = entity.StationName;
+
+
         }
 
         public bool HasChanged(clsAGVStateDto newState)
