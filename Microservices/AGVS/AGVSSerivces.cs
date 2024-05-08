@@ -1,4 +1,5 @@
-﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.RunMode;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE.Helpers;
@@ -169,6 +170,27 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         LOG.Critical($"LoadUnload Order Start Feedback to AGVS FAIL,{ex.Message}", ex);
                         //return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                         return new Dictionary<int, int>();
+                    }
+                }
+            }
+            public static async void AfterTransferTaskAutoCharge(string strAGVName)
+            {
+                using (agvs_http)
+                {
+                    try
+                    {
+                        var route = $"/api/Task/charge?user=dev";
+                        LOG.INFO($"AfterTransferTaskAutoCharge start");
+                        clsTaskDto charge = new clsTaskDto();
+                        charge.TaskName = "TRAN_AutoCharge";
+                        charge.DesignatedAGVName = strAGVName;
+                        charge.Action = ACTION_TYPE.Charge;
+                        charge.To_Station = "-1";
+                        var response = await agvs_http.PostAsync<clsAGVSTaskReportResponse, clsTaskDto>(route, charge);
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.Critical($"AfterTransferTaskAutoCharge Feedback to AGVS FAIL,{ex.Message}", ex);
                     }
                 }
             }
