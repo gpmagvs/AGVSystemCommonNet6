@@ -182,9 +182,10 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         var route = $"/api/Task/charge?user=dev";
                         LOG.INFO($"AfterTransferTaskAutoCharge start");
                         clsTaskDto charge = new clsTaskDto();
-                        charge.TaskName = "TRAN_AutoCharge";
+                        charge.TaskName = $"ACharge_{DateTime.Now.ToString("yyyyMMdd_HHmmssfff")}";
                         charge.DesignatedAGVName = strAGVName;
                         charge.Action = ACTION_TYPE.Charge;
+                        charge.Carrier_ID = "-1";
                         charge.To_Station = "-1";
                         var response = await agvs_http.PostAsync<clsAGVSTaskReportResponse, clsTaskDto>(route, charge);
                     }
