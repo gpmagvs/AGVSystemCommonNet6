@@ -73,11 +73,9 @@ namespace AGVSystemCommonNet6.MAP
             {
                 double totalRotation = 0;
 
-                // 如果站点数量少于2，无法计算角度
                 if (Stations.Count < 2)
                     return totalRotation;
 
-                // 初始朝向从第一个点到第二个点的方位角
                 double previousAngle = CalculateAngle(Stations[0], Stations[1]);
 
                 for (int i = 1; i < Stations.Count - 1; i++)
@@ -90,10 +88,6 @@ namespace AGVSystemCommonNet6.MAP
 
                     // 累积相对旋转角度
                     totalRotation += Math.Abs(angleDifference);
-                    if(angleDifference < 10)
-                    {
-
-                    }
                     // 更新前一个角度为当前角度
                     previousAngle = currentAngle;
                 }
@@ -104,12 +98,10 @@ namespace AGVSystemCommonNet6.MAP
             // 计算从一个方位角度到另一个的相对旋转角度
             private double CalculateRelativeAngle(double fromAngle, double toAngle)
             {
+
+                // 计算角度差并返回其绝对值
                 double angleDifference = toAngle - fromAngle;
-
-                // 将角度转换到 [-180, 180] 范围
-                angleDifference = (angleDifference + 180) % 360 - 180;
-
-                return angleDifference;
+                return Math.Abs(angleDifference);
             }
 
             private double CalculateAngle(MapPoint point1, MapPoint point2)
