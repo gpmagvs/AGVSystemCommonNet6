@@ -69,11 +69,19 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             {
                 using (agvs_http)
                 {
-                    var route = $"/api/Task/LoadUnloadTaskFinish?tag={tagNumber}&action={action}";
-                    clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
-                    LOG.INFO($"LoadUnload Task Finish Feedback to AGVS, AGVS Response = {response.ToJson()}");
-                    return response;
-
+                    try
+                    {
+                        var route = $"/api/Task/LoadUnloadTaskFinish?tag={tagNumber}&action={action}";
+                        LOG.INFO($"LoadUnloadActionFinishReport start");
+                        clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+                        LOG.INFO($"LoadUnload Task Finish Feedback to AGVS, AGVS Response = {response.ToJson()}");
+                        return response;
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.Critical($"LoadUnload Task Finish Feedback to AGVS FAIL,{ex.Message}", ex);
+                        return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
+                    }
                 }
             }
 
@@ -85,6 +93,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     try
                     {
                         var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&action={action}";
+                        LOG.INFO($"LoadUnloadActionStartReport start");
                         clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
                         LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                         return response;
@@ -104,23 +113,31 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
 
             public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int to_Station_Tag, ACTION_TYPE action)
             {
-                using (agvs_http)
+                clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse() { confirm = false };
+                int intRetry = 0;
+                bool IsReportOK = false;
+                while (intRetry < 3 && IsReportOK == false)
                 {
                     try
                     {
                         var route = $"/api/Task/LDULDOrderStart?from={from_Station_Tag}&to={to_Station_Tag}&action={action}";
-                        clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+                        LOG.INFO($"StartLDULDOrderReport start");
+                        using (agvs_http)
+                        {
+                            response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+                        }
                         LOG.INFO($"LoadUnload Order Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                         return response;
-
                     }
                     catch (Exception ex)
                     {
-                        LOG.Critical($"LoadUnload Order Start Feedback to AGVS FAIL,{ex.Message}", ex);
-                        return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
-
+                        LOG.Critical($"LoadUnload Order Start Feedback to AGVS FAIL (try:{intRetry + 1}times),{ex.Message}", ex);
+                        response = new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                     }
+                    intRetry++;
+                    Task.Delay(1000);
                 }
+                return response;
             }
 
             public static async Task<Dictionary<int, int>> GetEQAcceptAGVTypeInfo(IEnumerable<int> tagsCollections)
@@ -130,6 +147,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     try
                     {
                         var route = $"/api/Equipment/GetEQOptionsByTags";
+                        LOG.INFO($"GetEQAcceptAGVTypeInfo start");
                         var response = await agvs_http.PostAsync<List<Dictionary<string, object>>, int[]>(route, tagsCollections.ToArray());
 
                         return response.ToDictionary(obj => int.Parse(obj["Tag"].ToString()), obj => int.Parse(obj["Accept_AGV_Type"].ToString()));
