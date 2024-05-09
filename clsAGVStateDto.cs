@@ -48,7 +48,6 @@ namespace AGVSystemCommonNet6
 
         [NotMapped] // 此欄位不會寫入資料表
         public DateTime TaskETA { get; set; } = DateTime.MaxValue;
-        [NotMapped]// 此欄位不會寫入資料表
         public bool IsExecutingOrder { get; set; } = false;
 
         [MaybeNull]
@@ -97,6 +96,7 @@ namespace AGVSystemCommonNet6
             CurrentAction = entity.CurrentAction;
             TransferProcess = entity.TransferProcess;
             IsCharging = entity.IsCharging;
+            IsExecutingOrder = entity.IsExecutingOrder;
             LowBatLvThreshold = entity.LowBatLvThreshold;
             MiddleBatLvThreshold = entity.MiddleBatLvThreshold;
             HighBatLvThreshold = entity.HighBatLvThreshold;

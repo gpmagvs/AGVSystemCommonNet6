@@ -14,27 +14,26 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private Timer _timer;
+        AGVSDbContext context;
 
         public DatabaseBackgroundService(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
+            context = _scopeFactory.CreateAsyncScope().ServiceProvider.GetRequiredService<AGVSDbContext>();
+
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            // 設置定時器，每隔 10 秒執行一次
-            _timer = new Timer(async _ => await DoWork(), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(150));
-            return Task.CompletedTask;
+            _= Task.Run(DoWork);
         }
 
         private async Task DoWork()
         {
-            try
+            while (true)
             {
-                using (var scope = _scopeFactory.CreateScope())
+                try
                 {
-                    // 從 DI 容器中獲取 DbContext 或其他服務
-                    AGVSDbContext context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
                     // 這裡進行背景數據庫操作或其他業務邏輯
                     var customerCount = context.Tasks.Count();
                     DatabaseCaches.TaskCaches.WaitExecuteTasks = await context.Tasks.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).AsNoTracking().ToListAsync();
@@ -47,10 +46,11 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
                     DatabaseCaches.Vehicle.VehicleStates = await context.AgvStates.AsNoTracking().ToListAsync();
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("[DatabaseBackgroundService] DoWork Exception" + ex.Message);
+                catch (Exception ex)
+                {
+                    Console.WriteLine("[DatabaseBackgroundService] DoWork Exception" + ex.Message);
+                }
+                await Task.Delay(150);
             }
 
         }
