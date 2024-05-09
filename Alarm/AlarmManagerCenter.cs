@@ -20,9 +20,7 @@ namespace AGVSystemCommonNet6.Alarm
         {
             get
             {
-                if (database == null)
-                    return new List<clsAlarmDto>();
-                return database.tables.SystemAlarms.AsNoTracking().Where(al => !al.Checked).ToList();
+                return DatabaseCaches.Alarms.UnCheckedAlarms;
             }
         }
         private static bool Initialized = false;

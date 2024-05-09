@@ -10,6 +10,7 @@ using AGVSystemCommonNet6.Configuration;
 using SQLite;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Log;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGVSystemCommonNet6.Availability
 {
@@ -27,7 +28,7 @@ namespace AGVSystemCommonNet6.Availability
         };
         private MAIN_STATUS previousMainState;
         private RTAvailabilityDto currentAvailability = new RTAvailabilityDto();
-
+        private SemaphoreSlim _DbActSemaphore = new SemaphoreSlim(1, 1);
         private MAIN_STATUS MainState
         {
             get => previousMainState;
@@ -76,7 +77,7 @@ namespace AGVSystemCommonNet6.Availability
             Task.Factory.StartNew(async () =>
             {
                 await Task.Delay(3000);
-                RestoreDataFromDatabase();
+                await RestoreDataFromDatabase();
                 SyncAvaliabilityDataWorker();
             });
         }
@@ -107,7 +108,7 @@ namespace AGVSystemCommonNet6.Availability
                     await Task.Delay(1000);
                     if (write_db_stopwatch.ElapsedMilliseconds > 10000)
                     {
-                        SaveDayAvailbilityToDatabase();
+                        await SaveDayAvailbilityToDatabase();
                         write_db_stopwatch.Restart();
                     }
 
@@ -115,14 +116,14 @@ namespace AGVSystemCommonNet6.Availability
                 }
             });
         }
-        private void RestoreDataFromDatabase()
+        private async Task RestoreDataFromDatabase()
         {
             try
             {
-
+                await Task.Delay(10);
                 using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
-                    var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
+                    var avaExist = aGVSDbContext._context.Availabilitys.AsNoTracking().FirstOrDefault(av => av.KeyStr == availability.GetKey());
                     if (avaExist != null)
                     {
                         lastDay = avaExist.Time.Day;
@@ -142,8 +143,9 @@ namespace AGVSystemCommonNet6.Availability
             }
         }
 
-        private async void UpdateRealTimeAvailbilityToDataBase(RTAvailabilityDto currentAvailability)
+        private async Task UpdateRealTimeAvailbilityToDataBase(RTAvailabilityDto currentAvailability)
         {
+            await _DbActSemaphore.WaitAsync();
             try
             {
                 using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
@@ -157,17 +159,23 @@ namespace AGVSystemCommonNet6.Availability
                     {
                         currentData.EndTime = currentAvailability.EndTime;
                     }
-                    var ret = aGVSDbContext._context.SaveChanges();
+                    var ret = await aGVSDbContext._context.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} " + ex.Message);
             }
+            finally
+            {
+                _DbActSemaphore.Release();
+            }
         }
 
-        private void SaveRealTimeAvailbilityToDatabase(RTAvailabilityDto currentAvailability)
+        private async Task SaveRealTimeAvailbilityToDatabase(RTAvailabilityDto currentAvailability)
         {
+            await _DbActSemaphore.WaitAsync();
+
             using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 try
@@ -175,19 +183,22 @@ namespace AGVSystemCommonNet6.Availability
                     var exist_data = aGVSDbContext._context.RealTimeAvailabilitys.FirstOrDefault(ad => ad.AGVName == currentAvailability.AGVName && ad.StartTime == currentAvailability.StartTime);
                     if (exist_data == null)
                     {
-
                         aGVSDbContext._context.RealTimeAvailabilitys.Add(currentAvailability);
                     }
                     else
                     {
                         exist_data.EndTime = currentAvailability.EndTime;
                     }
-                    aGVSDbContext._context.SaveChanges();
+                    var ret = await aGVSDbContext._context.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} " + ex.Message);
 
+                }
+                finally
+                {
+                    _DbActSemaphore.Release();
                 }
             }
         }
@@ -195,8 +206,10 @@ namespace AGVSystemCommonNet6.Availability
         /// <summary>
         /// 儲存每日稼動
         /// </summary>
-        private void SaveDayAvailbilityToDatabase()
+        private async Task SaveDayAvailbilityToDatabase()
         {
+            await _DbActSemaphore.WaitAsync();
+
             try
             {
                 using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
@@ -220,12 +233,16 @@ namespace AGVSystemCommonNet6.Availability
                         avaExist.UNKNOWN_TIME = availability.UNKNOWN_TIME;
 
                     }
-                    aGVSDbContext._context.SaveChanges();
+                    var ret = await aGVSDbContext._context.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
             {
                 LOG.ERROR(ex);
+            }
+            finally
+            {
+                _DbActSemaphore.Release();
             }
 
         }
