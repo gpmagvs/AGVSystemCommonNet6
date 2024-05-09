@@ -168,11 +168,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public string Carrier_ID { get; set; } = "";
 
-        /// <summary>
-        /// 任務需要換車時的中繼站點Tag
-        /// </summary>
-        [AllowNull]
-        public int ChangeAGVMiddleStationTag { get; set; } = 0;
+        ///// <summary>
+        ///// 任務需要換車時的中繼站點Tag
+        ///// </summary>
+        //[AllowNull]
+        //public int ChangeAGVMiddleStationTag { get; set; } = 0;
 
         [Required]
         public int Height { get; set; } = 0;
