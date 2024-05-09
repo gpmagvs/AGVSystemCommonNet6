@@ -136,7 +136,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         response = new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                     }
                     intRetry++;
-                    Task.Delay(1000);
+                    await Task.Delay(1000);
                 }
                 return response;
             }

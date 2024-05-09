@@ -59,7 +59,6 @@ namespace AGVSystemCommonNet6.HttpTools
                 }
                 WebSocket client = await _context.WebSockets.AcceptWebSocketAsync();
                 clsWebsocktClientHandler clientHander = new clsWebsocktClientHandler(client, path, user_id);
-                LOG.TRACE($"User Broswer AGVS Website {ClientsOfAllChannel.Keys.ToJson()}");
 
                 if (ClientsOfAllChannel.TryGetValue(path, out var clientCollection))
                 {
