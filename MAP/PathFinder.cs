@@ -98,10 +98,18 @@ namespace AGVSystemCommonNet6.MAP
             // 计算从一个方位角度到另一个的相对旋转角度
             private double CalculateRelativeAngle(double fromAngle, double toAngle)
             {
-
-                // 计算角度差并返回其绝对值
                 double angleDifference = toAngle - fromAngle;
-                return Math.Abs(angleDifference);
+                // 将角度转换到 [-180, 180] 范围
+                // 將角度轉換到 [-180, 180] 范圍
+                if (angleDifference > 180)
+                {
+                    angleDifference -= 360;
+                }
+                else if (angleDifference < -180)
+                {
+                    angleDifference += 360;
+                }
+                return angleDifference;
             }
 
             private double CalculateAngle(MapPoint point1, MapPoint point2)

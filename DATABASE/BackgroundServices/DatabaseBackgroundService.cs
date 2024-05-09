@@ -25,17 +25,18 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _= Task.Run(DoWork);
+            _ = Task.Run(DoWork);
         }
 
         private async Task DoWork()
         {
             while (true)
             {
+                Stopwatch _stopwatch = Stopwatch.StartNew();
                 try
                 {
+
                     // 這裡進行背景數據庫操作或其他業務邏輯
-                    var customerCount = context.Tasks.Count();
                     DatabaseCaches.TaskCaches.WaitExecuteTasks = await context.Tasks.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).AsNoTracking().ToListAsync();
                     DatabaseCaches.TaskCaches.CompleteTasks = await context.Tasks.OrderByDescending(task => task.RecieveTime)
                                                                            .Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
@@ -50,7 +51,11 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 {
                     Console.WriteLine("[DatabaseBackgroundService] DoWork Exception" + ex.Message);
                 }
-                await Task.Delay(150);
+                _stopwatch.Stop();
+                if (_stopwatch.Elapsed.Seconds > 1)
+                {
+                    Console.WriteLine("DatabaseBackgroundService Work Time Long...: "+_stopwatch.Elapsed.TotalSeconds);
+                }
             }
 
         }
