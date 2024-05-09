@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 {
@@ -14,7 +15,8 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private Timer _timer;
-
+        private Timer _timer_query_latest_finished_task;
+        public int cacheTimerInterval { get; set; } = 200;
         public DatabaseBackgroundService(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
@@ -23,8 +25,38 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(callback, null, 0, 200);
+            _timer = new Timer(callback, null, 0, cacheTimerInterval);
+            _timer_query_latest_finished_task = new Timer(fetchFinishTasksCallback, null, 0, 5000);
             //_ = Task.Run(DoWork);
+        }
+
+        private void fetchFinishTasksCallback(object? state)
+        {
+            Stopwatch _stopwatch = Stopwatch.StartNew();
+
+            using (var scope = _scopeFactory.CreateAsyncScope())
+            {
+                try
+                {
+                    using AGVSDbContext context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
+                    DatabaseCaches.TaskCaches.CompleteTasks = context.Tasks.AsNoTracking()
+                                                                            .Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
+                                                                            .OrderByDescending(task => task.RecieveTime)
+                                                                               .Take(40).ToList();
+                    _stopwatch.Stop();
+
+                    if (_stopwatch.Elapsed.Seconds > 1)
+                    {
+                        Console.WriteLine("DatabaseBackgroundService [fetchFinishTasksCallback] Time Spend Long...: " + _stopwatch.Elapsed.TotalSeconds);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("[DatabaseBackgroundService] fetchFinishTasksCallback: Exception" + ex.Message);
+
+                }
+
+            }
         }
 
         private void callback(object? state)
@@ -36,14 +68,15 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 {
                     using AGVSDbContext context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
                     // 這裡進行背景數據庫操作或其他業務邏輯
-                    var taskLatest = context.Tasks.AsNoTracking().OrderByDescending(task => task.RecieveTime).Take(40).ToList();
+                    //var taskLatest = context.Tasks.AsNoTracking().OrderByDescending(task => task.RecieveTime).Take(40).ToList();
 
-                    DatabaseCaches.TaskCaches.WaitExecuteTasks = taskLatest.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
+                    DatabaseCaches.TaskCaches.WaitExecuteTasks = context.Tasks.AsNoTracking().Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
 
 
-                    DatabaseCaches.TaskCaches.CompleteTasks = taskLatest.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
-                                                                        .ToList();
-                    DatabaseCaches.TaskCaches.RunningTasks = taskLatest.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
+                    //DatabaseCaches.TaskCaches.CompleteTasks = taskLatest.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
+                    //                                                    .ToList();
+
+                    DatabaseCaches.TaskCaches.RunningTasks = context.Tasks.AsNoTracking().Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
                     //_stopwatch.Stop();
                     // Console.WriteLine("TaskCaches: " + _stopwatch.Elapsed.ToString());
                     //_stopwatch.Restart();

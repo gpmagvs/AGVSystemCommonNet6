@@ -56,7 +56,7 @@ namespace AGVSystemCommonNet6.MAP.Geometry
         }
 
         public MapPoint StartPointTag { get; set; } = new MapPoint();
-        public MapPoint EndPointTag { get; set; } = new MapPoint();
+        public MapPoint EndMapPoint { get; set; } = new MapPoint();
         public PointF Corner1 { get; set; } = new PointF();
         public PointF Corner2 { get; set; } = new PointF();
         public PointF Corner3 { get; set; } = new PointF();
@@ -87,11 +87,11 @@ namespace AGVSystemCommonNet6.MAP.Geometry
             float distanceX = rotaionRegion.Center.X - closestX;
             float distanceY = rotaionRegion.Center.Y - closestY;
 
-            return distanceX * distanceX + distanceY * distanceY <= rotaionRegion.RotationRadius* rotaionRegion.RotationRadius;
+            return distanceX * distanceX + distanceY * distanceY <= rotaionRegion.RotationRadius * rotaionRegion.RotationRadius;
         }
         public bool IsIntersectionTo(MapRectangle rectangle_compare_to)
         {
-            
+
             // 对于每个矩形，计算四个边的法线（这里简化为水平和垂直方向）
             PointF[] axes = CalculateRotatedRectangleNormals((float)this.Theta);
             PointF[] axes2 = CalculateRotatedRectangleNormals((float)rectangle_compare_to.Theta);
@@ -109,6 +109,64 @@ namespace AGVSystemCommonNet6.MAP.Geometry
             return true; // 没有找到分离轴，两个矩形重叠
         }
 
+        public void TranformTo(PointF center,double targetAngleDegrees)
+        {
+
+            // Convert degrees to radians
+            float targetAngleRadians = (float)(targetAngleDegrees * Math.PI / 180.0);
+
+            // Get the center of the rectangle
+
+            // Helper function to rotate a point around the center point
+            PointF RotatePoint(PointF point, PointF center, float angleRadians)
+            {
+                // Translate point back to origin (center)
+                float translatedX = point.X - center.X;
+                float translatedY = point.Y - center.Y;
+
+                // Apply the rotation matrix
+                float rotatedX = translatedX * (float)Math.Cos(angleRadians) - translatedY * (float)Math.Sin(angleRadians);
+                float rotatedY = translatedX * (float)Math.Sin(angleRadians) + translatedY * (float)Math.Cos(angleRadians);
+
+                // Translate point back to original center
+                return new PointF(rotatedX + center.X, rotatedY + center.Y);
+            }
+
+            // Rotate each corner point to the target angle
+            Corner1 = RotatePoint(Corner1, center, targetAngleRadians);
+            Corner2 = RotatePoint(Corner2, center, targetAngleRadians);
+            Corner3 = RotatePoint(Corner3, center, targetAngleRadians);
+            Corner4 = RotatePoint(Corner4, center, targetAngleRadians);
+            
+        }
+
+
+        public MapRectangle GetTransform(double angleDegrees, PointF center)
+        {
+            // 將角度從度轉換為弧度
+            double diffDegress = Theta - angleDegrees;
+
+            double angleRadians = diffDegress * Math.PI / 180.0;
+
+            // 創建新矩形的四個角點
+            PointF rotatedCorner1 = RotatePoint(Corner1, center, angleRadians);
+            PointF rotatedCorner2 = RotatePoint(Corner2, center, angleRadians);
+            PointF rotatedCorner3 = RotatePoint(Corner3, center, angleRadians);
+            PointF rotatedCorner4 = RotatePoint(Corner4, center, angleRadians);
+
+            // 創建新的 MapRectangle 對象
+            MapRectangle rotatedRectangle = new MapRectangle
+            {
+                Corner1 = rotatedCorner1,
+                Corner2 = rotatedCorner2,
+                Corner3 = rotatedCorner3,
+                Corner4 = rotatedCorner4,
+                StartPointTag = StartPointTag, // 可以根據需要複製其他屬性
+                EndMapPoint = EndMapPoint
+            };
+
+            return rotatedRectangle;
+        }
         PointF CalculateCentroid()
         {
             float centerX = (Corner1.X + Corner2.X + Corner3.X + Corner4.X) / 4;
@@ -175,6 +233,13 @@ namespace AGVSystemCommonNet6.MAP.Geometry
             return vector1.X * vector2.X + vector1.Y * vector2.Y;
         }
 
+        private PointF RotatePoint(PointF point, PointF center, double angleRadians)
+        {
+            // 將點相對於中心點進行旋轉
+            double rotatedX = Math.Cos(angleRadians) * (point.X - center.X) - Math.Sin(angleRadians) * (point.Y - center.Y) + center.X;
+            double rotatedY = Math.Sin(angleRadians) * (point.X - center.X) + Math.Cos(angleRadians) * (point.Y - center.Y) + center.Y;
+            return new PointF((float)rotatedX, (float)rotatedY);
+        }
     }
 
 }
