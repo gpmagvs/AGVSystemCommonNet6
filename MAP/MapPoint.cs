@@ -42,7 +42,7 @@ namespace AGVSystemCommonNet6.MAP
         public double Y { get; set; }
         public string? Name { get; set; } = "";
         public int TagNumber { get; set; }
-        public int Direction { get; set; }
+        public double Direction { get; set; }
         /// <summary>
         /// 
         /// 二次定位點的停車角度
@@ -119,7 +119,7 @@ namespace AGVSystemCommonNet6.MAP
         public int TagOfOutPoint { get; set; } = -1;
         public string? Region { get; set; } = "";
 
-        
+
 
         [JsonIgnore]
         public bool IsCharge

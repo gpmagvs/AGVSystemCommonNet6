@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch;
 using AGVSystemCommonNet6.AGVDispatch.Model;
+using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Availability;
 using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.User;
@@ -26,10 +27,18 @@ namespace AGVSystemCommonNet6.DATABASE
         /// </summary>
         public DbSet<clsStopRegionDto> StopRegionData { get; set; }
 
-        public DbSet<clsPointPassInfo> PointPassTime {  get; set; }
+        public DbSet<clsPointPassInfo> PointPassTime { get; set; }
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options)
             : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<clsTaskDto>().HasIndex(t => t.RecieveTime);
+            modelBuilder.Entity<clsTaskDto>().HasIndex(t => t.State);
+            modelBuilder.Entity<clsAlarmDto>().HasIndex(a => a.Checked);
         }
     }
 }

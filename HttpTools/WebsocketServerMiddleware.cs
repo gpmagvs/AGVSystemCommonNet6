@@ -136,7 +136,6 @@ namespace AGVSystemCommonNet6.HttpTools
                             channelTasks.Add(ProcessChannelAsync(item));
                             //ProcessChannelAsync(item);
                         }
-
                         await Task.WhenAll(channelTasks);
                         async Task ProcessChannelAsync(KeyValuePair<string, object> item)
                         {
@@ -154,7 +153,7 @@ namespace AGVSystemCommonNet6.HttpTools
 
                                 byte[] datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
 
-                                List<Task> clientTasks = new List<Task>();
+                                List<Task<bool>> clientTasks = new List<Task<bool>>();
 
                                 var aliveclients = clients.Where(c => c != null).Where(c => c.WebSocket.CloseStatus == null).Where(c => c.WebSocket.State == System.Net.WebSockets.WebSocketState.Open).ToList();
                                 foreach (clsWebsocktClientHandler client in aliveclients)
@@ -163,9 +162,9 @@ namespace AGVSystemCommonNet6.HttpTools
                                     //SendMessageAsync(client, datPublishOut);
                                 }
 
-                                await Task.WhenAll(clientTasks);
+                                var results= await Task.WhenAll(clientTasks);
 
-                                async Task SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
+                                async Task<bool> SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
                                 {
                                     int offset = 0;
                                     int chunkSize = 512;
@@ -185,11 +184,13 @@ namespace AGVSystemCommonNet6.HttpTools
 
                                             offset += bytesToSend;
                                         }
+                                        return true;
                                     }
                                     catch (Exception ex)
                                     {
                                         client.InvokeOnClientDisconnect();
                                         Console.WriteLine(ex.Message + "\r\n" + ex.StackTrace);
+                                        return false;
                                     }
                                 }
                             }

@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using RosSharp.RosBridgeClient.MessageTypes.Std;
 using System;
 using System.Collections.Generic;
@@ -62,24 +63,23 @@ namespace AGVSystemCommonNet6.Availability
                         {
                             MTTRMTBF_TimeToDateTime.Add(DateTime.Parse(alarmtime)); //將異常時間轉為datetime
                         }
-                        int index = 0;
-                        foreach (DateTime alarmendtime in MTTRMTBF_TimeToDateTime)
+                        for (int index = 0; index < count; index++)
                         {
                             //取的異常結束時間
-                            AlarmEndTime = MTTRMTBF_TimeToDateTime[index].AddSeconds(MTTRMTBF_DurationToint[index]);
+                            //AlarmEndTime = MTTRMTBF_TimeToDateTime[index].AddSeconds(MTTRMTBF_DurationToint[index]);
+                            AlarmEndTimeList.Add(MTTRMTBF_TimeToDateTime[index].AddSeconds(MTTRMTBF_DurationToint[index]));
                         }
-                        AlarmEndTimeList.Add(AlarmEndTime);
                         for (int i = 1; i < count; i++)
                         {
                             //計算異常排除至下一筆異常時間差
-                            RunUntilAlarmTime = AlarmEndTimeList[i] - AlarmEndTimeList[i - 1];
+                            //RunUntilAlarmTime = AlarmEndTimeList[i] - AlarmEndTimeList[i - 1];
+                            RunUntilAlarmTimeList.Add(AlarmEndTimeList[i] - AlarmEndTimeList[i - 1]);
                         }
-                        RunUntilAlarmTimeList.Add(RunUntilAlarmTime);
+
                         TimeSpan totalSpan = TimeSpan.Zero;
-                        foreach (TimeSpan timeSpantotal in RunUntilAlarmTimeList)
+                        for (int i = 0; i < RunUntilAlarmTimeList.Count; i++)
                         {
-                            //計算總時間差
-                            totalSpan.Add(timeSpantotal);
+                            totalSpan += RunUntilAlarmTimeList[i];
                         }
                         RunUntilAlarmTimeTotal = (int)totalSpan.TotalSeconds;//將時間差統一轉成秒
                         Mttr_data.Add(Mttr_DurationCount / count);
@@ -111,8 +111,6 @@ namespace AGVSystemCommonNet6.Availability
                 }
                 time = time.AddDays(1);
             }
-            
-            
         }
     }
 }
