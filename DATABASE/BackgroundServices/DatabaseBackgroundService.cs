@@ -40,9 +40,9 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 {
                     using AGVSDbContext context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
                     DatabaseCaches.TaskCaches.CompleteTasks = context.Tasks.AsNoTracking()
-                                                                            .Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
                                                                             .OrderByDescending(task => task.RecieveTime)
-                                                                               .Take(40).ToList();
+                                                                            .Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.FAILURE)
+                                                                            .Take(40).ToList();
                     _stopwatch.Stop();
 
                     if (_stopwatch.Elapsed.Seconds > 1)
