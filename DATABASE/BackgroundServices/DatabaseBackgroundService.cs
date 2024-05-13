@@ -1,4 +1,5 @@
-﻿using AGVSystemCommonNet6.DATABASE;
+﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.DATABASE;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,11 +39,20 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
             {
                 try
                 {
+
                     using AGVSDbContext context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
-                    DatabaseCaches.TaskCaches.CompleteTasks = context.Tasks.AsNoTracking()
+
+                    List<clsTaskDto> GetTasksInSpecficTimeRange()
+                    {
+                        DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
+                        return context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToList();
+                    }
+
+
+                    DatabaseCaches.TaskCaches.CompleteTasks = GetTasksInSpecficTimeRange()
                                                                             .Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
                                                                             .OrderByDescending(task => task.RecieveTime)
-                                                                               .Take(40).ToList();
+                                                                            .Take(40).ToList();
                     _stopwatch.Stop();
 
                     if (_stopwatch.Elapsed.Seconds > 1)
@@ -58,7 +68,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
             }
         }
-
+      
         private void callback(object? state)
         {
             Stopwatch _stopwatch = Stopwatch.StartNew();
@@ -70,13 +80,21 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                     // 這裡進行背景數據庫操作或其他業務邏輯
                     //var taskLatest = context.Tasks.AsNoTracking().OrderByDescending(task => task.RecieveTime).Take(40).ToList();
 
-                    DatabaseCaches.TaskCaches.WaitExecuteTasks = context.Tasks.AsNoTracking().Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
+                    List<clsTaskDto> GetTasksInSpecficTimeRange()
+                    {
+                        DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-2);
+                        return context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToList();
+                    }
+
+                    List<clsTaskDto> _TasksForQuery = GetTasksInSpecficTimeRange();
+
+                    DatabaseCaches.TaskCaches.WaitExecuteTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
 
 
                     //DatabaseCaches.TaskCaches.CompleteTasks = taskLatest.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
                     //                                                    .ToList();
 
-                    DatabaseCaches.TaskCaches.RunningTasks = context.Tasks.AsNoTracking().Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
+                    DatabaseCaches.TaskCaches.RunningTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
                     //_stopwatch.Stop();
                     // Console.WriteLine("TaskCaches: " + _stopwatch.Elapsed.ToString());
                     //_stopwatch.Restart();
