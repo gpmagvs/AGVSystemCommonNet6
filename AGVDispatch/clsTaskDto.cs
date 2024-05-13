@@ -34,6 +34,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         MeasureInBay = 10,
         LoadingAtTransferStation,
         UnloadingAtTransferStation,
+        AvoidPath,
         Completed = 500,
     }
     public class clsTaskDto
