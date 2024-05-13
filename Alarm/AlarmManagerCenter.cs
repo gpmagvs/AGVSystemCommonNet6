@@ -61,6 +61,7 @@ namespace AGVSystemCommonNet6.Alarm
                 var alarmExist = dbhelper.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time || alarm.AlarmCode == alarmDto.AlarmCode);
                 if (alarmExist != null)
                 {
+                    await semaphoreSlim.WaitAsync();
                     foreach (var prop in alarmDto.GetType().GetProperties())
                     {
                         var val = prop.GetValue(alarmDto);
@@ -71,9 +72,9 @@ namespace AGVSystemCommonNet6.Alarm
                             alarmExist.GetType().GetProperty(prop.Name).SetValue(alarmExist, val);
                         }
                     }
-
                     //dbhelper._context.SystemAlarms.Update(alarmDto);
                     await dbhelper.SaveChanges();
+                    semaphoreSlim.Release();
                 }
                 else
                     await AddAlarmAsync(alarmDto);
@@ -81,6 +82,10 @@ namespace AGVSystemCommonNet6.Alarm
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally
+            {
+
             }
         }
         private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
@@ -107,7 +112,6 @@ namespace AGVSystemCommonNet6.Alarm
 
             try
             {
-
                 clsAlarmCode alarmCodeData;
                 string description_zh = "";
                 string description_En = "";
@@ -134,11 +138,7 @@ namespace AGVSystemCommonNet6.Alarm
                     //TrobleShootingMethod = AGVsTrobleShootings[alarm.ToString()].EN_TrobleShootingDescription,
                     //TrobleShootingReference = AGVsTrobleShootings[alarm.ToString()].TrobleShootingFilePath
                 };
-                lock (AlarmLockObject)
-                {
-                    alarmDto.Time = DateTime.Now;
-                }
-
+                alarmDto.Time = DateTime.Now;
                 await AddAlarmAsync(alarmDto);
                 LOG.WARN($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
                 return alarmDto;
@@ -150,7 +150,6 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-
             }
         }
 
@@ -257,49 +256,67 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static async Task ResetAlarmAsync(clsAlarmDto alarm, bool resetAllSameCode = false)
         {
-            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+
+            try
             {
-                if (resetAllSameCode)
+                await semaphoreSlim.WaitAsync();
+                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
-                    var alarms_same_code = dbhelper._context.SystemAlarms.Where(_alarm => _alarm.Checked == false && _alarm.AlarmCode == alarm.AlarmCode);
-                    foreach (clsAlarmDto? alarm_ in alarms_same_code)
+                    if (resetAllSameCode)
                     {
-                        alarm_.Checked = true;
-                        alarm_.ResetAalrmMemberName = alarm.ResetAalrmMemberName;
-                        await UpdateAlarmAsync(alarm_);
+                        var alarms_same_code = dbhelper._context.SystemAlarms.Where(_alarm => _alarm.Checked == false && _alarm.AlarmCode == alarm.AlarmCode);
+                        foreach (clsAlarmDto? alarm_ in alarms_same_code)
+                        {
+                            alarm_.Checked = true;
+                            alarm_.ResetAalrmMemberName = alarm.ResetAalrmMemberName;
+                            await UpdateAlarmAsync(alarm_);
+                        }
                     }
-                }
-                else
-                {
-                    if (dbhelper._context.Set<clsAlarmDto>().FirstOrDefault(a => a.Checked == false && (a == alarm || a.AlarmCode == alarm.AlarmCode)) != null)
+                    else
                     {
-                        alarm.Checked = true;
-                        await UpdateAlarmAsync(alarm);
+                        if (dbhelper._context.Set<clsAlarmDto>().FirstOrDefault(a => a.Checked == false && (a == alarm || a.AlarmCode == alarm.AlarmCode)) != null)
+                        {
+                            alarm.Checked = true;
+                            await UpdateAlarmAsync(alarm);
+                        }
                     }
                 }
             }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+
 
         }
 
         private static object _lockObj = new object();
 
-        public static int RemoveAlarm(clsAlarmDto alarmDto)
+        public static async Task<int> RemoveAlarm(clsAlarmDto alarmDto)
         {
-            lock (_lockObj)
+
+            try
             {
-                try
+                await semaphoreSlim.WaitAsync();
+                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
-                    using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
-                    {
-                        dbhelper._context.Set<clsAlarmDto>().Remove(alarmDto);
-                        return dbhelper._context.SaveChanges();
-                    }
+                    dbhelper._context.Set<clsAlarmDto>().Remove(alarmDto);
+                    return dbhelper._context.SaveChanges();
                 }
-                catch (Exception ex)
-                {
-                    LOG.ERROR(ex);
-                    return -1;
-                }
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR(ex);
+                return -1;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
             }
         }
         public static void SqlSelect(clsAlarmDto alarmquery)
@@ -358,7 +375,7 @@ namespace AGVSystemCommonNet6.Alarm
         {
             try
             {
-
+                await semaphoreSlim.WaitAsync();
                 using (var dbhelper = new AGVSDatabase())
                 {
                     var alarms = dbhelper.tables.SystemAlarms.Where(alarm => !alarm.Checked && alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
@@ -372,6 +389,10 @@ namespace AGVSystemCommonNet6.Alarm
             catch (Exception ex)
             {
                 LOG.ERROR(ex);
+            }
+            finally
+            {
+                semaphoreSlim.Release();
             }
         }
         public static async Task SetAlarmCheckedAsync(string eQName, ALARMS alarm_code, string checker_name = "")
@@ -387,17 +408,31 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        public static void SetAlarmsAllCheckedByEquipmentName(string name)
+        public static async Task SetAlarmsAllCheckedByEquipmentName(string name)
         {
-            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            try
             {
-                foreach (var _alarm in dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name))
+                await semaphoreSlim.WaitAsync();
+                using var agvsDb = new AGVSDatabase();
+                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
-                    _alarm.Checked = true;
-                }
+                    foreach (var _alarm in dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name))
+                    {
+                        _alarm.Checked = true;
+                    }
 
-                dbhelper._context.SaveChanges();
+                    dbhelper._context.SaveChanges();
+                }
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+
         }
 
         public static clsAlarmDto[] GetAlarmsByEqName(string name)
@@ -416,14 +451,27 @@ namespace AGVSystemCommonNet6.Alarm
 
         }
 
-        public static void UpdateAlarmDuration(string name, int alarm_ID)
+        public static async Task UpdateAlarmDuration(string name, int alarm_ID)
         {
-            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            try
             {
-                var alarms = dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name && alarm.AlarmCode == alarm_ID).ToArray();
-                alarms.Last().Duration = int.Parse(Math.Round((DateTime.Now - alarms.Last().Time).TotalSeconds) + "");
-                dbhelper._context.SaveChanges();
+                await semaphoreSlim.WaitAsync();
+                using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+                {
+                    var alarms = dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name && alarm.AlarmCode == alarm_ID).ToArray();
+                    alarms.Last().Duration = int.Parse(Math.Round((DateTime.Now - alarms.Last().Time).TotalSeconds) + "");
+                    dbhelper._context.SaveChanges();
+                }
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+
         }
     }
 
