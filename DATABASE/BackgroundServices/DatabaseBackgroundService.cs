@@ -42,15 +42,10 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
                     using AGVSDbContext context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
 
-                    List<clsTaskDto> GetTasksInSpecficTimeRange()
-                    {
-                        DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
-                        return context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToList();
-                    }
 
 
                     DatabaseCaches.TaskCaches.CompleteTasks = GetTasksInSpecficTimeRange()
-                                                                            .Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
+                                                                            .Where(task => IsTaskInFinishedState(task))
                                                                             .OrderByDescending(task => task.RecieveTime)
                                                                             .Take(40).ToList();
                     _stopwatch.Stop();
@@ -58,6 +53,19 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                     if (_stopwatch.Elapsed.Seconds > 1)
                     {
                         Console.WriteLine("DatabaseBackgroundService [fetchFinishTasksCallback] Time Spend Long...: " + _stopwatch.Elapsed.TotalSeconds);
+                    }
+
+                    List<clsTaskDto> GetTasksInSpecficTimeRange()
+                    {
+                        DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-2);
+                        return context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToList();
+                    }
+
+                    bool IsTaskInFinishedState(clsTaskDto _task)
+                    {
+                        return _task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL ||
+                               _task.State == AGVDispatch.Messages.TASK_RUN_STATUS.FAILURE ||
+                               _task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH;
                     }
                 }
                 catch (Exception ex)
@@ -68,7 +76,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
             }
         }
-      
+
         private void callback(object? state)
         {
             Stopwatch _stopwatch = Stopwatch.StartNew();
