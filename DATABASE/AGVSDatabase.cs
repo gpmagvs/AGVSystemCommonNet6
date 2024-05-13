@@ -36,7 +36,7 @@ namespace AGVSystemCommonNet6.DATABASE
 
                 using (AGVSDatabase database = new AGVSDatabase())
                 {
-                    DatabaseVersionCheck(database);
+                    //DatabaseVersionCheck(database);
                     _DefaultUsersCreate(database.tables.Users);
                     _UnCheckedAlarmsSetAsCheckes(database.tables.SystemAlarms);
                     _ = database.SaveChanges().Result;

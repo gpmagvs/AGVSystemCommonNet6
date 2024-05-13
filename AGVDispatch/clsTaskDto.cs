@@ -169,7 +169,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// <summary>
         /// 任務需要換車時的中繼站點Tag
         /// </summary>
-        [AllowNull]
+        [MaybeNull]
         public int ChangeAGVMiddleStationTag { get; set; } = 0;
 
         [Required]
