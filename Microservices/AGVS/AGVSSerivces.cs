@@ -174,13 +174,13 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
             }
 
-            public static async Task<List<int>> GetTransferStationTag(int tag)
+            public static async Task<List<int>> GetEQAcceptTransferTagInfoByTag(int tag)
             {
                 using (agvs_http)
                 {
                     try
                     {
-                        var route = $"/api/Equipment/GetEQInfoByTag?Tag=10";
+                        var route = $"/api/Equipment/GetEQInfoByTag?Tag={tag}";
                         //LOG.INFO($"GetEQAcceptAGVTypeInfo start");
                         var response = await agvs_http.GetAsync<Dictionary<string,object>>(route);
                         object vv= response["AcceptTransferTag"];
@@ -190,12 +190,10 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     catch (Exception ex)
                     {
                         LOG.Critical($"GetEQAcceptAGVTypeInfo from AGVS FAIL,{ex.Message}", ex);
-                        //return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
-                        //return new Dictionary<int, int>();
                         return new List<int>();
                     }
                 }
-            }
+            }            
 
             public static async void AfterTransferTaskAutoCharge(string strAGVName)
             {
