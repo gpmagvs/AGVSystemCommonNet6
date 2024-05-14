@@ -12,7 +12,7 @@ namespace AGVSystemCommonNet6.Alarm
     public class AlarmManagerCenter
     {
         public static string ALARM_CODE_FILE_PATH = @"C:\AGVS\AGVS_AlarmCodes.json";
-        public static string TROBLE_SHOOTING_FILE_PATH = @"C:\AGVS\AGVS_TrobleShooting.csv";
+        public static string TROBLE_SHOOTING_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_TrobleShooting.csv");
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
         private static AGVSDatabase database;
@@ -180,7 +180,7 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "AGVS_TrobleShooting.csv")) == true)
                 {
-                    File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "AGVS_TrobleShooting.csv"), Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_TrobleShooting.csv"),true);
+                    File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "AGVS_TrobleShooting.csv"), TROBLE_SHOOTING_FILE_PATH, true);
                 }
             }
             UadateAGVsTrobleShootings(ref AGVsTrobleShootings);
@@ -229,6 +229,8 @@ namespace AGVSystemCommonNet6.Alarm
                     EN_TrobleShootingDescription = "Ask GPM for Help",
                     ZH_TrobleShootingDescription = "請洽GPM"
                 });
+
+                LOG.ERROR($"有未記載的Alarm Code : {item.ToString()}");
             }
 
             FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);
