@@ -21,6 +21,7 @@ namespace AGVSystemCommonNet6.DATABASE
             public static List<clsTaskDto> CompleteTasks { get; internal set; } = new List<clsTaskDto>();
 
             public static List<clsTaskDto> RunningTasks { get; internal set; } = new List<clsTaskDto>();
+
             public static List<clsTaskDto> InCompletedTasks
             {
                 get

@@ -123,6 +123,10 @@ namespace AGVSystemCommonNet6.MAP
         public int TagOfOutPoint { get; set; } = -1;
         public string? Region { get; set; } = "";
 
+        /// <summary>
+        /// 任務權重,僅在工作站點有用
+        /// </summary>
+        public int PriorityOfTask { get; set; } = 1;
 
 
         [JsonIgnore]

@@ -134,7 +134,7 @@ namespace AGVSystemCommonNet6.HttpTools
                         foreach (KeyValuePair<string, object> item in CurrentViewModelDataOfAllChannel)
                         {
                             channelTasks.Add(ProcessChannelAsync(item));
-                            //ProcessChannelAsync(item);
+                            // ProcessChannelAsync(item);
                         }
                         await Task.WhenAll(channelTasks);
                         async Task ProcessChannelAsync(KeyValuePair<string, object> item)
@@ -154,35 +154,25 @@ namespace AGVSystemCommonNet6.HttpTools
                                 byte[] datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
 
                                 List<Task<bool>> clientTasks = new List<Task<bool>>();
+                                List<byte[]> chunks = await CreateChunkData(datPublishOut);
 
                                 var aliveclients = clients.Where(c => c != null).Where(c => c.WebSocket.CloseStatus == null).Where(c => c.WebSocket.State == System.Net.WebSockets.WebSocketState.Open).ToList();
                                 foreach (clsWebsocktClientHandler client in aliveclients)
                                 {
-                                    clientTasks.Add(SendMessageAsync(client, datPublishOut));
-                                    //SendMessageAsync(client, datPublishOut);
+
+                                    clientTasks.Add(SendMessageAsync(client, chunks));
+                                    //SendMessageAsync(client, chunks);
                                 }
-
-                                var results= await Task.WhenAll(clientTasks);
-
-                                async Task<bool> SendMessageAsync(clsWebsocktClientHandler client, byte[] data)
+                                var results = await Task.WhenAll(clientTasks);
+                                async Task<bool> SendMessageAsync(clsWebsocktClientHandler client, List<byte[]> chunks)
                                 {
-                                    int offset = 0;
-                                    int chunkSize = 512;
-
-
                                     try
                                     {
-                                        while (offset < data.Length)
+                                        for (int i = 0; i < chunks.Count; i++)
                                         {
-                                            int remainingBytes = data.Length - offset;
-                                            int bytesToSend = Math.Min(remainingBytes, chunkSize);
-
-                                            byte[] chunk = new byte[bytesToSend];
-                                            Array.Copy(data, offset, chunk, 0, bytesToSend);
-
-                                            await client.WebSocket.SendAsync(new ArraySegment<byte>(chunk), WebSocketMessageType.Text, offset + bytesToSend >= data.Length, CancellationToken.None);
-
-                                            offset += bytesToSend;
+                                            var data = chunks[i];
+                                            bool isMsgEnd = i == chunks.Count - 1;
+                                            await client.WebSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Text, isMsgEnd, CancellationToken.None);
                                         }
                                         return true;
                                     }
@@ -222,6 +212,32 @@ namespace AGVSystemCommonNet6.HttpTools
             });
         }
 
+        private async Task<List<byte[]>> CreateChunkData(byte[] datPublishOut)
+        {
+            int offset = 0;
+            int chunkSize = 16384;
+            List<byte[]> chunks = new List<byte[]>();
+            var dataLen = datPublishOut.Length;
+            while (offset < datPublishOut.Length)
+            {
+                try
+                {
+                    byte[] data = new byte[chunkSize];
+                    int remainingBytes = dataLen - offset;
+                    int bytesToSend = Math.Min(remainingBytes, chunkSize);
+                    byte[] chunk = new byte[bytesToSend];
+                    Array.Copy(datPublishOut, offset, chunk, 0, bytesToSend);
+                    offset += bytesToSend;
+                    chunks.Add(chunk);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return chunks;
+
+        }
 
         protected abstract Task CollectViewModelData();
     }
