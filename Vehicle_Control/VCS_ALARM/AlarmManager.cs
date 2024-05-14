@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.Alarm;
+using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using Newtonsoft.Json;
@@ -13,7 +14,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
         public static List<clsAlarmCode> AlarmList { get; private set; } = new List<clsAlarmCode>();
         public static Dictionary<string, clsVCSTrobleShooting> VCSTrobleShootings = new Dictionary<string, clsVCSTrobleShooting>();
-        public static string TROBLE_SHOOTING_FILE_PATH = @"C:\AGVS\VCS_TrobleShooting.csv";
+        public static string TROBLE_SHOOTING_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "VCS_TrobleShooting.csv");
         public static bool Active { get; set; } = false;
 
         public static ConcurrentDictionary<DateTime, clsAlarmCode> CurrentAlarms = new ConcurrentDictionary<DateTime, clsAlarmCode>()
@@ -189,6 +190,13 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
         public static void LoadVCSTrobleShootings()
         {
+            if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Resources")) == true)
+            {
+                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "VCS_TrobleShooting.csv")) == true)
+                {
+                    File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "VCS_TrobleShooting.csv"), TROBLE_SHOOTING_FILE_PATH, true);
+                }
+            }
             UpdateVCSTrobleShootings(ref VCSTrobleShootings);
         }
 
@@ -232,7 +240,11 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 VCSTrobleShootings.Add(AlarmDescription, new clsVCSTrobleShooting()
                 {
                     Alarm = item.ToString(),
+                    EN_TrobleShootingDescription = "Ask GPM for Help",
+                    ZH_TrobleShootingDescription = "請洽GPM"
                 });
+
+                LOG.WARN($"有未記載的Alarm Code : {item.ToString()}");
             }
 
             FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);

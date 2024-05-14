@@ -29,7 +29,7 @@ namespace AGVSystemCommonNet6.Configuration
 
         public string AGVUpdateFileFolder { get; set; } = "C:\\AGVS\\AGV_Update";
 
-        public string TrobleShootingFolder { get; set; } = "D:\\Program\\AGVSystem\\bin\\Debug\\net6.0\\Resources\\";
+        public string TrobleShootingFolder { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\");
 
     }
     public class clsMapConfigs

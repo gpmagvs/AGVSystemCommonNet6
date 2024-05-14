@@ -54,7 +54,7 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        private string _TrobleShootingReference = "/Reources/AOI_SOP_000_AGV 當機處理.pdf";
+        private string _TrobleShootingReference = "/AOI_SOP_000_AGV 當機處理.pdf";
         public string TrobleShootingReference
         {
             get { return _TrobleShootingReference; }
