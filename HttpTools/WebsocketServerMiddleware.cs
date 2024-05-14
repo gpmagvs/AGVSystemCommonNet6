@@ -196,6 +196,7 @@ namespace AGVSystemCommonNet6.HttpTools
                             }
                             catch (Exception ex)
                             {
+                                LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
                             }
 
                         }
