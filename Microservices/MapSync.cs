@@ -14,7 +14,7 @@ namespace AGVSystemCommonNet6.Microservices
         {
             try
             {
-                HttpHelper http = new HttpHelper(AGVSConfigulator.SysConfigs.VMSHost);
+                using HttpHelper http = new HttpHelper(AGVSConfigulator.SysConfigs.VMSHost);
                 bool alive = await http.GetAsync<bool>($"/api/Map/Reload?map_file={map_file_path}");
                 return (alive, "");
             }
