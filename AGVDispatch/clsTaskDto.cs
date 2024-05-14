@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -164,6 +165,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         [Required]
         public string To_Slot { get; set; } = "-1";
+
+        public int CST_TYPE = -1;
 
         public string Carrier_ID { get; set; } = "";
 
