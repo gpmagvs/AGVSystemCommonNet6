@@ -44,6 +44,10 @@ namespace AGVSystemCommonNet6.MAP
         public int TagNumber { get; set; }
         public double Direction { get; set; }
         /// <summary>
+        /// 避車停車角度
+        /// </summary>
+        public double Direction_Avoid { get; set; }
+        /// <summary>
         /// 
         /// 二次定位點的停車角度
         /// </summary>
