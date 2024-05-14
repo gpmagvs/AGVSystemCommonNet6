@@ -176,6 +176,13 @@ namespace AGVSystemCommonNet6.Alarm
 
         private static void LoadTrobleShootingDescription()
         {
+            if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Resources")) == true)
+            {
+                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "AGVS_TrobleShooting.csv")) == true)
+                {
+                    File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "AGVS_TrobleShooting.csv"), Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_TrobleShooting.csv"),true);
+                }
+            }
             UadateAGVsTrobleShootings(ref AGVsTrobleShootings);
         }
 
@@ -219,6 +226,8 @@ namespace AGVSystemCommonNet6.Alarm
                 AGVsTrobleShootings.Add(AlarmDescription, new clsAGVsTrobleShooting()
                 {
                     Alarm = item.ToString(),
+                    EN_TrobleShootingDescription = "Ask GPM for Help",
+                    ZH_TrobleShootingDescription = "請洽GPM"
                 });
             }
 

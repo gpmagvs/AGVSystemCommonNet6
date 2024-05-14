@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.Alarm;
+using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using Newtonsoft.Json;
@@ -189,6 +190,13 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
         public static void LoadVCSTrobleShootings()
         {
+            if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Resources")) == true)
+            {
+                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "VCS_TrobleShooting.csv")) == true)
+                {
+                    File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "VCS_TrobleShooting.csv"), Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "VCS_TrobleShooting.csv"), true);
+                }
+            }
             UpdateVCSTrobleShootings(ref VCSTrobleShootings);
         }
 
@@ -232,6 +240,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 VCSTrobleShootings.Add(AlarmDescription, new clsVCSTrobleShooting()
                 {
                     Alarm = item.ToString(),
+                    EN_TrobleShootingDescription = "Ask GPM for Help",
+                    ZH_TrobleShootingDescription = "請洽GPM"
                 });
             }
 
