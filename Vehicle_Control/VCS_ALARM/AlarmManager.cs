@@ -244,7 +244,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                     ZH_TrobleShootingDescription = "請洽GPM"
                 });
 
-                LOG.ERROR($"有未記載的Alarm Code : {item.ToString()}");
+                LOG.WARN($"有未記載的Alarm Code : {item.ToString()}");
             }
 
             FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);
