@@ -44,6 +44,10 @@ namespace AGVSystemCommonNet6.MAP
         public int TagNumber { get; set; }
         public double Direction { get; set; }
         /// <summary>
+        /// 避車停車角度
+        /// </summary>
+        public double Direction_Avoid { get; set; }
+        /// <summary>
         /// 
         /// 二次定位點的停車角度
         /// </summary>
@@ -119,6 +123,10 @@ namespace AGVSystemCommonNet6.MAP
         public int TagOfOutPoint { get; set; } = -1;
         public string? Region { get; set; } = "";
 
+        /// <summary>
+        /// 任務權重,僅在工作站點有用
+        /// </summary>
+        public int PriorityOfTask { get; set; } = 1;
 
 
         [JsonIgnore]

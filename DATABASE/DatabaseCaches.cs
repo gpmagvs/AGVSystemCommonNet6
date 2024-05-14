@@ -21,6 +21,7 @@ namespace AGVSystemCommonNet6.DATABASE
             public static List<clsTaskDto> CompleteTasks { get; internal set; } = new List<clsTaskDto>();
 
             public static List<clsTaskDto> RunningTasks { get; internal set; } = new List<clsTaskDto>();
+
             public static List<clsTaskDto> InCompletedTasks
             {
                 get
@@ -28,7 +29,7 @@ namespace AGVSystemCommonNet6.DATABASE
                     List<clsTaskDto> clsTaskDtos = new List<clsTaskDto>();
                     clsTaskDtos.AddRange(WaitExecuteTasks);
                     clsTaskDtos.AddRange(RunningTasks);
-                    return clsTaskDtos;
+                    return clsTaskDtos.OrderBy(st => (int)st.State).ToList();
                 }
             }
         }
