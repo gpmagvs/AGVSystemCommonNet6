@@ -11,9 +11,10 @@ namespace AGVSystemCommonNet6.Alarm
 {
     public class AlarmManagerCenter
     {
-        public static string ALARM_CODE_FILE_PATH = @"C:\AGVS\AGVS_AlarmCodes.json";
+        public static string ALARM_CODE_FILE_PATH = @".\Resources\AGVS_AlarmCodes.json";
         public static string TROBLE_SHOOTING_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_TrobleShooting.csv");
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
+        public static Dictionary<int, clsAlarmCode> AlarmCodes2 = new Dictionary<int, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
         private static AGVSDatabase database;
         public static List<clsAlarmDto> uncheckedAlarms
@@ -152,6 +153,51 @@ namespace AGVSystemCommonNet6.Alarm
             {
             }
         }
+        public static async Task<clsAlarmDto> AddAlarmAsync(int alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
+        {
+
+            try
+            {
+                clsAlarmCode alarmCodeData;
+                string description_zh = "";
+                string description_En = "";
+                if (!AlarmCodes2.TryGetValue(alarm, out alarmCodeData))
+                {
+                    description_zh = description_En = alarm.ToString();
+                }
+                else
+                {
+                    description_zh = alarmCodeData.Description_Zh;
+                    description_En = alarmCodeData.Description_En;
+                }
+                clsAlarmDto alarmDto = new clsAlarmDto()
+                {
+                    Equipment_Name = Equipment_Name,
+                    Description_Zh = description_zh,
+                    Description_En = description_En,
+                    Level = level,
+                    AlarmCode = (int)alarm,
+                    OccurLocation = location == null ? "" : location,
+                    Task_Name = taskName == null ? "" : taskName,
+                    Time = DateTime.Now,
+                    Source = source,
+                    //TrobleShootingMethod = AGVsTrobleShootings[alarm.ToString()].EN_TrobleShootingDescription,
+                    //TrobleShootingReference = AGVsTrobleShootings[alarm.ToString()].TrobleShootingFilePath
+                };
+                alarmDto.Time = DateTime.Now;
+                await AddAlarmAsync(alarmDto);
+                LOG.WARN($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
+                return alarmDto;
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR("AddAlarmAsync", ex);
+                return null;
+            }
+            finally
+            {
+            }
+        }
 
 
         private static void LoadAlarmCodes()
@@ -159,18 +205,11 @@ namespace AGVSystemCommonNet6.Alarm
             if (File.Exists(ALARM_CODE_FILE_PATH))
             {
                 clsAlarmCode[]? _AlarmCodes = JsonConvert.DeserializeObject<clsAlarmCode[]>(File.ReadAllText(ALARM_CODE_FILE_PATH));
-                AlarmCodes = _AlarmCodes.ToDictionary(ac => ac.AlarmCode, ac => ac);
+                AlarmCodes2 = _AlarmCodes.ToDictionary(ac => ac.AlarmCode, ac => ac);
             }
             else
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(ALARM_CODE_FILE_PATH));
-                AlarmCodes.Add(ALARMS.VMS_DISCONNECT, new clsAlarmCode
-                {
-                    AlarmCode = ALARMS.VMS_DISCONNECT,
-                    Description_En = "VMS Disconnect",
-                    Description_Zh = "車載管理系統斷線"
-                });
-                File.WriteAllText(ALARM_CODE_FILE_PATH, JsonConvert.SerializeObject(AlarmCodes.Values.ToArray(), Formatting.Indented));
+                //TODO
             }
         }
 
@@ -258,7 +297,7 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 return new clsAlarmCode
                 {
-                    AlarmCode = alarm_enum,
+                    AlarmCode = (int)alarm_enum,
                     Description_En = alarm_enum.ToString(),
                     Description_Zh = alarm_enum.ToString()
                 };
