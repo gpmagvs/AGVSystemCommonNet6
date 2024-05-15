@@ -52,7 +52,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
                     if (_stopwatch.Elapsed.Seconds > 1)
                     {
-                        Console.WriteLine("DatabaseBackgroundService [fetchFinishTasksCallback] Time Spend Long...: " + _stopwatch.Elapsed.TotalSeconds);
+                        Console.WriteLine($"{DateTime.Now} DatabaseBackgroundService [fetchFinishTasksCallback] Time Spend Long...: " + _stopwatch.Elapsed.TotalSeconds);
                     }
 
                     List<clsTaskDto> GetTasksInSpecficTimeRange()
@@ -70,7 +70,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("[DatabaseBackgroundService] fetchFinishTasksCallback: Exception" + ex.Message);
+                    Console.WriteLine($"{DateTime.Now} [DatabaseBackgroundService] fetchFinishTasksCallback: Exception" + ex.Message);
 
                 }
 
@@ -114,7 +114,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
                     if (_stopwatch.Elapsed.Seconds > 1)
                     {
-                        Console.WriteLine("DatabaseBackgroundService Work Time Long...: " + _stopwatch.Elapsed.TotalSeconds);
+                        Console.WriteLine($"{DateTime.Now} DatabaseBackgroundService Work Time Long...: " + _stopwatch.Elapsed.TotalSeconds);
                     }
                 }
 
@@ -123,7 +123,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[DatabaseBackgroundService] DoWork Exception" + ex.Message);
+                Console.WriteLine($"{DateTime.Now} [DatabaseBackgroundService] DoWork Exception" + ex.Message);
             }
 
         }

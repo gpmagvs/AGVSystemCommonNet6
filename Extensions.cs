@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.MAP;
 using Newtonsoft.Json;
@@ -148,7 +149,7 @@ namespace AGVSystemCommonNet6
         /// <param name="from_loc_x"></param>
         /// <param name="from_loc_y"></param>
         /// <returns></returns>
-        public static double CalculateDistance(this MapPoint map_station, double from_loc_x, double from_loc_y,int tag=-1)
+        public static double CalculateDistance(this MapPoint map_station, double from_loc_x, double from_loc_y, int tag = -1)
         {
             if (map_station == null)
                 return -1;
@@ -156,7 +157,10 @@ namespace AGVSystemCommonNet6
             //Console.WriteLine($"Distance from ({map_station.X},{map_station.Y}) (Tag:{map_station.TagNumber}) to ({from_loc_x},{from_loc_y})(Tag:{tag}) is {distance}");
             return distance;
         }
-
+        public static double CalculateDistance(this MapPoint map_station, clsCoordination coord)
+        {
+            return map_station.CalculateDistance(coord.X, coord.Y);
+        }
 
         /// <summary>
         /// 計算與站點的距離
@@ -167,7 +171,7 @@ namespace AGVSystemCommonNet6
         /// <returns></returns>
         public static double CalculateDistance(this MapPoint map_station, MapPoint from_station)
         {
-            return map_station.CalculateDistance(from_station.X, from_station.Y,from_station.TagNumber);
+            return map_station.CalculateDistance(from_station.X, from_station.Y, from_station.TagNumber);
         }
 
 
