@@ -178,7 +178,7 @@ namespace AGVSystemCommonNet6.MAP
         }
         public List<clsPathInfo> FindPathes(Map map, int startPtIndex, int endPtIndex, PathFinderOption options = null)
         {
-            var stations = map.Points.ToList().FindAll(st => st.Value.Enable).ToDictionary(pt => pt.Key, pt => pt.Value);
+            var stations = map.Points.ToList().FindAll(st => st.Key == startPtIndex ? true : st.Value.Enable).ToDictionary(pt => pt.Key, pt => pt.Value);
             try
             {
                 List<KeyValuePair<int, MapPoint>> staions_ordered = new List<KeyValuePair<int, MapPoint>>();
