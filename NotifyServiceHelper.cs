@@ -83,15 +83,23 @@ namespace AGVSystemCommonNet6.Notify
 
         public static async Task NotifyAsync(NotifyMessage.NOTIFY_TYPE type, string message, bool show)
         {
-            await Task.Run(() =>
+            var handler = OnMessage;
+            if (handler != null)
             {
-                OnMessage?.Invoke("", new NotifyMessage
+                try
                 {
-                    type = type,
-                    message = message,
-                    show = show
-                });
-            });
+                    OnMessage?.Invoke("", new NotifyMessage
+                    {
+                        type = type,
+                        message = message,
+                        show = show
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
         }
     }
 }
