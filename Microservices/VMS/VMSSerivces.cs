@@ -80,7 +80,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 };
                 while (true)
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(5000);
                     try
                     {
                         bool hasVmsDisconnectAlarm = alarm != null;
@@ -167,7 +167,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             try
             {
                 HttpHelper http = new HttpHelper(VMSHostUrl);
-                bool alive = await http.GetAsync<bool>($"/api/System/VMSAliveCheck", 2);
+                bool alive = await http.GetAsync<bool>($"/api/System/VMSAliveCheck", 8);
                 return (alive, "");
             }
             catch (Exception ex)
