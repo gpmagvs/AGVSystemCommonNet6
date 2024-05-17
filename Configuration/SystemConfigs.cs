@@ -62,7 +62,9 @@ namespace AGVSystemCommonNet6.Configuration
         public bool CheckAGVCargoStatusWhenLDULDAction { get; set; } = true;
 
         public bool UnLockEntryPointWhenParkAtEquipment { get; set; } = false;
+        public bool MultiRegionNavigation { get; set; } = false;
 
         public int SegmentTrajectoryPointNum { get; set; } = 3;
+
     }
 }

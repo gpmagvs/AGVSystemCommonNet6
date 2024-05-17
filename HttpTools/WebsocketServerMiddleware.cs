@@ -116,101 +116,101 @@ namespace AGVSystemCommonNet6.HttpTools
 
         protected async Task StartCollectViewModelDataAndPublishOutAsync()
         {
-            await Task.Run(async () =>
+            //await Task.Run(async () =>
+            //{
+            //});
+            LOG.WARN($"Start Websocket data publish");
+            while (true)
             {
-                LOG.WARN($"Start Websocket data publish");
-                while (true)
+                //await _ClientConnectionChanging.WaitAsync();
+                await Task.Delay(publish_duration);
+                //await _ClientConnectionChanging.WaitAsync();
+                Initializd = true;
+                try
                 {
-                    //await _ClientConnectionChanging.WaitAsync();
-                    await Task.Delay(publish_duration);
-                    //await _ClientConnectionChanging.WaitAsync();
-                    Initializd = true;
-                    try
+                    await CollectViewModelData();
+
+                    List<Task> channelTasks = new List<Task>();
+
+                    foreach (KeyValuePair<string, object> item in CurrentViewModelDataOfAllChannel)
                     {
-                        await CollectViewModelData();
-
-                        List<Task> channelTasks = new List<Task>();
-
-                        foreach (KeyValuePair<string, object> item in CurrentViewModelDataOfAllChannel)
+                        channelTasks.Add(ProcessChannelAsync(item));
+                        // ProcessChannelAsync(item);
+                    }
+                    await Task.WhenAll(channelTasks);
+                    async Task ProcessChannelAsync(KeyValuePair<string, object> item)
+                    {
+                        try
                         {
-                            channelTasks.Add(ProcessChannelAsync(item));
-                            // ProcessChannelAsync(item);
+                            var ChannelName = item.Key;
+                            var clientsInThisChannel = ClientsOfAllChannel[ChannelName];
+
+                            if (clientsInThisChannel.Count == 0)
+                                return;
+                            var clients = clientsInThisChannel.ToArray();
+                            object Data = item.Value;
+                            if (Data == null)
+                                return;
+
+                            byte[] datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
+
+                            List<Task<bool>> clientTasks = new List<Task<bool>>();
+                            List<byte[]> chunks = await CreateChunkData(datPublishOut);
+
+                            var aliveclients = clients.Where(c => c != null).Where(c => c.WebSocket.CloseStatus == null).Where(c => c.WebSocket.State == System.Net.WebSockets.WebSocketState.Open).ToList();
+                            foreach (clsWebsocktClientHandler client in aliveclients)
+                            {
+
+                                clientTasks.Add(SendMessageAsync(client, chunks));
+                                //SendMessageAsync(client, chunks);
+                            }
+                            var results = await Task.WhenAll(clientTasks);
+                            async Task<bool> SendMessageAsync(clsWebsocktClientHandler client, List<byte[]> chunks)
+                            {
+                                try
+                                {
+                                    for (int i = 0; i < chunks.Count; i++)
+                                    {
+                                        var data = chunks[i];
+                                        bool isMsgEnd = i == chunks.Count - 1;
+                                        await client.WebSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Text, isMsgEnd, CancellationToken.None);
+                                    }
+                                    return true;
+                                }
+                                catch (Exception ex)
+                                {
+                                    client.InvokeOnClientDisconnect();
+                                    Console.WriteLine(ex.Message + "\r\n" + ex.StackTrace);
+                                    return false;
+                                }
+                            }
                         }
-                        await Task.WhenAll(channelTasks);
-                        async Task ProcessChannelAsync(KeyValuePair<string, object> item)
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                var ChannelName = item.Key;
-                                var clientsInThisChannel = ClientsOfAllChannel[ChannelName];
-
-                                if (clientsInThisChannel.Count == 0)
-                                    return;
-                                var clients = clientsInThisChannel.ToArray();
-                                object Data = item.Value;
-                                if (Data == null)
-                                    return;
-
-                                byte[] datPublishOut = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
-
-                                List<Task<bool>> clientTasks = new List<Task<bool>>();
-                                List<byte[]> chunks = await CreateChunkData(datPublishOut);
-
-                                var aliveclients = clients.Where(c => c != null).Where(c => c.WebSocket.CloseStatus == null).Where(c => c.WebSocket.State == System.Net.WebSockets.WebSocketState.Open).ToList();
-                                foreach (clsWebsocktClientHandler client in aliveclients)
-                                {
-
-                                    clientTasks.Add(SendMessageAsync(client, chunks));
-                                    //SendMessageAsync(client, chunks);
-                                }
-                                var results = await Task.WhenAll(clientTasks);
-                                async Task<bool> SendMessageAsync(clsWebsocktClientHandler client, List<byte[]> chunks)
-                                {
-                                    try
-                                    {
-                                        for (int i = 0; i < chunks.Count; i++)
-                                        {
-                                            var data = chunks[i];
-                                            bool isMsgEnd = i == chunks.Count - 1;
-                                            await client.WebSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Text, isMsgEnd, CancellationToken.None);
-                                        }
-                                        return true;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        client.InvokeOnClientDisconnect();
-                                        Console.WriteLine(ex.Message + "\r\n" + ex.StackTrace);
-                                        return false;
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
-                            }
-
+                            LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
                         }
 
                     }
-                    catch (Exception ex)
-                    {
-                        LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
-                    }
-                    finally
-                    {
-                        //_ClientConnectionChanging.Release();
-                        //try
-                        //{
-                        //  
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
-                        //    _ClientConnectionChanging = new SemaphoreSlim(1, 1);
-                        //}
-                    }
+
                 }
-            });
+                catch (Exception ex)
+                {
+                    LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
+                }
+                finally
+                {
+                    //_ClientConnectionChanging.Release();
+                    //try
+                    //{
+                    //  
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    LOG.WARN($"Websocket data publish fail.= {ex.Message}, {ex.StackTrace}");
+                    //    _ClientConnectionChanging = new SemaphoreSlim(1, 1);
+                    //}
+                }
+            }
         }
 
         private async Task<List<byte[]>> CreateChunkData(byte[] datPublishOut)
