@@ -167,7 +167,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         [Required]
         public string To_Slot { get; set; } = "-1";
 
-        public int CST_TYPE = -1;
+        public int CST_TYPE { get; set; } = 200;
 
         public string Carrier_ID { get; set; } = "";
 
@@ -187,6 +187,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public int Priority { get; set; } = 50;
 
         public bool IsTrafficControlTask { get; set; } = false;
+        /// <summary>
+        /// by pass 功能:
+        /// 1.EQ IO狀態
+        /// 2.搬運任務起終點可接受貨物類型
+        /// </summary>
         [NotMapped]
         public bool bypass_eq_status_check { get; set; } = false;
 
@@ -239,6 +244,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             IsTrafficControlTask = dto.IsTrafficControlTask;
             bypass_eq_status_check = dto.bypass_eq_status_check;
 
+            CST_TYPE = dto.CST_TYPE;
             need_change_agv = dto.need_change_agv;
         }
 
