@@ -31,6 +31,7 @@ namespace AGVSystemCommonNet6
         public ONLINE_STATE OnlineStatus { get; set; }
         public string CurrentLocation { get; set; } = "";
         public int CargoStatus { get; set; } = 0;
+        public CST_TYPE CargoType { get; set; } = CST_TYPE.None;
         public string CurrentCarrierID { get; set; } = "";
         public double BatteryLevel_1 { get; set; } = 0;
         public double BatteryLevel_2 { get; set; } = 0;
@@ -87,6 +88,7 @@ namespace AGVSystemCommonNet6
             OnlineStatus = entity.OnlineStatus;
             CurrentLocation = entity.CurrentLocation;
             CargoStatus = entity.CargoStatus;
+            CargoType = entity.CargoType;
             CurrentCarrierID = entity.CurrentCarrierID;
             BatteryLevel_1 = entity.BatteryLevel_1;
             BatteryLevel_2 = entity.BatteryLevel_2;
