@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AGVSystemCommonNet6.Log;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -83,6 +84,7 @@ namespace AGVSystemCommonNet6.Notify
 
         public static async Task NotifyAsync(NotifyMessage.NOTIFY_TYPE type, string message, bool show)
         {
+            LOG.TRACE($"[Notify]-[{type}] {message}");
             var handler = OnMessage;
             if (handler != null)
             {
