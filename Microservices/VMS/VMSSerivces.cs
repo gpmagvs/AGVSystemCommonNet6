@@ -186,7 +186,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
             catch (Exception ex)
             {
-                return new ResponseModel.clsResponseBase(false, ex.Message);
+                return new ResponseModel.clsResponseBase() { confirm = false, message = ex.Message };
             }
         }
         public async static Task<ResponseModel.clsResponseBase> RemovePartsReplaceworkstationTag(int tagOfEQInPartsReplacing)
@@ -199,7 +199,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
             catch (Exception ex)
             {
-                return new ResponseModel.clsResponseBase(false, ex.Message);
+                return new ResponseModel.clsResponseBase() { confirm = false, message = ex.Message };
             }
         }
 
@@ -217,7 +217,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 }
                 catch (Exception ex)
                 {
-                    return new clsResponseBase(false, $"服務器內部失敗:{ex.Message}");
+                    return new clsResponseBase() { confirm = false, message = $"服務器內部失敗:{ex.Message}" };
                 }
             }
         }

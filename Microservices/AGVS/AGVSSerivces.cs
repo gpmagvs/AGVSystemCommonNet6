@@ -96,7 +96,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&action={action}";
                         LOG.INFO($"LoadUnloadActionStartReport start");
                         clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
-                        LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
+                        //LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                         return response;
                     }
                     catch (Exception ex)
@@ -106,7 +106,6 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     }
                 }
             }
-
             public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int destineTag, ACTION_TYPE action)
             {
                 return await StartLDULDOrderReport(-1, destineTag, action);
@@ -182,8 +181,8 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     {
                         var route = $"/api/Equipment/GetEQInfoByTag?Tag={tag}";
                         //LOG.INFO($"GetEQAcceptAGVTypeInfo start");
-                        var response = await agvs_http.GetAsync<Dictionary<string,object>>(route);
-                        object vv= response["AcceptTransferTag"];
+                        var response = await agvs_http.GetAsync<Dictionary<string, object>>(route);
+                        object vv = response["AcceptTransferTag"];
                         List<int> ll = JsonConvert.DeserializeObject<List<int>>(vv.ToString());
                         return ll;
                     }
@@ -193,7 +192,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         return new List<int>();
                     }
                 }
-            }            
+            }
 
             public static async void AfterTransferTaskAutoCharge(string strAGVName)
             {

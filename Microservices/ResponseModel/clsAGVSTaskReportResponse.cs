@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AGVSystemCommonNet6.Alarm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace AGVSystemCommonNet6.Microservices.ResponseModel
         {
         }
 
-        public clsAGVSTaskReportResponse(bool confirm, string message) : base(confirm, message)
+        public clsAGVSTaskReportResponse(bool confirm,ALARMS AlarmCode, string message) : base(confirm,AlarmCode, message)
         {
         }
     }
