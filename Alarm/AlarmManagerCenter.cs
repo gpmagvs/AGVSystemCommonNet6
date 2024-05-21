@@ -92,9 +92,9 @@ namespace AGVSystemCommonNet6.Alarm
         private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         public static async Task AddAlarmAsync(clsAlarmDto alarmDto)
         {
-            await semaphoreSlim.WaitAsync();
             try
             {
+                await semaphoreSlim.WaitAsync();
                 if (!Initialized)
                     Initialize();
                 database.tables.SystemAlarms.Add(alarmDto);
