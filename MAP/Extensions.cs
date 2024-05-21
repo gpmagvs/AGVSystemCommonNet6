@@ -36,41 +36,49 @@ namespace AGVSystemCommonNet6.MAP
         }
         public static MapRegion GetRegion(this double[] coordination, Map map)
         {
-            //取出所有區域集合
-            var checkResults = map.Regions.ToDictionary(region => region, region => isInRegion(region.PolygonCoordinations, coordination));
-            var pari = checkResults.FirstOrDefault(region => region.Value);
-            if (pari.Key == null)
-                return new MapRegion
-                {
-                    IsNarrowPath = false,
-                    RegionType = MapRegion.MAP_REGION_TYPE.UNKNOWN,
-                    Name = MapRegion.MAP_REGION_TYPE.UNKNOWN + ""
-                };
-            return pari.Key;
-            bool isInRegion(List<double[]> polygon, double[] testPoint)
-            {
-                bool result = false;
-                double X = testPoint[0];
-                double Y = testPoint[1];
-
-                int j = polygon.Count - 1;
-                for (int i = 0; i < polygon.Count; i++)
-                {
-                    if (polygon[i][1] < Y && polygon[j][1] >= Y || polygon[j][1] < Y && polygon[i][1] >= Y)
+            try
+            { //取出所有區域集合
+                var checkResults = map.Regions.ToDictionary(region => region, region => isInRegion(region.PolygonCoordinations, coordination));
+                var pari = checkResults.FirstOrDefault(region => region.Value);
+                if (pari.Key == null)
+                    return new MapRegion
                     {
-                        if (polygon[i][0] + (Y - polygon[i][1]) / (polygon[j][1] - polygon[i][1]) * (polygon[j][0] - polygon[i][0]) < X)
+                        IsNarrowPath = false,
+                        RegionType = MapRegion.MAP_REGION_TYPE.UNKNOWN,
+                        Name = MapRegion.MAP_REGION_TYPE.UNKNOWN + ""
+                    };
+                return pari.Key;
+                bool isInRegion(List<double[]> polygon, double[] testPoint)
+                {
+                    bool result = false;
+                    double X = testPoint[0];
+                    double Y = testPoint[1];
+
+                    int j = polygon.Count - 1;
+                    for (int i = 0; i < polygon.Count; i++)
+                    {
+                        if (polygon[i][1] < Y && polygon[j][1] >= Y || polygon[j][1] < Y && polygon[i][1] >= Y)
                         {
-                            result = !result;
+                            if (polygon[i][0] + (Y - polygon[i][1]) / (polygon[j][1] - polygon[i][1]) * (polygon[j][0] - polygon[i][0]) < X)
+                            {
+                                result = !result;
+                            }
                         }
+                        j = i;
                     }
-                    j = i;
+                    return result;
                 }
-                return result;
+            }
+            catch (Exception)
+            {
+                return new MapRegion();
             }
         }
 
         public static MapRegion GetRegion(this MapPoint mapPoint, Map map)
         {
+            if (mapPoint == null)
+                return new MapRegion();
             return new double[2] { mapPoint.X, mapPoint.Y }.GetRegion(map);
         }
         public static MapRegion GetRegion(this clsCoordination coordinaiton, Map map)

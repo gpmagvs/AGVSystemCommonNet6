@@ -19,7 +19,7 @@ namespace AGVSystemCommonNet6.MAP
             UNKNOWN
         }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public MAP_REGION_TYPE RegionType { get; set; } = MAP_REGION_TYPE.FORBID;
         public List<double[]> PolygonCoordinations { get; set; } = new List<double[]>();
         public bool IsOpend { get; set; } = false;
