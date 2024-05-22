@@ -5,7 +5,10 @@ using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Data;
 using System.Text;
+using static AGVSystemCommonNet6.DATABASE.DatabaseCaches;
 
 namespace AGVSystemCommonNet6.Alarm
 {
@@ -415,9 +418,10 @@ namespace AGVSystemCommonNet6.Alarm
                 var _alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
                                     && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name)) && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
                 );
-
-                List<string> list = _alarms.Select(alarm => $"{alarm.Time},{alarm.Task_Name},{alarm.Equipment_Name},,{alarm.AlarmCode}{alarm.Description_En},{alarm.Description_Zh},{alarm.Duration},{alarm.OccurLocation},{alarm.Level}").ToList();
-                File.WriteAllLines(FilePath, list, Encoding.GetEncoding("big5"));
+                List<string> list = new List<string> { "發生時間,EQ名稱,警報碼,警報描述,警報類型,任務名稱 ,發生地點,持續時間,清除警報人員" };
+                list.AddRange(_alarms.Select(alarm => $"{alarm.Time},{alarm.Equipment_Name},{alarm.AlarmCode},{alarm.Description},{alarm.Level},{alarm.Task_Name},{alarm.OccurLocation},{alarm.Duration},{alarm.ResetAalrmMemberName}"));
+                //List<string> list = _alarms.Select(alarm => $"{alarm.Time},{alarm.Task_Name},{alarm.Equipment_Name},,{alarm.AlarmCode}{alarm.Description_En},{alarm.Description_Zh},{alarm.Duration},{alarm.OccurLocation},{alarm.Level}").ToList();
+                File.WriteAllLines(FilePath, list, Encoding.UTF8);
             };
             return FilePath;
         }
