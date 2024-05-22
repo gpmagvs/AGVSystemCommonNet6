@@ -72,6 +72,7 @@ namespace AGVSystemCommonNet6.HttpTools
                             LOG.TRACE($"User-{user_id} Broswer AGVS Website  | Online-Client={OnlineClientNumber}");
                         }
                         await clientHander.ListenConnection();
+
                     }
                     catch (Exception ex)
                     {
@@ -79,6 +80,7 @@ namespace AGVSystemCommonNet6.HttpTools
                     }
                     finally
                     {
+                        client.Dispose();
                     }
                 }
             }
@@ -96,6 +98,7 @@ namespace AGVSystemCommonNet6.HttpTools
         {
             try
             {
+                e.OnClientDisconnect -= ClientHander_OnClientDisconnect;
                 KeyValuePair<string, ConcurrentDictionary<string, clsWebsocktClientHandler>> group = ClientsOfAllChannel.FirstOrDefault(kp => kp.Value.ContainsKey(e.UserID));
                 if (group.Value != null)
                 {
@@ -165,16 +168,19 @@ namespace AGVSystemCommonNet6.HttpTools
                                 clientTasks.Add(SendMessageAsync(client, chunks));
                                 //SendMessageAsync(client, chunks);
                             }
-                            var results = await Task.WhenAll(clientTasks);
+                            await Task.WhenAll(clientTasks);
+                            Data = datPublishOut = null;
+                            chunks.Clear();
+
                             async Task<bool> SendMessageAsync(clsWebsocktClientHandler client, List<byte[]> chunks)
                             {
                                 try
                                 {
                                     for (int i = 0; i < chunks.Count; i++)
                                     {
-                                        var data = chunks[i];
+                                        byte[] data = chunks[i];
                                         bool isMsgEnd = i == chunks.Count - 1;
-                                        await client.WebSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Text, isMsgEnd, CancellationToken.None);
+                                        await client.WebSocket.SendAsync(data, WebSocketMessageType.Text, isMsgEnd, CancellationToken.None);
                                     }
                                     return true;
                                 }
