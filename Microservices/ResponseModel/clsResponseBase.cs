@@ -19,5 +19,6 @@ namespace AGVSystemCommonNet6.Microservices.ResponseModel
         public string message { get; set; } = "";
 
         public ALARMS AlarmCode { get; set; } = ALARMS.NONE;
+        public int alarmcode_int { get; set; } = 0;
     }
 }

@@ -192,12 +192,17 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// 1.EQ IO狀態
         /// 2.搬運任務起終點可接受貨物類型
         /// </summary>
-        [NotMapped]
         public bool bypass_eq_status_check { get; set; } = false;
 
 
         [AllowNull]
         public bool need_change_agv { get; set; } = false;
+        /// <summary>
+        /// 一般任務:0, 
+        /// ex:A->轉->B
+        /// A->轉:1 , 轉->B:2
+        /// </summary>
+        public int transfer_task_stage { get; set; } = 0;
 
         public void Update(clsTaskDto dto)
         {
@@ -246,6 +251,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             CST_TYPE = dto.CST_TYPE;
             need_change_agv = dto.need_change_agv;
+            transfer_task_stage = dto.transfer_task_stage;
         }
 
     }
