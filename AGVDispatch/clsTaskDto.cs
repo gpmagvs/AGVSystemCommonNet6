@@ -197,6 +197,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         [AllowNull]
         public bool need_change_agv { get; set; } = false;
+        /// <summary>
+        /// 一般任務:0, 
+        /// ex:A->轉->B
+        /// A->轉:1 , 轉->B:2
+        /// </summary>
+        public int transfer_task_stage { get; set; } = 0;
 
         public void Update(clsTaskDto dto)
         {
@@ -245,6 +251,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             CST_TYPE = dto.CST_TYPE;
             need_change_agv = dto.need_change_agv;
+            transfer_task_stage = dto.transfer_task_stage;
         }
 
     }
