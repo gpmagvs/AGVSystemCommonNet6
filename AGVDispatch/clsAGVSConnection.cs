@@ -177,13 +177,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task Start()
         {
-            int _delay = 150;
+            int _delay = 200;
             await Task.Delay(1);
             while (true)
             {
-                CheckAndClearOlderMessageStored();
                 try
                 {
+                    if (!UseWebAPI)
+                        CheckAndClearOlderMessageStored();
                     if (!IsConnected())
                     {
                         if (!UseWebAPI)
