@@ -192,7 +192,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// 1.EQ IO狀態
         /// 2.搬運任務起終點可接受貨物類型
         /// </summary>
-        [NotMapped]
         public bool bypass_eq_status_check { get; set; } = false;
 
 

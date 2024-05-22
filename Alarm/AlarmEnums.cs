@@ -94,6 +94,8 @@ namespace AGVSystemCommonNet6.Alarm
         Download_Task_To_AGV_Fail = 74,
         EQ_LOAD_REQUEST_ON_BUT_HAS_CARGO = 75,
         EQ_UNLOAD_REQUEST_ON_BUT_NO_CARGO = 76,
+        EQ_UNLOAD_REQUEST_ON_BUT_POSE_NOT_UP = 76,
+        EQ_LOAD_REQUEST_ON_BUT_POSE_NOT_DOWN = 76,
         EQ_UNLOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 77,
         EQ_LOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 78,
         AGV_Type_Is_Not_Allow_To_Execute_Task_At_Source_Equipment = 79,
