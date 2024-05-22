@@ -26,7 +26,7 @@ namespace AGVSystemCommonNet6.HttpTools
 
         protected bool Initializd = false;
 
-        public readonly int publish_duration = 0;
+        public readonly int publish_duration = 100;
 
         public WebsocketServerMiddleware(int publish_duration = 100)
         {
