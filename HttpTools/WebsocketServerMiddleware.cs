@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using SQLitePCL;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace AGVSystemCommonNet6.HttpTools
 
         public virtual List<string> channelMaps { get; set; } = new List<string>();
 
-        protected Dictionary<string, List<clsWebsocktClientHandler>> ClientsOfAllChannel = new Dictionary<string, List<clsWebsocktClientHandler>>();
+        protected Dictionary<string, ConcurrentDictionary<string, clsWebsocktClientHandler>> ClientsOfAllChannel = new();
         protected Dictionary<string, object> CurrentViewModelDataOfAllChannel = new Dictionary<string, object>();
 
         public int OnlineClientNumber => ClientsOfAllChannel.First().Value.Count;
@@ -35,7 +36,7 @@ namespace AGVSystemCommonNet6.HttpTools
 
         public virtual void Initialize()
         {
-            ClientsOfAllChannel = channelMaps.ToDictionary(str => str, str => new List<clsWebsocktClientHandler>());
+            ClientsOfAllChannel = channelMaps.ToDictionary(str => str, str => new ConcurrentDictionary<string, clsWebsocktClientHandler>());
             CurrentViewModelDataOfAllChannel = channelMaps.ToDictionary(str => str, str => new object());
             StartCollectViewModelDataAndPublishOutAsync();
         }
@@ -64,7 +65,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 {
                     try
                     {
-                        clientCollection.Add(clientHander);
+                        clientCollection.TryAdd(user_id, clientHander);
                         clientHander.OnClientDisconnect += ClientHander_OnClientDisconnect;
                         if (user_id != "")
                         {
@@ -95,13 +96,13 @@ namespace AGVSystemCommonNet6.HttpTools
         {
             try
             {
-                var group = ClientsOfAllChannel.FirstOrDefault(kp => kp.Value.Contains(e));
+                KeyValuePair<string, ConcurrentDictionary<string, clsWebsocktClientHandler>> group = ClientsOfAllChannel.FirstOrDefault(kp => kp.Value.ContainsKey(e.UserID));
                 if (group.Value != null)
                 {
-                    group.Value.Remove(e);
+                    group.Value.TryRemove(e.UserID, out clsWebsocktClientHandler websocketHandler);
                     if (e.UserID != "")
                         LOG.TRACE($"User-{e.UserID} Leave AGVS Website. | Online-Client={OnlineClientNumber}");
-                    e.Close();
+                    websocketHandler?.WebSocket.Dispose();
                 }
             }
             catch (Exception ex)
@@ -157,8 +158,8 @@ namespace AGVSystemCommonNet6.HttpTools
                             List<Task<bool>> clientTasks = new List<Task<bool>>();
                             List<byte[]> chunks = await CreateChunkData(datPublishOut);
 
-                            var aliveclients = clients.Where(c => c != null).Where(c => c.WebSocket.CloseStatus == null).Where(c => c.WebSocket.State == System.Net.WebSockets.WebSocketState.Open).ToList();
-                            foreach (clsWebsocktClientHandler client in aliveclients)
+                            var aliveclients = clients.Where(c => c.Value != null).Where(c => c.Value.WebSocket.CloseStatus == null).Where(c => c.Value.WebSocket.State == System.Net.WebSockets.WebSocketState.Open).ToList();
+                            foreach (clsWebsocktClientHandler client in aliveclients.Select(kp => kp.Value))
                             {
 
                                 clientTasks.Add(SendMessageAsync(client, chunks));

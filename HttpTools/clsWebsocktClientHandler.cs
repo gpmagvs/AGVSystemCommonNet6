@@ -58,7 +58,7 @@ namespace AGVSystemCommonNet6.HttpTools
         {
             try
             {
-                await WebSocket.CloseAsync(WebSocketCloseStatus.ProtocolError, "", CancellationToken.None);
+                await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "backend close", CancellationToken.None);
             }
             catch (Exception)
             {
