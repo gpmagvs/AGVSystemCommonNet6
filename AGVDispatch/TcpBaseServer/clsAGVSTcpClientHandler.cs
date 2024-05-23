@@ -83,7 +83,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     catch (Exception ex)
                     {
                         OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                        AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
+                        AlarmManagerCenter.AddAlarmAsync(1050);//AGV_TCPIP_DISCONNECT
                         LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                         _SocketClient?.Dispose();
                     }
@@ -106,7 +106,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             catch (Exception ex)
                             {
                                 OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                                AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
+                                AlarmManagerCenter.AddAlarmAsync(1050);//AGV_TCPIP_DISCONNECT
                                 LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                             }
                         }
@@ -186,7 +186,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         catch (Exception ex)
                         {
                             OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                            AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
+                            AlarmManagerCenter.AddAlarmAsync(1050);//AGV_TCPIP_DISCONNECT
                             LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                             _SocketClient?.Dispose();
                         }
@@ -195,7 +195,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 catch (Exception ex)
                 {
                     OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
-                    AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
+                    AlarmManagerCenter.AddAlarmAsync(1050);//AGV_TCPIP_DISCONNECT
                     LOG.ERROR($"{ClientIP} {ex.Message}", ex);
                     _SocketClient?.Dispose();
                 }
