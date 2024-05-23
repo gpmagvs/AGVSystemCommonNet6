@@ -25,6 +25,7 @@ namespace AGVSystemCommonNet6.HttpTools
             var buff = new ArraySegment<byte>(new byte[4]);
             while (WebSocket.State == WebSocketState.Open)
             {
+                await Task.Delay(100);
                 try
                 {
                     var result = await WebSocket.ReceiveAsync(buff, CancellationToken.None).ConfigureAwait(false);
@@ -51,6 +52,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
             finally
             {
+                WebSocket.Dispose();
                 OnClientDisconnect?.Invoke(this, this);
             }
         }
@@ -58,7 +60,7 @@ namespace AGVSystemCommonNet6.HttpTools
         {
             try
             {
-                await WebSocket.CloseAsync(WebSocketCloseStatus.ProtocolError, "", CancellationToken.None);
+                await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "backend close", CancellationToken.None);
             }
             catch (Exception)
             {

@@ -13,6 +13,7 @@ namespace AGVSystemCommonNet6.MAP
             STK = 2,
             Charge = 3,
             Buffer = 4,
+            Buffer_EQ = 41,
             Charge_Buffer = 5,
             Charge_STK = 6,
             Exchange = 7,

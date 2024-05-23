@@ -55,8 +55,8 @@ namespace AGVSystemCommonNet6.MAP.Geometry
             }
         }
 
-        public MapPoint StartPointTag { get; set; } = new MapPoint();
-        public MapPoint EndMapPoint { get; set; } = new MapPoint();
+        public MapPoint StartPoint { get; set; } = new MapPoint();
+        public MapPoint EndPoint { get; set; } = new MapPoint();
         public PointF Corner1 { get; set; } = new PointF();
         public PointF Corner2 { get; set; } = new PointF();
         public PointF Corner3 { get; set; } = new PointF();
@@ -109,7 +109,7 @@ namespace AGVSystemCommonNet6.MAP.Geometry
             return true; // 没有找到分离轴，两个矩形重叠
         }
 
-        public void TranformTo(PointF center,double targetAngleDegrees)
+        public void TranformTo(PointF center, double targetAngleDegrees)
         {
 
             // Convert degrees to radians
@@ -137,7 +137,7 @@ namespace AGVSystemCommonNet6.MAP.Geometry
             Corner2 = RotatePoint(Corner2, center, targetAngleRadians);
             Corner3 = RotatePoint(Corner3, center, targetAngleRadians);
             Corner4 = RotatePoint(Corner4, center, targetAngleRadians);
-            
+
         }
 
 
@@ -161,8 +161,8 @@ namespace AGVSystemCommonNet6.MAP.Geometry
                 Corner2 = rotatedCorner2,
                 Corner3 = rotatedCorner3,
                 Corner4 = rotatedCorner4,
-                StartPointTag = StartPointTag, // 可以根據需要複製其他屬性
-                EndMapPoint = EndMapPoint
+                StartPoint = StartPoint, // 可以根據需要複製其他屬性
+                EndPoint = EndPoint
             };
 
             return rotatedRectangle;

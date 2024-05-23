@@ -32,11 +32,14 @@ namespace AGVSystemCommonNet6.MAP
 
             public STRATEGY Strategy { get; set; } = STRATEGY.MINIMAL_ROTATION_ANGLE;
 
+            public double VehicleCurrentAngle { get; set; } = double.MaxValue;
+
         }
 
         public class clsPathInfo
         {
             public ConcurrentQueue<MapPoint> waitPoints = new ConcurrentQueue<MapPoint>();
+            public double VehicleBeginAngle { get; set; } = double.MaxValue;
 
             public List<MapPoint> stations { get; set; } = new List<MapPoint>();
             public List<int> tags => stations.Select(s => s.TagNumber).ToList();
@@ -76,7 +79,9 @@ namespace AGVSystemCommonNet6.MAP
                 if (Stations.Count < 2)
                     return totalRotation;
 
-                double previousAngle = CalculateAngle(Stations[0], Stations[1]);
+                double firstPathAngle = CalculateAngle(Stations[0], Stations[1]);
+                //double previousAngle = VehicleBeginAngle == double.MaxValue ? CalculateAngle(Stations[0], Stations[1]) : VehicleBeginAngle;
+                double previousAngle = firstPathAngle;
 
                 for (int i = 1; i < Stations.Count - 1; i++)
                 {
@@ -86,12 +91,30 @@ namespace AGVSystemCommonNet6.MAP
                     double currentAngle = CalculateAngle(currentPoint, nextPoint);
                     double angleDifference = CalculateRelativeAngle(previousAngle, currentAngle);
 
+                    angleDifference = Math.Abs(angleDifference);
                     // 累积相对旋转角度
-                    totalRotation += Math.Abs(angleDifference);
+                    totalRotation += angleDifference;
+
+                    if (angleDifference > 30)
+                        totalRotation += 10000000;
+
                     // 更新前一个角度为当前角度
                     previousAngle = currentAngle;
                 }
-
+                //考慮車子一開始的角度
+                if (VehicleBeginAngle != double.MaxValue)
+                {
+                    double rotationToNextPointAngle = CalculateRelativeAngle(VehicleBeginAngle, firstPathAngle);
+                    int tagOfNextPoint = Stations[1].TagNumber;
+                    var diff = Math.Abs(rotationToNextPointAngle);
+                    if (diff < 45)
+                        totalRotation += 0;
+                    else if (diff > 90)
+                        totalRotation += 1230;
+                    else
+                        totalRotation += 500;
+                }
+                //Console.WriteLine($"Rotation to {tagOfNextPoint} relative angle = {rotationToNextPointAngle}");
                 return totalRotation;
             }
 
@@ -235,6 +258,7 @@ namespace AGVSystemCommonNet6.MAP
                 return pathWithStations.Select(path => new clsPathInfo()
                 {
                     stations = path,
+                    VehicleBeginAngle = options == null ? double.MaxValue : options.VehicleCurrentAngle
 
                 }).ToList();
 
