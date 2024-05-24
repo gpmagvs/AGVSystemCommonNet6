@@ -79,7 +79,7 @@ namespace AGVSystemCommonNet6
         public double LowBatLvThreshold { get; set; } = 20;
         public double MiddleBatLvThreshold { get; set; } = 50;
         public double HighBatLvThreshold { get; set; } = 99;
-
+        public string AppVersion { get; set; } = "";
         public void Update(clsAGVStateDto entity)
         {
             AGV_Description = entity.AGV_Description;
@@ -107,6 +107,7 @@ namespace AGVSystemCommonNet6
             TaskSourceStationName = entity.TaskSourceStationName;
             TaskDestineStationName = entity.TaskDestineStationName;
             StationName = entity.StationName;
+            AppVersion = entity.AppVersion;
 
 
         }

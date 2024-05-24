@@ -70,6 +70,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
         public clsForkStates ForkStatus { get; set; } = new clsForkStates();
         public double TotalTime { get; set; }
         public double TotalDistance { get; set; }
+        public string AppVersion { get; set; } = "1.0.0.0";
     }
 
     public class clsDriverStates
