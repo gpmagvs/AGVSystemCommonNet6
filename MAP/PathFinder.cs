@@ -110,9 +110,9 @@ namespace AGVSystemCommonNet6.MAP
                     if (diff < 45)
                         totalRotation += 0;
                     else if (diff > 90)
-                        totalRotation += 1230;
+                        totalRotation += 9991230;
                     else
-                        totalRotation += 500;
+                        totalRotation += 2222500;
                 }
                 //Console.WriteLine($"Rotation to {tagOfNextPoint} relative angle = {rotationToNextPointAngle}");
                 return totalRotation;
