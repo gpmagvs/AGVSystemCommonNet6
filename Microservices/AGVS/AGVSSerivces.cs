@@ -106,12 +106,8 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     }
                 }
             }
-            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int destineTag, ACTION_TYPE action)
-            {
-                return await StartLDULDOrderReport(-1, destineTag, action);
-            }
 
-            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int to_Station_Tag, ACTION_TYPE action)
+            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag,int from_station_slot, int to_Station_Tag,int to_Station_Slot, ACTION_TYPE action)
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse() { confirm = false };
                 int intRetry = 0;
@@ -120,7 +116,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 {
                     try
                     {
-                        var route = $"/api/Task/LDULDOrderStart?from={from_Station_Tag}&to={to_Station_Tag}&action={action}";
+                        var route = $"/api/Task/LDULDOrderStart?from={from_Station_Tag}&FromSlot={from_station_slot}&to={to_Station_Tag}&ToSlot={to_Station_Slot}&action={action}";
                         LOG.INFO($"StartLDULDOrderReport start");
                         using (agvs_http)
                         {
