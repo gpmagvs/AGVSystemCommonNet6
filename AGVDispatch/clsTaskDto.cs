@@ -36,6 +36,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         LoadingAtTransferStation,
         UnloadingAtTransferStation,
         AvoidPath,
+        AvoidPath_Park,
         Traveling_To_Region_Wait_Point,
         Completed = 500,
     }
