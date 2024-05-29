@@ -169,13 +169,13 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
             }
 
-            public static async Task<List<int>> GetEQAcceptTransferTagInfoByTag(int tag)
+            public static async Task<List<int>> GetEQWIPAcceptTransferTagInfoByTag(int tag)
             {
                 using (agvs_http)
                 {
                     try
                     {
-                        var route = $"/api/Equipment/GetEQInfoByTag?Tag={tag}";
+                        var route = $"/api/Equipment/GetEQWIPInfoByTag?Tag={tag}";
                         //LOG.INFO($"GetEQAcceptAGVTypeInfo start");
                         var response = await agvs_http.GetAsync<Dictionary<string, object>>(route);
                         object vv = response["AcceptTransferTag"];
