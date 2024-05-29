@@ -122,6 +122,7 @@ namespace AGVSystemCommonNet6.Alarm
         REGIST_REGIONS_TO_PARTS_SYSTEM_FAIL = 100,
         SYSTEM_EQP_MANAGEMENT_INITIALIZE_FAIL_WITH_EXCEPTION = 101,
         INVALID_CHARGE_STATION = 102,
+        Battery_Not_Connect = 3037,
     }
 
 }
