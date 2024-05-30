@@ -56,7 +56,7 @@ namespace AGVSystemCommonNet6.Abstracts
             {
                 try
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(10000);
                     ping_success = await PingServer();
 
                 }
@@ -72,7 +72,7 @@ namespace AGVSystemCommonNet6.Abstracts
         {
             const int timeout = 3000; // 1秒超時
             byte[] buffer = new byte[32];
-            PingOptions options = new PingOptions { Ttl = 128 };
+            PingOptions options = new PingOptions { Ttl = 64 };
 
             using (Ping pingSender = new Ping())
             {
