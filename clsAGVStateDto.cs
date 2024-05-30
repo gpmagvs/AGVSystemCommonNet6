@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6;
 using AGVSystemCommonNet6.AGVDispatch;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
+using AGVSystemCommonNet6.Maintainance;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -80,6 +81,7 @@ namespace AGVSystemCommonNet6
         public double MiddleBatLvThreshold { get; set; } = 50;
         public double HighBatLvThreshold { get; set; } = 99;
         public string AppVersion { get; set; } = "";
+        public List<VehicleMaintain> MaintainSettings { get; set; } = new List<VehicleMaintain>();
         public void Update(clsAGVStateDto entity)
         {
             AGV_Description = entity.AGV_Description;
@@ -108,8 +110,6 @@ namespace AGVSystemCommonNet6
             TaskDestineStationName = entity.TaskDestineStationName;
             StationName = entity.StationName;
             AppVersion = entity.AppVersion;
-
-
         }
 
         public bool HasChanged(clsAGVStateDto newState)

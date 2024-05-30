@@ -71,12 +71,16 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
                     if (!columnExists)
                     {
                         var defaultValue = GetDefaultValue(prop.PropertyType); // 需要实现这个方法
-                        var commandText = $"ALTER TABLE {tableName} ADD {columnName} {columnType} NOT NULL DEFAULT {defaultValue};";
-                        using (var command = new SqlCommand(commandText, connection))
+                        if (defaultValue != null)
                         {
-                            await command.ExecuteNonQueryAsync();
+
+                            var commandText = $"ALTER TABLE {tableName} ADD {columnName} {columnType} NOT NULL DEFAULT {defaultValue};";
+                            using (var command = new SqlCommand(commandText, connection))
+                            {
+                                await command.ExecuteNonQueryAsync();
+                            }
+                            Console.WriteLine($"column name:{columnName}, type:{columnType} now is added!");
                         }
-                        Console.WriteLine($"column name:{columnName}, type:{columnType} now is added!");
 
                     }
                 }
@@ -96,7 +100,7 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
                 {
                     return "0";
                 }
-                
+
                 else if (type == typeof(bool))
                 {
                     return "0"; // SQL Server中布尔型用bit表示，0为false
@@ -120,7 +124,7 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
             {
                 return "''";
             }
-            throw new NotImplementedException($"Default value for type {type.Name} is not defined.");
+            return null;
         }
 
         private string GetSqlDataType(string csharpTypeName, string baseTypeName)
@@ -154,7 +158,7 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
                 return sqlType;
             }
 
-            throw new NotSupportedException($"The C# type '{csharpTypeName}' is not supported.");
+            return null;
         }
         private async Task<bool> CheckIfColumnExists(SqlConnection connection, string tableName, string columnName)
         {

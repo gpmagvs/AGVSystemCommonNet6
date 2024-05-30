@@ -48,6 +48,7 @@ namespace AGVSystemCommonNet6.Notify
                 }
                 catch (Exception ex)
                 {
+                    client?.Dispose();
                 }
             }
         }
