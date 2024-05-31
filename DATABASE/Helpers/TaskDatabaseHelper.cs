@@ -170,7 +170,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
         {
-            var folder = Path.Combine(Environment.CurrentDirectory, @"SaveLog\\Task");
+            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath+"Task");
             var _fileName = fileName is null ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
             Directory.CreateDirectory(folder);
             string FilePath = Path.Combine(folder, "TaskQuery_" + _fileName);
