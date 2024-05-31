@@ -26,6 +26,7 @@ namespace AGVSystemCommonNet6.Configuration
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
         public clsAGVTaskControlConfigs TaskControlConfigs { get; set; } = new clsAGVTaskControlConfigs();
         public clsAutoModeConfigs AutoModeConfigs { get; set; } = new clsAutoModeConfigs();
+        public clsAutoSendDailyData AutoSendDailyData { get; set; } = new clsAutoSendDailyData();
 
         public string AGVUpdateFileFolder { get; set; } = "C:\\AGVS\\AGV_Update";
 
@@ -66,5 +67,10 @@ namespace AGVSystemCommonNet6.Configuration
 
         public int SegmentTrajectoryPointNum { get; set; } = 3;
 
+    }
+    public class clsAutoSendDailyData
+    {
+        public string SavePath { get; set; } = @"d:\DailyData\";
+        public int SaveTime { get; set; } = 1;
     }
 }
