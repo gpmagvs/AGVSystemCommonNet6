@@ -409,7 +409,7 @@ namespace AGVSystemCommonNet6.Alarm
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
         {
-            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath +"Alarm");
+            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath + "Alarm");
             var _fileName = fileName is null ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
             Directory.CreateDirectory(folder);
             string FilePath = Path.Combine(folder, "AlarmQuery_" + _fileName);
@@ -425,14 +425,14 @@ namespace AGVSystemCommonNet6.Alarm
             };
             return FilePath;
         }
-        public static async Task SetAlarmCheckedAsync(string eQName, int alarm_code, string checker_name = "")
+        public static async Task SetAlarmCheckedAsync(string eQName, int alarm_code, string checker_name = "", string location = null)
         {
             try
             {
                 await semaphoreSlim.WaitAsync();
                 using (var dbhelper = new AGVSDatabase())
                 {
-                    var alarms = dbhelper.tables.SystemAlarms.Where(alarm => !alarm.Checked && alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code).ToArray();
+                    var alarms = dbhelper.tables.SystemAlarms.Where(alarm => !alarm.Checked && alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code && (location == null ? true : alarm.OccurLocation == location)).ToArray();
                     foreach (var item in alarms)
                     {
                         item.Checked = true;
@@ -452,6 +452,10 @@ namespace AGVSystemCommonNet6.Alarm
         public static async Task SetAlarmCheckedAsync(string eQName, ALARMS alarm_code, string checker_name = "")
         {
             await SetAlarmCheckedAsync(eQName, (int)alarm_code, checker_name);
+        }
+        public static async Task SetAlarmCheckedAsync(string eQName, string location, ALARMS alarm_code, string checker_name = "")
+        {
+            await SetAlarmCheckedAsync(eQName, (int)alarm_code, checker_name, location);
         }
 
         public static async Task SetAlarmsCheckedAsync(string eQName, List<ALARMS> unchecked_alarms, string checker_name = "")
