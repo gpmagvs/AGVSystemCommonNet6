@@ -123,6 +123,7 @@ namespace AGVSystemCommonNet6.Alarm
         SYSTEM_EQP_MANAGEMENT_INITIALIZE_FAIL_WITH_EXCEPTION = 101,
         INVALID_CHARGE_STATION = 102,
         Battery_Not_Connect = 3037,
+        Rack_Port_Sensor_Flash = 3038,
     }
 
 }
