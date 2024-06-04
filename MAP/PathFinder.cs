@@ -102,18 +102,18 @@ namespace AGVSystemCommonNet6.MAP
                     previousAngle = currentAngle;
                 }
                 //考慮車子一開始的角度
-                if (VehicleBeginAngle != double.MaxValue)
-                {
-                    double rotationToNextPointAngle = CalculateRelativeAngle(VehicleBeginAngle, firstPathAngle);
-                    int tagOfNextPoint = Stations[1].TagNumber;
-                    var diff = Math.Abs(rotationToNextPointAngle);
-                    if (diff < 45)
-                        totalRotation += 0;
-                    else if (diff > 90)
-                        totalRotation += 9991230;
-                    else
-                        totalRotation += 2222500;
-                }
+                //if (VehicleBeginAngle != double.MaxValue)
+                //{
+                //    double rotationToNextPointAngle = CalculateRelativeAngle(VehicleBeginAngle, firstPathAngle);
+                //    int tagOfNextPoint = Stations[1].TagNumber;
+                //    var diff = Math.Abs(rotationToNextPointAngle);
+                //    if (diff < 45)
+                //        totalRotation += 0;
+                //    else if (diff > 90)
+                //        totalRotation += 9991230;
+                //    else
+                //        totalRotation += 2222500;
+                //}
                 //Console.WriteLine($"Rotation to {tagOfNextPoint} relative angle = {rotationToNextPointAngle}");
                 return totalRotation;
             }
