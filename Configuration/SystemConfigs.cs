@@ -24,7 +24,6 @@ namespace AGVSystemCommonNet6.Configuration
         public int WebUserLogoutExipreTime { get; set; } = 300;
         public clsMapConfigs MapConfigs { get; set; } = new clsMapConfigs();
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
-        public clsAGVTaskControlConfigs TaskControlConfigs { get; set; } = new clsAGVTaskControlConfigs();
         public clsAutoModeConfigs AutoModeConfigs { get; set; } = new clsAutoModeConfigs();
         public clsAutoSendDailyData AutoSendDailyData { get; set; } = new clsAutoSendDailyData();
 
@@ -62,8 +61,8 @@ namespace AGVSystemCommonNet6.Configuration
     {
         public bool CheckAGVCargoStatusWhenLDULDAction { get; set; } = true;
 
-        public bool UnLockEntryPointWhenParkAtEquipment { get; set; } = false;
-        public bool MultiRegionNavigation { get; set; } = false;
+        public bool UnLockEntryPointWhenParkAtEquipment { get; set; } = true;
+        public bool MultiRegionNavigation { get; set; } = true;
 
         public int SegmentTrajectoryPointNum { get; set; } = 3;
 
