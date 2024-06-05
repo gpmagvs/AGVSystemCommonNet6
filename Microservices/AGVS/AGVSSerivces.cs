@@ -5,6 +5,7 @@ using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.MAP;
 using AGVSystemCommonNet6.Microservices.ResponseModel;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
@@ -87,13 +88,13 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             }
 
 
-            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, ACTION_TYPE action)
+            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, int slot, ACTION_TYPE action)
             {
                 using (agvs_http)
                 {
                     try
                     {
-                        var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&action={action}";
+                        var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&slot={slot}&action={action}";
                         LOG.INFO($"LoadUnloadActionStartReport start");
                         clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
                         //LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
@@ -107,7 +108,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
             }
 
-            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag,int from_station_slot, int to_Station_Tag,int to_Station_Slot, ACTION_TYPE action)
+            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int from_station_slot, int to_Station_Tag, int to_Station_Slot, ACTION_TYPE action)
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse() { confirm = false };
                 int intRetry = 0;
@@ -188,30 +189,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         return new List<int>();
                     }
                 }
-            }
-
-            public static async void AfterTransferTaskAutoCharge(string strAGVName)
-            {
-                using (agvs_http)
-                {
-                    try
-                    {
-                        var route = $"/api/Task/charge?user=dev";
-                        LOG.INFO($"AfterTransferTaskAutoCharge start");
-                        clsTaskDto charge = new clsTaskDto();
-                        charge.TaskName = $"ACharge_{DateTime.Now.ToString("yyyyMMdd_HHmmssfff")}";
-                        charge.DesignatedAGVName = strAGVName;
-                        charge.Action = ACTION_TYPE.Charge;
-                        charge.Carrier_ID = "-1";
-                        charge.To_Station = "-1";
-                        var response = await agvs_http.PostAsync<clsAGVSTaskReportResponse, clsTaskDto>(route, charge);
-                    }
-                    catch (Exception ex)
-                    {
-                        LOG.Critical($"AfterTransferTaskAutoCharge Feedback to AGVS FAIL,{ex.Message}", ex);
-                    }
-                }
-            }
+            }           
         }
     }
 }
