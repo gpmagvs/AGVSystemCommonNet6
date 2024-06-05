@@ -5,6 +5,7 @@ using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.MAP;
 using AGVSystemCommonNet6.Microservices.ResponseModel;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
@@ -190,27 +191,20 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
             }
 
-            public static async void AfterTransferTaskAutoCharge(string strAGVName)
+            public static async void GetMapPointByTag(int tag)
             {
-                using (agvs_http)
-                {
-                    try
-                    {
-                        var route = $"/api/Task/charge?user=dev";
-                        LOG.INFO($"AfterTransferTaskAutoCharge start");
-                        clsTaskDto charge = new clsTaskDto();
-                        charge.TaskName = $"ACharge_{DateTime.Now.ToString("yyyyMMdd_HHmmssfff")}";
-                        charge.DesignatedAGVName = strAGVName;
-                        charge.Action = ACTION_TYPE.Charge;
-                        charge.Carrier_ID = "-1";
-                        charge.To_Station = "-1";
-                        var response = await agvs_http.PostAsync<clsAGVSTaskReportResponse, clsTaskDto>(route, charge);
-                    }
-                    catch (Exception ex)
-                    {
-                        LOG.Critical($"AfterTransferTaskAutoCharge Feedback to AGVS FAIL,{ex.Message}", ex);
-                    }
-                }
+                //using (agvs_http)
+                //{
+                //    try
+                //    {
+                //        var route = $"/api/Map/GetMapPointByTag?tag={tag}";
+                //        var response = await agvs_http.PostAsync<clsAGVSTaskReportResponse, clsTaskDto>(route, charge);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        LOG.Critical($"AfterTransferTaskAutoCharge Feedback to AGVS FAIL,{ex.Message}", ex);
+                //    }
+                //}
             }
         }
     }
