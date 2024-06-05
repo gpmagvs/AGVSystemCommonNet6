@@ -88,13 +88,13 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             }
 
 
-            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, ACTION_TYPE action)
+            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, int slot, ACTION_TYPE action)
             {
                 using (agvs_http)
                 {
                     try
                     {
-                        var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&action={action}";
+                        var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&slot={slot}&action={action}";
                         LOG.INFO($"LoadUnloadActionStartReport start");
                         clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
                         //LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
@@ -108,7 +108,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
             }
 
-            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag,int from_station_slot, int to_Station_Tag,int to_Station_Slot, ACTION_TYPE action)
+            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int from_station_slot, int to_Station_Tag, int to_Station_Slot, ACTION_TYPE action)
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse() { confirm = false };
                 int intRetry = 0;
@@ -189,23 +189,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         return new List<int>();
                     }
                 }
-            }
-
-            public static async void GetMapPointByTag(int tag)
-            {
-                //using (agvs_http)
-                //{
-                //    try
-                //    {
-                //        var route = $"/api/Map/GetMapPointByTag?tag={tag}";
-                //        var response = await agvs_http.PostAsync<clsAGVSTaskReportResponse, clsTaskDto>(route, charge);
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        LOG.Critical($"AfterTransferTaskAutoCharge Feedback to AGVS FAIL,{ex.Message}", ex);
-                //    }
-                //}
-            }
+            }           
         }
     }
 }
