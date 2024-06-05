@@ -61,7 +61,7 @@ namespace AGVSystemCommonNet6.HttpTools
             {
                 Stopwatch sw = Stopwatch.StartNew();
                 timeout_sec = timeout;
-                var response = await http_client.PostAsync(api_route, content);
+                using HttpResponseMessage response = await http_client.PostAsync(api_route, content);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
@@ -96,7 +96,7 @@ namespace AGVSystemCommonNet6.HttpTools
             try
             {
                 timeout_sec = timeout;
-                var response = await http_client.PostAsync(api_route, content);
+                using HttpResponseMessage response = await http_client.PostAsync(api_route, content);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
@@ -128,9 +128,8 @@ namespace AGVSystemCommonNet6.HttpTools
             try
             {
                 string url = this.baseUrl + $"{api_route}";
-                HttpResponseMessage response = null;
                 timeout_sec = timeout;
-                response = await http_client.GetAsync(api_route);
+                using HttpResponseMessage response = await http_client.GetAsync(api_route);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     jsonContent = await response.Content.ReadAsStringAsync();
@@ -155,9 +154,8 @@ namespace AGVSystemCommonNet6.HttpTools
             try
             {
                 string url = this.baseUrl + $"{api_route}";
-                HttpResponseMessage response = null;
                 timeout_sec = timeout;
-                response = await http_client.GetAsync(api_route);
+                using HttpResponseMessage response = await http_client.GetAsync(api_route);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     str_result = await response.Content.ReadAsStringAsync();

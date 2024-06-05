@@ -163,12 +163,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public clsRunningStatus previousRunningStatusReport_via_WEBAPI = new clsRunningStatus();
         private async Task<(bool, SimpleRequestResponseWithTimeStamp runningStateReportAck)> TryRnningStateReportAsync(int timeout_ = 8)
         {
+            clsRunningStatus runnginStatus = null;
+            SimpleRequestResponse response = null;
             try
             {
                 if (UseWebAPI)
                 {
-                    clsRunningStatus runnginStatus = OnWebAPIProtocolGetRunningStatus();
-                    SimpleRequestResponse response = await PostRunningStatus(runnginStatus);
+                    runnginStatus = OnWebAPIProtocolGetRunningStatus();
+                    response = await PostRunningStatus(runnginStatus);
                     previousRunningStatusReport_via_WEBAPI = runnginStatus;
                     return (response.ReturnCode == RETURN_CODE.OK || response.ReturnCode == RETURN_CODE.NG, new SimpleRequestResponseWithTimeStamp
                     {
@@ -216,6 +218,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
             catch (Exception)
             {
                 return (false, null);
+            }
+            finally
+            {
+                runnginStatus = null;
+                response = null;
             }
         }
 
@@ -299,12 +306,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
         public async Task<(bool, OnlineModeQueryResponse onlineModeQuAck)> TryOnlineModeQueryAsync(int timeout_ = 8)
         {
+            OnlineModeQueryResponse response = null;
             try
             {
                 await Task.Delay(10);
                 if (UseWebAPI)
                 {
-                    var response = await GetOnlineMode();
+                    response = await GetOnlineMode();
                     VMS_API_Call_Fail_Flag = false;
                     return (true, response);
                 }
@@ -315,7 +323,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     if (AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out MessageBase mesg))
                     {
                         clsOnlineModeQueryResponseMessage QueryResponseMessage = mesg as clsOnlineModeQueryResponseMessage;
-                        var response = QueryResponseMessage.OnlineModeQueryResponse;
+                        response = QueryResponseMessage.OnlineModeQueryResponse;
                         mesg.Dispose();
                         return (true, response);
                     }
@@ -334,6 +342,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 VMS_API_Call_Fail_Flag = true;
                 await Task.Delay(3000);
                 return (false, null);
+            }
+            finally
+            {
+                response = null;
             }
         }
     }
