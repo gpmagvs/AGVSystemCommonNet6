@@ -142,11 +142,11 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                     goal.mobilityModes = (ushort)DetermineGuideType(taskData.Action_Type);
                 }
 
-                if (taskData.Action_Type == ACTION_TYPE.ExchangeBattery)
-                {
-                    poses = poses.Skip(1).ToArray();
-                    pathInfo = pathInfo.Skip(1).ToArray();
-                }
+                //if (taskData.Action_Type == ACTION_TYPE.ExchangeBattery)
+                //{
+                //    poses = poses.Skip(1).ToArray();
+                //    pathInfo = pathInfo.Skip(1).ToArray();
+                //}
                 goal.planPath.poses = poses;
                 goal.pathInfo = pathInfo;
                 return goal;
