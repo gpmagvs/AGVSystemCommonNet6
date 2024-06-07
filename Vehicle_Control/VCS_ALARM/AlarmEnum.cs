@@ -269,6 +269,7 @@
         Handshake_Fail_BAT_EXG_EQ_Check_Ready_NOT_OFF,
         Handshake_Fail_BAT_EXG_EQ_BUSY_OFF_TIMEOUT,
         Handshake_Fail_BAT_Remove_Timeout,
+        Handshake_Fail_BAT_Install_Timeout,
         Handshake_Fail_BAT_EXG_EQ_VALID_OFF_WHEN_HANDSHAKING,
         AAsk_Remote_Cst_Status_Fail = 3300,
         BAsk_Remote_Cst_Status_Timeout = 3310,
