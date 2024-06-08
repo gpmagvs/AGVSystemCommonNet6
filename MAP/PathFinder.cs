@@ -274,12 +274,13 @@ namespace AGVSystemCommonNet6.MAP
         public clsPathInfo FindShortestPath(Map map, int startPtIndex, int endPtIndex, PathFinderOption options)
         {
             var pathes = FindPathes(map, startPtIndex, endPtIndex, options);
+            IEnumerable<clsPathInfo> top20 = pathes.OrderBy(pt => pt.total_travel_distance).Take(20);
             if (options != null && options.Strategy == PathFinderOption.STRATEGY.SHORST_DISTANCE)
-                return pathes.OrderBy(path => path.total_travel_distance).FirstOrDefault();
+                return top20.FirstOrDefault();
             else
             {
 
-                var ordered = pathes.OrderBy(path => path.total_rotation_angle);
+                var ordered = top20.OrderBy(path => path.total_rotation_angle);
                 return ordered.FirstOrDefault();
             }
         }

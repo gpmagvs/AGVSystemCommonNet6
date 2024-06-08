@@ -24,26 +24,32 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
     public static class AGVSSerivces
     {
         public static string AGVSHostUrl => "http://127.0.0.1:5216";
-        private static HttpHelper agvs_http => new HttpHelper(AGVSHostUrl);
+        private static HttpHelper _agvs_http;
+        private static HttpHelper GetAGVSHttpHelper()
+        {
+            if (_agvs_http == null)
+            {
+                return new HttpHelper(AGVSHostUrl);
+            }
+            else
+                return _agvs_http;
+        }
+
 
         public struct TRAFFICS
         {
             public static async Task<clsAGVSBlockedPointsResponse> GetBlockedTagsByEqMaintain()
             {
-                using (agvs_http)
-                {
-                    clsAGVSBlockedPointsResponse response = await agvs_http.GetAsync<clsAGVSBlockedPointsResponse>($"/api/Traffic/GetBlockedTagsByEqMaintain");
-                    return response;
-                }
+                var agvs_http = GetAGVSHttpHelper();
+                clsAGVSBlockedPointsResponse response = await agvs_http.GetAsync<clsAGVSBlockedPointsResponse>($"/api/Traffic/GetBlockedTagsByEqMaintain");
+                return response;
             }
 
             public static async Task<clsGetUsableChargeStationTagResponse> GetUseableChargeStationTags(string agv_name)
             {
-                using (agvs_http)
-                {
-                    clsGetUsableChargeStationTagResponse response = await agvs_http.GetAsync<clsGetUsableChargeStationTagResponse>($"/api/Traffic/GetUseableChargeStationTags?agv_name={agv_name}");
-                    return response;
-                }
+                var agvs_http = GetAGVSHttpHelper();
+                clsGetUsableChargeStationTagResponse response = await agvs_http.GetAsync<clsGetUsableChargeStationTagResponse>($"/api/Traffic/GetUseableChargeStationTags?agv_name={agv_name}");
+                return response;
             }
         }
 
@@ -58,54 +64,54 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             /// <returns></returns>
             public static async Task<clsAGVSTaskReportResponse> StartTransferCargoReport(string AGVName, int SourceTag, int DestineTag)
             {
-                using (agvs_http)
-                {
-                    clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}");
-                    LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
-                    return response;
-                }
+
+                var agvs_http = GetAGVSHttpHelper();
+                clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}");
+                LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
+                return response;
+
             }
 
 
             public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action)
             {
-                using (agvs_http)
+
+                var agvs_http = GetAGVSHttpHelper();
+                try
                 {
-                    try
-                    {
-                        var route = $"/api/Task/LoadUnloadTaskFinish?tag={tagNumber}&action={action}";
-                        LOG.INFO($"LoadUnloadActionFinishReport start");
-                        clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
-                        LOG.INFO($"LoadUnload Task Finish Feedback to AGVS, AGVS Response = {response.ToJson()}");
-                        return response;
-                    }
-                    catch (Exception ex)
-                    {
-                        LOG.Critical($"LoadUnload Task Finish Feedback to AGVS FAIL,{ex.Message}", ex);
-                        return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
-                    }
+                    var route = $"/api/Task/LoadUnloadTaskFinish?tag={tagNumber}&action={action}";
+                    LOG.INFO($"LoadUnloadActionFinishReport start");
+                    clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+                    LOG.INFO($"LoadUnload Task Finish Feedback to AGVS, AGVS Response = {response.ToJson()}");
+                    return response;
                 }
+                catch (Exception ex)
+                {
+                    LOG.Critical($"LoadUnload Task Finish Feedback to AGVS FAIL,{ex.Message}", ex);
+                    return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
+                }
+
             }
 
 
             public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, int slot, ACTION_TYPE action)
             {
-                using (agvs_http)
+
+                var agvs_http = GetAGVSHttpHelper();
+                try
                 {
-                    try
-                    {
-                        var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&slot={slot}&action={action}";
-                        LOG.INFO($"LoadUnloadActionStartReport start");
-                        clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
-                        //LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
-                        return response;
-                    }
-                    catch (Exception ex)
-                    {
-                        LOG.Critical($"LoadUnload Task Start Feedback to AGVS FAIL,{ex.Message}", ex);
-                        return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
-                    }
+                    var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&slot={slot}&action={action}";
+                    LOG.INFO($"LoadUnloadActionStartReport start");
+                    clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+                    //LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
+                    return response;
                 }
+                catch (Exception ex)
+                {
+                    LOG.Critical($"LoadUnload Task Start Feedback to AGVS FAIL,{ex.Message}", ex);
+                    return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
+                }
+
             }
 
             public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int from_station_slot, int to_Station_Tag, int to_Station_Slot, ACTION_TYPE action)
@@ -119,10 +125,10 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     {
                         var route = $"/api/Task/LDULDOrderStart?from={from_Station_Tag}&FromSlot={from_station_slot}&to={to_Station_Tag}&ToSlot={to_Station_Slot}&action={action}";
                         LOG.INFO($"StartLDULDOrderReport start");
-                        using (agvs_http)
-                        {
-                            response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
-                        }
+
+                        var agvs_http = GetAGVSHttpHelper();
+                        response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+
                         LOG.INFO($"LoadUnload Order Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                         return response;
                     }
@@ -139,57 +145,56 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
 
             public static async Task<Dictionary<int, int>> GetEQAcceptAGVTypeInfo(IEnumerable<int> tagsCollections)
             {
-                using (agvs_http)
+
+                var agvs_http = GetAGVSHttpHelper();
+                try
                 {
-                    try
-                    {
-                        var route = $"/api/Equipment/GetEQOptionsByTags";
-                        //LOG.INFO($"GetEQAcceptAGVTypeInfo start");
-                        var response = await agvs_http.PostAsync<List<Dictionary<string, object>>, int[]>(route, tagsCollections.ToArray());
+                    var route = $"/api/Equipment/GetEQOptionsByTags";
+                    //LOG.INFO($"GetEQAcceptAGVTypeInfo start");
+                    var response = await agvs_http.PostAsync<List<Dictionary<string, object>>, int[]>(route, tagsCollections.ToArray());
 
-                        return response.ToDictionary(obj => int.Parse(obj["Tag"].ToString()), obj => int.Parse(obj["Accept_AGV_Type"].ToString()));
+                    return response.ToDictionary(obj => int.Parse(obj["Tag"].ToString()), obj => int.Parse(obj["Accept_AGV_Type"].ToString()));
 
-                        //[
-                        //  {
-                        //    Tag = option.TagID,
-                        //    EqName = option.Name,
-                        //    AGVModbusGatewayPort = option.ConnOptions.AGVModbusGatewayPort,
-                        //    Accept_AGV_Type = option.Accept_AGV_Type
-                        //  },
-                        //  {
-                        //      ...
-                        //  }
-                        //]
-                    }
-                    catch (Exception ex)
-                    {
-                        LOG.Critical($"GetEQAcceptAGVTypeInfo from AGVS FAIL,{ex.Message}", ex);
-                        //return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
-                        return new Dictionary<int, int>();
-                    }
+                    //[
+                    //  {
+                    //    Tag = option.TagID,
+                    //    EqName = option.Name,
+                    //    AGVModbusGatewayPort = option.ConnOptions.AGVModbusGatewayPort,
+                    //    Accept_AGV_Type = option.Accept_AGV_Type
+                    //  },
+                    //  {
+                    //      ...
+                    //  }
+                    //]
                 }
+                catch (Exception ex)
+                {
+                    LOG.Critical($"GetEQAcceptAGVTypeInfo from AGVS FAIL,{ex.Message}", ex);
+                    //return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
+                    return new Dictionary<int, int>();
+                }
+
             }
 
             public static async Task<List<int>> GetEQWIPAcceptTransferTagInfoByTag(int tag)
             {
-                using (agvs_http)
+                HttpHelper agvs_http = GetAGVSHttpHelper();
+                try
                 {
-                    try
-                    {
-                        var route = $"/api/Equipment/GetEQWIPInfoByTag?Tag={tag}";
-                        //LOG.INFO($"GetEQAcceptAGVTypeInfo start");
-                        var response = await agvs_http.GetAsync<Dictionary<string, object>>(route);
-                        object vv = response["AcceptTransferTag"];
-                        List<int> ll = JsonConvert.DeserializeObject<List<int>>(vv.ToString());
-                        return ll;
-                    }
-                    catch (Exception ex)
-                    {
-                        LOG.Critical($"GetEQAcceptAGVTypeInfo from AGVS FAIL,{ex.Message}", ex);
-                        return new List<int>();
-                    }
+                    var route = $"/api/Equipment/GetEQWIPInfoByTag?Tag={tag}";
+                    //LOG.INFO($"GetEQAcceptAGVTypeInfo start");
+                    var response = await agvs_http.GetAsync<Dictionary<string, object>>(route);
+                    object vv = response["AcceptTransferTag"];
+                    List<int> ll = JsonConvert.DeserializeObject<List<int>>(vv.ToString());
+                    return ll;
                 }
-            }           
+                catch (Exception ex)
+                {
+                    LOG.Critical($"GetEQAcceptAGVTypeInfo from AGVS FAIL,{ex.Message}", ex);
+                    return new List<int>();
+                }
+
+            }
         }
     }
 }
