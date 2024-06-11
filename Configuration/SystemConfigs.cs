@@ -29,6 +29,8 @@ namespace AGVSystemCommonNet6.Configuration
 
         public string AGVUpdateFileFolder { get; set; } = "C:\\AGVS\\AGV_Update";
 
+        public string LogFolder { get; set; } = "C:\\AGVSLog";
+
         public string TrobleShootingFolder { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\");
 
     }
