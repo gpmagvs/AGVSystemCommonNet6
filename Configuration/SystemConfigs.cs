@@ -24,11 +24,12 @@ namespace AGVSystemCommonNet6.Configuration
         public int WebUserLogoutExipreTime { get; set; } = 300;
         public clsMapConfigs MapConfigs { get; set; } = new clsMapConfigs();
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
-        public clsAGVTaskControlConfigs TaskControlConfigs { get; set; } = new clsAGVTaskControlConfigs();
         public clsAutoModeConfigs AutoModeConfigs { get; set; } = new clsAutoModeConfigs();
         public clsAutoSendDailyData AutoSendDailyData { get; set; } = new clsAutoSendDailyData();
 
         public string AGVUpdateFileFolder { get; set; } = "C:\\AGVS\\AGV_Update";
+
+        public string LogFolder { get; set; } = "C:\\AGVSLog";
 
         public string TrobleShootingFolder { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\");
 
@@ -62,8 +63,8 @@ namespace AGVSystemCommonNet6.Configuration
     {
         public bool CheckAGVCargoStatusWhenLDULDAction { get; set; } = true;
 
-        public bool UnLockEntryPointWhenParkAtEquipment { get; set; } = false;
-        public bool MultiRegionNavigation { get; set; } = false;
+        public bool UnLockEntryPointWhenParkAtEquipment { get; set; } = true;
+        public bool MultiRegionNavigation { get; set; } = true;
 
         public int SegmentTrajectoryPointNum { get; set; } = 3;
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
 {
-    public class IOlistMsg:Message
+    public class IOlistMsg : Message
     {
         public const string RosMessageName = "gpm_msgs/IOlist";
 
@@ -28,6 +28,20 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
             Key = key;
             Coil = coil;
             addr = address;
+        }
+    }
+
+    public class IOlistMsg_KGSBase : IOlistMsg
+    {
+        public new const string RosMessageName = "agvstate/IOlist";
+
+        public IOlistMsg_KGSBase() : base()
+        {
+        }
+
+        public IOlistMsg_KGSBase(string key, int coil, int address) : base(key, coil, address)
+        {
+
         }
     }
 }

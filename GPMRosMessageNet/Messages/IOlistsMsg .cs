@@ -25,4 +25,21 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
             IOtable = iOtable;
         }
     }
+
+    public class IOlistsMsg_KGS : IOlistsMsg
+    {
+        public new const string RosMessageName = "agvstate/IOlists";
+
+        public new IOlistMsg_KGSBase[] IOtable;
+
+        public IOlistsMsg_KGS()
+        {
+            IOtable = new IOlistMsg_KGSBase[0];
+        }
+
+        public IOlistsMsg_KGS(IOlistMsg_KGSBase[] iOtable)
+        {
+            IOtable = iOtable;
+        }
+    }
 }
