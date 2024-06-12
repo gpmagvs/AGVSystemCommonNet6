@@ -1,7 +1,6 @@
 ﻿using AGVSystemCommonNet6.Abstracts;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
-using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -68,7 +67,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-        public LogBase Logger = new LogBase();
+        public ILogger<clsAGVSConnection> logger;
+
         public enum MESSAGE_TYPE
         {
             REQ_0101_ONLINE_MODE_QUERY = 0101,
@@ -99,20 +99,17 @@ namespace AGVSystemCommonNet6.AGVDispatch
             this.VMSPort = Port;
             LocalIP = null;
             VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
-            VMSWebAPIHttp.Logger = this.Logger;
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
-            AGVsWebAPIHttp.Logger = this.Logger;
         }
-        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_TYPE AGV_TYPE = AGV_TYPE.FORK)
+        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_TYPE AGV_TYPE = AGV_TYPE.FORK, ILogger<clsAGVSConnection> logger = null)
         {
+            this.logger = logger;
             this.IP = HostIP;
             this.VMSPort = HostPort;
             this.LocalIP = localIP;
             this.AGV_Type = AGV_TYPE;
             VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{VMSPort}");
-            VMSWebAPIHttp.Logger = this.Logger;
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
-            AGVsWebAPIHttp.Logger = this.Logger;
             AutoPingServerCheck = true;
             PingServerCheckProcess();
             AGVSMessageFactory.OnCylicSystemByteCreate += (_crteated_systemByte) =>
@@ -127,10 +124,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             EQName = _EQName;
         }
 
-        public void SetLogFolder(string folder_name)
-        {
-            Logger.LogFolderName = folder_name;
-        }
         public override async Task<bool> Connect()
         {
             try
@@ -147,7 +140,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     }
                     catch (Exception ex)
                     {
-                        LOG.ERROR($"[AGVS] Connect Fail..本地網卡IP設定錯誤-{ipEndpoint.Address.ToString()} 不可用", ex, true);
+                        logger.LogError(ex, $"[AGVS] Connect Fail..本地網卡IP設定錯誤-{ipEndpoint.Address.ToString()} 不可用", true);
                         tcpClient = null;
                         await Task.Delay(3000);
                         return false;
@@ -163,12 +156,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 socketState.stream = tcpClient.GetStream();
                 socketState.Reset();
                 socketState.stream.BeginRead(socketState.buffer, socketState.offset, clsSocketState.buffer_size - socketState.offset, ReceieveCallbaak, socketState);
-                LOG.INFO($"[AGVS] Connect To AGVS Success !!");
+                logger.LogInformation($"[AGVS] Connect To AGVS Success !!");
                 return true;
             }
             catch (Exception ex)
             {
-                LOG.ERROR($"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{VMSPort})..Will Retry it after 3 secoond...", false);
+                logger.LogError(ex, $"[AGVS] Connect Fail..{ex.Message}. Can't Connect To AGVS ({IP}:{VMSPort})..Will Retry it after 3 secoond...");
                 tcpClient = null;
                 await Task.Delay(3000);
                 return false;
@@ -189,7 +182,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     {
                         if (!UseWebAPI)
                         {
-                            LOG.WARN($"Try Connect TO AGVS Via TCP/IP({IP}:{VMSPort})", false);
+                            logger.LogWarning($"Try Connect TO AGVS Via TCP/IP({IP}:{VMSPort})");
                             bool Reconnected = await Connect();
                             Connected = Reconnected;
                             continue;
@@ -228,7 +221,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 Current_Warning_Code = AlarmCodes.OnlineModeQuery_T1_Timeout;
                 OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
-                LOG.Critical("[AGVS] OnlineMode Query Fail...AGVS No Response");
+                logger.LogWarning("[AGVS] OnlineMode Query Fail...AGVS No Response");
                 return false;
             }
             else
@@ -247,7 +240,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             if (!_runningStateReport_result.Item1)
             {
                 Current_Warning_Code = AlarmCodes.RunningStatusReport_T1_Timeout;
-                LOG.Critical("[AGVS] Running State Report Fail...AGVS No Response");
+                logger.LogWarning("[AGVS] Running State Report Fail...AGVS No Response");
                 OnRunningStatusReport_T1Timeout?.Invoke(this, EventArgs.Empty);
             }
             else
@@ -266,12 +259,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         AGVSMessageStoreDictionary.TryRemove(item.Key, out _);
                         item.Value.Dispose();
                     }
-                    LOG.TRACE($"Find {count} old message, remove from AGVSMessageStoreDictionary ");
+                    logger.LogTrace($"Find {count} old message, remove from AGVSMessageStoreDictionary ");
                 }
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex.Message, ex);
+                logger.LogError(ex.Message, ex);
             }
         }
 
@@ -348,7 +341,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                LOG.ERROR($"DeserializeObjec Error When GetMESSAGE_TYPE\r\n{message_json}", ex);
                 return MESSAGE_TYPE.UNKNOWN;
             }
 
@@ -425,7 +417,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return false;
             try
             {
-                LogMsgToAGVS($"(TCP/IP) {dataByte.GetString(Encoding.ASCII)}");
+                logger.LogTrace($"(TCP/IP) {dataByte.GetString(Encoding.ASCII)}");
                 socketState.stream.Write(dataByte, 0, dataByte.Length);
                 return true;
             }
@@ -451,29 +443,15 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (IOException ioex)
             {
-                LOG.ERROR($"[AGVS] 發送訊息的過程中發生 IOException : {ioex.Message}", ioex);
+                logger.LogError(ioex, $"[AGVS] 發送訊息的過程中發生 IOException : {ioex.Message}");
                 Disconnect();
                 return false;
             }
             catch (Exception ex)
             {
-                LOG.ERROR($"[AGVS] 發送訊息的過程中發生未知的錯誤 : {ex.Message}", ex);
+                logger.LogError(ex, $"[AGVS] 發送訊息的過程中發生未知的錯誤 : {ex.Message}");
                 return false;
             }
         }
-        private string AGVSServerUrl => UseWebAPI ? VMSWebAPIHttp.baseUrl : $"{IP}:{VMSPort}";
-        public async Task LogMsgToAGVS(string msg)
-        {
-            if (Logger == null)
-                return;
-            await Logger.LogAsync(new LogItem(LogLevel.Trace, $"[*->{AGVSServerUrl}] {msg}", false));
-        }
-        public async Task LogMsgFromAGVS(string msg)
-        {
-            if (Logger == null)
-                return;
-            await Logger.LogAsync(new LogItem(LogLevel.Trace, $"[{AGVSServerUrl}->*] {msg}", false));
-        }
-
     }
 }

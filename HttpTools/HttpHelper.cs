@@ -18,7 +18,6 @@ namespace AGVSystemCommonNet6.HttpTools
             public string ErrorMessage { get; set; } = string.Empty;
         }
         public HttpClient http_client { get; private set; }
-        public LogBase Logger;
         public readonly string baseUrl;
         private int _timeout_sec = 5;
         private bool disposedValue;

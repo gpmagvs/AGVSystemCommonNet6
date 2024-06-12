@@ -25,7 +25,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             MessageBase? MSG = null;
             MESSAGE_TYPE msgType = GetMESSAGE_TYPE(_json);
-            LogMsgFromAGVS(_json);
+            logger.LogTrace(_json);
             try
             {
                 if (msgType == MESSAGE_TYPE.UNKNOWN)

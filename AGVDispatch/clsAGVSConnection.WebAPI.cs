@@ -24,19 +24,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
 
                 string api_route = $"/api/AGV/OnlineMode?AGVName={EQName}&Model={AGV_Type}";
-                LogMsgToAGVS($"(Get) {api_route}");
+                logger?.LogTrace($"(Get) {api_route}");
                 var response = await VMSWebAPIHttp.GetAsync<Dictionary<string, object>>(api_route);
 
-                LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                logger?.LogTrace($"(Post) {api_route},Response={response.ToJson()}");
                 return new OnlineModeQueryResponse
                 {
                     RemoteMode = int.Parse(response["RemoteMode"].ToString()) == 0 ? REMOTE_MODE.OFFLINE : REMOTE_MODE.ONLINE,
                     TimeStamp = response["TimeStamp"].ToString()
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                logger?.LogError(ex, ex.Message);
                 throw;
             }
         }
@@ -47,14 +47,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
 
                 string api_route = mode == REMOTE_MODE.ONLINE ? $"/api/AGV/OnlineReq?AGVName={EQName}&tag={currentTag}" : $"/api/AGV/OfflineReq?AGVName={EQName}&";
-                LogMsgToAGVS($"(Post) {api_route},body json =");
+                logger?.LogTrace($"(Post) {api_route},body json =");
                 var response = await VMSWebAPIHttp.PostAsync<SimpleRequestResponse, object>(api_route, null);
-                LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                logger?.LogTrace($"(Post) {api_route},Response={response.ToJson()}");
                 return response;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                logger?.LogError(ex, ex.Message);
                 throw;
             }
         }
@@ -64,18 +64,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
 
                 string api_route = $"/api/AGV/AGVStatus?AGVName={EQName}&Model={AGV_Type}";
-                LogMsgToAGVS($"(Post) {api_route},body json = {status.ToJson()}");
+                logger?.LogTrace($"(Post) {api_route},body json = {status.ToJson()}");
                 var response = await VMSWebAPIHttp.PostAsync<Dictionary<string, object>, clsRunningStatus>(api_route, status);
-                LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                logger?.LogTrace($"(Post) {api_route},Response={response.ToJson()}");
                 var returnCode = int.Parse(response["ReturnCode"].ToString());
                 return new SimpleRequestResponse
                 {
                     ReturnCode = Enum.GetValues(typeof(RETURN_CODE)).Cast<RETURN_CODE>().First(code => ((int)code) == returnCode),
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
+                logger?.LogError(ex, ex.Message);
                 throw;
             }
         }
@@ -87,10 +88,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 var _VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{VMSPort}", 3);
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
                 var api_route = $"/api/AGV/TaskFeedback?AGVName={EQName}&Model={AGV_Type}";
-                _ = LogMsgToAGVS($"(Post) {api_route},body json ={feedback.ToJson()}");
+                logger?.LogTrace($"(Post) {api_route},body json ={feedback.ToJson()}");
 
                 var response = await _VMSWebAPIHttp.PostAsync<Dictionary<object, string>, clsFeedbackData>(api_route, feedback, 1);
-                _ = LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                logger?.LogTrace($"(Post) {api_route},Response={response.ToJson()}");
                 var returnCode = int.Parse(response["ReturnCode"].ToString());
                 _VMSWebAPIHttp.Dispose();
                 return new SimpleRequestResponse
@@ -101,7 +102,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                LOG.Critical($"PostTaskFeedBack Exception:{ex.Message}", ex);
+                logger?.LogError($"PostTaskFeedBack Exception:{ex.Message}", ex);
                 return new SimpleRequestResponse
                 {
                     Message = ex.Message,
@@ -122,9 +123,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
 
                 var api_route = $"/api/AGV/ReportMeasure?AGVName={EQName}&Model={AGV_Type}";
-                LogMsgToAGVS($"(Post){api_route},body json ={measure_reuslt.ToJson()}");
+                logger?.LogTrace($"(Post){api_route},body json ={measure_reuslt.ToJson()}");
                 var response = await VMSWebAPIHttp.PostAsync<Dictionary<object, string>, clsMeasureResult>(api_route, measure_reuslt);
-                LogMsgFromAGVS($"(Post) {api_route},Response={response.ToJson()}");
+                logger?.LogTrace($"(Post) {api_route},Response={response.ToJson()}");
                 var returnCode = int.Parse(response["ReturnCode"].ToString());
                 return new SimpleRequestResponse
                 {
@@ -134,6 +135,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
+                logger?.LogError(ex, ex.Message);
                 throw ex;
             }
         }
@@ -144,12 +146,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
                 var api_route = $"/api/AGV/CarrierVirtualID?AGVName={EQName}&Model={AGV_Type}";
-                LogMsgToAGVS($"(GET){api_route},body json =");
+                logger?.LogTrace($"(GET){api_route},body json =");
                 clsCarrierVirtualIDResponseWebAPI response = await VMSWebAPIHttp.GetAsync<clsCarrierVirtualIDResponseWebAPI>(api_route);
                 return response;
             }
             catch (Exception ex)
             {
+                logger?.LogError(ex, ex.Message);
                 throw;
             }
         }
@@ -160,13 +163,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
                 var api_route = $"/api/Equipment/GetEQOptionByTag?eq_tag={eQTag}";
-                LogMsgToAGVS($"(GET){api_route},body json =");
+                logger?.LogTrace($"(GET){api_route},body json =");
                 //(new { Tag = option.TagID, EqName = option.Name, AGVModbusGatewayPort = option.ConnOptions.AGVModbusGatewayPort }
                 clsEQOptions response = await AGVsWebAPIHttp.GetAsync<clsEQOptions>(api_route);
                 return response;
             }
             catch (Exception ex)
             {
+                logger?.LogError(ex, ex.Message);
                 throw;
             }
         }
@@ -176,13 +180,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 // return Ok(new { ReturnCode = 1, Message = "AGV Not Found" });
                 var api_route = $"/api/Equipment/GetEQOptionsByTags";
-                LogMsgToAGVS($"(POST){api_route},body json =");
+                logger?.LogTrace($"(POST){api_route},body json =");
                 //(new { Tag = option.TagID, EqName = option.Name, AGVModbusGatewayPort = option.ConnOptions.AGVModbusGatewayPort }
                 List<clsEQOptions> response = await AGVsWebAPIHttp.PostAsync<List<clsEQOptions>, int[]>(api_route, eQTags);
                 return response;
             }
             catch (Exception ex)
             {
+                logger?.LogError(ex, ex.Message);
                 throw;
             }
         }
@@ -192,7 +197,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             try
             {
                 var api_route = $"/api/AGV/LeaveWorkStationRequest?AGVName={vehicleName}&EQTag={currentEQTag}";
-                LogMsgToAGVS($"(POST){api_route},body json =");
+                logger?.LogTrace($"(POST){api_route},body json =");
                 (bool success, string json) response = await VMSWebAPIHttp.PostAsync(api_route, null);
                 if (!response.success)
                     return false;
@@ -202,7 +207,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                LOG.Critical(ex);
+                logger?.LogError(ex, ex.Message);
                 return false;
             }
         }
