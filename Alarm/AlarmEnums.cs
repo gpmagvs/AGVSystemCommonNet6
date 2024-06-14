@@ -124,6 +124,10 @@ namespace AGVSystemCommonNet6.Alarm
         INVALID_CHARGE_STATION = 102,
         Battery_Not_Connect = 3037,
         Rack_Port_Sensor_Flash = 3038,
+        Transfer_Tags_Not_Found = 3039,
+        No_Transfer_Station_To_Work = 3040,
+        Task_Aborted = 3041,
+        CANNOT_DISPATCH_CHARGE_TASK_WHEN_AGV_HAS_CARGO = 3042,
     }
 
 }
