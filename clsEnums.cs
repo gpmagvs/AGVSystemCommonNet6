@@ -13,7 +13,8 @@ namespace AGVSystemCommonNet6
             INSPECTION_AGV = 2,
             SUBMERGED_SHIELD = 3,
             SUBMERGED_SHIELD_Parts = 4,
-            Any = 999
+            Any = 999,
+            Null = -1
         }
         public enum OPERATOR_MODE
         {
