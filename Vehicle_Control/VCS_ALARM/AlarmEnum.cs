@@ -468,5 +468,6 @@
         Fork_Slot_Teach_Data_ERROR = 860048,
         Battery_Low_Level_Auto_PC_Shutdown = 860049,
         Battery_Over_Voltage_When_Charging = 860050,
+        Reject_AGVS_Task = 860051,
     }
 }
