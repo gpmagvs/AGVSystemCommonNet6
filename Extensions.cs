@@ -174,6 +174,15 @@ namespace AGVSystemCommonNet6
             return map_station.CalculateDistance(from_station.X, from_station.Y, from_station.TagNumber);
         }
 
+        public static double TotalTravelDistance(this IEnumerable<MapPoint> points)
+        {
+            double distance = 0;
+            for (int i = 0; i < points.Count() - 1; i++)
+            {
+                distance += points.ElementAt(i).CalculateDistance(points.ElementAt(i + 1));
+            }
+            return distance;
+        }
 
         /// <summary>
         /// 將整數轉成2進位,每個bit用boolean表示0/1 (0:false, 1:ture)
