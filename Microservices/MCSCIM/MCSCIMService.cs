@@ -13,7 +13,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         private static HttpHelper agvs_http => new HttpHelper(MCSCIMUrl);
         public static async Task<(bool confirm, string message)> Online()
         {
-            (bool confirm, string message) response = new(false, "[Online] Fail");
+            (bool confirm, string message) response = new(false, "[Online] Fail:");
             using (agvs_http)
             {
                 try
@@ -25,14 +25,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 }
                 catch (Exception ex)
                 {
-                    response.message += ex.ToString();
+                    response.message += ex.Message.ToString();
                 }
             }
             return response;
         }
         public static async Task<(bool confirm, string message)> Offline()
         {
-            (bool confirm, string message) response = new(false, "[Offline] Fail");
+            (bool confirm, string message) response = new(false, "[Offline] Fail:");
             using (agvs_http)
             {
                 try
@@ -44,7 +44,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 }
                 catch (Exception ex)
                 {
-                    response.message += ex.ToString();
+                    response.message += ex.Message.ToString();
                 }
             }
             return response;
@@ -87,6 +87,32 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             }
             return response;
         }
+        /// <summary>
+        /// data[0]:clsTaskDto 
+        /// data[1]:task status, ref to AGVSCIM.TaskManager.clsTask.TaskStatus
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static async Task<(bool confirm, string message)> TaskReporter(object data)
+        {
+            (bool confirm, string message) response = new(false, "[TaskReporter] Fail");
+            using (agvs_http)
+            {
+                try
+                {
+                    var route = $"/api/HostMode/TaskCollecter";
+                    (bool success, string json) v = await agvs_http.PostAsync(route,data);
+                    //response.confirm = v.confirm;
+                    //response.message = v.message;
+                }
+                catch (Exception ex)
+                {
+                    response.message += ex.ToString();
+                }
+            }
+            return response;
+        }
+
 
         internal class ResponseObject
         {
