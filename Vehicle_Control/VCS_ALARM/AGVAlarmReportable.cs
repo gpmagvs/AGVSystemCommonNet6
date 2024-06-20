@@ -1,5 +1,4 @@
 ﻿using AGVSystemCommonNet6.Log;
-using static AGVSystemCommonNet6.Vehicle_Control.CarComponent;
 
 namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 {
@@ -31,7 +30,6 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
             OnAlarmResetAsNoneRequest?.Invoke("", EventArgs.Empty);
         }
 
-        public STATE CurrentAlarmState { get; private set; }
         public abstract string alarm_locate_in_name { get; }
 
         private AlarmCodes _current_alarm_code = AlarmCodes.None;
@@ -45,7 +43,6 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 {
                     if (value != AlarmCodes.None)
                     {
-                        CurrentAlarmState = STATE.ABNORMAL;
                         AlarmManager.AddWarning(value);
                         LOG.WARN($"{alarm_locate_in_name} Warning: {value}");
                     }
@@ -67,7 +64,6 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 {
                     if (value != AlarmCodes.None)
                     {
-                        CurrentAlarmState = STATE.ABNORMAL;
                         AlarmManager.AddAlarm(value, false);
                         LOG.ERROR($"{alarm_locate_in_name} Alarm: {value}");
                     }
