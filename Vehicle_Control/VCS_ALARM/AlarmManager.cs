@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using SQLite;
 using System.Collections.Concurrent;
 using System.Text;
+using WebSocketSharp;
 
 namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 {
@@ -97,7 +98,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 AddWarning(item);
             }
         }
-        public static void AddWarning(AlarmCodes Alarm_code)
+        public static void AddWarning(AlarmCodes Alarm_code, string SpecficDescription_Zh = "", string SpecficDescription_En = "")
         {
             if (!Active)
                 return;
@@ -113,6 +114,10 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
             }
 
             clsAlarmCode warning_save = warning.Clone();
+
+            warning_save.Description = SpecficDescription_En.IsNullOrEmpty() ? warning.Description : SpecficDescription_En;
+            warning_save.CN = SpecficDescription_Zh.IsNullOrEmpty() ? warning.CN : SpecficDescription_Zh;
+
             warning_save.Time = DateTime.Now;
             warning_save.ELevel = clsAlarmCode.LEVEL.Warning;
             warning_save.IsRecoverable = true;
@@ -140,7 +145,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 AddAlarm(item.Item1, item.Item2);
             }
         }
-        public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable)
+        public static void AddAlarm(AlarmCodes Alarm_code, bool IsRecoverable, string SpecficDescription_Zh = "", string SpecficDescription_En = "")
         {
             if (!Active)
                 return;
@@ -171,6 +176,10 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 clsAlarmCode alarm_save = alarm.Clone();
                 alarm_save.Time = DateTime.Now;
                 alarm_save.ELevel = clsAlarmCode.LEVEL.Alarm;
+
+                alarm_save.Description = SpecficDescription_En.IsNullOrEmpty() ? alarm_save.Description : SpecficDescription_En;
+                alarm_save.CN = SpecficDescription_Zh.IsNullOrEmpty() ? alarm_save.CN : SpecficDescription_Zh;
+
                 alarm_save.IsRecoverable = IsRecoverable;
                 if (CurrentAlarms.TryAdd(alarm_save.Time, alarm_save))
                 {

@@ -78,6 +78,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         /// AGV無法用一般移動的方式導航至工作站點內
         /// </summary>
         AGV_CANNOT_GO_TO_WORKSTATION_WITH_NORMAL_MOVE_ACTION = 5,
+        AGV_CANNOT_EXECUTE_NORMAL_MOVE_ACTION_IN_NON_NORMAL_POINT = 51,
+        AGV_CANNOT_EXECUTE_TASK_WHEN_WORKING_AT_WORKSTATION = 52,
         /// <summary>
         /// 任務資料不合法
         /// </summary>
@@ -131,7 +133,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         Unknown,
         NoAction = 999
     }
-   
+
     public enum CST_TYPE
     {
         None = 0,
