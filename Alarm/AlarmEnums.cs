@@ -128,6 +128,7 @@ namespace AGVSystemCommonNet6.Alarm
         No_Transfer_Station_To_Work = 3040,
         Task_Aborted = 3041,
         CANNOT_DISPATCH_CHARGE_TASK_WHEN_AGV_HAS_CARGO = 3042,
+        VEHICLES_TRAJECTORY_CONFLIC = 3043,
     }
 
 }
