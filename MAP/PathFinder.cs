@@ -373,7 +373,7 @@ namespace AGVSystemCommonNet6.MAP
             return int.Parse(Math.Round(distance * 10000, 0).ToString());
         }
 
-        static void DijkstraAlgorithm(int[,] graph, int source, out int[] distance, out int[] parent)
+         void DijkstraAlgorithm(int[,] graph, int source, out int[] distance, out int[] parent)
         {
             int n = graph.GetLength(0);
             bool[] visited = new bool[n];
@@ -414,7 +414,7 @@ namespace AGVSystemCommonNet6.MAP
             }
         }
         // 使用 DFS 來找到所有可能路徑
-        static void FindAllPathsDFS(int[,] graph, int source, int target, List<int> currentPath, List<List<int>> allPaths, bool[] visited)
+         void FindAllPathsDFS(int[,] graph, int source, int target, List<int> currentPath, List<List<int>> allPaths, bool[] visited)
         {
             visited[source] = true;
             currentPath.Add(source);
@@ -441,7 +441,7 @@ namespace AGVSystemCommonNet6.MAP
             currentPath.RemoveAt(currentPath.Count - 1);
         }
 
-        static List<List<int>> FindAllPaths(int[,] graph, int source, int target)
+         List<List<int>> FindAllPaths(int[,] graph, int source, int target)
         {
             int n = graph.GetLength(0);
             bool[] visited = new bool[n];
