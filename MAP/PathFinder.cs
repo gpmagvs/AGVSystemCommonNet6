@@ -1,5 +1,6 @@
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Exceptions;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -17,6 +18,11 @@ namespace AGVSystemCommonNet6.MAP
         public static event EventHandler<Exception> OnExceptionHappen;
         public class PathFinderOption
         {
+            public enum ALGORITHM
+            {
+                Dijsktra,
+                DFS
+            }
             public enum STRATEGY
             {
                 SHORST_DISTANCE,
@@ -29,7 +35,7 @@ namespace AGVSystemCommonNet6.MAP
             /// 要避開的TAG點位
             /// </summary>
             public List<int> ConstrainTags { get; set; } = new List<int>();
-
+            public ALGORITHM Algorithm { get; set; } = ALGORITHM.DFS;
             public STRATEGY Strategy { get; set; } = STRATEGY.MINIMAL_ROTATION_ANGLE;
 
             public double VehicleCurrentAngle { get; set; } = double.MaxValue;
@@ -199,7 +205,7 @@ namespace AGVSystemCommonNet6.MAP
             int endIndex = map.Points.FirstOrDefault(kp => kp.Value.TagNumber == endPt.TagNumber).Key;
             return FindPathes(map, startIndex, endIndex, options);
         }
-        public List<clsPathInfo> FindPathes(Map map, int startPtIndex, int endPtIndex, PathFinderOption options = null)
+        public List<clsPathInfo> FindPathes(Map map, int startPtIndex, int endPtIndex, PathFinderOption? options = null)
         {
             var stations = map.Points.ToList().FindAll(st => st.Key == startPtIndex ? true : st.Value.Enable).ToDictionary(pt => pt.Key, pt => pt.Value);
             try
@@ -253,7 +259,7 @@ namespace AGVSystemCommonNet6.MAP
 
                 var source = startIndex;
                 DijkstraAlgorithm(graph, source, out int[] distance, out int[] parent);
-                var allPathes = FindAllPaths(graph, source, finalIndex);
+                var allPathes = FindAllPaths(graph, source, finalIndex, options == null ? PathFinderOption.ALGORITHM.DFS : options.Algorithm);
                 var pathWithStations = allPathes.Select(path => path.Select(index => staions_ordered[index].Value).ToList()).ToList();
                 return pathWithStations.Select(path => new clsPathInfo()
                 {
@@ -373,7 +379,7 @@ namespace AGVSystemCommonNet6.MAP
             return int.Parse(Math.Round(distance * 10000, 0).ToString());
         }
 
-         void DijkstraAlgorithm(int[,] graph, int source, out int[] distance, out int[] parent)
+        void DijkstraAlgorithm(int[,] graph, int source, out int[] distance, out int[] parent)
         {
             int n = graph.GetLength(0);
             bool[] visited = new bool[n];
@@ -414,7 +420,7 @@ namespace AGVSystemCommonNet6.MAP
             }
         }
         // 使用 DFS 來找到所有可能路徑
-         void FindAllPathsDFS(int[,] graph, int source, int target, List<int> currentPath, List<List<int>> allPaths, bool[] visited)
+        void FindAllPathsDFS(int[,] graph, int source, int target, List<int> currentPath, List<List<int>> allPaths, bool[] visited)
         {
             visited[source] = true;
             currentPath.Add(source);
@@ -435,22 +441,35 @@ namespace AGVSystemCommonNet6.MAP
                     }
                 }
             }
-
             // 回溯：取消當前節點的訪問狀態
             visited[source] = false;
             currentPath.RemoveAt(currentPath.Count - 1);
+
         }
 
-         List<List<int>> FindAllPaths(int[,] graph, int source, int target)
+        List<List<int>> FindAllPaths(int[,] graph, int source, int target, PathFinderOption.ALGORITHM algorithm = PathFinderOption.ALGORITHM.DFS)
         {
-            int n = graph.GetLength(0);
-            bool[] visited = new bool[n];
-            List<int> currentPath = new List<int>();
-            List<List<int>> allPaths = new List<List<int>>();
+            if (algorithm == PathFinderOption.ALGORITHM.Dijsktra)
+            {
 
-            FindAllPathsDFS(graph, source, target, currentPath, allPaths, visited);
-
-            return allPaths;
+                //先用 Dijkstra 算法找到最短路徑
+                DijkstraSearch dijkstraSearch = new DijkstraSearch(graph);
+                List<int> pathFindByDijkstra = dijkstraSearch.FindShortestPath(source, target);
+                if (pathFindByDijkstra.Count == 0 || pathFindByDijkstra[0] != source || pathFindByDijkstra[pathFindByDijkstra.Count - 1] != target)
+                {
+                    return new List<List<int>>();
+                }
+                return new List<List<int>>() { pathFindByDijkstra };
+            }
+            else
+            {
+                int n = graph.GetLength(0);
+                bool[] visited = new bool[n];
+                List<int> currentPath = new List<int>();
+                List<List<int>> allPaths = new List<List<int>>();
+                FindAllPathsDFS(graph, source, target, currentPath, allPaths, visited);
+                return allPaths;
+            }
         }
     }
 }

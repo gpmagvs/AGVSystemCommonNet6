@@ -8,166 +8,78 @@ namespace AGVSystemCommonNet6.MAP
 {
     public class DijkstraSearch
     {
-        private static readonly int Infinity = int.MaxValue;
+        private int[,] graph;
+        private int verticesCount;
 
-        public static List<List<int>> FindKShortestPaths(int[,] graph, int source, int target, int k)
+        public DijkstraSearch(int[,] adjacencyMatrix)
         {
-            int n = graph.GetLength(0);
-            List<List<int>> kShortestPaths = new List<List<int>>();
-            PriorityQueue<Path> pq = new PriorityQueue<Path>();
-            int[] distances = new int[n];
-            List<int>[] previousPaths = new List<int>[n];
+            graph = adjacencyMatrix;
+            verticesCount = adjacencyMatrix.GetLength(0);
+        }
+        public List<int> FindShortestPath(int source, int target)
+        {
+            // Initialize distance array and visited array
+            int[] distances = new int[verticesCount];
+            bool[] visited = new bool[verticesCount];
+            int[] previous = new int[verticesCount];
 
-            // 初始化距離和前驅路徑
-            for (int i = 0; i < n; i++)
+            // Initialize distances with infinity and source with 0
+            for (int i = 0; i < verticesCount; i++)
             {
-                distances[i] = Infinity;
-                previousPaths[i] = new List<int>();
+                distances[i] = int.MaxValue;
+                visited[i] = false;
+                previous[i] = -1;
             }
             distances[source] = 0;
-            previousPaths[source].Add(source);
 
-            // 將起始節點放入優先級隊列
-            pq.Enqueue(new Path(source, 0, previousPaths[source]));
-
-            // Dijkstra 算法主循環
-            while (pq.Count > 0 && kShortestPaths.Count < k)
+            // Dijkstra's algorithm
+            for (int count = 0; count < verticesCount - 1; count++)
             {
-                Path current = pq.Dequeue();
+                // Find the vertex with the minimum distance value
+                int u = MinimumDistance(distances, visited);
 
-                int u = current.Node;
-                int dist = current.Distance;
-                List<int> path = current.PathToHere;
+                // Mark the picked vertex as visited
+                visited[u] = true;
 
-                // 如果當前路徑已經比之前找到的更長，則跳過
-                if (dist > distances[u])
-                    continue;
-
-                // 如果到達目標節點，添加到最佳路徑列表中
-                if (u == target)
+                // Update the distance values of adjacent vertices
+                for (int v = 0; v < verticesCount; v++)
                 {
-                    kShortestPaths.Add(path);
-                    continue; // 繼續尋找下一條最短路徑
-                }
-
-                // 遍歷相鄰節點
-                for (int v = 0; v < n; v++)
-                {
-                    if (graph[u, v] > 0) // 假設 graph[u, v] > 0 表示有連接
+                    if (!visited[v] && graph[u, v] != 0 && distances[u] != int.MaxValue && distances[u] + graph[u, v] < distances[v])
                     {
-                        int newDist = dist + graph[u, v];
-
-                        // 如果找到更短的路徑
-                        if (newDist < distances[v])
-                        {
-                            distances[v] = newDist;
-
-                            // 更新前驅路徑
-                            List<int> newPath = new List<int>(path);
-                            newPath.Add(v);
-                            previousPaths[v] = newPath;
-
-                            // 將新路徑添加到優先級隊列
-                            pq.Enqueue(new Path(v, newDist, newPath));
-
-                            // 如果優先級隊列超過 k，則移除最長的路徑
-                            if (pq.Count > k)
-                            {
-                                pq.Dequeue();
-                            }
-                        }
-                        else if (newDist == distances[v])
-                        {
-                            // 如果找到與當前最短路徑長度相同的路徑，則將其添加到前驅路徑列表中
-                            List<int> newPath = new List<int>(path);
-                            newPath.Add(v);
-                            previousPaths[v].AddRange(newPath);
-                        }
+                        distances[v] = distances[u] + graph[u, v];
+                        previous[v] = u;
                     }
                 }
             }
 
-            return kShortestPaths;
+            // Build the path from source to target using previous array
+            List<int> path = new List<int>();
+            int current = target;
+            while (current != -1)
+            {
+                path.Add(current);
+                current = previous[current];
+            }
+            path.Reverse(); // Reverse to get path from source to target
+
+            return path;
         }
 
-        public class Path : IComparable<Path>
+        private int MinimumDistance(int[] distances, bool[] visited)
         {
-            public int Node { get; set; }
-            public int Distance { get; set; }
-            public List<int> PathToHere { get; set; }
+            int min = int.MaxValue;
+            int minIndex = -1;
 
-            public Path(int node, int distance, List<int> pathToHere)
+            for (int v = 0; v < verticesCount; v++)
             {
-                Node = node;
-                Distance = distance;
-                PathToHere = pathToHere;
-            }
-
-            public int CompareTo(Path other)
-            {
-                // 用於最小堆的比較，按照距離升序排列
-                return this.Distance.CompareTo(other.Distance);
-            }
-        }
-
-        // 最小堆實現
-        public class PriorityQueue<T> where T : IComparable<T>
-        {
-            private List<T> heap = new List<T>();
-
-            public int Count { get { return heap.Count; } }
-
-            public void Enqueue(T item)
-            {
-                heap.Add(item);
-                int i = heap.Count - 1;
-                while (i > 0)
+                if (visited[v] == false && distances[v] <= min)
                 {
-                    int parent = (i - 1) / 2;
-                    if (heap[parent].CompareTo(heap[i]) <= 0)
-                        break;
-                    T tmp = heap[i];
-                    heap[i] = heap[parent];
-                    heap[parent] = tmp;
-                    i = parent;
+                    min = distances[v];
+                    minIndex = v;
                 }
             }
 
-            public T Dequeue()
-            {
-                T root = heap[0];
-                heap[0] = heap[heap.Count - 1];
-                heap.RemoveAt(heap.Count - 1);
-
-                int i = 0;
-                while (true)
-                {
-                    int left = 2 * i + 1;
-                    int right = 2 * i + 2;
-                    int smallest = i;
-
-                    if (left < heap.Count && heap[left].CompareTo(heap[smallest]) < 0)
-                        smallest = left;
-
-                    if (right < heap.Count && heap[right].CompareTo(heap[smallest]) < 0)
-                        smallest = right;
-
-                    if (smallest == i)
-                        break;
-
-                    T tmp = heap[i];
-                    heap[i] = heap[smallest];
-                    heap[smallest] = tmp;
-                    i = smallest;
-                }
-
-                return root;
-            }
-
-            public T Peek()
-            {
-                return heap[0];
-            }
+            return minIndex;
         }
     }
 }
