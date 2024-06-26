@@ -290,6 +290,10 @@ namespace AGVSystemCommonNet6.MAP
                 return ordered.FirstOrDefault();
             }
         }
+        public static clsMapPoint[] GetTrajectory(List<MapPoint> stations)
+        {
+            return GetTrajectory(defaultMap.Name, stations);
+        }
         public static clsMapPoint[] GetTrajectory(string MapName, List<MapPoint> stations)
         {
             List<clsMapPoint> trajectoryPoints = new List<clsMapPoint>();
