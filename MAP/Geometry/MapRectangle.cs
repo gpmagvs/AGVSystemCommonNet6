@@ -240,6 +240,11 @@ namespace AGVSystemCommonNet6.MAP.Geometry
             double rotatedY = Math.Sin(angleRadians) * (point.X - center.X) + Math.Cos(angleRadians) * (point.Y - center.Y) + center.Y;
             return new PointF((float)rotatedX, (float)rotatedY);
         }
+
+        public override string ToString()
+        {
+            return $"{StartPoint.Graph.Display}->{EndPoint.Graph.Display}";
+        }
     }
 
 }
