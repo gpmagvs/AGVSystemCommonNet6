@@ -469,5 +469,6 @@
         Battery_Low_Level_Auto_PC_Shutdown = 860049,
         Battery_Over_Voltage_When_Charging = 860050,
         Reject_AGVS_Task = 860051,
+        Fork_Cannot_Go_Home_At_Non_Normal_Point = 860052,
     }
 }
