@@ -37,7 +37,6 @@ namespace AGVSystemCommonNet6.DATABASE
 
                 using (AGVSDatabase database = new AGVSDatabase())
                 {
-                    //DatabaseVersionCheck(database);
                     _DefaultUsersCreate(database.tables.Users);
                     _UnCheckedAlarmsSetAsCheckes(database.tables.SystemAlarms);
                     _ = database.SaveChanges().Result;
@@ -45,7 +44,7 @@ namespace AGVSystemCommonNet6.DATABASE
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
         private static async Task<bool> DatabaseColumnCheck(AGVSDatabase database)
