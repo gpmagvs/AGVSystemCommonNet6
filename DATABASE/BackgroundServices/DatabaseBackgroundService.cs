@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,8 +38,6 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 try
                 {
                     await Task.Delay(5000);
-
-
                     DatabaseCaches.TaskCaches.CompleteTasks = GetTasksInSpecficTimeRange()
                                                                             .Where(task => IsTaskInFinishedState(task))
                                                                             .OrderByDescending(task => task.RecieveTime)
@@ -65,7 +64,8 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message + ex.StackTrace);
+                     scope = _scopeFactory.CreateAsyncScope();
+                     context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
                 }
             }
         }
@@ -86,23 +86,22 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                         DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-2);
                         return context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToList();
                     }
+                    List<clsAlarmDto> GetAlarmsInSpeficTimeRange()
+                    {
+                        DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
+                        return context.SystemAlarms.AsNoTracking().Where(al => al.Time >= recieveTimeLowerLimit).ToList();
+                    }
 
                     List<clsTaskDto> _TasksForQuery = GetTasksInSpecficTimeRange();
 
                     DatabaseCaches.TaskCaches.WaitExecuteTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
 
-
-                    //DatabaseCaches.TaskCaches.CompleteTasks = taskLatest.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
-                    //                                                    .ToList();
-
                     DatabaseCaches.TaskCaches.RunningTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
-                    //_stopwatch.Stop();
-                    // Console.WriteLine("TaskCaches: " + _stopwatch.Elapsed.ToString());
-                    //_stopwatch.Restart();
-                    DatabaseCaches.Alarms.UnCheckedAlarms = context.SystemAlarms.AsNoTracking().Where(alarm => !alarm.Checked).ToList();
-                    // Console.WriteLine("UnCheckedAlarms: " + _stopwatch.Elapsed.ToString());
-                    // _stopwatch.Restart();
+               
+                    DatabaseCaches.Alarms.UnCheckedAlarms = GetAlarmsInSpeficTimeRange().Where(alarm => !alarm.Checked).ToList();
+                   
                     DatabaseCaches.Vehicle.VehicleStates = context.AgvStates.AsNoTracking().ToList();
+
                     _stopwatch.Stop();
 
                     if (_stopwatch.Elapsed.Seconds > 1)
@@ -113,54 +112,10 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message + ex.StackTrace);
+                    scope = _scopeFactory.CreateAsyncScope();
+                    context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
                 }
             }
-
-            //try
-            //{
-            //    using (var scope = _scopeFactory.CreateAsyncScope())
-            //    {
-            //        using AGVSDbContext context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
-            //        // 這裡進行背景數據庫操作或其他業務邏輯
-            //        //var taskLatest = context.Tasks.AsNoTracking().OrderByDescending(task => task.RecieveTime).Take(40).ToList();
-
-            //        List<clsTaskDto> GetTasksInSpecficTimeRange()
-            //        {
-            //            DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-2);
-            //            return context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToList();
-            //        }
-
-            //        List<clsTaskDto> _TasksForQuery = GetTasksInSpecficTimeRange();
-
-            //        DatabaseCaches.TaskCaches.WaitExecuteTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
-
-
-            //        //DatabaseCaches.TaskCaches.CompleteTasks = taskLatest.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.CANCEL || task.State == AGVDispatch.Messages.TASK_RUN_STATUS.ACTION_FINISH)
-            //        //                                                    .ToList();
-
-            //        DatabaseCaches.TaskCaches.RunningTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
-            //        //_stopwatch.Stop();
-            //        // Console.WriteLine("TaskCaches: " + _stopwatch.Elapsed.ToString());
-            //        //_stopwatch.Restart();
-            //        DatabaseCaches.Alarms.UnCheckedAlarms = context.SystemAlarms.AsNoTracking().Where(alarm => !alarm.Checked).ToList();
-            //        // Console.WriteLine("UnCheckedAlarms: " + _stopwatch.Elapsed.ToString());
-            //        // _stopwatch.Restart();
-            //        DatabaseCaches.Vehicle.VehicleStates = context.AgvStates.AsNoTracking().ToList();
-            //        _stopwatch.Stop();
-
-            //        if (_stopwatch.Elapsed.Seconds > 1)
-            //        {
-            //            Console.WriteLine($"{DateTime.Now} DatabaseBackgroundService Work Time Long...: " + _stopwatch.Elapsed.TotalSeconds);
-            //        }
-            //    }
-
-
-            //    // Console.WriteLine("VehicleStates: " + _stopwatch.Elapsed.ToString());
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine($"{DateTime.Now} [DatabaseBackgroundService] DoWork Exception" + ex.Message);
-            //}
 
         }
 
