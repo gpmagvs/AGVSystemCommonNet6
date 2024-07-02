@@ -28,8 +28,42 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     return new List<clsTrajCoordination>();
             }
         }
+        public async Task<(bool success, string error_msg)> StoreTrajectory(string taskID, string agvName, string trajRecordjson)
+        {
 
-        public async Task<(bool success,string error_msg)> StoreTrajectory(string taskID, string agvName, double x, double y, double theta)
+            using (var db = new AGVSDatabase())
+            {
+                try
+                {
+                    clsTaskTrajecotroyStore? existData = db.tables.TaskTrajecotroyStores.FirstOrDefault(t => t.TaskName == taskID);
+
+                    if (existData == null) //新增
+                    {
+                        db.tables.TaskTrajecotroyStores.Add(new clsTaskTrajecotroyStore
+                        {
+                            TaskName = taskID,
+                            AGVName = agvName,
+                            CoordinationsJson = trajRecordjson
+                        });
+                    }
+                    else
+                    {
+                        existData.AGVName = agvName;
+                        existData.CoordinationsJson = trajRecordjson;
+
+                    }
+                    await db.SaveChanges();
+                    return (true, "");
+                }
+                catch (Exception ex)
+                {
+                    return (false, ex.Message);
+                }
+
+            }
+        }
+
+        public async Task<(bool success, string error_msg)> StoreTrajectory(string taskID, string agvName, double x, double y, double theta)
         {
             var coordination = new clsTrajCoordination
             {
