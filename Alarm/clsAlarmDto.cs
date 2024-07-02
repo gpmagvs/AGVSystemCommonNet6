@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.Alarm
 {
+    [Index(nameof(Time))]
+    [Index(nameof(Checked))]
     public class clsAlarmDto
     {
         [Key]
@@ -25,7 +28,7 @@ namespace AGVSystemCommonNet6.Alarm
                     string TrobleShooting = ((ALARMS)_Alarmcode).ToString();
                     if (AlarmManagerCenter.AGVsTrobleShootings.ContainsKey(TrobleShooting))
                     {
-                        TrobleShootingMethod = $"{AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].EN_TrobleShootingDescription}({AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].ZH_TrobleShootingDescription})" ;
+                        TrobleShootingMethod = $"{AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].EN_TrobleShootingDescription}({AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].ZH_TrobleShootingDescription})";
                         TrobleShootingReference = AlarmManagerCenter.AGVsTrobleShootings[TrobleShooting].TrobleShootingFilePath;
                     }
                 }

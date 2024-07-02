@@ -40,8 +40,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
         Traveling_To_Region_Wait_Point,
         Completed = 500,
     }
+
+    [Index(nameof(RecieveTime))]
+    [Index(nameof(StartTime))]
+    [Index(nameof(FinishTime))]
     public class clsTaskDto
     {
+
         public DateTime RecieveTime { get; set; }
 
         [NotMapped]

@@ -40,9 +40,6 @@ namespace AGVSystemCommonNet6.DATABASE
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<clsTaskDto>().HasIndex(t => t.RecieveTime);
-            modelBuilder.Entity<clsTaskDto>().HasIndex(t => t.State);
-            modelBuilder.Entity<clsAlarmDto>().HasIndex(a => a.Checked);
         }
     }
 }

@@ -38,10 +38,9 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 try
                 {
                     await Task.Delay(5000);
-                    DatabaseCaches.TaskCaches.CompleteTasks = GetTasksInSpecficTimeRange()
-                                                                            .Where(task => IsTaskInFinishedState(task))
-                                                                            .OrderByDescending(task => task.RecieveTime)
-                                                                            .Take(40).ToList();
+                    DatabaseCaches.TaskCaches.CompleteTasks = (await GetTasksInSpecficTimeRange()).Where(task => IsTaskInFinishedState(task))
+                                                                                                  .OrderByDescending(task => task.RecieveTime)
+                                                                                                  .Take(40).ToList();
                     _stopwatch.Stop();
 
                     if (_stopwatch.Elapsed.Seconds > 8)
@@ -49,10 +48,10 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                         Console.WriteLine($"{DateTime.Now} DatabaseBackgroundService [fetchFinishTasksCallback] Time Spend Long...: " + _stopwatch.Elapsed.TotalSeconds);
                     }
 
-                    List<clsTaskDto> GetTasksInSpecficTimeRange()
+                    async Task<List<clsTaskDto>> GetTasksInSpecficTimeRange()
                     {
                         DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-2);
-                        return context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToList();
+                        return await context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToListAsync();
                     }
 
                     bool IsTaskInFinishedState(clsTaskDto _task)
@@ -64,8 +63,8 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 }
                 catch (Exception ex)
                 {
-                     scope = _scopeFactory.CreateAsyncScope();
-                     context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
+                    scope = _scopeFactory.CreateAsyncScope();
+                    context = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
                 }
             }
         }
@@ -81,25 +80,25 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 try
                 {
                     await Task.Delay(cacheTimerInterval);
-                    List<clsTaskDto> GetTasksInSpecficTimeRange()
+                    async Task<List<clsTaskDto>> GetTasksInSpecficTimeRange()
                     {
                         DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-2);
-                        return context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToList();
+                        return await context.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToListAsync();
                     }
-                    List<clsAlarmDto> GetAlarmsInSpeficTimeRange()
+                    async Task<List<clsAlarmDto>> GetAlarmsInSpeficTimeRange()
                     {
                         DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
-                        return context.SystemAlarms.AsNoTracking().Where(al => al.Time >= recieveTimeLowerLimit).ToList();
+                        return await context.SystemAlarms.AsNoTracking().Where(al => al.Time >= recieveTimeLowerLimit).ToListAsync();
                     }
 
-                    List<clsTaskDto> _TasksForQuery = GetTasksInSpecficTimeRange();
+                    List<clsTaskDto> _TasksForQuery = await GetTasksInSpecficTimeRange();
 
                     DatabaseCaches.TaskCaches.WaitExecuteTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
 
                     DatabaseCaches.TaskCaches.RunningTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
-               
-                    DatabaseCaches.Alarms.UnCheckedAlarms = GetAlarmsInSpeficTimeRange().Where(alarm => !alarm.Checked).ToList();
-                   
+
+                    DatabaseCaches.Alarms.UnCheckedAlarms = (await GetAlarmsInSpeficTimeRange()).Where(alarm => !alarm.Checked).ToList();
+
                     DatabaseCaches.Vehicle.VehicleStates = context.AgvStates.AsNoTracking().ToList();
 
                     _stopwatch.Stop();
