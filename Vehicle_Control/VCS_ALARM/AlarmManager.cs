@@ -211,25 +211,26 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
         public static void UpdateVCSTrobleShootings(ref Dictionary<string, clsVCSTrobleShooting> VCSTrobleShootings)
         {
+            List<clsVCSTrobleShooting> troubleShootings = new List<clsVCSTrobleShooting>();
             if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
             {
                 string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH, Encoding.GetEncoding("big5"));
                 List<string>? _TrobleShootingDescription = _AllTrobleShootingDescription.Split("\r\n").ToList();
                 _TrobleShootingDescription.RemoveAt(0);
-                foreach (string TrobleShooting in _TrobleShootingDescription)
+
+                troubleShootings = _TrobleShootingDescription.Where(TrobleShooting => TrobleShooting.Split(',').Count() == 4)
+                                                                                              .Select(TrobleShooting => CreateTrobleShootingInstance(TrobleShooting))
+                                                                                              .ToList();
+                clsVCSTrobleShooting CreateTrobleShootingInstance(string trobleShooting)
                 {
-                    string[] TrobleShootingCase = TrobleShooting.Split(',');
-                    if (TrobleShootingCase.Count() != 4)
-                        continue;
-                    if (VCSTrobleShootings.ContainsKey(TrobleShootingCase[0]))
-                        continue;
-                    VCSTrobleShootings.Add(TrobleShootingCase[0], new clsVCSTrobleShooting()
+                    string[] TrobleShootingCase = trobleShooting.Split(',');
+                    return new clsVCSTrobleShooting
                     {
                         Alarm = TrobleShootingCase[0],
                         EN_TrobleShootingDescription = TrobleShootingCase[1],
                         ZH_TrobleShootingDescription = TrobleShootingCase[2],
                         TrobleShootingFilePath = TrobleShootingCase[3]
-                    });
+                    };
                 }
             }
             else
@@ -239,33 +240,32 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
             var Alarms = Enum.GetValues(typeof(AlarmCodes)).Cast<AlarmCodes>();
 
-            foreach (var item in Alarms)
+            // 檢查是否有未記載的Alarm Code
+            List<clsVCSTrobleShooting> unsignAlarmCodes = Alarms.Where(item => !troubleShootings.Any(ts => ts.Alarm == item.ToString()))
+                                                                .Select(item => new clsVCSTrobleShooting()
+                                                                {
+                                                                    Alarm = item.ToString(),
+                                                                    EN_TrobleShootingDescription = "Ask GPM for Help",
+                                                                    ZH_TrobleShootingDescription = "請洽GPM"
+                                                                }).ToList();
+
+            foreach (var item in unsignAlarmCodes)
             {
-                string AlarmDescription = item.ToString();
-
-                if (VCSTrobleShootings.ContainsKey(AlarmDescription))
-                    continue;
-
-                VCSTrobleShootings.Add(AlarmDescription, new clsVCSTrobleShooting()
-                {
-                    Alarm = item.ToString(),
-                    EN_TrobleShootingDescription = "Ask GPM for Help",
-                    ZH_TrobleShootingDescription = "請洽GPM"
-                });
-
-                LOG.WARN($"有未記載的Alarm Code : {item.ToString()}");
+                LOG.WARN($"有未記載的Alarm Code : {item.Alarm}");
             }
 
-            FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);
+            troubleShootings.AddRange(unsignAlarmCodes);
+            VCSTrobleShootings = troubleShootings.DistinctBy(TrobleShooting => TrobleShooting.Alarm)
+                                                 .ToDictionary(TrobleShooting => TrobleShooting.Alarm, TrobleShooting => TrobleShooting);
 
+            FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);
             using (StreamWriter sr = new StreamWriter(fs, Encoding.GetEncoding("big5")))
             {
                 sr.WriteLine("Alarm,En_TrobleShootingDescription,ZH_TrobleShootingDescription,TrobleShootingFilePath");
-                foreach (var item in VCSTrobleShootings)
-                {
-                    sr.WriteLine($"{item.Value.Alarm},{item.Value.EN_TrobleShootingDescription},{item.Value.ZH_TrobleShootingDescription},{item.Value.TrobleShootingFilePath}");
-                }
+                IEnumerable<string> troubleShootingCsvLines = VCSTrobleShootings.Select(item => $"{item.Value.Alarm},{item.Value.EN_TrobleShootingDescription},{item.Value.ZH_TrobleShootingDescription},{item.Value.TrobleShootingFilePath}");
+                sr.Write(string.Join("\n", troubleShootingCsvLines));
             }
         }
+
     }
 }
