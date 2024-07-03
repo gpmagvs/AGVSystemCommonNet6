@@ -21,6 +21,18 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         public static string VMSHostUrl => "http://127.0.0.1:5036";
         public static event EventHandler OnVMSReconnected;
         public static bool IsAlive { get; private set; } = false;
+
+        private static HttpHelper _VMS_http;
+        private static HttpHelper GetVMSHttpHelper()
+        {
+            if (_VMS_http == null)
+            {
+                return new HttpHelper(VMSHostUrl);
+            }
+            else
+                return _VMS_http;
+        }
+
         public static Dictionary<VMS_GROUP, VMSConfig>? ReadVMSVehicleGroupSetting(string Vehicle_Json_file)
         {
             Dictionary<VMS_GROUP, VMSConfig> config = new Dictionary<VMS_GROUP, VMSConfig>();
@@ -123,7 +135,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         {
             try
             {
-                HttpHelper httpHelper = new HttpHelper($"http://127.0.0.1:5036", timeout_sec: 2);
+                HttpHelper httpHelper = GetVMSHttpHelper();
                 return await httpHelper.GetAsync<List<clsAGVStateDto>>("/api/VmsManager/AGVStatus");
             }
             catch (Exception)
@@ -136,8 +148,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             //confirm = confirm, message
             try
             {
-                HttpHelper http = new HttpHelper(VMSHostUrl);
-                Dictionary<string, object> response = await http.PostAsync<Dictionary<string, object>, object>($"/api/System/RunMode?mode={mode}&forecing_change={forecing_change}", null);
+                HttpHelper httpHelper = GetVMSHttpHelper();
+                Dictionary<string, object> response = await httpHelper.PostAsync<Dictionary<string, object>, object>($"/api/System/RunMode?mode={mode}&forecing_change={forecing_change}", null);
                 return ((bool)response["confirm"], response["message"].ToString());
             }
             catch (Exception ex)
@@ -154,8 +166,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
             try
             {
-                using HttpHelper http = new HttpHelper(VMSHostUrl);
-                await http.GetStringAsync($"/api/Task/Cancel?task_name={taskName}");
+                HttpHelper httpHelper = GetVMSHttpHelper();
+                await httpHelper.GetStringAsync($"/api/Task/Cancel?task_name={taskName}");
             }
             catch (Exception ex)
             {
@@ -166,8 +178,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         {
             try
             {
-                HttpHelper http = new HttpHelper(VMSHostUrl);
-                bool alive = await http.GetAsync<bool>($"/api/System/VMSAliveCheck", 8);
+                HttpHelper httpHelper = GetVMSHttpHelper();
+                bool alive = await httpHelper.GetAsync<bool>($"/api/System/VMSAliveCheck", 8);
                 return (alive, "");
             }
             catch (Exception ex)
@@ -180,8 +192,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         {
             try
             {
-                HttpHelper http = new HttpHelper(VMSHostUrl);
-                var response = await http.GetAsync<ResponseModel.clsResponseBase>($"/api/Navigation/AddPartsReplaceworkstationTag?workstationTag={tagOfEQInPartsReplacing}", 3);
+                HttpHelper httpHelper = GetVMSHttpHelper();
+                var response = await httpHelper.GetAsync<ResponseModel.clsResponseBase>($"/api/Navigation/AddPartsReplaceworkstationTag?workstationTag={tagOfEQInPartsReplacing}", 3);
                 return response;
             }
             catch (Exception ex)
@@ -193,8 +205,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         {
             try
             {
-                HttpHelper http = new HttpHelper(VMSHostUrl);
-                var response = await http.GetAsync<ResponseModel.clsResponseBase>($"/api/Navigation/RemovePartsReplaceworkstationTag?workstationTag={tagOfEQInPartsReplacing}", 3);
+                HttpHelper httpHelper = GetVMSHttpHelper();
+                var response = await httpHelper.GetAsync<ResponseModel.clsResponseBase>($"/api/Navigation/RemovePartsReplaceworkstationTag?workstationTag={tagOfEQInPartsReplacing}", 3);
                 return response;
             }
             catch (Exception ex)
@@ -210,10 +222,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 try
                 {
 
-                    using (HttpHelper http = new HttpHelper(VMSHostUrl))
-                    {
-                        return await http.GetAsync<clsResponseBase>($"/api/Task/CheckOrderExecutableByBatStatus?agvName={agvName}&orderAction={orderAction}");
-                    }
+                    HttpHelper httpHelper = GetVMSHttpHelper();
+                    return await httpHelper.GetAsync<clsResponseBase>($"/api/Task/CheckOrderExecutableByBatStatus?agvName={agvName}&orderAction={orderAction}");
                 }
                 catch (Exception ex)
                 {

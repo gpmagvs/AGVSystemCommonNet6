@@ -32,7 +32,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
             Task.Run(fetchFinishTasksCallback);
         }
 
-        private async void fetchFinishTasksCallback()
+        private async Task fetchFinishTasksCallback()
         {
             Stopwatch _stopwatch = Stopwatch.StartNew();
             while (true)
@@ -53,12 +53,12 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
                         if (_stopwatch.Elapsed.Seconds > 8)
                         {
-                            Console.WriteLine($"{DateTime.Now} DatabaseBackgroundService [fetchFinishTasksCallback] Time Spend Long...: " + _stopwatch.Elapsed.TotalSeconds);
+                            _logger.LogWarning($"{DateTime.Now} DatabaseBackgroundService [fetchFinishTasksCallback] Time Spend Long...: " + _stopwatch.Elapsed.TotalSeconds);
                         }
 
                         async Task<List<clsTaskDto>> GetTasksInSpecficTimeRange()
                         {
-                            DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-2);
+                            DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
                             return await dbContext.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToListAsync();
                         }
 
@@ -77,9 +77,11 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
             }
         }
 
-        private async void DatabaseDataSyncWork()
+        private async Task DatabaseDataSyncWork()
         {
             Stopwatch _stopwatch = Stopwatch.StartNew();
+            Stopwatch _stopwatch_tasks_query = Stopwatch.StartNew();
+            Stopwatch _stopwatch_alarms_query = Stopwatch.StartNew();
 
             while (true)
             {
@@ -90,18 +92,40 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                     using (var scope = _services.CreateScope())
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
-
-
-
                         async Task<List<clsTaskDto>> GetTasksInSpecficTimeRange()
                         {
-                            DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-2);
-                            return await dbContext.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).ToListAsync();
+                            _stopwatch_tasks_query.Restart();
+                            try
+                            {
+
+                                DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
+                                return await dbContext.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).OrderByDescending(t=>t.RecieveTime).Take(30).ToListAsync();
+                            }
+                            finally{
+                                _stopwatch_tasks_query.Stop();
+                                if (_stopwatch_tasks_query.Elapsed.Seconds > 1)
+                                {
+                                    _logger.LogWarning($"{DateTime.Now} DatabaseBackgroundService [GetTasksInSpecficTimeRange] Time Spend Long...: " + _stopwatch_tasks_query.Elapsed.TotalSeconds);
+                                }
+                            }
                         }
                         async Task<List<clsAlarmDto>> GetAlarmsInSpeficTimeRange()
                         {
-                            DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
-                            return await dbContext.SystemAlarms.AsNoTracking().Where(al => al.Time >= recieveTimeLowerLimit).ToListAsync();
+                            _stopwatch_alarms_query.Restart();
+                            try
+                            {
+                                DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
+                                return await dbContext.SystemAlarms.AsNoTracking().Where(al => al.Time >= recieveTimeLowerLimit).ToListAsync();
+                            }
+                            finally
+                            {
+                                _stopwatch_alarms_query.Stop();
+                                if (_stopwatch_alarms_query.Elapsed.Seconds > 1)
+                                {
+                                    _logger.LogWarning($"{DateTime.Now} DatabaseBackgroundService [GetAlarmsInSpeficTimeRange] Time Spend Long...: " + _stopwatch_alarms_query.Elapsed.TotalSeconds);
+                                }
+                            }
+                           
                         }
 
                         List<clsTaskDto> _TasksForQuery = await GetTasksInSpecficTimeRange();
@@ -118,7 +142,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
                         if (_stopwatch.Elapsed.Seconds > 1)
                         {
-                            Console.WriteLine($"{DateTime.Now} DatabaseBackgroundService Work Time Long...: " + _stopwatch.Elapsed.TotalSeconds);
+                            _logger.LogWarning($"{DateTime.Now} DatabaseBackgroundService Work Time Long...: " + _stopwatch.Elapsed.TotalSeconds);
                         }
 
                     }
