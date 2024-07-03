@@ -130,6 +130,8 @@ namespace AGVSystemCommonNet6.Alarm
         CANNOT_DISPATCH_CHARGE_TASK_WHEN_AGV_HAS_CARGO = 3042,
         VEHICLES_TRAJECTORY_CONFLIC = 3043,
         REGION_NOT_ENTERABLE = 3044,
+        From_To_Of_Transfer_Task_Is_Incorrectly = 3045,
+        AGV_NO_Carge_Cannot_Transfer_Cargo_From_AGV_To_Desinte = 3046,
     }
 
 }

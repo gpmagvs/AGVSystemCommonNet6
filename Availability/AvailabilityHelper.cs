@@ -138,7 +138,6 @@ namespace AGVSystemCommonNet6.Availability
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{typeof(AGVStatusDBHelper).Name}" + ex.Message);
 
             }
         }
@@ -164,7 +163,6 @@ namespace AGVSystemCommonNet6.Availability
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} " + ex.Message);
             }
             finally
             {
@@ -193,7 +191,6 @@ namespace AGVSystemCommonNet6.Availability
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} " + ex.Message);
 
                 }
                 finally
