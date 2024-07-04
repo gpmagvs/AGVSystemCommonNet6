@@ -39,7 +39,7 @@ namespace AGVSystemCommonNet6.Configuration
         {
             _configFilePath = Path.Combine(ConfigsFilesFolder, "SystemConfigs.json");
             SysConfigs = LoadConfig(_configFilePath);
-            WatchSystemConfigs(_configFilePath);
+            //WatchSystemConfigs(_configFilePath);
         }
 
         private static void WatchSystemConfigs(string _configFilePath)
