@@ -158,7 +158,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
         }
 
-        public static async Task TaskCancel(string taskName)
+        public static async Task TaskCancel(string taskName, string reason)
         {
             if (!IsAlive)
             {
@@ -167,7 +167,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             try
             {
                 HttpHelper httpHelper = GetVMSHttpHelper();
-                await httpHelper.GetStringAsync($"/api/Task/Cancel?task_name={taskName}");
+                await httpHelper.GetStringAsync($"/api/Task/Cancel?task_name={taskName}&reason={reason}");
             }
             catch (Exception ex)
             {
