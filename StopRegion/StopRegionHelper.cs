@@ -77,7 +77,7 @@ namespace AGVSystemCommonNet6.StopRegion
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{typeof(AGVStatusDBHelper).Name} " + ex.Message);
+               
             }
         }
     }

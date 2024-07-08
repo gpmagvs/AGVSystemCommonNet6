@@ -46,7 +46,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
     [Index(nameof(FinishTime))]
     public class clsTaskDto
     {
-
         public DateTime RecieveTime { get; set; }
 
         [NotMapped]
@@ -147,6 +146,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         [Required]
         public string From_Station { get; set; } = "-1";
+
+
+        [NotMapped]
+        public bool IsFromAGV => From_Station.Contains("AGV");
 
         [NotMapped]
         public string From_Station_Display { get; set; } = string.Empty;

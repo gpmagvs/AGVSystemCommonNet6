@@ -34,9 +34,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         public static object lockObj = new object();
         public async Task<int> SaveChanges()
         {
-            await saveChangeSemaphoreSlim.WaitAsync();
             try
             {
+                await saveChangeSemaphoreSlim.WaitAsync();
                 return await dbhelper._context.SaveChangesAsync();
             }
             catch (Exception ex)

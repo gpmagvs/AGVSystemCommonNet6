@@ -64,7 +64,6 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             /// <returns></returns>
             public static async Task<clsAGVSTaskReportResponse> StartTransferCargoReport(string AGVName, int SourceTag, int DestineTag)
             {
-
                 var agvs_http = GetAGVSHttpHelper();
                 clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}");
                 LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
@@ -114,7 +113,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
 
             }
 
-            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int from_station_slot, int to_Station_Tag, int to_Station_Slot, ACTION_TYPE action)
+            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int from_station_slot, int to_Station_Tag, int to_Station_Slot, ACTION_TYPE action, bool isSourceAGV = false)
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse() { confirm = false };
                 int intRetry = 0;
@@ -123,7 +122,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 {
                     try
                     {
-                        var route = $"/api/Task/LDULDOrderStart?from={from_Station_Tag}&FromSlot={from_station_slot}&to={to_Station_Tag}&ToSlot={to_Station_Slot}&action={action}";
+                        var route = $"/api/Task/LDULDOrderStart?from={from_Station_Tag}&FromSlot={from_station_slot}&to={to_Station_Tag}&ToSlot={to_Station_Slot}&action={action}&isSourceAGV={isSourceAGV}";
                         LOG.INFO($"StartLDULDOrderReport start");
 
                         var agvs_http = GetAGVSHttpHelper();
