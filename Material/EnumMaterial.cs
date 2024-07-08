@@ -26,7 +26,7 @@ namespace AGVSystemCommonNet6.Material
     public enum MaterialCondition : int
     {
         //搬運狀態
-        wait = 1,
+        Wait = 1,
         Transfering,
         Done,
         //帳料修改狀態

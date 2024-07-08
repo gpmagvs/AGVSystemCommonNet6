@@ -79,7 +79,7 @@ namespace AGVSystemCommonNet6.Material
             }
         }
 
-        public static async Task<clsMaterialInfo> AddMaterialInfo(string MaterialID, string TargetStation, MaterialInstallStatus installStatus, MaterialIDStatus IDStatus, MaterialType materialType)
+        public static async Task<clsMaterialInfo> AddMaterialInfo(string MaterialID, string TargetStation, MaterialInstallStatus installStatus, MaterialIDStatus IDStatus, MaterialType materialType, MaterialCondition materialCondition)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace AGVSystemCommonNet6.Material
                     InstallStatus = installStatus,
                     IDStatus = IDStatus,
                     Type = materialType,
-                    Condition = MaterialCondition.Add
+                    Condition = materialCondition
                 };
                 materialDto.RecordTime = DateTime.Now;
                 await AddMaterialInfo(materialDto);
