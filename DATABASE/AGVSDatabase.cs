@@ -4,6 +4,7 @@ using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Availability;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
+using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.User;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +60,7 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<clsTaskTrajecotroyStore>(nameof(database.tables.TaskTrajecotroyStores));
             await schemaUpdater.EnsureFieldExists<clsMeasureResult>(nameof(database.tables.InstrumentMeasureResult));
             await schemaUpdater.EnsureFieldExists<clsStopRegionDto>(nameof(database.tables.StopRegionData));
-
+            await schemaUpdater.EnsureFieldExists<clsMaterialInfo>(nameof(database.tables.MaterialInfo));
 
             return true;
         }
@@ -85,6 +86,7 @@ namespace AGVSystemCommonNet6.DATABASE
                 databse.tables.TaskTrajecotroyStores.FirstOrDefault();
                 databse.tables.InstrumentMeasureResult.FirstOrDefault();
                 databse.tables.StopRegionData.FirstOrDefault();
+                databse.tables.MaterialInfo.FirstOrDefault();
             }
             catch (Exception ex)
             {
