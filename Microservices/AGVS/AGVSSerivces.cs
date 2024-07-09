@@ -28,11 +28,8 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
         private static HttpHelper GetAGVSHttpHelper()
         {
             if (_agvs_http == null)
-            {
-                return new HttpHelper(AGVSHostUrl);
-            }
-            else
-                return _agvs_http;
+                _agvs_http = new HttpHelper(AGVSHostUrl);
+            return _agvs_http;
         }
 
 
@@ -68,13 +65,9 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}");
                 LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
                 return response;
-
             }
-
-
             public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action)
             {
-
                 var agvs_http = GetAGVSHttpHelper();
                 try
                 {
@@ -91,11 +84,8 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
 
             }
-
-
             public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, int slot, ACTION_TYPE action)
             {
-
                 var agvs_http = GetAGVSHttpHelper();
                 try
                 {
@@ -110,9 +100,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     LOG.Critical($"LoadUnload Task Start Feedback to AGVS FAIL,{ex.Message}", ex);
                     return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                 }
-
             }
-
             public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int from_station_slot, int to_Station_Tag, int to_Station_Slot, ACTION_TYPE action, bool isSourceAGV = false)
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse() { confirm = false };
@@ -141,7 +129,6 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
                 return response;
             }
-
             public static async Task<Dictionary<int, int>> GetEQAcceptAGVTypeInfo(IEnumerable<int> tagsCollections)
             {
 
@@ -172,9 +159,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     //return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                     return new Dictionary<int, int>();
                 }
-
             }
-
             public static async Task<List<int>> GetEQWIPAcceptTransferTagInfoByTag(int tag)
             {
                 HttpHelper agvs_http = GetAGVSHttpHelper();
@@ -192,8 +177,29 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     LOG.Critical($"GetEQAcceptAGVTypeInfo from AGVS FAIL,{ex.Message}", ex);
                     return new List<int>();
                 }
-
             }
+        }
+        public static async Task<(bool confirm, string message)> TaskReporter(object data)
+        {
+            (bool confirm, string message) response = new(false, "[AGVSSerivces.TaskReporter] System Error");
+            GetAGVSHttpHelper();
+            try
+            {
+                var route = $"/api/MCSCIM/TaskReporter";
+                string strJson = data.ToJson();
+                (bool success, string json) v = await _agvs_http.PostAsync(route, data, timeout: 7);
+                clsAGVSTaskReportResponse responsedata = JsonConvert.DeserializeObject<clsAGVSTaskReportResponse>(v.json);
+                if (v.success == true && responsedata.confirm == true)
+                    response.confirm = true;
+                else
+                    response.confirm = false;
+                response.message = responsedata.message;
+            }
+            catch (Exception ex)
+            {
+                response.message = $"[AGVSSerivces.TaskReporter] {ex.Message}";
+            }
+            return response;
         }
     }
 }

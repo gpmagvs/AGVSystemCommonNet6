@@ -95,19 +95,20 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task<(bool confirm, string message)> TaskReporter(object data)
         {
-            (bool confirm, string message) response = new(false, "[TaskReporter] Fail");
+            (bool confirm, string message) response = new(false, "[MCSCIMService.TaskReporter] System Error.");
             using (agvs_http)
             {
                 try
                 {
                     var route = $"/api/HostMode/TaskCollecter";
+                    string strJson = data.ToJson();
                     (bool success, string json) v = await agvs_http.PostAsync(route,data);
-                    //response.confirm = v.confirm;
-                    //response.message = v.message;
+                    response.confirm = v.success;
+                    response.message = v.json;
                 }
                 catch (Exception ex)
                 {
-                    response.message += ex.ToString();
+                    response.message = $"[MCSCIMService.TaskReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
                 }
             }
             return response;
