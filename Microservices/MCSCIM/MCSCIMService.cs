@@ -25,7 +25,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 }
                 catch (Exception ex)
                 {
-                    response.message += ex.Message.ToString();
+                    response.message = $"[MCSCIMService.Online] {agvs_http.http_client.BaseAddress} {ex.Message}";
                 }
             }
             return response;
@@ -102,7 +102,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 {
                     var route = $"/api/HostMode/TaskCollecter";
                     string strJson = data.ToJson();
-                    (bool success, string json) v = await agvs_http.PostAsync(route,data);
+                    (bool success, string json) v = await agvs_http.PostAsync(route, data);
                     response.confirm = v.success;
                     response.message = v.json;
                 }
@@ -119,6 +119,24 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             public bool confirm { get; set; } = false;
             public string message { get; set; }
+        }
+        /// <summary>
+        /// 需與 AGVSCIMServicePlatform.Models.clsTask.TaskStatus 完全一致
+        /// </summary>
+        public enum TaskStatus
+        {
+            init = 0,
+            wait_to_execute = 1,
+            wait_to_assign = 2,
+            assgined = 2,
+            wait_to_start = 3,
+            start = 4,
+            wait_to_source = 5,
+            at_source_wait_in = 6,
+            wait_to_dest = 7,
+            at_destination_wait_in = 8,
+            wait_to_complete = 9,
+            completed = 96, fail = 97, cancel = 98, finish_and_reported = 99
         }
     }
 }

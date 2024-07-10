@@ -179,6 +179,12 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
             }
         }
+        /// <summary>
+        /// TaskStatus
+        /// wait_to_assign = 0, assgined = 1, wait_to_start = 2, start = 3, wait_to_complete = 4, completed = 5, fail = 6, cancel = 7, finish_and_reported = 8
+        /// </summary>
+        /// <param name="data">(clsTaskDto, clsTask.TaskStatus)</param>
+        /// <returns></returns>
         public static async Task<(bool confirm, string message)> TaskReporter(object data)
         {
             (bool confirm, string message) response = new(false, "[AGVSSerivces.TaskReporter] System Error");
