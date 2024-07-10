@@ -52,6 +52,10 @@ namespace AGVSystemCommonNet6.Configuration
         /// 當設備維修時封閉進入點
         /// </summary>
         public bool DisableEntryPointWhenEQMaintaining { get; set; } = false;
+        /// <summary>
+        /// 當設備零件更換時封閉進入點
+        /// </summary>
+        public bool DisableEntryPointWhenEQPartsReplacing { get; set; } = false;
 
     }
 

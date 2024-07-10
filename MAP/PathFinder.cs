@@ -216,7 +216,7 @@ namespace AGVSystemCommonNet6.MAP
                 {
                     if (options.OnlyNormalPoint)
                     {
-                        var normal_pts = stations.ToList().Where(kp => kp.Value.StationType == 0).ToList();
+                        var normal_pts = stations.ToList().Where(kp => kp.Value.StationType == STATION_TYPE.Normal || kp.Value.StationType == STATION_TYPE.Auto_Door).ToList();
                         if (options.ContainElevatorPoint)
                         {
                             normal_pts.AddRange(stations.Where(kp => kp.Value.StationType == STATION_TYPE.Elevator));
