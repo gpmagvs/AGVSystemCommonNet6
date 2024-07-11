@@ -136,7 +136,8 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             wait_to_dest = 7,
             at_destination_wait_in = 8,
             wait_to_complete = 9,
-            completed = 96, fail = 97, cancel = 98, finish_and_reported = 99
+            completed = 96, fail = 97, cancel = 98, finish_and_reported = 99,
+            ignore = 100
         }
     }
 }
