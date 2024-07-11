@@ -33,6 +33,8 @@ namespace AGVSystemCommonNet6.Configuration
 
         public string TrobleShootingFolder { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\");
 
+        public clsMaterialBufferLevelMonitor MaterialBufferLevelMonitor { get; set; } = new clsMaterialBufferLevelMonitor();
+
     }
     public class clsMapConfigs
     {
@@ -77,6 +79,12 @@ namespace AGVSystemCommonNet6.Configuration
     {
         public string SavePath { get; set; } = @"d:\DailyData\";
         public int SaveTime { get; set; } = 1;
+    }
+
+    public class clsMaterialBufferLevelMonitor
+    {
+        public bool MonitorSwitch { get; set; } = false;
+        public int LevelThreshold { get; set; } = 0;
     }
 
 }

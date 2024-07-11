@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EquipmentManagment\EquipmentManagment.csproj" />
     <ProjectReference Include="..\RosBridgeClient\RosBridgeClient.csproj" />
   </ItemGroup>
 
