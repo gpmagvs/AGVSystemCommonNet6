@@ -2,6 +2,8 @@
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Microservices.AGVS;
+using AGVSystemCommonNet6.Microservices.MCS;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -20,6 +22,7 @@ namespace AGVSystemCommonNet6.Alarm
         public static Dictionary<int, clsAlarmCode> AlarmCodes2 = new Dictionary<int, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
         private static AGVSDatabase database;
+        public static bool IsReportAlarmToHostON = false;
         public static List<clsAlarmDto> uncheckedAlarms
         {
             get
@@ -145,6 +148,8 @@ namespace AGVSystemCommonNet6.Alarm
                 alarmDto.Time = DateTime.Now;
                 await AddAlarmAsync(alarmDto);
                 LOG.WARN($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
+                if (IsReportAlarmToHostON == true)
+                    await MCSCIMService.AlarmReporter(alarmDto);
                 return alarmDto;
             }
             catch (Exception ex)
