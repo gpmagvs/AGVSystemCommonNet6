@@ -49,6 +49,13 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 clsGetUsableChargeStationTagResponse response = await agvs_http.GetAsync<clsGetUsableChargeStationTagResponse>($"/api/Traffic/GetUseableChargeStationTags?agv_name={agv_name}");
                 return response;
             }
+
+            public static async Task<List<int>> GetTagsOfEQPartsReplacing()
+            {
+                var agvs_http = GetAGVSHttpHelper();
+                List<int> response = await agvs_http.GetAsync<List<int>>($"/api/Traffic/GetTagsOfEQPartsReplacing");
+                return response;
+            }
         }
 
         public struct TRANSFER_TASK
