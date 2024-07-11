@@ -132,6 +132,7 @@ namespace AGVSystemCommonNet6.Alarm
         REGION_NOT_ENTERABLE = 3044,
         From_To_Of_Transfer_Task_Is_Incorrectly = 3045,
         AGV_NO_Carge_Cannot_Transfer_Cargo_From_AGV_To_Desinte = 3046,
+        Path_Not_Exist_In_Route = 3047,
     }
 
 }
