@@ -19,5 +19,6 @@ namespace AGVSystemCommonNet6.Material
 
         public int SourceTag { get; set; } = -1;
         public string SourceStation { get; set; } = string.Empty;
+        public int SourceSlot { get; set; } = 0;
     }
 }
