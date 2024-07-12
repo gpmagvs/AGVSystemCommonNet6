@@ -22,7 +22,7 @@ namespace AGVSystemCommonNet6.Alarm
         public static Dictionary<int, clsAlarmCode> AlarmCodes2 = new Dictionary<int, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
         private static AGVSDatabase database;
-        public static bool IsReportAlarmToHostON = false;
+        public static bool IsReportAlarmToHostON { get; set; } = false;
         public static List<clsAlarmDto> uncheckedAlarms
         {
             get
@@ -30,8 +30,6 @@ namespace AGVSystemCommonNet6.Alarm
                 return DatabaseCaches.Alarms.UnCheckedAlarms;
             }
         }
-
-        public static bool IsReportAlarmToHostON { get; set; }
 
         private static bool Initialized = false;
         public AlarmManagerCenter() { }
