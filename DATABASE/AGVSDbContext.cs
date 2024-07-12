@@ -3,6 +3,7 @@ using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Availability;
 using AGVSystemCommonNet6.Maintainance;
+using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.User;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,8 @@ namespace AGVSystemCommonNet6.DATABASE
         public DbSet<clsPointPassInfo> PointPassTime { get; set; }
 
         public DbSet<VehicleMaintain> VehicleMaintain { get; set; }
+
+        public DbSet<clsMaterialInfo> MaterialInfo {  get; set; }
 
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options)
             : base(options)
