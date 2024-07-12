@@ -30,6 +30,9 @@ namespace AGVSystemCommonNet6.Alarm
                 return DatabaseCaches.Alarms.UnCheckedAlarms;
             }
         }
+
+        public static bool IsReportAlarmToHostON { get; set; }
+
         private static bool Initialized = false;
         public AlarmManagerCenter() { }
 

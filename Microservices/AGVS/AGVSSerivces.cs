@@ -7,6 +7,7 @@ using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.MAP;
 using AGVSystemCommonNet6.Microservices.ResponseModel;
+using AGVSystemCommonNet6.Notify;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
 using System;
@@ -48,6 +49,13 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 clsGetUsableChargeStationTagResponse response = await agvs_http.GetAsync<clsGetUsableChargeStationTagResponse>($"/api/Traffic/GetUseableChargeStationTags?agv_name={agv_name}");
                 return response;
             }
+
+            public static async Task<List<int>> GetTagsOfEQPartsReplacing()
+            {
+                var agvs_http = GetAGVSHttpHelper();
+                List<int> response = await agvs_http.GetAsync<List<int>>($"/api/Traffic/GetTagsOfEQPartsReplacing");
+                return response;
+            }
         }
 
         public struct TRANSFER_TASK
@@ -66,23 +74,24 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
                 return response;
             }
-            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action)
+            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action, string agvName)
             {
+                clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse(false, ALARMS.SYSTEM_ERROR, "");
                 var agvs_http = GetAGVSHttpHelper();
                 try
                 {
                     var route = $"/api/Task/LoadUnloadTaskFinish?tag={tagNumber}&action={action}";
                     LOG.INFO($"LoadUnloadActionFinishReport start");
-                    clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+                    response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
                     LOG.INFO($"LoadUnload Task Finish Feedback to AGVS, AGVS Response = {response.ToJson()}");
-                    return response;
                 }
                 catch (Exception ex)
                 {
                     LOG.Critical($"LoadUnload Task Finish Feedback to AGVS FAIL,{ex.Message}", ex);
-                    return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
+                    response = new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                 }
-
+                NotifyServiceHelper.INFO($"{agvName} {action} Action Finish Report To AGVS.Alarm Code Response={response.AlarmCode}");
+                return response;
             }
             public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, int slot, ACTION_TYPE action)
             {
