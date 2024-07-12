@@ -74,7 +74,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
                 return response;
             }
-            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action, string agvName)
+            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action, string agvName="")
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse(false, ALARMS.SYSTEM_ERROR, "");
                 var agvs_http = GetAGVSHttpHelper();
