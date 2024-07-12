@@ -176,6 +176,45 @@ namespace AGVSystemCommonNet6.Material
         }
 
         /// <summary>
+        /// 修改物料ID
+        /// </summary>
+        /// <param name="OriginMaterialID"></param>
+        /// <param name="NewMaterialID"></param>
+        /// <param name="SourceStation"></param>
+        /// <param name="installStatus"></param>
+        /// <param name="materialIDStatus"></param>
+        /// <param name="materialType"></param>
+        /// <returns></returns>
+        public static async Task<clsMaterialInfo> EditMaterialInfo(string OriginMaterialID,string NewMaterialID,string SourceStation,MaterialInstallStatus installStatus,MaterialIDStatus materialIDStatus,MaterialType materialType)
+        {
+            try
+            {
+                clsMaterialInfo materialDto = new clsMaterialInfo()
+                {
+                    MaterialID = OriginMaterialID,
+                    ActualID = NewMaterialID,
+                    SourceStation = SourceStation,
+                    InstallStatus = installStatus,
+                    IDStatus = materialIDStatus,
+                    Type = materialType,
+                    Condition = MaterialCondition.Edit
+                };
+                materialDto.RecordTime = DateTime.Now;
+                await AddMaterialInfo(materialDto);
+                LOG.INFO($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
+                return materialDto;
+            }
+            catch (Exception ex)
+            {
+                LOG.ERROR("AddMaterialAsync", ex);
+                return null;
+            }
+            finally
+            {
+            }
+        }
+
+        /// <summary>
         /// 查找時間範圍內的Material Log
         /// </summary>
         /// <param name="startTime"></param>
