@@ -2,6 +2,7 @@
 using RosSharp.RosBridgeClient.MessageTypes.Std;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace AGVSystemCommonNet6.Material
     [Index(nameof(TargetStation))]
     public class clsMaterialInfo
     {
+        [Key]
         public DateTime RecordTime { get; set; } = DateTime.Now;
         public string MaterialID { get; set; } = "";
 
