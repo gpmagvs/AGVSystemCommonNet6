@@ -74,7 +74,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
                 return response;
             }
-            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action, string agvName="")
+            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action, string agvName = "")
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse(false, ALARMS.SYSTEM_ERROR, "");
                 var agvs_http = GetAGVSHttpHelper();
@@ -232,6 +232,26 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             catch (Exception ex)
             {
                 response.message = $"[AGVSSerivces.AlarmReporterSwitch] {ex.Message}";
+            }
+            return response;
+        }
+
+        public static async Task<(bool confirm, string message, object obj)> GetNGPort()
+        {
+            (bool confirm, string message, object obj) response = new(false, "", null);
+            GetAGVSHttpHelper();
+            try
+            {
+                var route = $"/api/Equipment/GetNgPort";
+                clsResponseBase v = await _agvs_http.GetAsync<clsResponseBase>(route, timeout: 15);
+                response.confirm = v.confirm;
+                response.message = v.message;
+                response.obj = v.ReturnObj;
+
+            }
+            catch (Exception ex)
+            {
+                response.message = ex.Message;
             }
             return response;
         }
