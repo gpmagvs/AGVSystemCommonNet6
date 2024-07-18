@@ -10,6 +10,7 @@ using AGVSystemCommonNet6.Microservices.ResponseModel;
 using AGVSystemCommonNet6.Notify;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
+using RosSharp.RosBridgeClient.MessageTypes.Std;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -187,6 +188,22 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     return new List<int>();
                 }
             }
+
+            public static async Task<bool> call_AGVs_carry_api(string strToken, string strUsername, object data)
+            {
+                HttpHelper agvs_http = GetAGVSHttpHelper();
+                agvs_http.http_client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", $"{strToken}");
+                try
+                {
+                    var route = $"/api/Task/carry?user={strUsername}";
+                    var response = await agvs_http.PostAsync(route, data, timeout: 15);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
         /// <summary>
         /// TaskStatus:MCSCIMService.TaskStatus
@@ -254,6 +271,28 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 response.message = ex.Message;
             }
             return response;
+        }
+        public static async Task<(bool confirm, string token, string strUsername)> Login()
+        {
+            (bool confirm, string token, string strUsername) response = new(false, "", "");
+            GetAGVSHttpHelper();
+            try
+            {
+                var route = $"/api/Auth/login?Username=dev&Password=12345678";
+                (bool success, string json) v = await _agvs_http.PostAsync(route, new AGVSystemCommonNet6.User.UserLoginRequest() { Username = "dev", Password = "12345678" }, timeout: 15);
+                response.confirm = v.success;
+                Dictionary<string, string> obj = JsonConvert.DeserializeObject<Dictionary<string, string>>(v.json);
+                string strToken = obj["token"];
+                string strUsername = obj["UserName"];
+                response.token = strToken;
+                response.strUsername = strUsername;
+            }
+            catch (Exception ex)
+            {
+                response.token = ex.Message;
+            }
+            return response;
+
         }
     }
 }

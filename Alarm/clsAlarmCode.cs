@@ -8,10 +8,13 @@ namespace AGVSystemCommonNet6.Alarm
 {
     public class clsAlarmCode
     {
-
-        public int AlarmCode { get; set; }
+        public ALARMS AlarmCode { get; set; }
         public string Description => $"{Description_Zh}({Description_En})";
         public string Description_Zh { get; set; } = "";
         public string Description_En { get; set; } = "";
+
+        public string En_TrobleShootingDescription { get; set; } = "";
+        public string ZH_TrobleShootingDescription { get; set; } = "";
+        public string TrobleShootingFilePath { get; set; } = "";
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
+using AGVSystemCommonNet6.GPMRosMessageNet.Messages;
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Microservices.AGVS;
 using AGVSystemCommonNet6.Microservices.MCS;
@@ -19,7 +20,6 @@ namespace AGVSystemCommonNet6.Alarm
         public static string ALARM_CODE_FILE_PATH = @".\Resources\AGVS_AlarmCodes.json";
         public static string TROBLE_SHOOTING_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_TrobleShooting.csv");
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
-        public static Dictionary<int, clsAlarmCode> AlarmCodes2 = new Dictionary<int, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
         private static AGVSDatabase database;
         public static bool IsReportAlarmToHostON { get; set; } = false;
@@ -162,64 +162,41 @@ namespace AGVSystemCommonNet6.Alarm
             {
             }
         }
-        public static async Task<clsAlarmDto> AddAlarmAsync(int alarm, ALARM_SOURCE source = ALARM_SOURCE.AGVS, ALARM_LEVEL level = ALARM_LEVEL.ALARM, string Equipment_Name = "", string location = "", string taskName = "")
-        {
-
-            try
-            {
-                clsAlarmCode alarmCodeData;
-                string description_zh = "";
-                string description_En = "";
-                if (!AlarmCodes2.TryGetValue(alarm, out alarmCodeData))
-                {
-                    description_zh = description_En = alarm.ToString();
-                }
-                else
-                {
-                    description_zh = alarmCodeData.Description_Zh;
-                    description_En = alarmCodeData.Description_En;
-                }
-                clsAlarmDto alarmDto = new clsAlarmDto()
-                {
-                    Equipment_Name = Equipment_Name,
-                    Description_Zh = description_zh,
-                    Description_En = description_En,
-                    Level = level,
-                    AlarmCode = (int)alarm,
-                    OccurLocation = location == null ? "" : location,
-                    Task_Name = taskName == null ? "" : taskName,
-                    Time = DateTime.Now,
-                    Source = source,
-                    //TrobleShootingMethod = AGVsTrobleShootings[alarm.ToString()].EN_TrobleShootingDescription,
-                    //TrobleShootingReference = AGVsTrobleShootings[alarm.ToString()].TrobleShootingFilePath
-                };
-                alarmDto.Time = DateTime.Now;
-                await AddAlarmAsync(alarmDto);
-                LOG.WARN($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
-                return alarmDto;
-            }
-            catch (Exception ex)
-            {
-                LOG.ERROR("AddAlarmAsync", ex);
-                return null;
-            }
-            finally
-            {
-            }
-        }
-
 
         private static void LoadAlarmCodes()
         {
-            if (File.Exists(ALARM_CODE_FILE_PATH))
+            Task.Run(() =>
             {
-                clsAlarmCode[]? _AlarmCodes = JsonConvert.DeserializeObject<clsAlarmCode[]>(File.ReadAllText(ALARM_CODE_FILE_PATH));
-                AlarmCodes2 = _AlarmCodes.ToDictionary(ac => ac.AlarmCode, ac => ac);
-            }
-            else
-            {
-                //TODO
-            }
+                if (File.Exists(ALARM_CODE_FILE_PATH))
+                {
+                    string strText = File.ReadAllText(ALARM_CODE_FILE_PATH);
+                    clsAlarmCode[]? _AlarmCodes = JsonConvert.DeserializeObject<clsAlarmCode[]>(strText);
+
+                    foreach (var alarm in _AlarmCodes)
+                    {
+                        if (Enum.IsDefined(typeof(ALARMS), alarm.AlarmCode))
+                        {
+                            //Console.WriteLine($"AlarmCode {alarm.AlarmCode} is defined in ALARMS.");
+                        }
+                        else
+                        {
+                            LOG.WARN($"AlarmCode {alarm.AlarmCode} is NOT defined in ALARMS.", show_console: true);
+                            //Console.WriteLine($"AlarmCode {alarm.AlarmCode} is NOT defined in ALARMS.");
+                        }
+                    }
+                    AlarmCodes = _AlarmCodes.ToDictionary(ac => ac.AlarmCode, ac => ac);
+                    // 如果有更新clsAlarmCode項目需要再寫回去檔案要true起來
+                    if (false)
+                    {
+                        string strAlarm = JsonConvert.SerializeObject(_AlarmCodes);
+                        File.WriteAllText(ALARM_CODE_FILE_PATH, strAlarm);
+                    }
+                }
+                else
+                {
+                    //TODO
+                }
+            });
         }
 
         private static void LoadTrobleShootingDescription()
@@ -306,7 +283,7 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 return new clsAlarmCode
                 {
-                    AlarmCode = (int)alarm_enum,
+                    AlarmCode = alarm_enum,
                     Description_En = alarm_enum.ToString(),
                     Description_Zh = alarm_enum.ToString()
                 };

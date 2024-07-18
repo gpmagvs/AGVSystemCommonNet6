@@ -79,7 +79,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 IsAlive = true;
                 Stopwatch sw = Stopwatch.StartNew();
                 bool previous_alive_state = true;
-                clsAlarmCode alarm = AlarmManagerCenter.GetAlarmCode(ALARMS.VMS_DISCONNECT);
+                clsAlarmCode alarm = AlarmManagerCenter.GetAlarmCode(ALARMS.VMSDisconnectwithVehicle);
                 clsAlarmDto disconnectAlarm = new clsAlarmDto()
                 {
                     AlarmCode = (int)alarm.AlarmCode,
@@ -105,14 +105,14 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                                 sw.Restart();
                                 disconnectAlarm.Checked = false;
                                 disconnectAlarm.Time = DateTime.Now;
-                                AlarmManagerCenter.AddAlarmAsync(150, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");//VMS_DISCONNECT
+                                AlarmManagerCenter.AddAlarmAsync(ALARMS.VMSDisconnectwithVehicle, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
                             }
                             else
                             {
                                 IsAlive = true;
                                 OnVMSReconnected?.Invoke("", EventArgs.Empty);
                                 sw.Restart();
-                                await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", 150, "SystemAuto");//VMS_DISCONNECT
+                                await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", ALARMS.VMSDisconnectwithVehicle, "SystemAuto");
                             }
                         }
                         else if (!response.alive)
