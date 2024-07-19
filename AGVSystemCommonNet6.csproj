@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>3.6.200.5</AssemblyVersion>
+    <AssemblyVersion>3.6.201.0</AssemblyVersion>
     <Version>3.6.2.1</Version>
   </PropertyGroup>
 
@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EquipmentManagment\EquipmentManagment.csproj" />
     <ProjectReference Include="..\RosBridgeClient\RosBridgeClient.csproj" />
   </ItemGroup>
 

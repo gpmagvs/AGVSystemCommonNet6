@@ -10,6 +10,7 @@ using AGVSystemCommonNet6.Microservices.ResponseModel;
 using AGVSystemCommonNet6.Notify;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
+using RosSharp.RosBridgeClient.MessageTypes.Std;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -74,7 +75,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
                 return response;
             }
-            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action, string agvName)
+            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(int tagNumber, ACTION_TYPE action, string agvName = "")
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse(false, ALARMS.SYSTEM_ERROR, "");
                 var agvs_http = GetAGVSHttpHelper();
@@ -187,10 +188,25 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     return new List<int>();
                 }
             }
+
+            public static async Task<bool> call_AGVs_carry_api(string strToken, string strUsername, object data)
+            {
+                HttpHelper agvs_http = GetAGVSHttpHelper();
+                agvs_http.http_client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", $"{strToken}");
+                try
+                {
+                    var route = $"/api/Task/carry?user={strUsername}";
+                    var response = await agvs_http.PostAsync(route, data, timeout: 15);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
         }
         /// <summary>
-        /// TaskStatus
-        /// wait_to_assign = 0, assgined = 1, wait_to_start = 2, start = 3, wait_to_complete = 4, completed = 5, fail = 6, cancel = 7, finish_and_reported = 8
+        /// TaskStatus:MCSCIMService.TaskStatus
         /// </summary>
         /// <param name="data">(clsTaskDto, clsTask.TaskStatus)</param>
         /// <returns></returns>
@@ -201,7 +217,6 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             try
             {
                 var route = $"/api/MCSCIM/TaskReporter";
-                string strJson = data.ToJson();
                 (bool success, string json) v = await _agvs_http.PostAsync(route, data, timeout: 7);
                 clsAGVSTaskReportResponse responsedata = JsonConvert.DeserializeObject<clsAGVSTaskReportResponse>(v.json);
                 if (v.success == true && responsedata.confirm == true)
@@ -215,6 +230,69 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 response.message = $"[AGVSSerivces.TaskReporter] {ex.Message}";
             }
             return response;
+        }
+        public static async Task<(bool confirm, string message)> AlarmReporterSwitch(bool truetoenable)
+        {
+            (bool confirm, string message) response = new(false, "[AGVSSerivces.AlarmReporterSwitch] System Error");
+            GetAGVSHttpHelper();
+            try
+            {
+                var route = $"/api/MCSCIM/AlarmReporterSwitch";
+                (bool success, string json) v = await _agvs_http.PostAsync(route, truetoenable, timeout: 7);
+                clsAGVSTaskReportResponse responsedata = JsonConvert.DeserializeObject<clsAGVSTaskReportResponse>(v.json);
+                if (v.success == true && responsedata.confirm == true)
+                    response.confirm = true;
+                else
+                    response.confirm = false;
+                response.message = responsedata.message;
+            }
+            catch (Exception ex)
+            {
+                response.message = $"[AGVSSerivces.AlarmReporterSwitch] {ex.Message}";
+            }
+            return response;
+        }
+
+        public static async Task<(bool confirm, string message, object obj)> GetNGPort()
+        {
+            (bool confirm, string message, object obj) response = new(false, "", null);
+            GetAGVSHttpHelper();
+            try
+            {
+                var route = $"/api/Equipment/GetNgPort";
+                clsResponseBase v = await _agvs_http.GetAsync<clsResponseBase>(route, timeout: 15);
+                response.confirm = v.confirm;
+                response.message = v.message;
+                response.obj = v.ReturnObj;
+
+            }
+            catch (Exception ex)
+            {
+                response.message = ex.Message;
+            }
+            return response;
+        }
+        public static async Task<(bool confirm, string token, string strUsername)> Login()
+        {
+            (bool confirm, string token, string strUsername) response = new(false, "", "");
+            GetAGVSHttpHelper();
+            try
+            {
+                var route = $"/api/Auth/login?Username=dev&Password=12345678";
+                (bool success, string json) v = await _agvs_http.PostAsync(route, new AGVSystemCommonNet6.User.UserLoginRequest() { Username = "dev", Password = "12345678" }, timeout: 15);
+                response.confirm = v.success;
+                Dictionary<string, string> obj = JsonConvert.DeserializeObject<Dictionary<string, string>>(v.json);
+                string strToken = obj["token"];
+                string strUsername = obj["UserName"];
+                response.token = strToken;
+                response.strUsername = strUsername;
+            }
+            catch (Exception ex)
+            {
+                response.token = ex.Message;
+            }
+            return response;
+
         }
     }
 }

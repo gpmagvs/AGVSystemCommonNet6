@@ -113,6 +113,26 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             }
             return response;
         }
+        public static async Task<(bool confirm, string message)> AlarmReporter(object data)
+        {
+            (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
+            using (agvs_http)
+            {
+                try
+                {
+                    var route = $"/api/HostMode/AlarmReporter";
+                    string strJson = data.ToJson();
+                    (bool success, string json) v = await agvs_http.PostAsync(route, data);
+                    response.confirm = v.success;
+                    response.message = v.json;
+                }
+                catch (Exception ex)
+                {
+                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
+                }
+            }
+            return response;
+        }
 
 
         internal class ResponseObject
@@ -125,19 +145,19 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// </summary>
         public enum TaskStatus
         {
-            init = 0,
-            wait_to_execute = 1,
-            wait_to_assign = 2,
-            assgined = 2,
-            wait_to_start = 3,
-            start = 4,
-            wait_to_source = 5,
-            at_source_wait_in = 6,
-            wait_to_dest = 7,
-            at_destination_wait_in = 8,
-            wait_to_complete = 9,
-            completed = 96, fail = 97, cancel = 98, finish_and_reported = 99,
-            ignore = 100
+            None = 0,
+            init = 1,
+            wait_to_execute = 2,
+            wait_to_assign = 3,
+            assgined = 4,
+            wait_to_start = 5,
+            start = 6,
+            wait_to_source = 7,
+            at_source_wait_in = 8,
+            wait_to_dest = 9,
+            at_destination_wait_in = 10,
+            wait_to_complete = 90,
+            completed = 96, fail = 97, cancel = 98, finish_and_reported = 99, transport_fail = 93, ignore = 101
         }
     }
 }
