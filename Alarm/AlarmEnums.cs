@@ -126,7 +126,6 @@ namespace AGVSystemCommonNet6.Alarm
         Transfer_Tags_Not_Found = 3039,
         No_Transfer_Station_To_Work = 3040,
         Task_Aborted = 3041,
-        CANNOT_DISPATCH_CHARGE_TASK_WHEN_AGV_HAS_CARGO = 3042,
         VEHICLES_TRAJECTORY_CONFLIC = 3043,
         REGION_NOT_ENTERABLE = 3044,
         From_To_Of_Transfer_Task_Is_Incorrectly = 3045,
