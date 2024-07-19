@@ -18,7 +18,7 @@ namespace AGVSystemCommonNet6.Alarm
 
     public enum ALARMS
     {
-        NONE = 1000,
+        NONE = 0,
         AGV_DISCONNECT = 1003,
         GET_ONLINE_REQ_BUT_AGV_DISCONNECT = 1004,
         GET_OFFLINE_REQ_BUT_AGV_DISCONNECT = 1005,
