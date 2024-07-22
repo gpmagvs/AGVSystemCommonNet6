@@ -414,6 +414,7 @@
         Under_Temperature = 5080,
         Under_Temperature_1_ = 5081,
         Under_Temperature_2_ = 5082,
+        Battery_Short_Circuit = 5083,
         EQP_PORT_HAS_OBSTACLE_BY_LSR = 7000,
         Auto_Door_Ouput_Not_Defined = 8000,
         License_Error = 9990,

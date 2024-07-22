@@ -18,7 +18,7 @@ namespace AGVSystemCommonNet6.Alarm
 
     public enum ALARMS
     {
-        NONE = 1000,
+        NONE = 0,
         AGV_DISCONNECT = 1003,
         GET_ONLINE_REQ_BUT_AGV_DISCONNECT = 1004,
         GET_OFFLINE_REQ_BUT_AGV_DISCONNECT = 1005,
@@ -130,6 +130,7 @@ namespace AGVSystemCommonNet6.Alarm
         REGION_NOT_ENTERABLE = 3044,
         From_To_Of_Transfer_Task_Is_Incorrectly = 3045,
         AGV_NO_Carge_Cannot_Transfer_Cargo_From_AGV_To_Desinte = 3046,
+        Path_Not_Exist_In_Route = 3047,
         #region KG
         CreateCommandFail = 210,
         NoActionType = 11,
