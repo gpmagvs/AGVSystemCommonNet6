@@ -1,8 +1,10 @@
-﻿using AGVSystemCommonNet6.Alarm;
+﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Microservices.AGVS;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using EquipmentManagment.MainEquipment;
 using EquipmentManagment.Manager;
@@ -186,7 +188,7 @@ namespace AGVSystemCommonNet6.Material
         /// <param name="materialIDStatus"></param>
         /// <param name="materialType"></param>
         /// <returns></returns>
-        public static async Task<clsMaterialInfo> EditMaterialInfo(string OriginMaterialID,string NewMaterialID,string SourceStation,MaterialInstallStatus installStatus,MaterialIDStatus materialIDStatus,MaterialType materialType)
+        public static async Task<clsMaterialInfo> EditMaterialInfo(string OriginMaterialID, string NewMaterialID, string SourceStation, MaterialInstallStatus installStatus, MaterialIDStatus materialIDStatus, MaterialType materialType)
         {
             try
             {
@@ -302,7 +304,7 @@ namespace AGVSystemCommonNet6.Material
 
             int MaxPriorityOfRack = CanUseRack.Min(rack => rack.EndPointOptions.StorageMonitorPriority);
             var FirstTargetRack = CanUseRack.FindAll(rack => rack.EndPointOptions.StorageMonitorPriority == MaxPriorityOfRack).First();
-            
+
             int MaxPriorityOfPort = FirstTargetRack.PortsStatus.ToList().Min(port => port.Properties.StoragePriority);
             var FirstMovePort = FirstTargetRack.PortsStatus.ToList().FirstOrDefault(port => port.Properties.StoragePriority == MaxPriorityOfPort);
 
@@ -353,6 +355,28 @@ namespace AGVSystemCommonNet6.Material
                 File.WriteAllLines(_fileName, list, Encoding.UTF8);
             };
             return _fileName;
+        }
+        public static async void HandlePortExistChanged(object sender, EventArgs e)
+        {
+            EquipmentManagment.MainEquipment.clsEQ eq = sender as EquipmentManagment.MainEquipment.clsEQ;
+            string strEQname = eq.EQName;
+            clsTransferMaterial info = MaterialManager.CheckEqMaterialOverLevel();
+
+            if (info != null)
+            {
+                clsTaskDto task = new clsTaskDto();
+                task.State = AGVDispatch.Messages.TASK_RUN_STATUS.WAIT;
+                task.Action = AGVDispatch.Messages.ACTION_TYPE.Carry;
+                task.From_Station = info.SourceStation;
+                task.From_Station_AGV_Type = clsEnums.AGV_TYPE.FORK;
+                task.From_Slot = info.SourceSlot.ToString();
+                task.To_Station = info.TargetStation;
+                task.To_Station_AGV_Type = clsEnums.AGV_TYPE.FORK;
+                task.To_Slot = info.TargetRow.ToString();
+
+                (bool confirm, string token, string strUsername) login = await AGVSSerivces.Login();
+                bool b = await AGVSSerivces.TRANSFER_TASK.call_AGVs_carry_api(login.token, login.strUsername, task);
+            }
         }
     }
 }
