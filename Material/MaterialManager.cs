@@ -281,34 +281,53 @@ namespace AGVSystemCommonNet6.Material
 
         public static clsTransferMaterial? NgMaterialTransferTarget()
         {
+            clsTransferMaterial NgMaterialTargetPort = null;
             var TargetPort = TargetPortRequest();
 
-            if (TargetPort == null) return null;
-
-            clsTransferMaterial NgMaterialTargetPort = new clsTransferMaterial()
+            if (TargetPort == null)
+                return null;
+            try
             {
-                TargetStation = $"{TargetPort.GetParentRack().EQName}-{TargetPort.Properties.ID}",
-                TargetTag = TargetPort.TagNumbers[TargetPort.Properties.Column - 1],
-                TargetColumn = TargetPort.Properties.Column,
-                TargetRow = TargetPort.Properties.Row,
-            };
+                NgMaterialTargetPort = new clsTransferMaterial();
+                string TargetStation = $"WIP:{TargetPort.GetParentRack().EQName};Port:{TargetPort.Properties.ID}";
+                int TargetTag = TargetPort.GetParentRack().RackOption.ColumnTagMap[TargetPort.Properties.Column].FirstOrDefault();
+                int TargetColumn = TargetPort.Properties.Column;
+                int TargetRow = TargetPort.Properties.Row;
+                NgMaterialTargetPort.TargetStation = TargetStation;
+                NgMaterialTargetPort.TargetTag = TargetTag;
+                NgMaterialTargetPort.TargetColumn = TargetColumn;
+                NgMaterialTargetPort.TargetRow = TargetRow;
+                NgMaterialTargetPort.message = "GET NG port OK";
+            }
+            catch (Exception ex)
+            {
+                NgMaterialTargetPort.message= ex.Message;
+            }
 
             return NgMaterialTargetPort;
         }
 
         private static clsPortOfRack? TargetPortRequest()
         {
-            var CanUseRack = StaEQPManagager.RacksList.FindAll(portOfRack => portOfRack.PortsStatus.Any(port => port.CargoExist == false && port.CarrierExist == false && port.Properties.PortEnable == EquipmentManagment.WIP.clsPortOfRack.Port_Enable.Enable));
-            if (CanUseRack.Count <= 0)
+            var CanUseRack = StaEQPManagager.RacksList.FindAll(rack => rack.RackOption.Enable).OrderBy(rack => rack.RackOption.StorageMonitorPriority);
+            if (CanUseRack.Count() <= 0)
                 return null;
 
-            int MaxPriorityOfRack = CanUseRack.Min(rack => rack.EndPointOptions.StorageMonitorPriority);
-            var FirstTargetRack = CanUseRack.FindAll(rack => rack.EndPointOptions.StorageMonitorPriority == MaxPriorityOfRack).First();
+            var ports = CanUseRack.SelectMany(rk => rk.PortsStatus.Where(p => p.CargoExist == false && p.Properties.PortEnable == clsPortOfRack.Port_Enable.Enable).Select(p=>p));
+            
+            return ports.OrderBy(x => x.Properties.StoragePriority).FirstOrDefault();
 
-            int MaxPriorityOfPort = FirstTargetRack.PortsStatus.ToList().Min(port => port.Properties.StoragePriority);
-            var FirstMovePort = FirstTargetRack.PortsStatus.ToList().FirstOrDefault(port => port.Properties.StoragePriority == MaxPriorityOfPort);
+            //var CanUseRack = StaEQPManagager.RacksList.FindAll(portOfRack => portOfRack.PortsStatus.Any(port => port.CargoExist == false && port.CarrierExist == false && port.Properties.PortEnable == EquipmentManagment.WIP.clsPortOfRack.Port_Enable.Enable));
+            //if (CanUseRack.Count <= 0)
+            //    return null;
 
-            return FirstMovePort;
+            //int MaxPriorityOfRack = CanUseRack.Min(rack => rack.EndPointOptions.StorageMonitorPriority);
+            //var FirstTargetRack = CanUseRack.FindAll(rack => rack.EndPointOptions.StorageMonitorPriority == MaxPriorityOfRack).First();
+
+            //int MaxPriorityOfPort = FirstTargetRack.PortsStatus.ToList().Min(port => port.Properties.StoragePriority);
+            //var FirstMovePort = FirstTargetRack.PortsStatus.ToList().FirstOrDefault(port => port.Properties.StoragePriority == MaxPriorityOfPort);
+
+            //return FirstMovePort;
         }
 
         /// <summary>
@@ -367,12 +386,12 @@ namespace AGVSystemCommonNet6.Material
                 clsTaskDto task = new clsTaskDto();
                 task.State = AGVDispatch.Messages.TASK_RUN_STATUS.WAIT;
                 task.Action = AGVDispatch.Messages.ACTION_TYPE.Carry;
-                task.From_Station = info.SourceStation;
+                task.From_Station = info.SourceTag.ToString();
                 task.From_Station_AGV_Type = clsEnums.AGV_TYPE.FORK;
                 task.From_Slot = info.SourceSlot.ToString();
-                task.To_Station = info.TargetStation;
+                task.To_Station = info.TargetTag.ToString();
                 task.To_Station_AGV_Type = clsEnums.AGV_TYPE.FORK;
-                task.To_Slot = info.TargetRow.ToString();
+                task.To_Slot = info.TargetSolt.ToString();
 
                 (bool confirm, string token, string strUsername) login = await AGVSSerivces.Login();
                 bool b = await AGVSSerivces.TRANSFER_TASK.call_AGVs_carry_api(login.token, login.strUsername, task);
