@@ -254,7 +254,7 @@ namespace AGVSystemCommonNet6.Material
             if (EqHasMateiral.Count <= AGVSConfigulator.SysConfigs.MaterialBufferLevelMonitor.LevelThreshold)
                 return null;
 
-            int MaxPriorityOfEq = EqHasMateiral.Min(eq => eq.EndPointOptions.StorageMonitorPriority);
+            int MaxPriorityOfEq = EqHasMateiral.Max(eq => eq.EndPointOptions.StorageMonitorPriority);
             var FirstMoveEq = EqHasMateiral.FirstOrDefault(eq => eq.EndPointOptions.StorageMonitorPriority == MaxPriorityOfEq);
 
             // 篩選出可以放的WIP儲位
@@ -315,7 +315,7 @@ namespace AGVSystemCommonNet6.Material
 
             var ports = CanUseRack.SelectMany(rk => rk.PortsStatus.Where(p => p.CargoExist == false && p.Properties.PortEnable == clsPortOfRack.Port_Enable.Enable).Select(p=>p));
             
-            return ports.OrderBy(x => x.Properties.StoragePriority).FirstOrDefault();
+            return ports.OrderByDescending(x => x.Properties.StoragePriority).FirstOrDefault();
 
             //var CanUseRack = StaEQPManagager.RacksList.FindAll(portOfRack => portOfRack.PortsStatus.Any(port => port.CargoExist == false && port.CarrierExist == false && port.Properties.PortEnable == EquipmentManagment.WIP.clsPortOfRack.Port_Enable.Enable));
             //if (CanUseRack.Count <= 0)
