@@ -131,28 +131,28 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string actionType, out List<clsTaskDto> Task)
         {
             TASK_RUN_STATUS state_query = 0;
-            if (Result == "完成")
+            if (Result == "完成" || Result == "Completed")
                 state_query = TASK_RUN_STATUS.ACTION_FINISH;
-            if (Result == "失敗")
+            if (Result == "失敗" || Result == "Fail")
                 state_query = TASK_RUN_STATUS.FAILURE;
-            if (Result == "取消")
+            if (Result == "取消" || Result == "Cancel")
                 state_query = TASK_RUN_STATUS.CANCEL;
 
 
             ACTION_TYPE action_type_query = ACTION_TYPE.None;
-            if (actionType == "移動")
+            if (actionType == "移動" || actionType =="Move")
                 action_type_query = ACTION_TYPE.None;
-            if (actionType == "放貨")
+            if (actionType == "放貨" || actionType =="UnLoad")
                 action_type_query = ACTION_TYPE.Load;
-            if (actionType == "取貨")
+            if (actionType == "取貨" || actionType == "Load")
                 action_type_query = ACTION_TYPE.Unload;
-            if (actionType == "充電")
+            if (actionType == "充電" || actionType == "Charge")
                 action_type_query = ACTION_TYPE.Charge;
-            if (actionType == "搬運")
+            if (actionType == "搬運" || actionType == "Transfer")
                 action_type_query = ACTION_TYPE.Carry;
-            if (actionType == "量測")
+            if (actionType == "量測" || actionType == "Measure")
                 action_type_query = ACTION_TYPE.Measure;
-            if (actionType == "交換電池")
+            if (actionType == "交換電池" || actionType == "Exchange Battrey")
                 action_type_query = ACTION_TYPE.ExchangeBattery;
 
             count = 0;
