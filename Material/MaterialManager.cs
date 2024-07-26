@@ -1,8 +1,10 @@
-﻿using AGVSystemCommonNet6.Alarm;
+﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Log;
+using AGVSystemCommonNet6.Microservices.AGVS;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using EquipmentManagment.MainEquipment;
 using EquipmentManagment.Manager;
@@ -186,7 +188,7 @@ namespace AGVSystemCommonNet6.Material
         /// <param name="materialIDStatus"></param>
         /// <param name="materialType"></param>
         /// <returns></returns>
-        public static async Task<clsMaterialInfo> EditMaterialInfo(string OriginMaterialID,string NewMaterialID,string SourceStation,MaterialInstallStatus installStatus,MaterialIDStatus materialIDStatus,MaterialType materialType)
+        public static async Task<clsMaterialInfo> EditMaterialInfo(string OriginMaterialID, string NewMaterialID, string SourceStation, MaterialInstallStatus installStatus, MaterialIDStatus materialIDStatus, MaterialType materialType)
         {
             try
             {
@@ -252,7 +254,7 @@ namespace AGVSystemCommonNet6.Material
             if (EqHasMateiral.Count <= AGVSConfigulator.SysConfigs.MaterialBufferLevelMonitor.LevelThreshold)
                 return null;
 
-            int MaxPriorityOfEq = EqHasMateiral.Min(eq => eq.EndPointOptions.StorageMonitorPriority);
+            int MaxPriorityOfEq = EqHasMateiral.Max(eq => eq.EndPointOptions.StorageMonitorPriority);
             var FirstMoveEq = EqHasMateiral.FirstOrDefault(eq => eq.EndPointOptions.StorageMonitorPriority == MaxPriorityOfEq);
 
             // 篩選出可以放的WIP儲位
@@ -279,34 +281,53 @@ namespace AGVSystemCommonNet6.Material
 
         public static clsTransferMaterial? NgMaterialTransferTarget()
         {
+            clsTransferMaterial NgMaterialTargetPort = null;
             var TargetPort = TargetPortRequest();
 
-            if (TargetPort == null) return null;
-
-            clsTransferMaterial NgMaterialTargetPort = new clsTransferMaterial()
+            if (TargetPort == null)
+                return null;
+            try
             {
-                TargetStation = $"{TargetPort.GetParentRack().EQName}-{TargetPort.Properties.ID}",
-                TargetTag = TargetPort.TagNumbers[TargetPort.Properties.Column - 1],
-                TargetColumn = TargetPort.Properties.Column,
-                TargetRow = TargetPort.Properties.Row,
-            };
+                NgMaterialTargetPort = new clsTransferMaterial();
+                string TargetStation = $"WIP:{TargetPort.GetParentRack().EQName};Port:{TargetPort.Properties.ID}";
+                int TargetTag = TargetPort.GetParentRack().RackOption.ColumnTagMap[TargetPort.Properties.Column].FirstOrDefault();
+                int TargetColumn = TargetPort.Properties.Column;
+                int TargetRow = TargetPort.Properties.Row;
+                NgMaterialTargetPort.TargetStation = TargetStation;
+                NgMaterialTargetPort.TargetTag = TargetTag;
+                NgMaterialTargetPort.TargetColumn = TargetColumn;
+                NgMaterialTargetPort.TargetRow = TargetRow;
+                NgMaterialTargetPort.message = "GET NG port OK";
+            }
+            catch (Exception ex)
+            {
+                NgMaterialTargetPort.message= ex.Message;
+            }
 
             return NgMaterialTargetPort;
         }
 
         private static clsPortOfRack? TargetPortRequest()
         {
-            var CanUseRack = StaEQPManagager.RacksList.FindAll(portOfRack => portOfRack.PortsStatus.Any(port => port.CargoExist == false && port.CarrierExist == false && port.Properties.PortEnable == EquipmentManagment.WIP.clsPortOfRack.Port_Enable.Enable));
-            if (CanUseRack.Count <= 0)
+            var CanUseRack = StaEQPManagager.RacksList.FindAll(rack => rack.RackOption.Enable).OrderBy(rack => rack.RackOption.StorageMonitorPriority);
+            if (CanUseRack.Count() <= 0)
                 return null;
 
-            int MaxPriorityOfRack = CanUseRack.Min(rack => rack.EndPointOptions.StorageMonitorPriority);
-            var FirstTargetRack = CanUseRack.FindAll(rack => rack.EndPointOptions.StorageMonitorPriority == MaxPriorityOfRack).First();
+            var ports = CanUseRack.SelectMany(rk => rk.PortsStatus.Where(p => p.CargoExist == false && p.Properties.PortEnable == clsPortOfRack.Port_Enable.Enable).Select(p=>p));
             
-            int MaxPriorityOfPort = FirstTargetRack.PortsStatus.ToList().Min(port => port.Properties.StoragePriority);
-            var FirstMovePort = FirstTargetRack.PortsStatus.ToList().FirstOrDefault(port => port.Properties.StoragePriority == MaxPriorityOfPort);
+            return ports.OrderByDescending(x => x.Properties.StoragePriority).FirstOrDefault();
 
-            return FirstMovePort;
+            //var CanUseRack = StaEQPManagager.RacksList.FindAll(portOfRack => portOfRack.PortsStatus.Any(port => port.CargoExist == false && port.CarrierExist == false && port.Properties.PortEnable == EquipmentManagment.WIP.clsPortOfRack.Port_Enable.Enable));
+            //if (CanUseRack.Count <= 0)
+            //    return null;
+
+            //int MaxPriorityOfRack = CanUseRack.Min(rack => rack.EndPointOptions.StorageMonitorPriority);
+            //var FirstTargetRack = CanUseRack.FindAll(rack => rack.EndPointOptions.StorageMonitorPriority == MaxPriorityOfRack).First();
+
+            //int MaxPriorityOfPort = FirstTargetRack.PortsStatus.ToList().Min(port => port.Properties.StoragePriority);
+            //var FirstMovePort = FirstTargetRack.PortsStatus.ToList().FirstOrDefault(port => port.Properties.StoragePriority == MaxPriorityOfPort);
+
+            //return FirstMovePort;
         }
 
         /// <summary>
@@ -353,6 +374,28 @@ namespace AGVSystemCommonNet6.Material
                 File.WriteAllLines(_fileName, list, Encoding.UTF8);
             };
             return _fileName;
+        }
+        public static async void HandlePortExistChanged(object sender, EventArgs e)
+        {
+            EquipmentManagment.MainEquipment.clsEQ eq = sender as EquipmentManagment.MainEquipment.clsEQ;
+            string strEQname = eq.EQName;
+            clsTransferMaterial info = MaterialManager.CheckEqMaterialOverLevel();
+
+            if (info != null)
+            {
+                clsTaskDto task = new clsTaskDto();
+                task.State = AGVDispatch.Messages.TASK_RUN_STATUS.WAIT;
+                task.Action = AGVDispatch.Messages.ACTION_TYPE.Carry;
+                task.From_Station = info.SourceTag.ToString();
+                task.From_Station_AGV_Type = clsEnums.AGV_TYPE.FORK;
+                task.From_Slot = info.SourceSlot.ToString();
+                task.To_Station = info.TargetTag.ToString();
+                task.To_Station_AGV_Type = clsEnums.AGV_TYPE.FORK;
+                task.To_Slot = info.TargetSolt.ToString();
+
+                (bool confirm, string token, string strUsername) login = await AGVSSerivces.Login();
+                bool b = await AGVSSerivces.TRANSFER_TASK.call_AGVs_carry_api(login.token, login.strUsername, task);
+            }
         }
     }
 }
