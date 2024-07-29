@@ -233,6 +233,7 @@ namespace AGVSystemCommonNet6.Alarm
         TaskCancelByHost = 670,
         Vehicle0303JobStatusStartTimeout = 680,
         Vehicle0303JobStatusEndTimeout = 681,
+        No_NG_Port_Can_Be_Used = 3048,
         #endregion
     }
 
