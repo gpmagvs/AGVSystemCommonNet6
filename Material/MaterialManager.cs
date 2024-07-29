@@ -270,7 +270,7 @@ namespace AGVSystemCommonNet6.Material
                     MaterialID = FirstMoveEq.EndPointOptions.InstalledCargoID,
                     SourceStation = FirstMoveEq.EQName,
                     SourceTag = FirstMoveEq.EndPointOptions.TagID,
-                    TargetStation = $"{FirstMovePort.GetParentRack().EQName}-{FirstMovePort.Properties.ID}",
+                    TargetStation = $"{FirstMovePort.GetParentRack().EQName}_{FirstMovePort.Properties.ID}",
                     TargetTag = FirstMovePort.TagNumbers[FirstMovePort.Properties.Column - 1],
                     TargetColumn = FirstMovePort.Properties.Column,
                     TargetRow = FirstMovePort.Properties.Row,
@@ -301,7 +301,7 @@ namespace AGVSystemCommonNet6.Material
             }
             catch (Exception ex)
             {
-                NgMaterialTargetPort.message= ex.Message;
+                NgMaterialTargetPort.message = ex.Message;
             }
 
             return NgMaterialTargetPort;
@@ -313,21 +313,33 @@ namespace AGVSystemCommonNet6.Material
             if (CanUseRack.Count() <= 0)
                 return null;
 
-            var ports = CanUseRack.SelectMany(rk => rk.PortsStatus.Where(p => p.CargoExist == false && p.Properties.PortEnable == clsPortOfRack.Port_Enable.Enable).Select(p=>p));
-            
-            return ports.OrderByDescending(x => x.Properties.StoragePriority).FirstOrDefault();
+            var ports = CanUseRack.SelectMany(rk => rk.PortsStatus.Where(p => p.CargoExist == false && p.Properties.PortEnable == clsPortOfRack.Port_Enable.Enable).Select(p => p));
+            var retPort = ports.OrderByDescending(x => x.Properties.StoragePriority).FirstOrDefault();
 
-            //var CanUseRack = StaEQPManagager.RacksList.FindAll(portOfRack => portOfRack.PortsStatus.Any(port => port.CargoExist == false && port.CarrierExist == false && port.Properties.PortEnable == EquipmentManagment.WIP.clsPortOfRack.Port_Enable.Enable));
-            //if (CanUseRack.Count <= 0)
-            //    return null;
+            return retPort;
+        }
 
-            //int MaxPriorityOfRack = CanUseRack.Min(rack => rack.EndPointOptions.StorageMonitorPriority);
-            //var FirstTargetRack = CanUseRack.FindAll(rack => rack.EndPointOptions.StorageMonitorPriority == MaxPriorityOfRack).First();
+        public static string AskMaterialLocation(string MaterialID)
+        {
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                var _materialInfo = dbhelper._context.Set<clsMaterialInfo>().Where(material => (material.ActualID == MaterialID || material.MaterialID == MaterialID) && material.Condition != MaterialCondition.Done && material.Condition != MaterialCondition.Delete);
+                
+                if (_materialInfo == null)
+                    return "Material Does Not Exist";
+                else if (_materialInfo.Count() <= 0)
+                    return "Material Does Not Exist";
 
-            //int MaxPriorityOfPort = FirstTargetRack.PortsStatus.ToList().Min(port => port.Properties.StoragePriority);
-            //var FirstMovePort = FirstTargetRack.PortsStatus.ToList().FirstOrDefault(port => port.Properties.StoragePriority == MaxPriorityOfPort);
+                string retLoacation = _materialInfo.FirstOrDefault().TargetStation;
+                return retLoacation;
+            };
+        }
 
-            //return FirstMovePort;
+        public static List<clsRack> AskRackInfo(string RackName)
+        {
+            var RetRack = StaEQPManagager.RacksList.FindAll(rack => rack.RackOption.Name == RackName);
+
+            return RetRack;
         }
 
         /// <summary>
@@ -339,7 +351,7 @@ namespace AGVSystemCommonNet6.Material
         /// <param name="materialCondition"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string SaveTocsv(DateTime startTime, DateTime endTime, string MaterialID = "", MaterialCondition materialCondition = MaterialCondition.Add, string fileName = null)
+        public static string SaveTocsv(DateTime startTime, DateTime endTime, string MaterialID = "", MaterialCondition materialCondition = MaterialCondition.Done, string fileName = null)
         {
             var folder = Path.Combine(Environment.CurrentDirectory, "Material History");
             var _fileName = fileName.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
@@ -358,7 +370,8 @@ namespace AGVSystemCommonNet6.Material
                     "Install Status," +
                     "Material ID Status," +
                     "Material Type," +
-                    "Material Condition" };
+                    "Material Condition"
+                };
                 list.AddRange(_materialInfo.Select(materialInfo =>
                 $"{materialInfo.RecordTime}," +
                 $"{materialInfo.MaterialID}," +
