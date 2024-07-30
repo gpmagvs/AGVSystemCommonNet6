@@ -1,0 +1,142 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "PartsAGVS_InfoContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "PartsModels",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "AGVSystemCommonNet6",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[AGVChargeStation]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AGVInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AGVMaintainTable]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[AlarmResetLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[CartInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[CartMaintainTable]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ChargeStationStatus]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Dispatch]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[EarthquakeLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ElevatorInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ElevatorWithAGVInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FireADAMInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FireAlarmLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[HIDLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MaterialStationInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MaterialWIP]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhoneParam]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RackInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RunStatus]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[StationGroup]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[StopRegion]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Task]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TaskQueue]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TrafficManager]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserInfo]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDateOnlyTimeOnly": false,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false
+}
