@@ -163,7 +163,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                     && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
                                     && (Result == "ALL" ? true : Task.State == state_query)
                                     && (actionType == "ALL" ? true : Task.Action == action_type_query)
-                                    && (failurereason == "ALL" ? true : Task.FailureReason ==failurereason)
+                                    && (failurereason == null ? (true) : (Task.FailureReason.Contains(failurereason)))
                                     /*(failurereason == "ALL" ? (true) :(Task.FailureReason.Contains(failurereason)))*/
                 /*(failurereason == "ALL" ? true :Task.FailureReason == failurereason)*/
                 );
