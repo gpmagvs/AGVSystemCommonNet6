@@ -128,7 +128,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         }
 
-        public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string actionType, out List<clsTaskDto> Task)
+        public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string actionType, string failurereason,out List<clsTaskDto> Task )
         {
             TASK_RUN_STATUS state_query = 0;
             if (Result == "完成" || Result == "Completed")
@@ -163,6 +163,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                     && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
                                     && (Result == "ALL" ? true : Task.State == state_query)
                                     && (actionType == "ALL" ? true : Task.Action == action_type_query)
+                                    && (failurereason == "ALL" ? true : Task.FailureReason ==failurereason)
+                                    /*(failurereason == "ALL" ? (true) :(Task.FailureReason.Contains(failurereason)))*/
+                /*(failurereason == "ALL" ? true :Task.FailureReason == failurereason)*/
                 );
                 count = _Task.Count();
                 Task = _Task.Skip((currentpage - 1) * 19).Take(19).ToList();
