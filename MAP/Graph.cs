@@ -20,5 +20,8 @@ namespace AGVSystemCommonNet6.MAP
         public bool IsBezierCurvePoint { get; set; } = false;
         public string BezierCurveID { get; set; } = "";
 
+        public double textOffsetX { get; set; } = 0;
+        public double textOffsetY { get; set; } = -22;
+
     }
 }
