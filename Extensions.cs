@@ -161,6 +161,11 @@ namespace AGVSystemCommonNet6
         {
             return map_station.CalculateDistance(coord.X, coord.Y);
         }
+        public static double CalculateDistance(this clsCoordination from, clsCoordination to)
+        {
+            double distance = Math.Sqrt(Math.Pow(from.X - to.X, 2) + Math.Pow(from.Y - to.Y, 2));
+            return distance;
+        }
 
         /// <summary>
         /// 計算與站點的距離

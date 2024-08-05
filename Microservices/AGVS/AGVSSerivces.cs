@@ -91,7 +91,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     LOG.Critical($"LoadUnload Task Finish Feedback to AGVS FAIL,{ex.Message}", ex);
                     response = new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                 }
-                NotifyServiceHelper.INFO($"{agvName} {action} Action Finish Report To AGVS.Alarm Code Response={response.AlarmCode}");
+                //NotifyServiceHelper.INFO($"{agvName} {action} Action Finish Report To AGVS.Alarm Code Response={response.AlarmCode}");
                 return response;
             }
             public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, int slot, ACTION_TYPE action)
