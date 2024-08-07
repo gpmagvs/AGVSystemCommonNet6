@@ -38,6 +38,8 @@ namespace AGVSystemCommonNet6.Configuration
 
         public bool LinkPartsAGVSystem { get; set; } = false;
 
+        public clsOrderState OrderState { get; set; } = new clsOrderState();
+
     }
     public class clsMapConfigs
     {
@@ -94,4 +96,11 @@ namespace AGVSystemCommonNet6.Configuration
         public int LevelThreshold { get; set; } = 0;
     }
 
+    public class clsOrderState
+    {
+        /// <summary>
+        /// 任務沒有被執行的超時時間(單位:分鐘)
+        /// </summary>
+        public double TaskNoExecutedTimeout { get; set; } = 20;
+    }
 }
