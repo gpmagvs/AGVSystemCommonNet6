@@ -12,7 +12,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
         public ushort batteryID { get; set; } = 1;
         public sbyte state { get; set; }
         public byte errorCode { get; set; }
-        public ushort Voltage { get; set; }
+        public ushort voltage { get; set; }
         public byte batteryLevel { get; set; }
         public ushort chargeCurrent { get; set; }
         public ushort dischargeCurrent { get; set; }
@@ -27,7 +27,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
             this.batteryID = 0;
             this.state = 0;
             this.errorCode = 0;
-            this.Voltage = 0;
+            this.voltage = 0;
             this.batteryLevel = 0;
             this.chargeCurrent = 0;
             this.dischargeCurrent = 0;
@@ -43,7 +43,7 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages
             this.batteryID = batteryID;
             this.state = state;
             this.errorCode = errorCode;
-            this.Voltage = Voltage;
+            this.voltage = Voltage;
             this.batteryLevel = batteryLevel;
             this.chargeCurrent = chargeCurrent;
             this.dischargeCurrent = dischargeCurrent;
