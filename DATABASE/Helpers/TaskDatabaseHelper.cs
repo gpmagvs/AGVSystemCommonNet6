@@ -173,10 +173,28 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
         {
-            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath + "Task");
+            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.clsAGVS_Print_Data.SavePath + "Task");
             var _fileName = fileName is null ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
             Directory.CreateDirectory(folder);
             string FilePath = Path.Combine(folder, "TaskQuery_" + _fileName);
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                var _Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
+                                    && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
+                );
+                List<string> list = new List<string> { "任務名稱,接收時間,開始時間,結束時間,搬運時間,執行結果,AGV名稱,任務類型,起始站點,結束站點,載物ID,派工人員,失敗原因" };
+                list.AddRange(_Task.Select(Task => $"{Task.TaskName},{Task.RecieveTime},{Task.StartTime},{Task.FinishTime},{(Task.FinishTime - Task.StartTime).TotalSeconds},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.From_Station},{Task.To_Station},{Task.Carrier_ID},{Task.DispatcherName},{Task.FailureReason}"));
+                File.WriteAllLines(FilePath, list, Encoding.UTF8);
+            };
+            return FilePath;
+        }
+        public static string AutoSaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
+        {
+            string YesterdayDate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath + YesterdayDate);
+            var _fileName = fileName is null ? YesterdayDate + ".csv" : fileName;
+            Directory.CreateDirectory(folder);
+            string FilePath = Path.Combine(folder, "Task" + _fileName);
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 var _Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime

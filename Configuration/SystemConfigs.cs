@@ -27,6 +27,7 @@ namespace AGVSystemCommonNet6.Configuration
         public clsEquipmentManagementConfigs EQManagementConfigs { get; set; } = new clsEquipmentManagementConfigs();
         public clsAutoModeConfigs AutoModeConfigs { get; set; } = new clsAutoModeConfigs();
         public clsAutoSendDailyData AutoSendDailyData { get; set; } = new clsAutoSendDailyData();
+        public clsAGVS_Print_Data clsAGVS_Print_Data { get; set; } = new clsAGVS_Print_Data();
 
         public string AGVUpdateFileFolder { get; set; } = "C:\\AGVS\\AGV_Update";
 
@@ -88,6 +89,10 @@ namespace AGVSystemCommonNet6.Configuration
     {
         public string SavePath { get; set; } = @"d:\DailyData\";
         public int SaveTime { get; set; } = 1;
+    }
+    public class clsAGVS_Print_Data
+    {
+        public string SavePath { get; set; } = @"d:\AGVS_Print_Data\";
     }
 
     public class clsMaterialBufferLevelMonitor

@@ -392,10 +392,33 @@ namespace AGVSystemCommonNet6.Alarm
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
         {
-            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath + "Alarm");
+            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.clsAGVS_Print_Data.SavePath + "Alarm");
             var _fileName = fileName is null ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
             Directory.CreateDirectory(folder);
             string FilePath = Path.Combine(folder, "AlarmQuery_" + _fileName);
+            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                var _alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
+                                    && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name)) && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
+                );
+                List<string> list = new List<string> { "發生時間,EQ名稱,警報碼,警報描述,警報類型,任務名稱 ,發生地點,持續時間,清除警報人員" };
+                list.AddRange(_alarms.Select(alarm => $"{alarm.Time},{alarm.Equipment_Name},{alarm.AlarmCode},{alarm.Description},{alarm.Level},{alarm.Task_Name},{alarm.OccurLocation},{alarm.Duration},{alarm.ResetAalrmMemberName}"));
+                //List<string> list = _alarms.Select(alarm => $"{alarm.Time},{alarm.Task_Name},{alarm.Equipment_Name},,{alarm.AlarmCode}{alarm.Description_En},{alarm.Description_Zh},{alarm.Duration},{alarm.OccurLocation},{alarm.Level}").ToList();
+                File.WriteAllLines(FilePath, list, Encoding.UTF8);
+            };
+            return FilePath;
+        }
+        public static string AutoSaveTocsv(DateTime startTime, DateTime endTime, string fileName)
+        {
+            return AutoSaveTocsv(startTime, endTime, "ALL", null, fileName);
+        }
+        public static string AutoSaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
+        {
+            string YesterdayDate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath + YesterdayDate);
+            var _fileName = fileName is null ? YesterdayDate + ".csv" : fileName;
+            Directory.CreateDirectory(folder);
+            string FilePath = Path.Combine(folder, "Alarm" + _fileName);
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 var _alarms = dbhelper._context.Set<clsAlarmDto>().Where(alarm => alarm.Time >= startTime && alarm.Time <= endTime
