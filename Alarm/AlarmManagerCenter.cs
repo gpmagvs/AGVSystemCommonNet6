@@ -104,6 +104,8 @@ namespace AGVSystemCommonNet6.Alarm
                 await semaphoreSlim.WaitAsync();
                 if (!Initialized)
                     Initialize();
+                if (alarmDto.AlarmCode == 0)
+                    return;
                 database.tables.SystemAlarms.Add(alarmDto);
                 await database.SaveChanges();
             }
@@ -120,6 +122,8 @@ namespace AGVSystemCommonNet6.Alarm
 
             try
             {
+                if (alarm == ALARMS.NONE)
+                    return new clsAlarmDto();
                 clsAlarmCode alarmCodeData;
                 string description_zh = "";
                 string description_En = "";
@@ -363,7 +367,7 @@ namespace AGVSystemCommonNet6.Alarm
             }
         }
 
-        public static void AlarmQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Alarm_description,out List<clsAlarmDto> alarms, string AlarmType = "ALL")
+        public static void AlarmQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Alarm_description, out List<clsAlarmDto> alarms, string AlarmType = "ALL")
         {
             count = 0;
             alarms = new List<clsAlarmDto>();
@@ -375,8 +379,8 @@ namespace AGVSystemCommonNet6.Alarm
                                     && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name))
                                     && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
                                     && (AlarmType == "ALL" ? (true) : (alarm.Level == level_to_query))
-                                    && (Alarm_description == null ? (true) :(alarm.Description_Zh.Contains(Alarm_description)))
-                                   
+                                    && (Alarm_description == null ? (true) : (alarm.Description_Zh.Contains(Alarm_description)))
+
                 );
                 count = _alarms.Count();
                 alarms = _alarms.Skip((currentpage - 1) * 19).Take(19).ToList();
