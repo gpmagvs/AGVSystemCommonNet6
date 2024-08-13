@@ -41,7 +41,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
             catch (Exception ex)
             {
-                LOG.Critical(ex.Message, ex);
+                LOG.Critical(ex.InnerException.Message, ex);
                 return 0;
             }
             finally

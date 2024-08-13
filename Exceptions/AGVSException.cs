@@ -12,6 +12,11 @@ namespace AGVSystemCommonNet6.Exceptions
         {
             Message = message;
         }
-        public abstract ALARMS Alarm_Code { get;  set; }
+        public abstract ALARMS Alarm_Code { get; set; }
+    }
+
+    public class VMSException : VMSExceptionAbstract
+    {
+        public override ALARMS Alarm_Code { get; set; } = ALARMS.SYSTEM_ERROR;
     }
 }

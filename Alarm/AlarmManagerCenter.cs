@@ -138,9 +138,9 @@ namespace AGVSystemCommonNet6.Alarm
                 }
                 clsAlarmDto alarmDto = new clsAlarmDto()
                 {
-                    Equipment_Name = Equipment_Name,
-                    Description_Zh = description_zh,
-                    Description_En = description_En,
+                    Equipment_Name = Equipment_Name == null ? "" : Equipment_Name,
+                    Description_Zh = description_zh == null ? "" : description_zh,
+                    Description_En = description_En == null ? "" : description_En,
                     Level = level,
                     AlarmCode = (int)alarm,
                     OccurLocation = location == null ? "" : location,
