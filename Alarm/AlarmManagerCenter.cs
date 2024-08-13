@@ -379,7 +379,7 @@ namespace AGVSystemCommonNet6.Alarm
                                     && (AGV_Name == "ALL" ? (true) : (alarm.Equipment_Name == AGV_Name))
                                     && (TaskName == null ? (true) : (alarm.Task_Name.Contains(TaskName)))
                                     && (AlarmType == "ALL" ? (true) : (alarm.Level == level_to_query))
-                                    && (Alarm_description == null ? (true) : (alarm.Description_Zh.Contains(Alarm_description)))
+                                    && (Alarm_description == null || Alarm_description == "ALL" ? (true) : (alarm.Description_Zh.Contains(Alarm_description)))
 
                 );
                 count = _alarms.Count();
