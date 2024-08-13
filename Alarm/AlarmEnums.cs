@@ -132,6 +132,8 @@ namespace AGVSystemCommonNet6.Alarm
         AGV_NO_Carge_Cannot_Transfer_Cargo_From_AGV_To_Desinte = 3046,
         Path_Not_Exist_In_Route = 3047,
         Path_Conflic_But_Dispatched = 3048,
+        WaitTaskBeExecutedTimeout = 3049,
+        No_NG_Port_Can_Be_Used = 3050,
         #region KG
         CreateCommandFail = 210,
         NoActionType = 11,
@@ -234,8 +236,6 @@ namespace AGVSystemCommonNet6.Alarm
         TaskCancelByHost = 670,
         Vehicle0303JobStatusStartTimeout = 680,
         Vehicle0303JobStatusEndTimeout = 681,
-        No_NG_Port_Can_Be_Used = 3048,
-        WaitTaskBeExecutedTimeout = 3049,
         #endregion
     }
 
