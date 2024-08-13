@@ -124,7 +124,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                         LOG.INFO($"StartLDULDOrderReport start");
 
                         var agvs_http = GetAGVSHttpHelper();
-                        response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+                        response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route, timeout: 10);
 
                         LOG.INFO($"LoadUnload Order Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                         return response;
