@@ -32,8 +32,17 @@ namespace AGVSystemCommonNet6.DATABASE
                 using (AGVSDatabase database = new AGVSDatabase())
                 {
                     database.dbContext.Database.EnsureCreated();
-                    await DatabaseColumnCheck(database);
-                    await database.SaveChanges();
+                    try
+                    {
+                        await DatabaseColumnCheck(database);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                    finally
+                    {
+                        await database.SaveChanges();
+                    }
                 }
 
                 using (AGVSDatabase database = new AGVSDatabase())
@@ -117,12 +126,24 @@ namespace AGVSystemCommonNet6.DATABASE
 
             if (dev_user == null)
                 users.Add(new UserEntity { UserName = "dev", Password = "12345678", Role = ERole.Developer });
+            else if (dev_user.WebFunctionPermissionsJson == "")
+            {
+                dev_user.WebFunctionPermissionsJson = new ViewModels.WebFunctionViewPermissions().ToJson();
+            }
 
             if (eng_user == null)
                 users.Add(new UserEntity { UserName = "eng", Password = "12345678", Role = ERole.Engineer });
+            else if (eng_user.WebFunctionPermissionsJson == "")
+            {
+                eng_user.WebFunctionPermissionsJson = new ViewModels.WebFunctionViewPermissions().ToJson();
+            }
 
             if (op_user == null)
                 users.Add(new UserEntity { UserName = "op", Password = "op", Role = ERole.Operator });
+            else if (op_user.WebFunctionPermissionsJson == "")
+            {
+                op_user.WebFunctionPermissionsJson = new ViewModels.WebFunctionViewPermissions().ToJson();
+            }
         }
     }
 }
