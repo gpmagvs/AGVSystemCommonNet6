@@ -124,25 +124,27 @@ namespace AGVSystemCommonNet6.DATABASE
             UserEntity? eng_user = users.FirstOrDefault(u => u.UserName == "eng");
             UserEntity? op_user = users.FirstOrDefault(u => u.UserName == "op");
 
+            string dev_eng_permission_json = new ViewModels.WebFunctionViewPermissions().ToJson();
             if (dev_user == null)
-                users.Add(new UserEntity { UserName = "dev", Password = "12345678", Role = ERole.Developer });
+                users.Add(new UserEntity { UserName = "dev", Password = "12345678", Role = ERole.Developer, WebFunctionPermissionsJson = dev_eng_permission_json });
             else if (dev_user.WebFunctionPermissionsJson == "")
             {
-                dev_user.WebFunctionPermissionsJson = new ViewModels.WebFunctionViewPermissions().ToJson();
+                dev_user.WebFunctionPermissionsJson = dev_eng_permission_json;
             }
 
             if (eng_user == null)
-                users.Add(new UserEntity { UserName = "eng", Password = "12345678", Role = ERole.Engineer });
+                users.Add(new UserEntity { UserName = "eng", Password = "12345678", Role = ERole.Engineer, WebFunctionPermissionsJson = dev_eng_permission_json });
             else if (eng_user.WebFunctionPermissionsJson == "")
             {
-                eng_user.WebFunctionPermissionsJson = new ViewModels.WebFunctionViewPermissions().ToJson();
+                eng_user.WebFunctionPermissionsJson = dev_eng_permission_json;
             }
 
+            string opPermissionJson = new ViewModels.WebFunctionViewPermissions(ERole.Operator).ToJson();
             if (op_user == null)
-                users.Add(new UserEntity { UserName = "op", Password = "op", Role = ERole.Operator });
+                users.Add(new UserEntity { UserName = "op", Password = "op", Role = ERole.Operator, WebFunctionPermissionsJson = opPermissionJson });
             else if (op_user.WebFunctionPermissionsJson == "")
             {
-                op_user.WebFunctionPermissionsJson = new ViewModels.WebFunctionViewPermissions().ToJson();
+                op_user.WebFunctionPermissionsJson = opPermissionJson;
             }
         }
     }

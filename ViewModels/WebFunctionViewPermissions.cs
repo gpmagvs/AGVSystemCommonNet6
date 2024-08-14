@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AGVSystemCommonNet6.User;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,55 @@ namespace AGVSystemCommonNet6.ViewModels
 {
     public class WebFunctionViewPermissions
     {
+
         public Menu menu { get; set; } = new Menu();
         public DataQuerySubMenu dataQuerySubMenu { get; set; } = new DataQuerySubMenu();
         public SystemConfigurationSubMenu systemConfigurationSubMenu { get; set; } = new SystemConfigurationSubMenu();
+        public WebFunctionViewPermissions()
+        {
+        }
+
+        public WebFunctionViewPermissions(ERole role)
+        {
+            switch (role)
+            {
+                case ERole.VISITOR:
+                    SetAsVisitorPermission();
+                    break;
+                case ERole.Operator:
+                    SetAsOperatorPermission();
+                    break;
+                case ERole.Engineer:
+                    break;
+                case ERole.Developer:
+                    break;
+                case ERole.GOD:
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public override string ToString()
         {
             return JsonConvert.SerializeObject(this);
+        }
+
+        private void SetAsVisitorPermission()
+        {
+            menu.WIPInfo =
+            menu.VehicleManagnment =
+            menu.Map =
+            menu.DataQuery =
+            menu.HotRun =
+            menu.SystemConfiguration = 0;
+        }
+        private void SetAsOperatorPermission()
+        {
+            menu.VehicleManagnment =
+            menu.Map =
+            menu.HotRun =
+            menu.SystemConfiguration = 0;
         }
 
         public class Menu
