@@ -187,14 +187,18 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
             var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p.GetGetMethod().IsPublic && p.GetSetMethod().IsPublic &&
                             !Attribute.IsDefined(p, typeof(NotMappedAttribute)));
-
-            foreach (var prop in properties)
+            try
             {
-                var columnName = prop.GetCustomAttribute<ColumnAttribute>()?.Name ?? prop.Name;
-                var columnType = GetSqlDataType(prop.PropertyType.Name, prop.PropertyType.BaseType?.Name);
-                commandText += $"[{columnName}] {columnType},";
+                foreach (var prop in properties)
+                {
+                    var columnName = prop.GetCustomAttribute<ColumnAttribute>()?.Name ?? prop.Name;
+                    var columnType = GetSqlDataType(prop.PropertyType.Name, prop.PropertyType.BaseType?.Name);
+                    commandText += $"[{columnName}] {columnType},";
+                }
             }
-
+            catch (Exception ex)
+            {
+            }
             commandText = commandText.TrimEnd(',') + ");";
 
             using (var command = new SqlCommand(commandText, connection))
