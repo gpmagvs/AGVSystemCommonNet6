@@ -64,7 +64,10 @@ namespace AGVSystemCommonNet6.Configuration
         /// 當設備零件更換時封閉進入點
         /// </summary>
         public bool DisableEntryPointWhenEQPartsReplacing { get; set; } = false;
-
+        /// <summary>
+        /// 當車載上報ID與任務不符時，是否要將貨送到NG PORT
+        /// </summary>
+        public bool TransferToNGPortWhenCarrierIDMissmatch { get; set; } = false;
     }
 
     public class clsAutoModeConfigs
