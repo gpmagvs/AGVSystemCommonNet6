@@ -33,8 +33,9 @@ namespace AGVSystemCommonNet6.DATABASE
 
         public DbSet<VehicleMaintain> VehicleMaintain { get; set; }
 
-        public DbSet<clsMaterialInfo> MaterialInfo {  get; set; }
+        public DbSet<clsMaterialInfo> MaterialInfo { get; set; }
 
+        public DbSet<clsStationStatus> StationStatus { get; set; }
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options)
             : base(options)
         {
