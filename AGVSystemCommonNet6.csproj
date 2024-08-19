@@ -1,49 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AssemblyVersion>3.6.220.10</AssemblyVersion>
-    <Version>3.6.2.1</Version>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyVersion>1.0.232.8</AssemblyVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Navigator\**" />
-    <Compile Remove="TASK\**" />
-    <EmbeddedResource Remove="Navigator\**" />
-    <EmbeddedResource Remove="TASK\**" />
-    <None Remove="Navigator\**" />
-    <None Remove="TASK\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Navigator\**" />
+		<Compile Remove="TASK\**" />
+		<EmbeddedResource Remove="Navigator\**" />
+		<EmbeddedResource Remove="TASK\**" />
+		<None Remove="Navigator\**" />
+		<None Remove="TASK\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.15" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.25" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.25">
-      <PrivateAssets>all</PrivateAssets> 
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NModbus4.Core" Version="1.0.2" />
-    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.15" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.25">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="NLog" Version="5.3.2" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.11" />
+		<PackageReference Include="NModbus4.Core" Version="1.0.2" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\EquipmentManagment\EquipmentManagment.csproj" />
-    <ProjectReference Include="..\RosBridgeClient\RosBridgeClient.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\EquipmentManagment\EquipmentManagment.csproj" />
+		<ProjectReference Include="..\RosBridgeClient\RosBridgeClient.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="GPMRosMessageNet\Sick_Safetyscanners\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="GPMRosMessageNet\Sick_Safetyscanners\" />
+	</ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-  	<!--<Exec Command="powershell.exe -ExecutionPolicy Bypass -File &quot;AutoVersionModify.ps1&quot;&#xD;&#xA;" />-->
-  </Target>
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<!--<Exec Command="powershell.exe -ExecutionPolicy Bypass -File &quot;AutoVersionModify.ps1&quot;&#xD;&#xA;" />-->
+	</Target>
 </Project>
 
 
