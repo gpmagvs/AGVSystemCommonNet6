@@ -23,19 +23,21 @@ namespace AGVSystemCommonNet6.Material
         public static void Initialize()
         {
             database = new AGVSDatabase();
-            var FailPorts = CompareStationInforWithExistSignal();
-            if (FailPorts.Count > 0)
-            {
-                string strFailPorts = "";
-                foreach (var port in FailPorts)
-                    strFailPorts += $"{port},";
 
-                AlarmManagerCenter.AddAlarmAsync(new clsAlarmDto()
-                {
-                    AlarmCode = (int)ALARMS.PutCSTButCSTSensorNotMatch,
-                    Level = ALARM_LEVEL.ALARM
-                });
-            }
+            //var FailPorts = CompareStationInforWithExistSignal();
+            //if (FailPorts.Count > 0)
+            //{
+            //    string strFailPorts = "";
+            //    foreach (var port in FailPorts)
+            //        strFailPorts += $"{port},";
+
+            //    AlarmManagerCenter.AddAlarmAsync(new clsAlarmDto()
+            //    {
+            //        AlarmCode = (int)ALARMS.PutCSTButCSTSensorNotMatch,
+            //        Level = ALARM_LEVEL.ALARM
+            //    });
+            //}
+
             Initialized = true;
         }
 
@@ -96,7 +98,7 @@ namespace AGVSystemCommonNet6.Material
             {
                 foreach (var WIPPort in rack.PortsStatus)
                 {
-                    var StationInfoInDB = stationStatus.FirstOrDefault(stationInfo => stationInfo.StationName == WIPPort.Properties.ID);
+                    var StationInfoInDB = stationStatus.FirstOrDefault(stationInfo => stationInfo.StationName == $"{rack.EQName}_{WIPPort.Properties.ID}");
 
                     if (StationInfoInDB == null)
                         continue;
@@ -129,5 +131,39 @@ namespace AGVSystemCommonNet6.Material
             //});
         }
 
+        public static async void ScanWIP()
+        {
+            if (!Initialized)
+                Initialize();
+
+            List<clsStationStatus> stationStatus = database.tables.StationStatus.ToList();
+
+            foreach (var rack in StaEQPManagager.RacksList)
+            {
+                foreach (var port in rack.PortsStatus)
+                {
+                    string _stationName = $"{rack.EQName}_{port.Properties.ID}";
+                    if (stationStatus.Any(status => status.StationName == _stationName) == false)
+                    {
+                        try
+                        {
+                            database.tables.StationStatus.Add(new clsStationStatus()
+                            {
+                                StationName = _stationName,
+                                StationCol = port.Properties.Column,
+                                StationRow = port.Properties.Row,
+                                StationTag = port.TagNumbers[0].ToString(),
+                                IsEnable = port.Properties.PortEnable == 0,
+                            });
+                            await database.SaveChanges();
+
+                        }
+                        catch (Exception exp)
+                        {
+                        }
+                    }
+                }
+            }
+        }
     }
 }
