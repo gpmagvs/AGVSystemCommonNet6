@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>1.0.233.7</AssemblyVersion>
+		<AssemblyVersion>1.0.233.9</AssemblyVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -32,6 +32,7 @@
 		<PackageReference Include="NModbus4.Core" Version="1.0.2" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
 		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+		<PackageReference Include="System.Management" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
