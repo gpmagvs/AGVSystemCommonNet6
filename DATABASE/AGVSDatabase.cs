@@ -70,6 +70,7 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<clsMeasureResult>(nameof(database.tables.InstrumentMeasureResult));
             await schemaUpdater.EnsureFieldExists<clsStopRegionDto>(nameof(database.tables.StopRegionData));
             await schemaUpdater.EnsureFieldExists<clsMaterialInfo>(nameof(database.tables.MaterialInfo));
+            await schemaUpdater.EnsureFieldExists<clsStationStatus>(nameof(database.tables.StationStatus));
 
             return true;
         }
@@ -96,6 +97,7 @@ namespace AGVSystemCommonNet6.DATABASE
                 databse.tables.InstrumentMeasureResult.FirstOrDefault();
                 databse.tables.StopRegionData.FirstOrDefault();
                 databse.tables.MaterialInfo.FirstOrDefault();
+                databse.tables.StationStatus.FirstOrDefault();
             }
             catch (Exception ex)
             {
