@@ -105,14 +105,14 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                                 sw.Restart();
                                 disconnectAlarm.Checked = false;
                                 disconnectAlarm.Time = DateTime.Now;
-                                AlarmManagerCenter.AddAlarmAsync(ALARMS.VMSDisconnectwithVehicle, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
+                                AlarmManagerCenter.AddAlarmAsync(ALARMS.AGVS_DISCONNECT_WITH_VMS, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
                             }
                             else
                             {
                                 IsAlive = true;
                                 OnVMSReconnected?.Invoke("", EventArgs.Empty);
                                 sw.Restart();
-                                await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", ALARMS.VMSDisconnectwithVehicle, "SystemAuto");
+                                await AlarmManagerCenter.SetAlarmCheckedAsync("VMS", ALARMS.AGVS_DISCONNECT_WITH_VMS, "SystemAuto");
                             }
                         }
                         else if (!response.alive)
