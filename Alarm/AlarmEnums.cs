@@ -19,7 +19,6 @@ namespace AGVSystemCommonNet6.Alarm
     public enum ALARMS
     {
         NONE = 0,
-        AGV_DISCONNECT = 1003,
         GET_ONLINE_REQ_BUT_AGV_DISCONNECT = 1004,
         GET_OFFLINE_REQ_BUT_AGV_DISCONNECT = 1005,
         GET_ONLINE_REQ_BUT_AGV_STATE_ERROR = 1006,
@@ -88,8 +87,7 @@ namespace AGVSystemCommonNet6.Alarm
         ERROR_WHEN_TASK_STATUS_CHAGE_DB = 1069,
         Destine_Normal_Station_Has_Task_To_Reach = 1070,
         Destine_Eq_Station_Has_Task_To_Park = 1071,
-        Destine_Charge_Station_Has_AGV = 1072,
-        PING_CHECK_FAIL = 1073,
+        Destine_Charge_Station_Has_AGV = 1072,      
         Download_Task_To_AGV_Fail = 1074,
         EQ_LOAD_REQUEST_ON_BUT_HAS_CARGO = 1075,
         EQ_UNLOAD_REQUEST_ON_BUT_NO_CARGO = 1076,
