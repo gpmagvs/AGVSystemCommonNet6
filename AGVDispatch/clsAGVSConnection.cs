@@ -216,7 +216,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         private async Task<bool> OnlineModeQueryOut()
         {
-            (bool, OnlineModeQueryResponse onlineModeQuAck) _OnlineModeQueryResult = await TryOnlineModeQueryAsync();
+            (bool, OnlineModeQueryResponse onlineModeQuAck) _OnlineModeQueryResult = await TryOnlineModeQueryAsync(20);
             if (!_OnlineModeQueryResult.Item1)
             {
                 Current_Warning_Code = AlarmCodes.OnlineModeQuery_T1_Timeout;
