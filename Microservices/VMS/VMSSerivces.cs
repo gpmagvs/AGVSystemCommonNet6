@@ -23,6 +23,9 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         public static bool IsAlive { get; private set; } = false;
 
         private static HttpHelper _VMS_http;
+
+        private static HttpHelper VMSAliveCheckHttp;
+
         private static HttpHelper GetVMSHttpHelper()
         {
             if (_VMS_http == null)
@@ -90,13 +93,14 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                     Source = ALARM_SOURCE.AGVS,
 
                 };
+                VMSAliveCheckHttp = new HttpHelper(VMSHostUrl, 4, comment: "VMS Alive Check");
                 while (true)
                 {
                     await Task.Delay(5000);
                     try
                     {
                         bool hasVmsDisconnectAlarm = alarm != null;
-                        (bool alive, string message) response = await VMSAliveCheck();
+                        (bool alive, string message) response = await VMSAliveCheck(VMSAliveCheckHttp);
                         if (previous_alive_state != response.alive)
                         {
                             if (!response.alive)
@@ -174,12 +178,11 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 throw ex;
             }
         }
-        private static async Task<(bool alive, string message)> VMSAliveCheck()
+        private static async Task<(bool alive, string message)> VMSAliveCheck(HttpHelper vMSAliveCheckHttp)
         {
             try
             {
-                HttpHelper httpHelper = GetVMSHttpHelper();
-                bool alive = await httpHelper.GetAsync<bool>($"/api/System/VMSAliveCheck", 8);
+                bool alive = await vMSAliveCheckHttp.GetAsync<bool>($"/api/System/VMSAliveCheck", 4);
                 return (alive, "");
             }
             catch (Exception ex)

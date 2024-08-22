@@ -98,7 +98,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
             this.IP = IP;
             this.VMSPort = Port;
             LocalIP = null;
-            VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{Port}");
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
         }
         public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_TYPE AGV_TYPE = AGV_TYPE.FORK, ILogger<clsAGVSConnection> logger = null)
@@ -108,7 +107,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             this.VMSPort = HostPort;
             this.LocalIP = localIP;
             this.AGV_Type = AGV_TYPE;
-            VMSWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{VMSPort}");
+            InitVMSWebAPIHttpChannels($"http://{IP}:{VMSPort}");
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
             AutoPingServerCheck = true;
             PingServerCheckProcess();
@@ -118,6 +117,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return !_is_systembyte_used;
             };
         }
+
+
         public void Setup(string _SID, string _EQName)
         {
             SID = _SID;
