@@ -1,5 +1,7 @@
-﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
+﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
+using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.MAP;
 using Newtonsoft.Json;
@@ -17,6 +19,17 @@ namespace AGVSystemCommonNet6
 {
     public static class Extensions
     {
+        private static Map _mapUse = null;
+        private static Map mapUse
+        {
+            get
+            {
+                if (_mapUse == null)
+                    _mapUse = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string errMsg, auto_create_segment: false, auto_check_path_error: false);
+                return _mapUse;
+            }
+        }
+
         public static Time ToStdTime(this DateTime _time)
         {
             return new Time()
@@ -208,6 +221,82 @@ namespace AGVSystemCommonNet6
         {
             return BitConverter.ToInt16(bool_ary.Select(b => b ? (byte)0x1 : (byte)0x00).Reverse().ToArray(), 0);
 
+        }
+        public static clsTaskDto ToGPMTaskDto(this KGSWebAGVSystemAPI.Models.ExecutingTask kgTask)
+        {
+            KGSWebAGVSystemAPI.Models.Task _Task = JsonConvert.DeserializeObject<KGSWebAGVSystemAPI.Models.Task>(JsonConvert.SerializeObject(kgTask));
+            var dto = _Task.ToGPMTaskDto();
+            return dto;
+        }
+
+        public static clsTaskDto ToGPMTaskDto(this KGSWebAGVSystemAPI.Models.Task kgTask)
+        {
+            try
+            {
+
+                var dto = new clsTaskDto
+                {
+                    Action = Enum.GetValues<ACTION_TYPE>().Cast<ACTION_TYPE>().FirstOrDefault(enuu => enuu.ToString() == kgTask.ActionType),
+                    TaskName = kgTask.Name,
+                    DesignatedAGVName = "AGV_" + kgTask.Agvid,
+                    DispatcherName = kgTask.AssignUserName,
+                    FailureReason = kgTask.FailReason,
+                    Carrier_ID = kgTask.Cstid,
+                    CST_TYPE = kgTask.Csttype == null ? 0 : (int)kgTask.Csttype,
+                    From_Slot = kgTask.FromStationPortNo + "",
+                    To_Slot = kgTask.ToStationPortNo + "",
+                    FinishTime = kgTask.EndTime == null ? DateTime.MinValue : (DateTime)kgTask.EndTime,
+                    RecieveTime = kgTask.ReceiveTime,
+                    StartTime = kgTask.StartTime == null ? DateTime.MinValue : (DateTime)kgTask.StartTime,
+                    State = GetTaskStatus(kgTask.Status),
+                    Priority = kgTask.Priority,
+                };
+
+                if (kgTask.FromStationId != null && mapUse.Points.TryGetValue((int)kgTask.FromStationId, out MapPoint fromPt))
+                {
+                    dto.From_Station = fromPt.TagNumber + "";
+                }
+                if (kgTask.ToStationId != null && mapUse.Points.TryGetValue((int)kgTask.ToStationId, out MapPoint toPt))
+                {
+                    dto.To_Station = toPt.TagNumber + "";
+                }
+                return dto;
+                TASK_RUN_STATUS GetTaskStatus(int status)
+                {
+                    switch (status)
+                    {
+                        case 98:
+                            return TASK_RUN_STATUS.WAIT;
+                        case 99:
+                            return TASK_RUN_STATUS.NAVIGATING;
+                        case 100:
+                            return TASK_RUN_STATUS.ACTION_FINISH;
+                        case 101:
+                            return TASK_RUN_STATUS.CANCEL;
+                        default:
+                            return TASK_RUN_STATUS.ACTION_FINISH;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new clsTaskDto()
+                {
+                    TaskName = null
+                };
+            }
+        }
+        public static List<clsTaskDto> ToGPMTaskCollection(this IEnumerable<KGSWebAGVSystemAPI.Models.Task> tasks)
+        {
+            List<clsTaskDto> task_ = new List<clsTaskDto>();
+            task_ = tasks.Select(kgTask => kgTask.ToGPMTaskDto()).ToList();
+            return task_.Where(tk => tk.TaskName != null).ToList();
+        }
+        public static List<clsTaskDto> ToGPMTaskCollection(this IEnumerable<KGSWebAGVSystemAPI.Models.ExecutingTask> tasks)
+        {
+            List<clsTaskDto> task_ = new List<clsTaskDto>();
+            task_ = tasks.Select(kgTask => kgTask.ToGPMTaskDto()).ToList();
+            return task_.Where(tk => tk.TaskName != null).ToList();
         }
     }
 }

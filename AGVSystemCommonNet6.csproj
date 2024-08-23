@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>1.0.235.14</AssemblyVersion>
+		<AssemblyVersion>1.0.236.24</AssemblyVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -37,6 +37,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\EquipmentManagment\EquipmentManagment.csproj" />
+		<ProjectReference Include="..\KGSWebAGVSystemAPI\KGSWebAGVSystemAPI.csproj" />
 		<ProjectReference Include="..\RosBridgeClient\RosBridgeClient.csproj" />
 	</ItemGroup>
 

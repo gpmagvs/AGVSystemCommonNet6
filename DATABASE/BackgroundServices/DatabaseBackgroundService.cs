@@ -1,6 +1,8 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch;
 using AGVSystemCommonNet6.Alarm;
+using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
+using KGSWebAGVSystemAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,6 +11,8 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using WebSocketSharp;
+using Task = System.Threading.Tasks.Task;
+using AGVSystemCommonNet6;
 
 namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 {
@@ -44,6 +48,17 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                     _stopwatch.Restart();
                     using (var scope = _services.CreateScope())
                     {
+
+                        if (AGVSConfigulator.SysConfigs.BaseOnKGSWebAGVSystem)
+                        {
+                            WebAGVSystemContext kgDBContext = scope.ServiceProvider.GetRequiredService<WebAGVSystemContext>();
+                            List<KGSWebAGVSystemAPI.Models.Task> tasks = kgDBContext.Tasks.AsNoTracking().OrderByDescending(task => task.ReceiveTime).Take(40).ToList();
+
+                            DatabaseCaches.TaskCaches.CompleteTasks = tasks.ToGPMTaskCollection();
+
+                            continue;
+                        }
+
                         var dbContext = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
 
                         DatabaseCaches.TaskCaches.CompleteTasks = (await GetTasksInSpecficTimeRange()).Where(task => IsTaskInFinishedState(task))
@@ -77,6 +92,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
             }
         }
 
+
         private async Task DatabaseDataSyncWork()
         {
             Stopwatch _stopwatch = Stopwatch.StartNew();
@@ -91,6 +107,17 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 {
                     using (var scope = _services.CreateScope())
                     {
+                        if (AGVSConfigulator.SysConfigs.BaseOnKGSWebAGVSystem)
+                        {
+                            WebAGVSystemContext kgDBContext = scope.ServiceProvider.GetRequiredService<WebAGVSystemContext>();
+                            var RunningAndWaitingTasks = kgDBContext.ExecutingTasks.AsNoTracking().ToList().ToGPMTaskCollection();
+                            DatabaseCaches.TaskCaches.WaitExecuteTasks = RunningAndWaitingTasks.Where(tk => tk.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
+                            DatabaseCaches.TaskCaches.RunningTasks = RunningAndWaitingTasks.Where(tk => tk.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
+                            continue;
+                        }
+
+
+
                         var dbContext = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
                         async Task<List<clsTaskDto>> GetTasksInSpecficTimeRange()
                         {
@@ -99,9 +126,10 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                             {
 
                                 DateTime recieveTimeLowerLimit = DateTime.Now.AddDays(-1);
-                                return await dbContext.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).OrderByDescending(t=>t.RecieveTime).Take(30).ToListAsync();
+                                return await dbContext.Tasks.AsNoTracking().Where(t => t.RecieveTime >= recieveTimeLowerLimit).OrderByDescending(t => t.RecieveTime).Take(30).ToListAsync();
                             }
-                            finally{
+                            finally
+                            {
                                 _stopwatch_tasks_query.Stop();
                                 if (_stopwatch_tasks_query.Elapsed.Seconds > 1)
                                 {
@@ -125,7 +153,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                                     _logger.LogWarning($"{DateTime.Now} DatabaseBackgroundService [GetAlarmsInSpeficTimeRange] Time Spend Long...: " + _stopwatch_alarms_query.Elapsed.TotalSeconds);
                                 }
                             }
-                           
+
                         }
 
                         List<clsTaskDto> _TasksForQuery = await GetTasksInSpecficTimeRange();
