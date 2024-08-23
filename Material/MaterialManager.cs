@@ -100,7 +100,7 @@ namespace AGVSystemCommonNet6.Material
                 await AddMaterialInfo(materialDto);
                 LOG.INFO($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
 
-                await AGVSSerivces.UpdateStationInfo(materialDto);
+                //await AGVSSerivces.UpdateStationInfo(materialDto);
 
                 return materialDto;
             }
