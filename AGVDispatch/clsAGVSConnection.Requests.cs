@@ -312,7 +312,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 await Task.Delay(10);
                 if (UseWebAPI)
                 {
-                    response = await GetOnlineMode();
+                    response = await GetOnlineMode(timeout_);
                     VMS_API_Call_Fail_Flag = false;
                     return (true, response);
                 }

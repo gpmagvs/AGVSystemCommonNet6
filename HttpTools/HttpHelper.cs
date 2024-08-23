@@ -1,11 +1,7 @@
-﻿using AGVSystemCommonNet6.Log;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NLog;
 using System.Diagnostics;
-using System.Net.Http;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.HttpTools
 {
@@ -21,7 +17,8 @@ namespace AGVSystemCommonNet6.HttpTools
         public readonly string baseUrl;
         private int _timeout_sec = 5;
         private bool disposedValue;
-
+        public string Comment { get; set; } = "";
+        private NLog.Logger logger = LogManager.GetLogger("HttpHelperLog");
         public int timeout_sec
         {
             get => _timeout_sec;
@@ -29,6 +26,7 @@ namespace AGVSystemCommonNet6.HttpTools
             {
                 if (_timeout_sec != value)
                 {
+                    logger.Info($"[{Comment}:{baseUrl}] Change timeout_sec from {_timeout_sec} to {value},Dispose Old HttpClinet instance  and New HttpClinet instance created");
                     _timeout_sec = value;
                     http_client?.Dispose();
                     http_client = new HttpClient()
@@ -39,15 +37,18 @@ namespace AGVSystemCommonNet6.HttpTools
                 }
             }
         }
-        public HttpHelper(string baseUrl, int timeout_sec = 3)
+        public HttpHelper(string baseUrl, int timeout_sec = 3, string comment = "")
         {
             this.baseUrl = baseUrl;
             this.timeout_sec = timeout_sec;
+            Comment = comment;
             http_client = new HttpClient()
             {
                 Timeout = TimeSpan.FromSeconds(timeout_sec),
                 BaseAddress = new Uri(baseUrl)
             };
+            logger.Info($"[{Comment}:{baseUrl}] HttpClinet instance created");
+
         }
         public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 3)
         {
@@ -76,11 +77,13 @@ namespace AGVSystemCommonNet6.HttpTools
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine(ex.Message);
+                logger.Error(ex);
                 throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                logger.Error(ex);
                 throw;
             }
 
@@ -112,11 +115,13 @@ namespace AGVSystemCommonNet6.HttpTools
             catch (TaskCanceledException ex)
             {
                 Console.WriteLine(ex.Message);
+                logger.Error(ex);
                 throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                logger.Error(ex);
                 throw;
             }
 
@@ -140,10 +145,12 @@ namespace AGVSystemCommonNet6.HttpTools
             }
             catch (TaskCanceledException ex)
             {
+                logger.Error(ex);
                 throw ex;
             }
             catch (Exception ex)
             {
+                logger.Error(ex);
                 throw ex;
             }
         }
@@ -165,10 +172,12 @@ namespace AGVSystemCommonNet6.HttpTools
             }
             catch (TaskCanceledException ex)
             {
+                logger.Error(ex);
                 throw ex;
             }
             catch (Exception ex)
             {
+                logger.Error(ex);
                 throw ex;
             }
         }
