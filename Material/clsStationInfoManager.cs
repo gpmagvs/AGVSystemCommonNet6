@@ -1,10 +1,12 @@
-﻿using AGVSystemCommonNet6.Alarm;
+﻿using AGVSystemCommonNet6.AGVDispatch;
+using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using EquipmentManagment.Manager;
 using EquipmentManagment.WIP;
+using Microsoft.AspNetCore.Routing.Tree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,18 +50,15 @@ namespace AGVSystemCommonNet6.Material
         /// </summary>
         /// <param name="stationStatus"></param>
         /// <returns></returns>
-        public static async Task UpdateStationInfo(clsStationStatus stationStatus)
+        private static async Task UpdateStationInfo(clsStationStatus stationStatus)
         {
             try
             {
-                if (StaEQPManagager.RacksList.FirstOrDefault(rack => rack.PortsStatus.Any(port => port.Properties.ID == stationStatus.StationName)) == null)
-                    return;
-
                 await semaphoreSlim.WaitAsync();
                 if (!Initialized)
                     Initialize();
 
-                if (CheckStationInfoExist(stationStatus.StationName) == false)
+                if (CheckStationInfoExist(stationStatus.StationTag, stationStatus.StationRow) == false)
                     database.tables.StationStatus.Add(stationStatus);
                 else
                     database.tables.StationStatus.Update(stationStatus);
@@ -73,13 +72,66 @@ namespace AGVSystemCommonNet6.Material
             finally { semaphoreSlim.Release(); }
         }
 
-        public static bool CheckStationInfoExist(string stationName)
+        public static async Task UpdateStationInfo(clsTaskDto taskDto, MaterialType materialType, string CarrierID)
+        {
+            clsStationStatus _stationStatus = new clsStationStatus()
+            {
+                UpdateTime = DateTime.Now,
+                StationRow = Convert.ToInt32(taskDto.To_Slot),
+                StationTag = taskDto.To_Station_Tag.ToString(),
+                MaterialID = CarrierID,
+                Type = materialType,
+                IsEnable = true
+            };
+
+            await UpdateStationInfo(_stationStatus);
+        }
+
+        public static void TransferTask2StationInfo(clsTaskDto taskDto, MaterialType materialType)
+        {
+            // 找出符合Tag Colunm Row的Port
+            int[] TagToFind = new int[] { taskDto.To_Station_Tag };
+            var TargetRack = StaEQPManagager.RacksList.FirstOrDefault(rack => rack.RackOption.ColumnTagMap.ContainsValue(TagToFind));
+
+            if (TargetRack == null)
+                return;
+
+            int columnNum = -1;
+            foreach (var tags in TargetRack.RackOption.ColumnTagMap)
+            {
+                if (tags.Value.SequenceEqual(TagToFind))
+                {
+                    columnNum = tags.Key;
+                    break;
+                }
+            }
+
+            if (columnNum == -1)
+                return;
+
+            string WIPPort = $"{columnNum}-{taskDto.To_Slot}";
+            string TargetStation = $"{TargetRack.EQName}_{WIPPort}";
+
+            UpdateStationInfo(new clsStationStatus()
+            {
+                UpdateTime = DateTime.Now,
+                StationName = TargetStation,
+                StationTag = taskDto.To_Station_Tag.ToString(),
+                StationCol = columnNum,
+                StationRow = Convert.ToInt32(taskDto.To_Slot),
+                MaterialID = taskDto.Carrier_ID,
+                Type = materialType
+            });
+        }
+
+        public static bool CheckStationInfoExist(string stationTag, int stationRow)
         {
             List<clsStationStatus> stationInfos = new List<clsStationStatus>();
 
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                var _stationInfos = dbhelper._context.Set<clsStationStatus>().OrderByDescending(stationinfo => stationinfo.StationName).Where(stationinfo => stationinfo.StationName == stationName);
+                var _stationInfos = dbhelper._context.Set<clsStationStatus>().OrderByDescending(stationinfo => stationinfo.StationTag).Where(
+                    stationinfo => stationinfo.StationTag == stationTag && stationinfo.StationRow == stationRow);
                 stationInfos = _stationInfos.ToList();
             };
 
@@ -131,7 +183,13 @@ namespace AGVSystemCommonNet6.Material
             //});
         }
 
-        public static async void ScanWIP()
+        public static async Task ScanWIP_EQ()
+        {
+            await ScanWIP();
+            await ScanEQ();
+        }
+
+        private static async Task ScanWIP()
         {
             if (!Initialized)
                 Initialize();
@@ -161,6 +219,38 @@ namespace AGVSystemCommonNet6.Material
                         catch (Exception exp)
                         {
                         }
+                    }
+                }
+            }
+        }
+
+        private static async Task ScanEQ()
+        {
+            if (!Initialized)
+                Initialize();
+
+            List<clsStationStatus> stationStatus = database.tables.StationStatus.ToList();
+
+            foreach (var EQ in StaEQPManagager.MainEQList)
+            {
+                string _stationName = $"{EQ.EQName}";
+                if (stationStatus.Any(status => status.StationName == _stationName) == false)
+                {
+                    try
+                    {
+                        database.tables.StationStatus.Add(new clsStationStatus()
+                        {
+                            StationName = _stationName,
+                            StationCol = 0,
+                            StationRow = 0,
+                            StationTag = EQ.EndPointOptions.TagID.ToString(),
+                            IsEnable = EQ.EndPointOptions.Enable,
+                        });
+                        await database.SaveChanges();
+
+                    }
+                    catch (Exception exp)
+                    {
                     }
                 }
             }
