@@ -68,10 +68,10 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             /// <param name="SourceTag"></param>
             /// <param name="DestineTag"></param>
             /// <returns></returns>
-            public static async Task<clsAGVSTaskReportResponse> StartTransferCargoReport(string AGVName, int SourceTag, int DestineTag, bool IsSourceAGV)
+            public static async Task<clsAGVSTaskReportResponse> StartTransferCargoReport(string AGVName, int SourceTag, int DestineTag, string SoureSlot, string DestineSlot, bool IsSourceAGV)
             {
                 var agvs_http = GetAGVSHttpHelper();
-                clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}&IsSourceAGV={IsSourceAGV}");
+                clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}&SourceSlot={SoureSlot}&DestineSlot={DestineSlot}&IsSourceAGV={IsSourceAGV}");
                 LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
                 return response;
             }
