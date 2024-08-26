@@ -4,6 +4,7 @@ using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.MAP;
+using KGSWebAGVSystemAPI.Sys;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient.MessageTypes.Geometry;
 using RosSharp.RosBridgeClient.MessageTypes.Std;
@@ -25,7 +26,10 @@ namespace AGVSystemCommonNet6
             get
             {
                 if (_mapUse == null)
-                    _mapUse = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string errMsg, auto_create_segment: false, auto_check_path_error: false);
+                {
+                    string mapPath = KGSSettingsHelper.GetCurrentMapUseFilePath();
+                    _mapUse = MapManager.LoadMapFromFile(mapPath, out string errMsg, auto_create_segment: false, auto_check_path_error: false);
+                }
                 return _mapUse;
             }
         }
@@ -222,6 +226,40 @@ namespace AGVSystemCommonNet6
             return BitConverter.ToInt16(bool_ary.Select(b => b ? (byte)0x1 : (byte)0x00).Reverse().ToArray(), 0);
 
         }
+
+        /// <summary>
+        /// 將GPM任務訂單轉成 KGS 任務API需要的查詢參數封裝
+        /// </summary>
+        /// <param name="gpmDto"></param>
+        /// <returns></returns>
+        public static KGSWebAGVSystemAPI.TaskOrder.MissionRequestParams ToKGSMissionRequestParam(this clsTaskDto gpmDto)
+        {
+            KGSWebAGVSystemAPI.TaskOrder.MissionRequestParams param = new KGSWebAGVSystemAPI.TaskOrder.MissionRequestParams();
+            param.CarName = gpmDto.DesignatedAGVName;
+            if (param.CarName != null)
+            {
+                try
+                {
+                    param.AGVID = int.Parse(param.CarName.Split('_')[1]);
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            string fromStationName = mapUse.Points.Values.FirstOrDefault(pt => pt.TagNumber == gpmDto.From_Station_Tag)?.Name;
+            string toStationName = mapUse.Points.Values.FirstOrDefault(pt => pt.TagNumber == gpmDto.To_Station_Tag)?.Name;
+
+            param.Action = gpmDto.Action.ToString();
+            param.Priority = gpmDto.Priority;
+            param.FromStation = fromStationName;
+            param.ToStation = toStationName;
+            param.CSTID = gpmDto.Carrier_ID;
+            param.CSTType = gpmDto.CST_TYPE;
+            param.RepeatTime = 1;
+            return param;
+        }
+
         public static clsTaskDto ToGPMTaskDto(this KGSWebAGVSystemAPI.Models.ExecutingTask kgTask)
         {
             KGSWebAGVSystemAPI.Models.Task _Task = JsonConvert.DeserializeObject<KGSWebAGVSystemAPI.Models.Task>(JsonConvert.SerializeObject(kgTask));
@@ -267,14 +305,14 @@ namespace AGVSystemCommonNet6
                     {
                         case 98:
                             return TASK_RUN_STATUS.WAIT;
-                        case 99:
+                        case 1:
                             return TASK_RUN_STATUS.NAVIGATING;
                         case 100:
                             return TASK_RUN_STATUS.ACTION_FINISH;
                         case 101:
                             return TASK_RUN_STATUS.CANCEL;
                         default:
-                            return TASK_RUN_STATUS.ACTION_FINISH;
+                            return TASK_RUN_STATUS.WAIT;
                     }
                 }
             }

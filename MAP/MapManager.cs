@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Configuration;
+using KGSWebAGVSystemAPI.Sys;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
 using System.IO.Compression;
@@ -69,7 +70,12 @@ namespace AGVSystemCommonNet6.MAP
         }
         public static Map LoadMapFromFile(bool auto_create_segment = true, bool auto_check_path_error = true)
         {
-            return LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out string msg, auto_create_segment, auto_check_path_error);
+            string mapFileFullName = AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName;
+            if (AGVSConfigulator.SysConfigs.BaseOnKGSWebAGVSystem)
+            {
+                mapFileFullName = KGSSettingsHelper.GetCurrentMapUseFilePath();
+            }
+            return LoadMapFromFile(mapFileFullName, out string msg, auto_create_segment, auto_check_path_error);
 
         }
         public static List<MapPath> CreateSegments(Map map)

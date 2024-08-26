@@ -107,17 +107,6 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                 {
                     using (var scope = _services.CreateScope())
                     {
-                        if (AGVSConfigulator.SysConfigs.BaseOnKGSWebAGVSystem)
-                        {
-                            WebAGVSystemContext kgDBContext = scope.ServiceProvider.GetRequiredService<WebAGVSystemContext>();
-                            var RunningAndWaitingTasks = kgDBContext.ExecutingTasks.AsNoTracking().ToList().ToGPMTaskCollection();
-                            DatabaseCaches.TaskCaches.WaitExecuteTasks = RunningAndWaitingTasks.Where(tk => tk.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
-                            DatabaseCaches.TaskCaches.RunningTasks = RunningAndWaitingTasks.Where(tk => tk.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
-                            continue;
-                        }
-
-
-
                         var dbContext = scope.ServiceProvider.GetRequiredService<AGVSDbContext>();
                         async Task<List<clsTaskDto>> GetTasksInSpecficTimeRange()
                         {
@@ -158,9 +147,26 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
 
                         List<clsTaskDto> _TasksForQuery = await GetTasksInSpecficTimeRange();
 
-                        DatabaseCaches.TaskCaches.WaitExecuteTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
+                        if (AGVSConfigulator.SysConfigs.BaseOnKGSWebAGVSystem)
+                        {
+                            try
+                            {
 
-                        DatabaseCaches.TaskCaches.RunningTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
+                                WebAGVSystemContext kgDBContext = scope.ServiceProvider.GetRequiredService<WebAGVSystemContext>();
+                                var RunningAndWaitingTasks = kgDBContext.ExecutingTasks.AsNoTracking().ToList().ToGPMTaskCollection();
+                                DatabaseCaches.TaskCaches.WaitExecuteTasks = RunningAndWaitingTasks.Where(tk => tk.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
+                                DatabaseCaches.TaskCaches.RunningTasks = RunningAndWaitingTasks.Where(tk => tk.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            DatabaseCaches.TaskCaches.WaitExecuteTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
+                            DatabaseCaches.TaskCaches.RunningTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
+                        }
 
                         DatabaseCaches.Alarms.UnCheckedAlarms = (await GetAlarmsInSpeficTimeRange()).Where(alarm => !alarm.Checked).ToList();
 

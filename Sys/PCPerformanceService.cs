@@ -38,7 +38,7 @@ namespace AGVSystemCommonNet6.Sys
                                 float systemCpuUsage = (float)Math.Round(cpuCounter.NextValue(), 2);
                                 // 獲取當前程序 CPU 使用率
                                 float processCpuUsage = (float)Math.Round(processCpuCounter.NextValue() / Environment.ProcessorCount, 2);
-                                logger.Info($"當前程序記憶體用量|{memoryUsage}MB/{totalMemory}MB({memoeryUsageRate}%)|當前程序CPU使用率|{processCpuUsage}%|系統整體CPU使用率${systemCpuUsage}%");
+                                logger.Trace($"當前程序記憶體用量|{memoryUsage}MB/{totalMemory}MB({memoeryUsageRate}%)|當前程序CPU使用率|{processCpuUsage}%|系統整體CPU使用率${systemCpuUsage}%");
                             }
                         }
                         catch (Exception ex)
