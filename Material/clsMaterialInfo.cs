@@ -14,6 +14,8 @@ namespace AGVSystemCommonNet6.Material
     [Index(nameof(ActualID))]
     [Index(nameof(SourceStation))]
     [Index(nameof(TargetStation))]
+    [Index(nameof(TaskSourceStation))]
+    [Index(nameof(TaskTargetStation))]
     public class clsMaterialInfo
     {
         [Key]
@@ -23,12 +25,20 @@ namespace AGVSystemCommonNet6.Material
         public string ActualID { get; set; } = "";
 
         public string SourceStation { get; set; } = "";
+        
+        public int SourceStationSlot { get; set; } = -1;
 
         public string TargetStation { get; set; } = "";
 
+        public int TargetStationSlot { get; set; } = -1;
+
         public string TaskSourceStation { get; set; } = "";
 
+        public int TaskSourceStationSlot { get; set; } = -1;
+
         public string TaskTargetStation { get; set; } = "";
+
+        public int TaskTargetStationSlot { get; set; } = -1;
 
         public MaterialIDStatus IDStatus { get; set; } = MaterialIDStatus.NG;
 

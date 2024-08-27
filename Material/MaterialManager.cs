@@ -71,7 +71,11 @@ namespace AGVSystemCommonNet6.Material
         /// <param name="materialType"></param>
         /// <param name="materialCondition"></param>
         /// <returns></returns>
-        public static async Task<clsMaterialInfo> CreateMaterialInfo(string MaterialID, string ActualID = "", string SourceStation = "", string TargetStation = "", string TaskSource = "", string TaskTarget = "", MaterialInstallStatus installStatus = MaterialInstallStatus.None, MaterialIDStatus IDStatus = MaterialIDStatus.None, MaterialType materialType = MaterialType.None, MaterialCondition materialCondition = MaterialCondition.Add)
+        public static async Task<clsMaterialInfo> CreateMaterialInfo(
+            string MaterialID, string ActualID = "", string SourceStation = "", string TargetStation = "",
+            string TaskSource = "", string TaskTarget = "", MaterialInstallStatus installStatus = MaterialInstallStatus.None, MaterialIDStatus IDStatus = MaterialIDStatus.None,
+            MaterialType materialType = MaterialType.None, MaterialCondition materialCondition = MaterialCondition.Add,
+            int SourceStationSlot = -1, int TargetStationSlot = -1, int TaskSourceSlot = -1, int TaskTargetSlot = -1)
         {
             try
             {
@@ -80,9 +84,13 @@ namespace AGVSystemCommonNet6.Material
                     MaterialID = MaterialID,
                     ActualID = ActualID,
                     SourceStation = SourceStation,
+                    SourceStationSlot = SourceStationSlot,
                     TargetStation = TargetStation,
+                    TargetStationSlot = TargetStationSlot,
                     TaskSourceStation = TaskSource,
+                    TaskSourceStationSlot = TaskSourceSlot,
                     TaskTargetStation = TaskTarget,
+                    TaskTargetStationSlot = TaskTargetSlot,
                     InstallStatus = installStatus,
                     IDStatus = IDStatus,
                     Type = materialType,
@@ -91,6 +99,9 @@ namespace AGVSystemCommonNet6.Material
                 materialDto.RecordTime = DateTime.Now;
                 await AddMaterialInfo(materialDto);
                 LOG.INFO($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
+
+                //await AGVSSerivces.UpdateStationInfo(materialDto);
+
                 return materialDto;
             }
             catch (Exception ex)
@@ -324,7 +335,7 @@ namespace AGVSystemCommonNet6.Material
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 var _materialInfo = dbhelper._context.Set<clsMaterialInfo>().Where(material => (material.ActualID == MaterialID || material.MaterialID == MaterialID) && material.Condition != MaterialCondition.Done && material.Condition != MaterialCondition.Delete);
-                
+
                 if (_materialInfo == null)
                     return "Material Does Not Exist";
                 else if (_materialInfo.Count() <= 0)
