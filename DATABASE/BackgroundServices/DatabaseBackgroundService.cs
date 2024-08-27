@@ -52,7 +52,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                         if (AGVSConfigulator.SysConfigs.BaseOnKGSWebAGVSystem)
                         {
                             WebAGVSystemContext kgDBContext = scope.ServiceProvider.GetRequiredService<WebAGVSystemContext>();
-                            List<KGSWebAGVSystemAPI.Models.Task> tasks = kgDBContext.Tasks.AsNoTracking().OrderByDescending(task => task.ReceiveTime).Take(40).ToList();
+                            List<KGSWebAGVSystemAPI.Models.Task> tasks = kgDBContext.Task.AsNoTracking().OrderByDescending(task => task.Receive_Time).Take(40).ToList();
 
                             DatabaseCaches.TaskCaches.CompleteTasks = tasks.ToGPMTaskCollection();
 
@@ -153,7 +153,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                             {
 
                                 WebAGVSystemContext kgDBContext = scope.ServiceProvider.GetRequiredService<WebAGVSystemContext>();
-                                var RunningAndWaitingTasks = kgDBContext.ExecutingTasks.AsNoTracking().ToList().ToGPMTaskCollection();
+                                var RunningAndWaitingTasks = kgDBContext.ExecutingTask.AsNoTracking().ToList().ToGPMTaskCollection();
                                 DatabaseCaches.TaskCaches.WaitExecuteTasks = RunningAndWaitingTasks.Where(tk => tk.State == AGVDispatch.Messages.TASK_RUN_STATUS.WAIT).ToList();
                                 DatabaseCaches.TaskCaches.RunningTasks = RunningAndWaitingTasks.Where(tk => tk.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
                             }

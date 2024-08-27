@@ -73,7 +73,18 @@ namespace AGVSystemCommonNet6.MAP
             string mapFileFullName = AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName;
             if (AGVSConfigulator.SysConfigs.BaseOnKGSWebAGVSystem)
             {
-                mapFileFullName = KGSSettingsHelper.GetCurrentMapUseFilePath();
+                var KGMapFileFullName = KGSSettingsHelper.GetCurrentMapUseFilePath();
+                string mapName = Path.GetFileNameWithoutExtension(KGMapFileFullName);
+                mapFileFullName = AGVSConfigulator.SysConfigs.MapConfigs.MapFolder + "/" + mapName + "-KG.json";
+                if (!File.Exists(mapFileFullName))
+                    File.Copy(KGMapFileFullName, mapFileFullName, true);
+                else
+                {
+                    Map kgMap = LoadMapFromFile(KGMapFileFullName, out string _, false, false);
+                    Map existMap = LoadMapFromFile(mapFileFullName, out string _, false, false);
+                    existMap.Points = kgMap.Points.Clone();
+                    SaveMapToFile(existMap, mapFileFullName);
+                }
             }
             return LoadMapFromFile(mapFileFullName, out string msg, auto_create_segment, auto_check_path_error);
 

@@ -274,17 +274,17 @@ namespace AGVSystemCommonNet6
 
                 var dto = new clsTaskDto
                 {
-                    Action = Enum.GetValues<ACTION_TYPE>().Cast<ACTION_TYPE>().FirstOrDefault(enuu => enuu.ToString() == kgTask.ActionType),
+                    Action = kgTask.ActionType == "Transfer" ? ACTION_TYPE.Carry : Enum.GetValues<ACTION_TYPE>().Cast<ACTION_TYPE>().FirstOrDefault(enuu => enuu.ToString() == kgTask.ActionType),
                     TaskName = kgTask.Name,
-                    DesignatedAGVName = "AGV_" + kgTask.Agvid,
+                    DesignatedAGVName = "AGV_" + kgTask.ExeVehicleID.ToString("X3"),
                     DispatcherName = kgTask.AssignUserName,
                     FailureReason = kgTask.FailReason,
-                    Carrier_ID = kgTask.Cstid,
-                    CST_TYPE = kgTask.Csttype == null ? 0 : (int)kgTask.Csttype,
+                    Carrier_ID = kgTask.CSTID,
+                    CST_TYPE = kgTask.CSTType == null ? 0 : (int)kgTask.CSTType,
                     From_Slot = kgTask.FromStationPortNo + "",
                     To_Slot = kgTask.ToStationPortNo + "",
                     FinishTime = kgTask.EndTime == null ? DateTime.MinValue : (DateTime)kgTask.EndTime,
-                    RecieveTime = kgTask.ReceiveTime,
+                    RecieveTime = kgTask.Receive_Time,
                     StartTime = kgTask.StartTime == null ? DateTime.MinValue : (DateTime)kgTask.StartTime,
                     State = GetTaskStatus(kgTask.Status),
                     Priority = kgTask.Priority,
@@ -306,6 +306,14 @@ namespace AGVSystemCommonNet6
                         case 98:
                             return TASK_RUN_STATUS.WAIT;
                         case 1:
+                            return TASK_RUN_STATUS.NAVIGATING;
+                        case 2:
+                            return TASK_RUN_STATUS.NAVIGATING;
+                        case 3:
+                            return TASK_RUN_STATUS.NAVIGATING;
+                        case 4:
+                            return TASK_RUN_STATUS.NAVIGATING;
+                        case 90:
                             return TASK_RUN_STATUS.NAVIGATING;
                         case 100:
                             return TASK_RUN_STATUS.ACTION_FINISH;
