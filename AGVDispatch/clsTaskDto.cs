@@ -181,6 +181,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public string Carrier_ID { get; set; } = "";
 
         /// <summary>
+        /// 車載真實上報ID
+        /// </summary>
+        public string Actual_Carrier_ID { get; set; } = "";
+
+        /// <summary>
         /// 任務需要換車時的中繼站點Tag
         /// </summary>
         [MaybeNull]
