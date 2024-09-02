@@ -21,10 +21,15 @@ namespace AGVSystemCommonNet6.GPMRosMessageNet.Messages.SickMsg
         //  8 byte Y int64 [mm]
         public int heading { get; set; }
         //  4 byte Heading int32 [mdeg]
+
+        /// <summary>
+        ///1 byte LocalizationStatus [0...100, 10: OK, 20: Warning, 30: Not localized, 40: System error]
+        /// </summary>
         public byte loc_status { get; set; }
-        //  1 byte LocalizationStatus [0...100, 10: OK, 20: Warning, 30: Not localized, 40: System error]
+        /// <summary>
+        /// 1 byte MapMatchingStatus [0...100, 90: Good, 60: Medium, 30: Low, 0; None]
+        /// </summary>
         public byte map_match_status { get; set; }
-        //  1 byte MapMatchingStatus [0...100, 90: Good, 60: Medium, 30: Low, 0; None]
         public uint sync_timestamp_sec { get; set; }
         //  seconds part of synchronized timestamp in system time calculated by Software-PLL
         public uint sync_timestamp_nsec { get; set; }
