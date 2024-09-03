@@ -36,6 +36,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public event EventHandler OnConnectionRestored;
 
         public event EventHandler OnOnlineModeQuery_T1Timeout;
+        public event EventHandler OnOnlineModeQuery_Recovery;
         public event EventHandler OnRunningStatusReport_T1Timeout;
         public event EventHandler<FeedbackData> OnTaskFeedBack_T1Timeout;
 
@@ -63,6 +64,23 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         OnDisconnected?.Invoke(this, EventArgs.Empty);
                     }
                     _Connected = value;
+                }
+            }
+        }
+
+        private bool _IsOnlineModeQueryTimeout = false;
+        public bool IsOnlineModeQueryTimeout
+        {
+            get => _IsOnlineModeQueryTimeout;
+            set
+            {
+                if (_IsOnlineModeQueryTimeout != value)
+                {
+                    _IsOnlineModeQueryTimeout = value;
+                    if (value)
+                        OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
+                    else
+                        OnOnlineModeQuery_Recovery?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -215,22 +233,21 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
 
-
         private async Task<bool> OnlineModeQueryOut()
         {
             (bool, OnlineModeQueryResponse onlineModeQuAck) _OnlineModeQueryResult = await TryOnlineModeQueryAsync(20);
             if (!_OnlineModeQueryResult.Item1)
             {
+                IsOnlineModeQueryTimeout = true;
                 Current_Warning_Code = AlarmCodes.OnlineModeQuery_T1_Timeout;
-                OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
                 logger.LogWarning("[AGVS] OnlineMode Query Fail...AGVS No Response");
                 return false;
             }
             else
             {
+                IsOnlineModeQueryTimeout = false;
                 IsGetOnlineModeTrying = false;
                 Connected = true;
-
                 Current_Warning_Code = AlarmCodes.None;
                 return true;
             }
