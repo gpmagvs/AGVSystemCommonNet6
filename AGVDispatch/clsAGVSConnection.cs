@@ -110,6 +110,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             InitVMSWebAPIHttpChannels($"http://{IP}:{VMSPort}");
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
             AutoPingServerCheck = true;
+            pingTimeoutInMillSecond = 20000;
             PingServerCheckProcess();
             AGVSMessageFactory.OnCylicSystemByteCreate += (_crteated_systemByte) =>
             {

@@ -14,6 +14,7 @@ namespace AGVSystemCommonNet6.Abstracts
         public int AGVsPort = 5216;
         public Action OnPingFail;
         public Action OnPingSuccess;
+        public int pingTimeoutInMillSecond = 3000;
 
         public bool AutoPingServerCheck { get; set; } = true;
         private bool _ping_success = true;
@@ -56,21 +57,21 @@ namespace AGVSystemCommonNet6.Abstracts
             {
                 try
                 {
-                    await Task.Delay(10000);
                     ping_success = await PingServer();
+                    await Task.Delay(ping_success ? 10000 : 1000);
 
                 }
                 catch (Exception ex)
                 {
                     LOG.ERROR($"Ping-{IP} 的過程中發生例外-{ex.Message}", ex, false);
                     ping_success = false;
+                    await Task.Delay(1000);
                 }
             }
         }
 
         public async Task<bool> PingServer()
         {
-            const int timeout = 3000; // 1秒超時
             byte[] buffer = new byte[32];
             PingOptions options = new PingOptions { Ttl = 64 };
 
@@ -81,7 +82,7 @@ namespace AGVSystemCommonNet6.Abstracts
 #if ping_debug
                     PingReply reply = await pingSender.SendPingAsync("192.168.23.23", timeout, buffer, options);
 #else
-                    PingReply reply = await pingSender.SendPingAsync(IP, timeout, buffer, options);
+                    PingReply reply = await pingSender.SendPingAsync(IP, pingTimeoutInMillSecond, buffer, options);
 #endif
                     return reply.Status == IPStatus.Success;
                 }
