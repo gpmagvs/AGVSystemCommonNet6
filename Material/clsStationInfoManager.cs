@@ -7,6 +7,7 @@ using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using EquipmentManagment.Manager;
 using EquipmentManagment.WIP;
 using Microsoft.AspNetCore.Routing.Tree;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,26 +21,10 @@ namespace AGVSystemCommonNet6.Material
         private static AGVSDatabase database;
 
         private static bool Initialized = false;
-        public clsStationInfoManager() { }
 
         public static void Initialize()
         {
             database = new AGVSDatabase();
-
-            //var FailPorts = CompareStationInforWithExistSignal();
-            //if (FailPorts.Count > 0)
-            //{
-            //    string strFailPorts = "";
-            //    foreach (var port in FailPorts)
-            //        strFailPorts += $"{port},";
-
-            //    AlarmManagerCenter.AddAlarmAsync(new clsAlarmDto()
-            //    {
-            //        AlarmCode = (int)ALARMS.PutCSTButCSTSensorNotMatch,
-            //        Level = ALARM_LEVEL.ALARM
-            //    });
-            //}
-
             Initialized = true;
         }
 
@@ -55,15 +40,46 @@ namespace AGVSystemCommonNet6.Material
             try
             {
                 await semaphoreSlim.WaitAsync();
+
                 if (!Initialized)
                     Initialize();
 
-                if (CheckStationInfoExist(stationStatus.StationTag, stationStatus.StationRow) == false)
-                    database.tables.StationStatus.Add(stationStatus);
-                else
-                    database.tables.StationStatus.Update(stationStatus);
+                using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+                {
+                    if (CheckStationInfoExist(stationStatus, out clsStationStatus StationStatusInputDB) == true)
+                    {
+                        aGVSDbContext._context.StationStatus.Update(StationStatusInputDB);
+                    }
+                    else
+                        aGVSDbContext._context.StationStatus.Add(stationStatus);
 
-                await database.SaveChanges();
+                    var ret = aGVSDbContext._context.SaveChanges();
+                }
+            }
+            catch (DbUpdateConcurrencyException dbex)
+            {
+                foreach (var entry in dbex.Entries)
+                {
+                    if (entry.Entity is clsStationStatus)
+                    {
+                        // 取得資料庫中的目前數據
+                        var databaseValues = entry.GetDatabaseValues();
+
+                        if (databaseValues == null)
+                        {
+                            // 數據已被刪除
+                            Console.WriteLine("Data has been deleted by another user.");
+                        }
+                        else
+                        {
+                            // 數據已被修改，你可以選擇用資料庫中的值覆蓋當前值
+                            entry.OriginalValues.SetValues(databaseValues);
+
+                            // 或者提示用戶選擇保留哪些更改
+                            Console.WriteLine("Data has been modified by another user. Choose to overwrite or keep the current changes.");
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -72,7 +88,7 @@ namespace AGVSystemCommonNet6.Material
             finally { semaphoreSlim.Release(); }
         }
 
-        public static async Task UpdateStationInfo(clsTaskDto taskDto, MaterialType materialType, string CarrierID)
+        public static async Task UpdateStationInfo(clsTaskDto taskDto, MaterialType materialType, string CarrierID,bool IsNGport = false)
         {
             clsStationStatus _stationStatus = new clsStationStatus()
             {
@@ -81,6 +97,7 @@ namespace AGVSystemCommonNet6.Material
                 StationTag = taskDto.To_Station_Tag.ToString(),
                 MaterialID = CarrierID,
                 Type = materialType,
+                IsNGPort = IsNGport,
                 IsEnable = true
             };
 
@@ -124,21 +141,30 @@ namespace AGVSystemCommonNet6.Material
             });
         }
 
-        public static bool CheckStationInfoExist(string stationTag, int stationRow)
+        public static bool CheckStationInfoExist(clsStationStatus stationStatus, out clsStationStatus CombineStationStatus)
         {
             List<clsStationStatus> stationInfos = new List<clsStationStatus>();
 
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 var _stationInfos = dbhelper._context.Set<clsStationStatus>().OrderByDescending(stationinfo => stationinfo.StationTag).Where(
-                    stationinfo => stationinfo.StationTag == stationTag && stationinfo.StationRow == stationRow);
+                    stationinfo => stationinfo.StationTag == stationStatus.StationTag && stationinfo.StationRow == stationStatus.StationRow);
                 stationInfos = _stationInfos.ToList();
             };
 
             if (stationInfos.Count <= 0)
+            {
+                CombineStationStatus = null;
                 return false;
+            }
             else
+            {
+                CombineStationStatus = stationStatus;
+                CombineStationStatus.StationName = stationInfos[0].StationName;
+                CombineStationStatus.StationCol = stationInfos[0].StationCol;
+
                 return true;
+            }
         }
 
         public static List<string> CompareStationInforWithExistSignal()

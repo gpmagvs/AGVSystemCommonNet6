@@ -8,14 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.Material
-{
-    [Index(nameof(UpdateTime))]
+{   
+    [Index(nameof(StationTag))]
     [Index(nameof(StationName))]
     [Index(nameof(MaterialID))]
     public class clsStationStatus
     {
         [Key]
-        public DateTime UpdateTime { get; set; } = DateTime.Now;
 
         public string StationName { get; set; } = "";
 
@@ -32,5 +31,6 @@ namespace AGVSystemCommonNet6.Material
         public bool IsNGPort { get; set; } = false;
 
         public bool IsEnable { get; set; } = true;
+        public DateTime UpdateTime { get; set; } = DateTime.Now;
     }
 }
