@@ -128,7 +128,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         }
 
-        public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string actionType, string failurereason,out List<clsTaskDto> Task )
+        public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string actionType, string failurereason, out List<clsTaskDto> Task)
         {
             TASK_RUN_STATUS state_query = 0;
             if (Result == "完成" || Result == "Completed")
@@ -140,9 +140,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
 
             ACTION_TYPE action_type_query = ACTION_TYPE.None;
-            if (actionType == "移動" || actionType =="Move")
+            if (actionType == "移動" || actionType == "Move")
                 action_type_query = ACTION_TYPE.None;
-            if (actionType == "放貨" || actionType =="UnLoad")
+            if (actionType == "放貨" || actionType == "UnLoad")
                 action_type_query = ACTION_TYPE.Load;
             if (actionType == "取貨" || actionType == "Load")
                 action_type_query = ACTION_TYPE.Unload;
@@ -164,7 +164,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                     && (Result == "ALL" ? true : Task.State == state_query)
                                     && (actionType == "ALL" ? true : Task.Action == action_type_query)
                                     && (failurereason == null ? (true) : (Task.FailureReason.Contains(failurereason)))
-                                    /*(failurereason == "ALL" ? (true) :(Task.FailureReason.Contains(failurereason)))*/
+                /*(failurereason == "ALL" ? (true) :(Task.FailureReason.Contains(failurereason)))*/
                 /*(failurereason == "ALL" ? true :Task.FailureReason == failurereason)*/
                 );
                 count = _Task.Count();
@@ -179,32 +179,45 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             string FilePath = Path.Combine(folder, "TaskQuery_" + _fileName);
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                var _Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
-                                    && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
-                );
-                List<string> list = new List<string> { "任務名稱,接收時間,開始時間,結束時間,搬運時間,執行結果,AGV名稱,任務類型,起始站點,結束站點,載物ID,派工人員,失敗原因" };
-                list.AddRange(_Task.Select(Task => $"{Task.TaskName},{Task.RecieveTime},{Task.StartTime},{Task.FinishTime},{(Task.FinishTime - Task.StartTime).TotalSeconds},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.From_Station},{Task.To_Station},{Task.Carrier_ID},{Task.DispatcherName},{Task.FailureReason}"));
-                File.WriteAllLines(FilePath, list, Encoding.UTF8);
+                List<clsTaskDto> _Tasks = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime &&
+                                                                                            Task.RecieveTime <= endTime &&
+                                                                                            (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) &&
+                                                                                            (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName))))
+                                                                             .ToList();
+                WirteTaskQueryResultToFile(FilePath, _Tasks);
             };
             return FilePath;
         }
-        public static string AutoSaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
+
+        public static string AutoSaveTocsv(DateTime startTime, DateTime endTime)
         {
             string YesterdayDate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-            var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath + YesterdayDate);
-            var _fileName = fileName is null ? YesterdayDate + ".csv" : fileName;
+            var folder = AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath + YesterdayDate;
+            var _fileName = YesterdayDate + ".csv";
             Directory.CreateDirectory(folder);
             string FilePath = Path.Combine(folder, "Task" + _fileName);
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                var _Task = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
-                                    && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
-                );
-                List<string> list = new List<string> { "任務名稱,接收時間,開始時間,結束時間,搬運時間,執行結果,AGV名稱,任務類型,起始站點,結束站點,載物ID,派工人員,失敗原因" };
-                list.AddRange(_Task.Select(Task => $"{Task.TaskName},{Task.RecieveTime},{Task.StartTime},{Task.FinishTime},{(Task.FinishTime - Task.StartTime).TotalSeconds},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.From_Station},{Task.To_Station},{Task.Carrier_ID},{Task.DispatcherName},{Task.FailureReason}"));
-                File.WriteAllLines(FilePath, list, Encoding.UTF8);
+                List<clsTaskDto> _Tasks = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime)
+                                                               .ToList();
+                WirteTaskQueryResultToFile(FilePath, _Tasks);
             };
             return FilePath;
+        }
+
+        private static void WirteTaskQueryResultToFile(string FilePath, List<clsTaskDto> Tasks)
+        {
+            List<string> list = new List<string> { "任務名稱,接收時間,開始時間,結束時間,搬運時間,執行結果,AGV名稱,任務類型,起始站點,結束站點,載物ID,派工人員,失敗原因" };
+            list.AddRange(Tasks.Select(Task => $"{Task.TaskName},{Task.RecieveTime},{Task.StartTime},{Task.FinishTime},{(Task.FinishTime - Task.StartTime).TotalSeconds},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.From_Station},{Task.To_Station},{Task.Carrier_ID},{Task.DispatcherName},{_GetFailReason(Task.FailureReason)}"));
+            File.WriteAllLines(FilePath, list, Encoding.UTF8);
+
+            string _GetFailReason(string failReason)
+            {
+                if (failReason == null || failReason == "")
+                    return "";
+                return failReason.Split(",")[0];
+            }
+
         }
 
 
