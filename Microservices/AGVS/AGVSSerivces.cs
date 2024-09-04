@@ -6,8 +6,10 @@ using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.MAP;
+using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.Microservices.ResponseModel;
 using AGVSystemCommonNet6.Notify;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
 using RosSharp.RosBridgeClient.MessageTypes.Std;
@@ -272,6 +274,28 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             }
             return response;
         }
+
+        [HttpPost("UpdateStationInfo")]
+        public static async Task<(bool confirm, string message)> UpdateStationInfo(clsStationStatus stationStatus)
+        {
+            (bool confirm, string message) response = new(false, "[AGVSSerivces.UpdateStationInfo] System Error");
+            GetAGVSHttpHelper();
+
+            try
+            {
+                var route = $"/api/Equipment/UpdateStationInfo";
+                (bool success, string message) v = await _agvs_http.PostAsync(route, stationStatus, timeout: 7);
+
+                response = v;
+            }
+            catch (Exception ex)
+            {
+                response.message = $"[AGVSSerivces.AlarmReporterSwitch] {ex.Message}";
+            }
+
+            return response;
+        }
+
         public static async Task<(bool confirm, string token, string strUsername)> Login()
         {
             (bool confirm, string token, string strUsername) response = new(false, "", "");

@@ -3,6 +3,7 @@ using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
+using AGVSystemCommonNet6.Microservices.AGVS;
 using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using EquipmentManagment.Manager;
 using EquipmentManagment.WIP;
@@ -49,12 +50,17 @@ namespace AGVSystemCommonNet6.Material
                     if (CheckStationInfoExist(stationStatus, out clsStationStatus StationStatusInputDB) == true)
                     {
                         aGVSDbContext._context.StationStatus.Update(StationStatusInputDB);
+                        await AGVSSerivces.UpdateStationInfo(StationStatusInputDB);
                     }
                     else
+                    {
                         aGVSDbContext._context.StationStatus.Add(stationStatus);
+                        await AGVSSerivces.UpdateStationInfo(stationStatus);
+                    }
 
                     var ret = aGVSDbContext._context.SaveChanges();
                 }
+
             }
             catch (DbUpdateConcurrencyException dbex)
             {
@@ -88,7 +94,7 @@ namespace AGVSystemCommonNet6.Material
             finally { semaphoreSlim.Release(); }
         }
 
-        public static async Task UpdateStationInfo(clsTaskDto taskDto, MaterialType materialType, string CarrierID,bool IsNGport = false)
+        public static async Task UpdateStationInfo(clsTaskDto taskDto, MaterialType materialType, string CarrierID, bool IsNGport = false)
         {
             clsStationStatus _stationStatus = new clsStationStatus()
             {
@@ -207,6 +213,54 @@ namespace AGVSystemCommonNet6.Material
             //        }
             //    }
             //});
+        }
+
+        public static async Task<(bool, string)> AssignStationInfo(clsStationStatus stationStatus)
+        {
+            try
+            {
+                foreach (var rack in StaEQPManagager.RacksList)
+                {
+                    if (rack.RackOption.ColumnTagMap.ContainsValue(new int[] { Convert.ToInt32(stationStatus.StationTag) }) == true)
+                    {
+                        foreach (var port in rack.PortsStatus)
+                        {
+                            if (port.Properties.Column == stationStatus.StationCol && port.Properties.Row == stationStatus.StationRow)
+                            {
+                                port.CarrierID = stationStatus.MaterialID;
+                                port.Properties.ProductionQualityStore = stationStatus.IsNGPort ? clsPortOfRack.PRUDUCTION_QUALITY.NG : clsPortOfRack.PRUDUCTION_QUALITY.OK;
+                                port.CarrierExist = true;
+                                port.InstallTime = stationStatus.UpdateTime;
+                                return (true, $"");
+                            }
+                            else
+                                continue;
+                        }
+                    }
+                    else
+                        continue;
+                }
+
+                foreach (var EQ in StaEQPManagager.MainEQList)
+                {
+                    if (EQ.EndPointOptions.TagID == Convert.ToInt32(stationStatus.StationTag))
+                    {
+                        EQ.PortStatus.CarrierID = stationStatus.MaterialID;
+                        EQ.PortStatus.CarrierExist = true;
+                        EQ.PortStatus.InstallTime = stationStatus.UpdateTime;
+                        return (true, $"");
+                    }
+                    else
+                        continue;
+                }
+
+                return (true, $"No EQ/Rack is updated !!");
+            }
+            catch (Exception exp)
+            {
+                return (false, exp.Message);
+            }
+
         }
 
         public static async Task ScanWIP_EQ()
