@@ -133,6 +133,7 @@ namespace AGVSystemCommonNet6.Alarm
         Path_Conflic_But_Dispatched = 3048,
         WaitTaskBeExecutedTimeout = 3049,
         No_NG_Port_Can_Be_Used = 3050,
+        OrderExecuteTimeout = 3051,
         #region KG
         CreateCommandFail = 210,
         NoActionType = 11,

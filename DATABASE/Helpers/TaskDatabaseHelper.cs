@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
+using AGVSystemCommonNet6.MAP;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -184,38 +185,97 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                                                                             (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) &&
                                                                                             (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName))))
                                                                              .ToList();
+                _Tasks = OrderDataRebuild(_Tasks, setCanceledAsFailure: false);
                 WirteTaskQueryResultToFile(FilePath, _Tasks);
             };
             return FilePath;
         }
-
-        public static string AutoSaveTocsv(DateTime startTime, DateTime endTime)
+        public static string ExportSpeficDateHistoryToDestine(DateTime date)
         {
-            string YesterdayDate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-            var folder = AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath + YesterdayDate;
-            var _fileName = YesterdayDate + ".csv";
+            DateTime queryStartTime = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
+            DateTime queryEndTime = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
+
+            string Date = date.ToString("yyyy-MM-dd");
+            string folder = Path.Combine(AGVSConfigulator.SysConfigs.AutoSendDailyData.SavePath, Date);
+            string _fileName = Date + ".csv";
             Directory.CreateDirectory(folder);
+            if (!Directory.Exists(folder))
+                throw new DirectoryNotFoundException($"無法創建資料夾({folder})");
             string FilePath = Path.Combine(folder, "Task" + _fileName);
+            List<clsTaskDto> _Tasks = new List<clsTaskDto>();
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                List<clsTaskDto> _Tasks = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime)
-                                                               .ToList();
-                WirteTaskQueryResultToFile(FilePath, _Tasks);
+                _Tasks = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= queryStartTime && Task.RecieveTime <= queryEndTime).ToList();
             };
+            _Tasks = OrderDataRebuild(_Tasks, setCanceledAsFailure: true);
+            WirteTaskQueryResultToFile(FilePath, _Tasks);
             return FilePath;
         }
+        public static string AutoExportYesterdayHistoryToDestine()
+        {
+            DateTime yesterDay = DateTime.Now.AddDays(-1);
+            return ExportSpeficDateHistoryToDestine(yesterDay);
+        }
+        private static List<clsTaskDto> OrderDataRebuild(List<clsTaskDto> _Tasks, bool setCanceledAsFailure = false)
+        {
+            Map _useMap = null;
+            try
+            {
+                _useMap = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out _, false, false);
+            }
+            catch (Exception ex)
+            {
+            }
+            _Tasks.ForEach(orderState =>
+            {
+                if (orderState.State == TASK_RUN_STATUS.CANCEL)
+                {
+                    orderState.State = TASK_RUN_STATUS.FAILURE;
+                }
+                if (_useMap != null)
+                {
+                    if (orderState.From_Station != "0" && orderState.From_Station != "-1")
+                        orderState.From_Station_Display = _GetDisplayNameOfTagStr(orderState.From_Station);
+                    if (orderState.To_Station != "0" && orderState.To_Station != "-1")
+                        orderState.To_Station_Display = _GetDisplayNameOfTagStr(orderState.To_Station);
 
+                    string _GetDisplayNameOfTagStr(string tagStr)
+                    {
+                        if (int.TryParse(tagStr, out int tag))
+                        {
+                            MapPoint _pt = _useMap.Points.Values.FirstOrDefault(pt => pt.TagNumber == tag);
+                            if (_pt == null)
+                                return tagStr;
+
+                            return _pt.Graph.Display;
+                        }
+                        else
+                        {
+                            return tagStr;
+                        }
+                    }
+                }
+
+            });
+            return _Tasks;
+        }
         private static void WirteTaskQueryResultToFile(string FilePath, List<clsTaskDto> Tasks)
         {
             List<string> list = new List<string> { "任務名稱,接收時間,開始時間,結束時間,搬運時間,執行結果,AGV名稱,任務類型,起始站點,結束站點,載物ID,派工人員,失敗原因" };
-            list.AddRange(Tasks.Select(Task => $"{Task.TaskName},{Task.RecieveTime},{Task.StartTime},{Task.FinishTime},{(Task.FinishTime - Task.StartTime).TotalSeconds},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.From_Station},{Task.To_Station},{Task.Carrier_ID},{Task.DispatcherName},{_GetFailReason(Task.FailureReason)}"));
+            list.AddRange(Tasks.Select(Task => $"{Task.TaskName},{Task.RecieveTime},{Task.StartTime},{Task.FinishTime},{(Task.FinishTime - Task.StartTime).TotalSeconds},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.From_Station_Display},{Task.To_Station_Display},{Task.Carrier_ID},{Task.DispatcherName},{_GetFailReason(Task.FailureReason)}"));
             File.WriteAllLines(FilePath, list, Encoding.UTF8);
 
             string _GetFailReason(string failReason)
             {
                 if (failReason == null || failReason == "")
                     return "";
-                return failReason.Split(",")[0];
+
+                if (failReason.Contains(","))
+                    return failReason.Split(",")[0];
+                else if (failReason.Contains(";"))
+                    return failReason.Split(";")[0];
+                else
+                    return failReason;
             }
 
         }

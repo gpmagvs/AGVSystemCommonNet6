@@ -112,5 +112,15 @@ namespace AGVSystemCommonNet6.Configuration
         /// 任務沒有被執行的超時時間(單位:分鐘)
         /// </summary>
         public double TaskNoExecutedTimeout { get; set; } = 20;
+
+        /// <summary>
+        /// 等待任務結束超時時間
+        /// </summary>
+        public double TaskDoActionTimeout { get; set; } = 20;
+
+
+        public bool CancelTaskWhenTaskNoExecutedTimeout { get; set; } = false;
+        public bool CancelTaskWhenTaskDoActionTimeout { get; set; } = false;
+
     }
 }

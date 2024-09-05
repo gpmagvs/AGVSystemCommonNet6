@@ -28,5 +28,10 @@ namespace AGVSystemCommonNet6.Sys
                 Console.WriteLine($"Set Environment variable '{variableName}' as {variableValue} fail. {ex.Message}");
             }
         }
+
+        public static string GetUserVariable(string variableName)
+        {
+            return Environment.GetEnvironmentVariable(variableName, EnvironmentVariableTarget.User);
+        }
     }
 }
