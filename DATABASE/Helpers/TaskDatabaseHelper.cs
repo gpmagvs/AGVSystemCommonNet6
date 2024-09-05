@@ -232,6 +232,17 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 {
                     orderState.State = TASK_RUN_STATUS.FAILURE;
                 }
+                if (orderState.Carrier_ID == "-1")
+                    orderState.Carrier_ID = "";
+
+                if (orderState.From_Slot == "-1")
+                    orderState.From_Slot = "0";
+                if (orderState.To_Slot == "-1")
+                    orderState.To_Slot = "0";
+
+                if (orderState.DispatcherName.ToLower() == "vms_idle")
+                    orderState.DispatcherName = "";
+
                 if (_useMap != null)
                 {
                     if (orderState.From_Station != "0" && orderState.From_Station != "-1")
@@ -261,8 +272,49 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         }
         private static void WirteTaskQueryResultToFile(string FilePath, List<clsTaskDto> Tasks)
         {
-            List<string> list = new List<string> { "任務名稱,接收時間,開始時間,結束時間,搬運時間,執行結果,AGV名稱,任務類型,起始站點,結束站點,載物ID,派工人員,失敗原因" };
-            list.AddRange(Tasks.Select(Task => $"{Task.TaskName},{Task.RecieveTime},{Task.StartTime},{Task.FinishTime},{(Task.FinishTime - Task.StartTime).TotalSeconds},{Task.StateName},{Task.DesignatedAGVName},{Task.ActionName},{Task.From_Station_Display},{Task.To_Station_Display},{Task.Carrier_ID},{Task.DispatcherName},{_GetFailReason(Task.FailureReason)}"));
+            List<string> list = new List<string> {
+                "任務名稱," +
+                "任務狀態," +
+                "接收時間," +
+                "起始站點," +
+                "目的站點," +
+                "起始Port," +
+                "目的Port," +
+                "任務描述," +
+                "執行AGV," +
+                "CSTID," +
+                "開始時間," +
+                "結束時間," +
+                "花費時間," +
+                "任務距離," +
+                "取料時間," +
+                "放料時間," +
+                "起始位置," +
+                "使用者ID," +
+                "取消任務使用者ID," +
+                "失敗原因" };
+
+            list.AddRange(Tasks.Select(Task =>
+            $"{Task.TaskName}," +
+            $"{Task.StateName}," +
+            $"{Task.RecieveTime}," +
+            $"{Task.From_Station_Display}," +
+            $"{Task.To_Station_Display}," +
+            $"{Task.From_Slot}," +
+            $"{Task.To_Slot}," +
+            $"{Task.ActionName}," +
+            $"{Task.DesignatedAGVName}," +
+            $"{Task.Carrier_ID}," +
+            $"{Task.StartTime}," +
+            $"{Task.FinishTime}," +
+            $"{TimeSpan.FromSeconds((Task.FinishTime - Task.StartTime).TotalSeconds).ToString()}," +
+            $"," +
+            $"," +
+            $"," +
+            $"," +
+            $"{(Task.DispatcherName.ToLower() == "vms_idle" ? "" : Task.DispatcherName)}," +
+            $"{(Task.State == TASK_RUN_STATUS.CANCEL ? Task.DesignatedAGVName : "")}," +
+            $"{_GetFailReason(Task.FailureReason)}"));
             File.WriteAllLines(FilePath, list, Encoding.UTF8);
 
             string _GetFailReason(string failReason)
