@@ -176,7 +176,15 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.clsAGVS_Print_Data.SavePath + "Task");
             var _fileName = fileName is null ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
-            Directory.CreateDirectory(folder);
+            try
+            {
+                Directory.CreateDirectory(folder);
+            }
+            catch (Exception)
+            {
+                folder = Path.GetTempPath();
+            }
+
             string FilePath = Path.Combine(folder, "TaskQuery_" + _fileName);
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
