@@ -27,6 +27,8 @@ namespace AGVSystemCommonNet6.MAP
         /// 格線尺寸(單位:公尺)
         /// </summary>
         public double gridSize { get; set; } = 1;
+        public double gridOffsetX { get; set; } = 0;
+        public double gridOffsetY { get; set; } = 0;
         /// <summary>
         /// 預設地圖背景是否顯示
         /// </summary>
