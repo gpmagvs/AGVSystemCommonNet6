@@ -58,6 +58,21 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
         public DateTime StartTime { get; set; }
         public DateTime FinishTime { get; set; }
+
+        /// <summary>
+        /// 取料時間
+        /// </summary>
+        public DateTime UnloadTime { get; set; }
+        /// <summary>
+        /// 放料時間
+        /// </summary>
+        public DateTime LoadTime { get; set; }
+
+        /// <summary>
+        /// 任務開始到結束車子行走的總里程
+        /// </summary>
+        public double TotalMileage { get; set; } = 0;
+
         [NotMapped]
         public string FinishTime_Formated
         {
@@ -165,11 +180,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public string To_Station { get; set; } = "-1";
         [NotMapped]
         public string To_Station_Display { get; set; } = string.Empty;
+
         [Required]
         public AGV_TYPE To_Station_AGV_Type { get; set; } = AGV_TYPE.Any;
         public int To_Station_Tag => int.TryParse(To_Station, out int tag) ? tag : -1;
 
+        /// <summary>
+        /// 起始位置
+        /// </summary>
+        public int StartLocationTag { get; set; } = 0;
 
+        [NotMapped]
+        public string StartLocationDisplay { get; set; } = string.Empty;
         public int TransferToTag { get; set; } = -1;
         public int TransferFromTag { get; set; } = -1;
 
@@ -266,6 +288,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
             CST_TYPE = dto.CST_TYPE;
             need_change_agv = dto.need_change_agv;
             transfer_task_stage = dto.transfer_task_stage;
+            UnloadTime = dto.UnloadTime;
+            LoadTime = dto.LoadTime;
+            TotalMileage = dto.TotalMileage;
+            StartLocationTag = dto.StartLocationTag;
+            Actual_Carrier_ID = dto.Actual_Carrier_ID;
         }
 
     }

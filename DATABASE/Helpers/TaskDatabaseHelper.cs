@@ -160,7 +160,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             Task = new List<clsTaskDto>();
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                var _Task = dbhelper._context.Set<clsTaskDto>().OrderByDescending(TK => TK.FinishTime).Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
+                var _Task = dbhelper._context.Set<clsTaskDto>().OrderByDescending(TK => TK.RecieveTime).Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
                                     && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
                                     && (Result == "ALL" ? true : Task.State == state_query)
                                     && (actionType == "ALL" ? true : Task.Action == action_type_query)
@@ -280,6 +280,14 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         }
         private static void WirteTaskQueryResultToFile(string FilePath, List<clsTaskDto> Tasks)
         {
+            Map _useMap = null;
+            try
+            {
+                _useMap = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out _, false, false);
+            }
+            catch (Exception ex)
+            {
+            }
             List<string> list = new List<string> {
                 "任務名稱," +
                 "任務狀態," +
@@ -316,10 +324,10 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{Task.StartTime}," +
             $"{Task.FinishTime}," +
             $"{TimeSpan.FromSeconds((Task.FinishTime - Task.StartTime).TotalSeconds).ToString()}," +
-            $"," +
-            $"," +
-            $"," +
-            $"," +
+            $"{Task.TotalMileage}," +
+            $"{(Task.UnloadTime == DateTime.MinValue ? "" : Task.UnloadTime)}," +
+            $"{(Task.LoadTime == DateTime.MinValue ? "" : Task.LoadTime)}," +
+            $"{_GetStationNameByTag(Task.StartLocationTag)}," +
             $"{(Task.DispatcherName.ToLower() == "vms_idle" ? "" : Task.DispatcherName)}," +
             $"{(Task.State == TASK_RUN_STATUS.CANCEL ? Task.DesignatedAGVName : "")}," +
             $"{_GetFailReason(Task.FailureReason)}"));
@@ -338,6 +346,15 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                     return failReason;
             }
 
+            string _GetStationNameByTag(int tag)
+            {
+                if (_useMap == null)
+                    return tag.ToString();
+                MapPoint mapPt = _useMap.Points.Values.FirstOrDefault(pt => pt.TagNumber == tag);
+                if (mapPt == null)
+                    return tag.ToString();
+                return mapPt.Graph.Display;
+            }
         }
 
 
