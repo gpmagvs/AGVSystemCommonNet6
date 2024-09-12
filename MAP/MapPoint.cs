@@ -48,6 +48,9 @@ namespace AGVSystemCommonNet6.MAP
         /// 避車停車角度
         /// </summary>
         public double Direction_Avoid { get; set; }
+
+        public bool UseAvoidThetaWhenStopAtWaitingPointOfEntryRegion { get; set; } = false;
+
         /// <summary>
         /// 
         /// 二次定位點的停車角度
