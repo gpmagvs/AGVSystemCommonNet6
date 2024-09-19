@@ -50,6 +50,9 @@ namespace AGVSystemCommonNet6.MAP
 
         public override string ToString()
         {
+            PathFinder.defaultMap.Points.TryGetValue(StartPtIndex, out var startPT);
+            PathFinder.defaultMap.Points.TryGetValue(EndPtIndex, out var endPT);
+            return $"{startPT?.TagNumber}->{endPT?.TagNumber}";
             return $"{StartPtIndex}->{EndPtIndex} (index)";
         }
     }
