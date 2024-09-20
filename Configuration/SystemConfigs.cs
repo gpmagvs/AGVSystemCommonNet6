@@ -31,10 +31,6 @@ namespace AGVSystemCommonNet6.Configuration
         public clsAutoSendDailyData AutoSendDailyData { get; set; } = new clsAutoSendDailyData();
         public clsAGVS_Print_Data clsAGVS_Print_Data { get; set; } = new clsAGVS_Print_Data();
 
-        public string AGVUpdateFileFolder { get; set; } = "C:\\AGVS\\AGV_Update";
-
-        public string LogFolder { get; set; } = "C:\\AGVSLog";
-
         public string TrobleShootingFolder { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\");
 
         public clsMaterialBufferLevelMonitor MaterialBufferLevelMonitor { get; set; } = new clsMaterialBufferLevelMonitor();
