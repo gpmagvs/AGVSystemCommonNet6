@@ -30,13 +30,15 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(configFilePath));
             }
+            systemConfigs.CONFIGS_ROOT_FOLDER = Path.GetDirectoryName(configFilePath);
             string json = JsonConvert.SerializeObject(systemConfigs, Formatting.Indented);
             File.WriteAllText(configFilePath, json);
             Console.WriteLine(json);
             return systemConfigs;
         }
-        public static void Init()
+        public static void Init(string configsFolder)
         {
+            ConfigsFilesFolder = string.IsNullOrEmpty(configsFolder) ? ConfigsFilesFolder : configsFolder;
             _configFilePath = Path.Combine(ConfigsFilesFolder, "SystemConfigs.json");
             SysConfigs = LoadConfig(_configFilePath);
             //WatchSystemConfigs(_configFilePath);

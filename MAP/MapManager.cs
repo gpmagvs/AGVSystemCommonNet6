@@ -70,7 +70,7 @@ namespace AGVSystemCommonNet6.MAP
         }
         public static Map LoadMapFromFile(bool auto_create_segment = true, bool auto_check_path_error = true)
         {
-            string mapFileFullName = AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName;
+            string mapFileFullName = AGVSConfigulator.SysConfigs.PATHES_STORE[SystemConfigs.PATH_ENUMS.CURRENT_MAP_FILE_PATH];
             if (AGVSConfigulator.SysConfigs.BaseOnKGSWebAGVSystem)
             {
                 var KGMapFileFullName = KGSSettingsHelper.GetCurrentMapUseFilePath();

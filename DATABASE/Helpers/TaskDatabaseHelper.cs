@@ -229,7 +229,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             Map _useMap = null;
             try
             {
-                _useMap = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out _, false, false);
+                _useMap = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.PATHES_STORE[SystemConfigs.PATH_ENUMS.CURRENT_MAP_FILE_PATH], out _, false, false);
             }
             catch (Exception ex)
             {
@@ -283,7 +283,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             Map _useMap = null;
             try
             {
-                _useMap = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.MapConfigs.MapFileFullName, out _, false, false);
+                _useMap = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.PATHES_STORE[SystemConfigs.PATH_ENUMS.CURRENT_MAP_FILE_PATH], out _, false, false);
             }
             catch (Exception ex)
             {
