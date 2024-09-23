@@ -198,7 +198,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 List<clsTaskDto> _Tasks = dbhelper._context.Set<clsTaskDto>().Where
                 (Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime &&
                 (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && 
-                (Result == "ALL"  ||Result== null? (true) : (Task.State == state_query)) &&
+                (Result == "ALL" ? (true) : (Task.State == state_query)) &&
                 (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))).ToList();
                 _Tasks = OrderDataRebuild(_Tasks, setCanceledAsFailure: false);
                 WirteTaskQueryResultToFile(FilePath, _Tasks);
@@ -243,8 +243,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
             _Tasks.ForEach(orderState =>
             {
-                if (orderState.State == TASK_RUN_STATUS.CANCEL)
+                if (orderState.State == TASK_RUN_STATUS.CANCEL && setCanceledAsFailure)
                 {
+                    //orderState.State = TASK_RUN_STATUS.CANCEL;
                     orderState.State = TASK_RUN_STATUS.FAILURE;
                 }
                 if (orderState.Carrier_ID == "-1")
@@ -319,7 +320,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
             list.AddRange(Tasks.Select(Task =>
             $"{Task.TaskName}," +
-            $"{Task.StateName}," +
+            $"{Task.State}," +
             $"{Task.RecieveTime}," +
             $"{Task.From_Station_Display}," +
             $"{Task.To_Station_Display}," +
