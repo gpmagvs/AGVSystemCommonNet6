@@ -172,10 +172,17 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 Task = _Task.Skip((currentpage - 1) * 19).Take(19).ToList();
             };
         }
-        public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string fileName = null)
+        public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string fileName = null)
         {
             var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.clsAGVS_Print_Data.SavePath + "Task");
             var _fileName = fileName is null ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
+            TASK_RUN_STATUS state_query = 0;
+            if (Result == "完成" || Result == "Completed")
+                state_query = TASK_RUN_STATUS.ACTION_FINISH;
+            if (Result == "失敗" || Result == "Fail")
+                state_query = TASK_RUN_STATUS.FAILURE;
+            if (Result == "取消" || Result == "Cancel")
+                state_query = TASK_RUN_STATUS.CANCEL;
             try
             {
                 Directory.CreateDirectory(folder);
@@ -188,11 +195,11 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             string FilePath = Path.Combine(folder, "TaskQuery_" + _fileName);
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                List<clsTaskDto> _Tasks = dbhelper._context.Set<clsTaskDto>().Where(Task => Task.RecieveTime >= startTime &&
-                                                                                            Task.RecieveTime <= endTime &&
-                                                                                            (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) &&
-                                                                                            (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName))))
-                                                                             .ToList();
+                List<clsTaskDto> _Tasks = dbhelper._context.Set<clsTaskDto>().Where
+                (Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime &&
+                (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && 
+                (Result == "ALL"  ||Result== null? (true) : (Task.State == state_query)) &&
+                (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))).ToList();
                 _Tasks = OrderDataRebuild(_Tasks, setCanceledAsFailure: false);
                 WirteTaskQueryResultToFile(FilePath, _Tasks);
             };
