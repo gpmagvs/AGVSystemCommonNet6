@@ -13,11 +13,12 @@ namespace AGVSystemCommonNet6.Configuration
         public enum PATH_ENUMS
         {
             CURRENT_MAP_FILE_PATH,
-            EQ_CONFIGS_FOLDER_PATH
+            EQ_CONFIGS_FOLDER_PATH,
+            MAP_FOLDER
         }
 
         [JsonIgnore]
-        public string CONFIGS_ROOT_FOLDER { get; set; } = "C://AGVS";
+        public string CONFIGS_ROOT_FOLDER { get; set; } = "C:\\AGVS";
 
         public bool BaseOnKGSWebAGVSystem { get; set; } = false;
         public string FieldName { get; set; } = "UMTC-AOI-2F";
@@ -56,14 +57,17 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 string MapFileFullName = "";
                 string EqConfigFolder = "";
+                string MapFolder = "";
 
-                MapFileFullName = MapConfigs.MapFolder.StartsWith('/') ? Path.Combine(CONFIGS_ROOT_FOLDER, MapConfigs.MapFileRelativePath.Trim('/')) : MapConfigs.MapFolder;
+                MapFolder = MapConfigs.MapFolder.StartsWith('/') ? Path.Combine(CONFIGS_ROOT_FOLDER, MapConfigs.MapFolder.Trim('/')) : MapConfigs.MapFolder;
+                MapFileFullName = Path.Combine(MapFolder, MapConfigs.CurrentMapFileName);
                 EqConfigFolder = EQManagementConfigs.EquipmentManagementConfigFolder.StartsWith('/') ? Path.Combine(CONFIGS_ROOT_FOLDER, EQManagementConfigs.EquipmentManagementConfigFolder.Trim('/')) : EQManagementConfigs.EquipmentManagementConfigFolder;
 
                 return new()
                 {
                     { PATH_ENUMS.EQ_CONFIGS_FOLDER_PATH, EqConfigFolder },
-                    { PATH_ENUMS.CURRENT_MAP_FILE_PATH, MapFileFullName }
+                    { PATH_ENUMS.CURRENT_MAP_FILE_PATH, MapFileFullName },
+                    { PATH_ENUMS.MAP_FOLDER, MapFolder }
                 };
             }
         }
