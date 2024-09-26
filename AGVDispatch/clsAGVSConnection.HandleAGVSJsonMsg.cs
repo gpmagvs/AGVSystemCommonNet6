@@ -18,6 +18,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             { MESSAGE_TYPE.OnlineMode_Change_ACK_0104, new ManualResetEvent(true) },
             { MESSAGE_TYPE.RunningStateReport_ACK_0106, new ManualResetEvent(true) },
             { MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK, new ManualResetEvent(true) },
+            { MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK, new ManualResetEvent(true) },
             { MESSAGE_TYPE.ACK_0324_VirtualID_ACK, new ManualResetEvent(true) }
         };
 

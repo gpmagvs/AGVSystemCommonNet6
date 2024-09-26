@@ -182,6 +182,46 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             return string.Format("{0}*{1}", json, "\r");
         }
+        internal static byte[] CreateExistRequestData(string EQName, string SID, int ExitTag, out clsExitRequest exitReqMsg)
+        {
+            exitReqMsg = new clsExitRequest()
+            {
+                SID = SID,
+                EQName = EQName,
+                SystemBytes = System_Byte_Cyclic,
+                Header = new Dictionary<string, ExitRequest>
+                {
+                    {"0311",new ExitRequest{
+                         TimeStamp = DateTime.Now.ToString("yyyyMMdd HH:mm:ss"),
+                          ExitPoint = ExitTag,
+                    } }
+                }
+            };
+            return Encoder.GetBytes(FormatSendOutString(exitReqMsg.ToJson(Formatting.None)));
+
+        }
+
+        internal static byte[] CreateExitResponseAckData(string EQName, string SID, int SystemBytes, out clsExitRequestACKMessage ExitRequestACKMsg)
+        {
+            ExitRequestACKMsg = new clsExitRequestACKMessage()
+            {
+                SID = SID,
+                EQName = EQName,
+                SystemBytes = SystemBytes,
+                Header = new Dictionary<string, SimpleRequestResponseWithTimeStamp>
+                {
+                    {"0314", new SimpleRequestResponseWithTimeStamp
+                    {
+                         TimeStamp = DateTime.Now.ToAGVSTimeFormat(),
+                          ReturnCode = 0
+                    } }
+                }
+
+            };
+            return Encoder.GetBytes(FormatSendOutString(ExitRequestACKMsg.ToJson(Formatting.None)));
+
+        }
+
 
         internal static byte[] CreateTaskFeedbackMessageData(string EQName, string SID, string TaskName, string TaskSimplex, int TaskSequence, int PointIndex, TASK_RUN_STATUS task_status, int tag, clsCoordination coordination, out clsTaskFeedbackMessage taskFeedbackMessage)
         {
@@ -233,6 +273,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
             return Encoder.GetBytes(FormatSendOutString(carrierRemovedMessage.ToJson(Formatting.None)));
 
         }
+
+
+
 
         /// <summary>
         /// 生成0323Message

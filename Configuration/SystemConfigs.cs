@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,16 @@ namespace AGVSystemCommonNet6.Configuration
 {
     public class SystemConfigs
     {
+        public enum PATH_ENUMS
+        {
+            CURRENT_MAP_FILE_PATH,
+            EQ_CONFIGS_FOLDER_PATH,
+            MAP_FOLDER
+        }
+
+        [JsonIgnore]
+        public string CONFIGS_ROOT_FOLDER { get; set; } = "C:\\AGVS";
+
         public bool BaseOnKGSWebAGVSystem { get; set; } = false;
         public string FieldName { get; set; } = "UMTC-AOI-2F";
         public string DBConnection { get; set; } = "Server=127.0.0.1;Database=GPMAGVs;User Id=sa;Password=12345678;Encrypt=False;MultipleActiveResultSets=True;Connection Lifetime=1;Min Pool Size=5;Max Pool Size=50;MultipleActiveResultSets=True;";
@@ -31,10 +42,6 @@ namespace AGVSystemCommonNet6.Configuration
         public clsAutoSendDailyData AutoSendDailyData { get; set; } = new clsAutoSendDailyData();
         public clsAGVS_Print_Data clsAGVS_Print_Data { get; set; } = new clsAGVS_Print_Data();
 
-        public string AGVUpdateFileFolder { get; set; } = "C:\\AGVS\\AGV_Update";
-
-        public string LogFolder { get; set; } = "C:\\AGVSLog";
-
         public string TrobleShootingFolder { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\");
 
         public clsMaterialBufferLevelMonitor MaterialBufferLevelMonitor { get; set; } = new clsMaterialBufferLevelMonitor();
@@ -43,21 +50,41 @@ namespace AGVSystemCommonNet6.Configuration
 
         public clsOrderState OrderState { get; set; } = new clsOrderState();
 
+        [JsonIgnore]
+        public Dictionary<PATH_ENUMS, string> PATHES_STORE
+        {
+            get
+            {
+                string MapFileFullName = "";
+                string EqConfigFolder = "";
+                string MapFolder = "";
+
+                MapFolder = MapConfigs.MapFolder.StartsWith('/') ? Path.Combine(CONFIGS_ROOT_FOLDER, MapConfigs.MapFolder.Trim('/')) : MapConfigs.MapFolder;
+                MapFileFullName = Path.Combine(MapFolder, MapConfigs.CurrentMapFileName);
+                EqConfigFolder = EQManagementConfigs.EquipmentManagementConfigFolder.StartsWith('/') ? Path.Combine(CONFIGS_ROOT_FOLDER, EQManagementConfigs.EquipmentManagementConfigFolder.Trim('/')) : EQManagementConfigs.EquipmentManagementConfigFolder;
+
+                return new()
+                {
+                    { PATH_ENUMS.EQ_CONFIGS_FOLDER_PATH, EqConfigFolder },
+                    { PATH_ENUMS.CURRENT_MAP_FILE_PATH, MapFileFullName },
+                    { PATH_ENUMS.MAP_FOLDER, MapFolder }
+                };
+            }
+        }
     }
     public class clsMapConfigs
     {
-        public string MapFolder { get; set; } = "C://AGVS//Map";
+        public string MapFolder { get; set; } = "/Map";
         public string CurrentMapFileName { get; set; } = "Map_UMTC_3F_MEC.json";
-        public string MapRegionConfigFile { get; set; } = "C://AGVS//Map//MapRegions.json";
 
         [JsonIgnore]
-        public string MapFileFullName => Path.Combine(MapFolder, CurrentMapFileName);
+        public string MapFileRelativePath => Path.Combine(MapFolder, CurrentMapFileName);
 
     }
     public class clsEquipmentManagementConfigs
     {
         public bool UseEQEmu { get; set; } = false;
-        public string EquipmentManagementConfigFolder { get; set; } = "C://AGVS//EquipmentManagement";
+        public string EquipmentManagementConfigFolder { get; set; } = "/EquipmentManagement";
         /// <summary>
         /// 當設備維修時封閉進入點
         /// </summary>

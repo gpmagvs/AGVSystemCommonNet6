@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static AGVSystemCommonNet6.AGVDispatch.Messages.clsVirtualIDQu;
@@ -17,6 +18,19 @@ namespace AGVSystemCommonNet6.AGVDispatch
 {
     public partial class clsAGVSConnection
     {
+        private bool TryExitResponseAck(bool accept_task, int system_byte)
+        {
+            if (AGVSMessageStoreDictionary.TryRemove(system_byte, out MessageBase _retMsg))
+            {
+                byte[] data = AGVSMessageFactory.CreateTaskDownloadReqAckData(EQName, SID, accept_task, system_byte, out clsSimpleReturnMessage ackMsg);
+                _ = LOG.INFO($"TaskDownload Ack : {ackMsg.ToJson()}");
+                _retMsg.Dispose();
+                ackMsg.Dispose();
+                return WriteDataOut(data);
+            }
+            else
+                return false;
+        }
         private bool TryTaskDownloadReqAckAsync(bool accept_task, int system_byte)
         {
             if (AGVSMessageStoreDictionary.TryRemove(system_byte, out MessageBase _retMsg))
@@ -161,6 +175,27 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public RunningStatus previousRunningStatusReport_via_TCPIP = new RunningStatus();
         public clsRunningStatus previousRunningStatusReport_via_WEBAPI = new clsRunningStatus();
+        internal ManualResetEvent WaitExitResponse = new ManualResetEvent(false);
+        internal int TagOfExitResponseFromAGVS = 0;
+        public async Task<bool> Exist_Request(int tag)
+        {
+            return true; //TODO CHECK
+            WaitExitResponse.Reset();
+            byte[] data = AGVSMessageFactory.CreateExistRequestData(EQName, SID, tag, out clsExitRequest? exitReqMsg);
+            bool success = await SendMsgToAGVSAndWaitReply(data, exitReqMsg.SystemBytes, MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK, 8);
+            if (!AGVSMessageStoreDictionary.TryRemove(exitReqMsg.SystemBytes, out MessageBase mesg))
+                return false;
+            clsExitRequestACKMessage ackMsgWrapper = mesg as clsExitRequestACKMessage;
+            if (ackMsgWrapper == null)
+                return false;
+            bool agvsTrafficStart = ackMsgWrapper.ExitRequestAck.ReturnCode == 0;
+            if (!agvsTrafficStart)
+                return false;
+            //等待AGV交管完成 會送0313給車載
+            bool reached = WaitExitResponse.WaitOne(3000);
+            return reached && TagOfExitResponseFromAGVS == tag;
+        }
+
         private async Task<(bool, SimpleRequestResponseWithTimeStamp runningStateReportAck)> TryRnningStateReportAsync(int timeout_ = 8)
         {
             clsRunningStatus runnginStatus = null;

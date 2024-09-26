@@ -134,6 +134,7 @@ namespace AGVSystemCommonNet6.Alarm
         WaitTaskBeExecutedTimeout = 3049,
         No_NG_Port_Can_Be_Used = 3050,
         OrderExecuteTimeout = 3051,
+        Destine_Point_Is_Not_Allow_To_Reach = 3052,
         #region KG
         CreateCommandFail = 210,
         NoActionType = 11,

@@ -103,6 +103,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
             ACK_0304_TASK_FEEDBACK_REPORT_ACK = 0304,
             REQ_0305_TASK_CANCEL = 0305,
             ACK_0306_TASK_CANCEL_ACK = 0306,
+            REQ_0311_EXIT_REQUEST = 0311,
+            ACK_0312_EXIT_REQUEST_ACK = 0312,
+            REQ_0313_EXIT_RESPONSE = 0313,
+            ACK_0314_EXIT_RESPONSE = 0314,
             Carrier_Remove_Request_0321 = 0321,
             Carrier_Remove_Request_ACK_0322 = 0322,
             REQ_0323_VirtualID_Query = 0323,
@@ -394,6 +398,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return MESSAGE_TYPE.REQ_0305_TASK_CANCEL;
             if (firstHeaderKey.Contains("0306"))
                 return MESSAGE_TYPE.ACK_0306_TASK_CANCEL_ACK;
+
+            if (firstHeaderKey.Contains("0311"))
+                return MESSAGE_TYPE.REQ_0311_EXIT_REQUEST;
+            if (firstHeaderKey.Contains("0312"))
+                return MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK;
             if (firstHeaderKey.Contains("0322"))
                 return MESSAGE_TYPE.Carrier_Remove_Request_ACK_0322;
             if (firstHeaderKey.Contains("0323"))

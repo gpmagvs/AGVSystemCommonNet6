@@ -59,6 +59,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         return new CarrierRemovedReportAckHandler(agvs_entity);
                     case MESSAGE_TYPE.ACK_0324_VirtualID_ACK:
                         return new VirtualIDQueryAckHandler(agvs_entity);
+                    case MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK:
+                        return new ExitRequestAckHandler(agvs_entity);
+                    case MESSAGE_TYPE.REQ_0313_EXIT_RESPONSE:
+                        return new ExitResponseHandler(agvs_entity);
                     default:
                         return null;
                 }
@@ -210,6 +214,53 @@ namespace AGVSystemCommonNet6.AGVDispatch
             protected override object GetMessageFromJson(string json)
             {
                 return JsonConvert.DeserializeObject<clsCarrierVirtualIDResponseMessage>(json);
+            }
+        }
+
+
+
+        /// <summary>
+        /// 0312
+        /// </summary>
+        public class ExitRequestAckHandler : MessageHandlerAbstract
+        {
+            public ExitRequestAckHandler(clsAGVSConnection agvs_entity) : base(agvs_entity)
+            {
+            }
+            public override object HandleMessage(string jsonMessage)
+            {
+                var _object = base.HandleMessage(jsonMessage);
+                clsExitRequestACKMessage response = (clsExitRequestACKMessage)_object;
+                return _object;
+            }
+            protected override object GetMessageFromJson(string json)
+            {
+                return JsonConvert.DeserializeObject<clsExitRequestACKMessage>(json);
+            }
+        }
+
+
+
+        /// <summary>
+        /// 0314
+        /// </summary>
+        public class ExitResponseHandler : MessageHandlerAbstract
+        {
+            public ExitResponseHandler(clsAGVSConnection agvs_entity) : base(agvs_entity)
+            {
+            }
+            public override object HandleMessage(string jsonMessage)
+            {
+                var _object = base.HandleMessage(jsonMessage);
+                clsExitResponse response = (clsExitResponse)_object;
+                agvs_entity.TagOfExitResponseFromAGVS = response.exitRequest.ExitPoint;
+                agvs_entity.WaitExitResponse.Set();
+                agvs_entity.TryExitResponseAck(true, response.SystemBytes);
+                return _object;
+            }
+            protected override object GetMessageFromJson(string json)
+            {
+                return JsonConvert.DeserializeObject<clsExitResponse>(json);
             }
         }
     }
