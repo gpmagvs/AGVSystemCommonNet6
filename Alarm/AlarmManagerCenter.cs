@@ -224,7 +224,7 @@ namespace AGVSystemCommonNet6.Alarm
                 return false;
 
             FileInfo _info = new FileInfo(ALARM_CODE_FILE_PATH);
-            return _info.LastWriteTime < new DateTime(2024, 10, 5, 0, 0, 0);
+            return _info.LastWriteTime < new DateTime(2024, 10, 4, 17, 27, 0);
         }
 
         private static void InitAlarmCodeJsonFileWatcher()
