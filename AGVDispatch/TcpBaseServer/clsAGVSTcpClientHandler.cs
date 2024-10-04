@@ -38,6 +38,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             public event EventHandler<clsOnlineModeRequestMessage> OnClientOnlineRequesting;
             public event EventHandler<clsRunningStatusReportMessage> OnClientRunningStatusReport;
             public event EventHandler<clsTaskFeedbackMessage> OnClientTaskFeedback;
+            public event EventHandler<clsExitRequest> OnClientExitRequesting;
             public event EventHandler OnTcpSocketDisconnect;
             public class clsSocketState
             {
@@ -261,6 +262,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             taskCancel_AGV_ReturnCode = response.ReturnCode;
                             TaskCancelWaitMRE.Set();
                         }
+                    }
+
+                    if (msgType == clsAGVSConnection.MESSAGE_TYPE.REQ_0311_EXIT_REQUEST)
+                    {
+                        clsExitRequest exitReqMsg = JsonConvert.DeserializeObject<clsExitRequest>(json);
+                        OnClientExitRequesting?.Invoke(this, exitReqMsg);
                     }
                 }
             }

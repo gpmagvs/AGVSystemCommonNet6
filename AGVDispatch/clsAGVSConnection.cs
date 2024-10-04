@@ -403,6 +403,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 return MESSAGE_TYPE.REQ_0311_EXIT_REQUEST;
             if (firstHeaderKey.Contains("0312"))
                 return MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK;
+
+            if (firstHeaderKey.Contains("0313"))
+                return MESSAGE_TYPE.REQ_0313_EXIT_RESPONSE;
+            if (firstHeaderKey.Contains("0314"))
+                return MESSAGE_TYPE.ACK_0314_EXIT_RESPONSE;
+
             if (firstHeaderKey.Contains("0322"))
                 return MESSAGE_TYPE.Carrier_Remove_Request_ACK_0322;
             if (firstHeaderKey.Contains("0323"))
@@ -463,6 +469,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             try
             {
+                if(ack_msg_type== MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK)
+                {
+
+                }
                 ManualResetEvent manualResetEvent = WaitAckResetEvents[ack_msg_type];
                 manualResetEvent.Reset();
                 WriteDataOut(dataByte);

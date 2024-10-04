@@ -22,8 +22,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             if (AGVSMessageStoreDictionary.TryRemove(system_byte, out MessageBase _retMsg))
             {
-                byte[] data = AGVSMessageFactory.CreateTaskDownloadReqAckData(EQName, SID, accept_task, system_byte, out clsSimpleReturnMessage ackMsg);
-                _ = LOG.INFO($"TaskDownload Ack : {ackMsg.ToJson()}");
+                byte[] data = AGVSMessageFactory.CreateExitResponseAckData(EQName, SID,  system_byte, out clsExitRequestACKMessage ackMsg);
+                _ = LOG.INFO($"0314 Ack : {ackMsg.ToJson()}");
                 _retMsg.Dispose();
                 ackMsg.Dispose();
                 return WriteDataOut(data);
@@ -179,7 +179,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         internal int TagOfExitResponseFromAGVS = 0;
         public async Task<bool> Exist_Request(int tag)
         {
-            return true; //TODO CHECK
+            //return true; //TODO CHECK
             WaitExitResponse.Reset();
             byte[] data = AGVSMessageFactory.CreateExistRequestData(EQName, SID, tag, out clsExitRequest? exitReqMsg);
             bool success = await SendMsgToAGVSAndWaitReply(data, exitReqMsg.SystemBytes, MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK, 8);

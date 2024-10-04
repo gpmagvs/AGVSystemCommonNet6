@@ -242,7 +242,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
 
         /// <summary>
-        /// 0314
+        /// 0313
         /// </summary>
         public class ExitResponseHandler : MessageHandlerAbstract
         {
