@@ -149,6 +149,7 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.No_Transfer_Station_To_Work, "無工作轉移站", "No Transfer Station To Work", "", "", ""),
             new clsAlarmCode(ALARMS.Task_Aborted, "任務中止", "Task Aborted", "", "", ""),
             new clsAlarmCode(ALARMS.VEHICLES_TRAJECTORY_CONFLIC, "車輛軌跡衝突", "Vehicles Trajectory Conflict", "", "", ""),
+            new clsAlarmCode(ALARMS.VMSDisconnectwithVehicle, "AGV與VMS斷線", "AGV Disconnect", "", "", ""),
         };
     }
 }
