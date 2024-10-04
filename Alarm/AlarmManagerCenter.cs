@@ -199,23 +199,34 @@ namespace AGVSystemCommonNet6.Alarm
                     }
 
                     //Build a file watcher to monitor AlarmCode json file changed and reload it.
-                    InitAlarmCodeJsonFileWatcher();
+
                 }
                 else
                 {
-                    //TODO
+                    //將預設table寫出為jSON
+                    string defaultAlarmCodeJson = JsonConvert.SerializeObject(AlarmCodeTable.Table, Formatting.Indented);
+                    File.WriteAllText(ALARM_CODE_FILE_PATH, defaultAlarmCodeJson);
+                    LoadAlarmCodes();
+                    return;
                 }
+                InitAlarmCodeJsonFileWatcher();
             });
+
         }
 
         private static void InitAlarmCodeJsonFileWatcher()
         {
-            if (_alarmCodeJsonFileWatcher != null)
-                return;
-
-            _alarmCodeJsonFileWatcher = new FileSystemWatcher(AGVSConfigulator.ConfigsFilesFolder, "AGVS_AlarmCodes.json");
-            _alarmCodeJsonFileWatcher.Changed += _alarmCodeJsonFileWatcher_Changed;
-            _alarmCodeJsonFileWatcher.EnableRaisingEvents = true;
+            try
+            {
+                if (_alarmCodeJsonFileWatcher != null)
+                    return;
+                _alarmCodeJsonFileWatcher = new FileSystemWatcher(AGVSConfigulator.ConfigsFilesFolder, "AGVS_AlarmCodes.json");
+                _alarmCodeJsonFileWatcher.Changed += _alarmCodeJsonFileWatcher_Changed;
+                _alarmCodeJsonFileWatcher.EnableRaisingEvents = true;
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         private static void _alarmCodeJsonFileWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -225,8 +236,10 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 await Task.Delay(1000);
                 LoadAlarmCodes();
+                Console.WriteLine($"Alarm code description file content has changed and system reload it done. => {e.FullPath}");
                 await Task.Delay(500);
                 _alarmCodeJsonFileWatcher.EnableRaisingEvents = true;
+
             });
         }
 

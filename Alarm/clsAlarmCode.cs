@@ -16,5 +16,19 @@ namespace AGVSystemCommonNet6.Alarm
         public string En_TrobleShootingDescription { get; set; } = "";
         public string ZH_TrobleShootingDescription { get; set; } = "";
         public string TrobleShootingFilePath { get; set; } = "";
+
+        public clsAlarmCode()
+        {
+
+        }
+        public clsAlarmCode(ALARMS alarmCode, string description_Zh, string description_En, string en_TrobleShootingDescription, string zH_TrobleShootingDescription, string trobleShootingFilePath)
+        {
+            AlarmCode = alarmCode;
+            Description_Zh = description_Zh;
+            Description_En = description_En;
+            En_TrobleShootingDescription = en_TrobleShootingDescription;
+            ZH_TrobleShootingDescription = zH_TrobleShootingDescription;
+            TrobleShootingFilePath = trobleShootingFilePath;
+        }
     }
 }
