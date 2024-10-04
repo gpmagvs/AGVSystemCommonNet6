@@ -22,6 +22,7 @@ namespace AGVSystemCommonNet6.Alarm
         public static string TROBLE_SHOOTING_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_TrobleShooting.csv");
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
+        private static FileSystemWatcher _alarmCodeJsonFileWatcher;
         private static AGVSDatabase database;
         public static bool IsReportAlarmToHostON { get; set; } = false;
         public static List<clsAlarmDto> uncheckedAlarms
@@ -190,17 +191,42 @@ namespace AGVSystemCommonNet6.Alarm
                         }
                     }
                     AlarmCodes = _AlarmCodes.ToDictionary(ac => ac.AlarmCode, ac => ac);
-                    // 如果有更新clsAlarmCode項目需要再寫回去檔案要true起來
+                    // 如果有更新clsAlarmCode項目需要再寫回去檔案要true起來=>???
                     if (false)
                     {
                         string strAlarm = JsonConvert.SerializeObject(_AlarmCodes);
                         File.WriteAllText(ALARM_CODE_FILE_PATH, strAlarm);
                     }
+
+                    //Build a file watcher to monitor AlarmCode json file changed and reload it.
+                    InitAlarmCodeJsonFileWatcher();
                 }
                 else
                 {
                     //TODO
                 }
+            });
+        }
+
+        private static void InitAlarmCodeJsonFileWatcher()
+        {
+            if (_alarmCodeJsonFileWatcher != null)
+                return;
+
+            _alarmCodeJsonFileWatcher = new FileSystemWatcher(AGVSConfigulator.ConfigsFilesFolder, "AGVS_AlarmCodes.json");
+            _alarmCodeJsonFileWatcher.Changed += _alarmCodeJsonFileWatcher_Changed;
+            _alarmCodeJsonFileWatcher.EnableRaisingEvents = true;
+        }
+
+        private static void _alarmCodeJsonFileWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            _alarmCodeJsonFileWatcher.EnableRaisingEvents = false;
+            Task.Factory.StartNew(async () =>
+            {
+                await Task.Delay(1000);
+                LoadAlarmCodes();
+                await Task.Delay(500);
+                _alarmCodeJsonFileWatcher.EnableRaisingEvents = true;
             });
         }
 
