@@ -17,7 +17,8 @@ namespace AGVSystemCommonNet6.Alarm
 {
     public class AlarmManagerCenter
     {
-        public static string ALARM_CODE_FILE_PATH = @".\Resources\AGVS_AlarmCodes.json";
+        //public static string ALARM_CODE_FILE_PATH = @".\Resources\AGVS_AlarmCodes.json";
+        public static string ALARM_CODE_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_AlarmCodes.json");
         public static string TROBLE_SHOOTING_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_TrobleShooting.csv");
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
@@ -217,6 +218,7 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static void UadateAGVsTrobleShootings(ref Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
             {
                 string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH, Encoding.GetEncoding("big5"));
