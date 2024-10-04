@@ -173,7 +173,10 @@ namespace AGVSystemCommonNet6.Alarm
         {
             Task.Run(() =>
             {
-                if (File.Exists(ALARM_CODE_FILE_PATH))
+                bool _IsFileExist = File.Exists(ALARM_CODE_FILE_PATH);
+                bool _IsFileTooOld = !_IsFileExist ? false : _IsAlarmCodeFileTooOld();
+
+                if (_IsFileExist && !_IsFileTooOld)
                 {
                     string strText = File.ReadAllText(ALARM_CODE_FILE_PATH);
                     clsAlarmCode[]? _AlarmCodes = JsonConvert.DeserializeObject<clsAlarmCode[]>(strText);
@@ -205,6 +208,7 @@ namespace AGVSystemCommonNet6.Alarm
                 {
                     //將預設table寫出為jSON
                     string defaultAlarmCodeJson = JsonConvert.SerializeObject(AlarmCodeTable.Table, Formatting.Indented);
+                    File.Delete(ALARM_CODE_FILE_PATH);
                     File.WriteAllText(ALARM_CODE_FILE_PATH, defaultAlarmCodeJson);
                     LoadAlarmCodes();
                     return;
@@ -212,6 +216,15 @@ namespace AGVSystemCommonNet6.Alarm
                 InitAlarmCodeJsonFileWatcher();
             });
 
+        }
+
+        private static bool _IsAlarmCodeFileTooOld()
+        {
+            if (!File.Exists(ALARM_CODE_FILE_PATH))
+                return false;
+
+            FileInfo _info = new FileInfo(ALARM_CODE_FILE_PATH);
+            return _info.LastWriteTime < new DateTime(2024, 10, 4, 0, 0, 0);
         }
 
         private static void InitAlarmCodeJsonFileWatcher()
