@@ -150,6 +150,9 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.Task_Aborted, "任務中止", "Task Aborted", "", "", ""),
             new clsAlarmCode(ALARMS.VEHICLES_TRAJECTORY_CONFLIC, "車輛軌跡衝突", "Vehicles Trajectory Conflict", "", "", ""),
             new clsAlarmCode(ALARMS.VMSDisconnectwithVehicle, "AGV與VMS斷線", "AGV Disconnect", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_EMO, "充電站EMO", "Charger EMO", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_Air_Error, "充電站氣壓異常", "Charger Air Pressure Abnormal", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_Smoke_Detected, "充電站偵煙異常", "Charger Smoke Detected", "", "", ""),
         };
     }
 }
