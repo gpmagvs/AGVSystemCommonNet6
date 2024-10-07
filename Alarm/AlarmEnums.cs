@@ -237,6 +237,9 @@ namespace AGVSystemCommonNet6.Alarm
         TaskCancelByHost = 670,
         Vehicle0303JobStatusStartTimeout = 680,
         Vehicle0303JobStatusEndTimeout = 681,
+        Charge_Station_EMO = 10763,
+        Charge_Station_Air_Error = 10764,
+        Charge_Station_Smoke_Detected = 10765,
         #endregion
     }
 
