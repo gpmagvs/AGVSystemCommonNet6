@@ -1,7 +1,7 @@
-﻿using AGVSystemCommonNet6.Log;
-using AGVSystemCommonNet6.User;
+﻿using AGVSystemCommonNet6.User;
 using AGVSystemCommonNet6.Vehicle_Control.Models;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
+using NLog;
 using RosSharp.RosBridgeClient.MessageTypes.Std;
 using SQLite;
 using static AGVSystemCommonNet6.Log.clsAGVSLogAnaylsis;
@@ -14,6 +14,8 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
         public static string databasePath { get; private set; } = "database.db";
         public static Action<string> OnDataBaseChanged;
         public static bool database_created => db != null;
+
+        private static Logger LOG = LogManager.GetCurrentClassLogger();
         public static void Initialize(string dbName = "VMS")
         {
             try
@@ -21,16 +23,16 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
                 databasePath = Path.Combine(Environment.CurrentDirectory, $"{dbName}.db");
                 db = new SQLiteConnection(databasePath);
                 CreateTablesResult results = db.CreateTables<clsAlarmCode, UserEntity, clsParkingAccuracy, clsAGVStatusTrack, clsVibrationStatusWhenAGVMoving>();
-                LOG.INFO(string.Join("\r\n", results.Results.Select(kp => $"Database table created result-{kp.Key.Name}=>{kp.Value}")));
+                LOG.Info(string.Join("\r\n", results.Results.Select(kp => $"Database table created result-{kp.Key.Name}=>{kp.Value}")));
                 CreateTableResult result = db.CreateTable<LDULDRecord>();
-                LOG.INFO($"Database table created result-LDULDRecord=>{result}");
+                LOG.Info($"Database table created result-LDULDRecord=>{result}");
 
                 CreateDefaultUsers();
                 db.TableChanged += Db_TableChanged;
             }
             catch (Exception ex)
             {
-                LOG.Critical($"初始化資料庫時發生錯誤＿{ex.Message}");
+                LOG.Fatal($"初始化資料庫時發生錯誤＿{ex.Message}");
                 db = null;
             }
         }
@@ -53,7 +55,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
                 }
                 catch (Exception ex)
                 {
-                    LOG.ERROR(ex);
+                    LOG.Error(ex);
                 }
             });
         }
@@ -72,7 +74,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
                 }
                 catch (Exception ex)
                 {
-                    LOG.ERROR(ex);
+                    LOG.Error(ex);
                 }
             });
         }
@@ -90,7 +92,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                LOG.Error(ex);
             }
         }
 
@@ -116,7 +118,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                LOG.Error(ex);
             }
         }
 
@@ -135,7 +137,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                LOG.Error(ex);
             }
         }
         public static int AlarmsTotalNum(DateTime from, DateTime to, string alarm_type = "All", int code = 0)
@@ -175,7 +177,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                LOG.Error(ex);
                 return 0;
             }
         }
@@ -210,7 +212,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                LOG.Error(ex);
                 return 0;
             }
 
@@ -298,6 +300,32 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             }
 
             return outputs;
+        }
+
+        internal static void RecoveryWithAlarmTable(List<clsAlarmCode> alarmList)
+        {
+            try
+            {
+                TableQuery<clsAlarmCode>? alarms = db?.Table<clsAlarmCode>();
+                foreach (clsAlarmCode item in alarms)
+                {
+                    clsAlarmCode? definedAlarm = alarmList.FirstOrDefault(al => al.Code == item.Code);
+                    if (definedAlarm != null && item.CN != definedAlarm.CN)
+                    {
+                        db?.Table<clsAlarmCode>().Delete(t => t.Time == item.Time);
+                        string oriCN = item.CN;
+                        string oriDes = item.Description;
+                        item.CN = definedAlarm.CN;
+                        item.Description = definedAlarm.Description;
+                        db?.Insert(item);
+                        Console.WriteLine($"Update alarm description from {oriCN}({oriDes}) to {item.CN}({item.Description})");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LOG.Error(ex);
+            }
         }
 
         public struct Query

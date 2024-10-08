@@ -1,8 +1,7 @@
-﻿using AGVSystemCommonNet6.Alarm;
-using AGVSystemCommonNet6.Configuration;
-using AGVSystemCommonNet6.Log;
+﻿using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.Vehicle_Control.VCSDatabase;
 using Newtonsoft.Json;
+using NLog;
 using SQLite;
 using System.Collections.Concurrent;
 using System.Text;
@@ -31,9 +30,10 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
         internal static event EventHandler OnAllAlarmClear;
         public static event EventHandler<AlarmCodes> OnUnRecoverableAlarmOccur;
+        private static NLog.Logger LOG = LogManager.GetCurrentClassLogger();
         public static bool LoadAlarmList(string alarm_JsonFile, out string message)
         {
-            LOG.INFO("Alarm List File to load :" + alarm_JsonFile);
+            LOG.Info("Alarm List File to load :" + alarm_JsonFile);
             message = string.Empty;
             try
             {
@@ -45,15 +45,15 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                 if (!alarm_json_file_exist || isAlarmDefaultUpdated)
                 {
                     File.Copy(default_alarm_json_file_path, alarm_JsonFile, true);
-                    LOG.TRACE($"Copy New AlarmList.json file to {alarm_JsonFile}");
+                    LOG.Trace($"Copy New AlarmList.json file to {alarm_JsonFile}");
                 }
                 AlarmList = JsonConvert.DeserializeObject<List<clsAlarmCode>>(File.ReadAllText(alarm_JsonFile));
-                LOG.INFO($"Alarm List Loaded !.{AlarmList.Count}");
+                LOG.Info($"Alarm List Loaded !.{AlarmList.Count}");
                 return true;
             }
             catch (Exception ex)
             {
-                LOG.Critical($"Alarm Code List load fail. {ex.Message} ", ex);
+                LOG.Fatal($"Alarm Code List load fail. {ex.Message} ", ex);
                 Environment.Exit(0);
                 return false;
             }
@@ -172,7 +172,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                         CN = Alarm_code.ToString(),
                     };
                 }
-                LOG.Critical($"Add Alarm_{alarm.Code}:{alarm.CN}({alarm.Description})");
+                LOG.Info($"Add Alarm_{alarm.Code}:{alarm.CN}({alarm.Description})");
                 clsAlarmCode alarm_save = alarm.Clone();
                 alarm_save.Time = DateTime.Now;
                 alarm_save.ELevel = clsAlarmCode.LEVEL.Alarm;
@@ -192,7 +192,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                LOG.Error(ex);
             }
 
         }
@@ -251,7 +251,7 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 
             foreach (var item in unsignAlarmCodes)
             {
-                LOG.WARN($"有未記載的Alarm Code : {item.Alarm}");
+                LOG.Warn($"有未記載的Alarm Code : {item.Alarm}");
             }
 
             troubleShootings.AddRange(unsignAlarmCodes);
@@ -267,5 +267,9 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
             }
         }
 
+        public static void RecoveryAlarmDB()
+        {
+            DBhelper.RecoveryWithAlarmTable(AlarmList);
+        }
     }
 }
