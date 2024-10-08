@@ -4,8 +4,8 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>1.0.282.19</AssemblyVersion>
-		<FileVersion>1.0.282.19</FileVersion>
+		<AssemblyVersion>1.0.282.21</AssemblyVersion>
+		<FileVersion>1.0.282.21</FileVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -14,11 +14,11 @@
 		<UpdateAssemblyVersion>True</UpdateAssemblyVersion>
 		<UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
 		<UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-		<AssemblyVersionSettings>IncrementOnDemand.IncrementOnDemand.DayOfYearStamp.IncrementWithResetOnIncrease</AssemblyVersionSettings>
+		<AssemblyVersionSettings>IncrementOnDemand.IncrementOnDemand.DayOfYearStamp.IncrementOnDemand</AssemblyVersionSettings>
 		<UpdatePackageVersion>False</UpdatePackageVersion>
 		<AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
 		<InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
-		<AssemblyFileVersionSettings>IncrementOnDemand.IncrementOnDemand.DayOfYearStamp.IncrementWithResetOnIncrease</AssemblyFileVersionSettings>
+		<AssemblyFileVersionSettings>IncrementOnDemand.IncrementOnDemand.DayOfYearStamp.IncrementOnDemand</AssemblyFileVersionSettings>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -27,11 +27,11 @@
 		<UpdateAssemblyVersion>True</UpdateAssemblyVersion>
 		<UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
 		<UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-		<AssemblyVersionSettings>IncrementOnDemand.IncrementOnDemand.DayOfYearStamp.IncrementWithResetOnIncrease</AssemblyVersionSettings>
+		<AssemblyVersionSettings>IncrementOnDemand.IncrementOnDemand.DayOfYearStamp.IncrementOnDemand</AssemblyVersionSettings>
 		<UpdatePackageVersion>False</UpdatePackageVersion>
 		<AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
 		<InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
-		<AssemblyFileVersionSettings>IncrementOnDemand.IncrementOnDemand.DayOfYearStamp.IncrementWithResetOnIncrease</AssemblyFileVersionSettings>
+		<AssemblyFileVersionSettings>IncrementOnDemand.IncrementOnDemand.DayOfYearStamp.IncrementOnDemand</AssemblyFileVersionSettings>
 	</PropertyGroup>
 
 	<ItemGroup>
