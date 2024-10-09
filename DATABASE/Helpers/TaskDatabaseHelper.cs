@@ -378,11 +378,18 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{_GetStationNameByTag(Task.StartLocationTag)}," +
             $"{(Task.DispatcherName.ToLower() == "vms_idle" ? "" : Task.DispatcherName)}," +
             $"{(Task.State == TASK_RUN_STATUS.CANCEL ? Task.DesignatedAGVName : "")}," +
-            $"{_GetFailReason(Task.FailureReason)}"));
+            $"{_GetFailReason(Task.State, Task.FailureReason)}"));
             File.WriteAllLines(FilePath, list, Encoding.UTF8);
 
-            string _GetFailReason(string failReason)
+            string _GetFailReason(TASK_RUN_STATUS taskState, string failReason)
             {
+
+                if (taskState != TASK_RUN_STATUS.ACTION_FINISH && string.IsNullOrEmpty(failReason))
+                {
+                    Alarm.clsAlarmCode alarm = AlarmManagerCenter.AlarmCodes[ALARMS.TrafficAbort];
+                    return $"[{(int)alarm.AlarmCode}] {alarm.Description}";
+                }
+
                 if (failReason == null || failReason == "")
                     return "";
 
