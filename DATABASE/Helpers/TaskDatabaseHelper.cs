@@ -307,6 +307,12 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             string strAlcode = failureReason.Split(']')[0].Replace("[", "");
             string originalAlarmEN = failureReason.Split('(').Last().Replace(")", "");
 
+            string originalAlarmZh = failureReason.Replace($"[{strAlcode}]", "").Replace($"({originalAlarmEN})", "");
+
+            if (originalAlarmEN.Trim() != originalAlarmZh.Trim())
+                return failureReason;
+            //string originalAlarmZh = failureReason.Split(' ').Last().Split("(").First();
+
             if (!int.TryParse(strAlcode, out int alarmCode))
                 return failureReason;
 
