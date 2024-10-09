@@ -245,7 +245,6 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             {
                 if (orderState.State == TASK_RUN_STATUS.CANCEL && setCanceledAsFailure)
                 {
-                    //orderState.State = TASK_RUN_STATUS.CANCEL;
                     orderState.State = TASK_RUN_STATUS.FAILURE;
                 }
                 if (orderState.Carrier_ID == "-1")
@@ -361,7 +360,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
             list.AddRange(Tasks.Select(Task =>
             $"{Task.TaskName}," +
-            $"{Task.State}," +
+            $"{Task.StateName}," +
             $"{Task.RecieveTime}," +
             $"{Task.From_Station_Display}," +
             $"{Task.To_Station_Display}," +
