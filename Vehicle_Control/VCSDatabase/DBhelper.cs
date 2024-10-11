@@ -327,6 +327,24 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
                 LOG.Error(ex);
             }
         }
+        internal static void RemoveOldAlarm(DateTime occurTimeLessThan)
+        {
+            try
+            {
+                LOG.Trace($"Start Delete Old Alarm Where Occur Time Less than {occurTimeLessThan}");
+                TableQuery<clsAlarmCode>? alarms = db?.Table<clsAlarmCode>();
+                List<clsAlarmCode> oldAlarms = alarms.Where(al => al.Time < occurTimeLessThan).ToList();
+                foreach (clsAlarmCode item in oldAlarms)
+                {
+                    db?.Table<clsAlarmCode>().Delete(t => t.Time == item.Time);
+                }
+                LOG.Trace($"Delete {oldAlarms.Count()} alarms.");
+            }
+            catch (Exception ex)
+            {
+                LOG.Error(ex);
+            }
+        }
 
         public struct Query
         {

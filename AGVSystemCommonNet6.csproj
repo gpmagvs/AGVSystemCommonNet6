@@ -4,8 +4,8 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>1.0.283.22</AssemblyVersion>
-		<FileVersion>1.0.283.22</FileVersion>
+		<AssemblyVersion>1.0.285.22</AssemblyVersion>
+		<FileVersion>1.0.285.22</FileVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -41,6 +41,332 @@
 		<EmbeddedResource Remove="TASK\**" />
 		<None Remove="Navigator\**" />
 		<None Remove="TASK\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="wwwroot\agv.png" />
+	  <None Remove="wwwroot\css\231.43c35b29.css" />
+	  <None Remove="wwwroot\css\402.499beeff.css" />
+	  <None Remove="wwwroot\css\580.b64eaf63.css" />
+	  <None Remove="wwwroot\css\723.f94f3ece.css" />
+	  <None Remove="wwwroot\css\790.1b8375fb.css" />
+	  <None Remove="wwwroot\css\app.cfa5bee9.css" />
+	  <None Remove="wwwroot\css\chunk-vendors.500e05f5.css" />
+	  <None Remove="wwwroot\favicon.ico" />
+	  <None Remove="wwwroot\fonts\bootstrap-icons.02685dab.woff2" />
+	  <None Remove="wwwroot\fonts\bootstrap-icons.8463cb1e.woff" />
+	  <None Remove="wwwroot\images\agv_controller_bg.png" />
+	  <None Remove="wwwroot\images\agv_lift.png" />
+	  <None Remove="wwwroot\images\agv_top_view.png" />
+	  <None Remove="wwwroot\images\alarm.png" />
+	  <None Remove="wwwroot\images\alarm2.png" />
+	  <None Remove="wwwroot\images\back_left.png" />
+	  <None Remove="wwwroot\images\back_right.png" />
+	  <None Remove="wwwroot\images\controller.png" />
+	  <None Remove="wwwroot\images\database.png" />
+	  <None Remove="wwwroot\images\down-arrow.png" />
+	  <None Remove="wwwroot\images\fork-lift.png" />
+	  <None Remove="wwwroot\images\forward_left.png" />
+	  <None Remove="wwwroot\images\forward_right.png" />
+	  <None Remove="wwwroot\images\home.png" />
+	  <None Remove="wwwroot\images\io_table.png" />
+	  <None Remove="wwwroot\images\lift.png" />
+	  <None Remove="wwwroot\images\map.png" />
+	  <None Remove="wwwroot\images\move.png" />
+	  <None Remove="wwwroot\images\rack.png" />
+	  <None Remove="wwwroot\images\rotate-left.png" />
+	  <None Remove="wwwroot\images\rotate-right.png" />
+	  <None Remove="wwwroot\images\settings.png" />
+	  <None Remove="wwwroot\images\signin.png" />
+	  <None Remove="wwwroot\images\stk_.jpg" />
+	  <None Remove="wwwroot\images\tray.png" />
+	  <None Remove="wwwroot\images\up-arrow.png" />
+	  <None Remove="wwwroot\img\Battery.1ddc9be9.png" />
+	  <None Remove="wwwroot\img\Battery_Container.5620afb4.png" />
+	  <None Remove="wwwroot\img\emo.b3b39af7.png" />
+	  <None Remove="wwwroot\img\fork_sketch_topview.3b988835.png" />
+	  <None Remove="wwwroot\index.html" />
+	  <None Remove="wwwroot\js\231.fb2ef6f0.js" />
+	  <None Remove="wwwroot\js\231.fb2ef6f0.js.map" />
+	  <None Remove="wwwroot\js\402.4bd07cba.js" />
+	  <None Remove="wwwroot\js\402.4bd07cba.js.map" />
+	  <None Remove="wwwroot\js\580.f0bb4185.js" />
+	  <None Remove="wwwroot\js\580.f0bb4185.js.map" />
+	  <None Remove="wwwroot\js\723.41d3e94d.js" />
+	  <None Remove="wwwroot\js\723.41d3e94d.js.map" />
+	  <None Remove="wwwroot\js\790.f085410e.js" />
+	  <None Remove="wwwroot\js\790.f085410e.js.map" />
+	  <None Remove="wwwroot\js\830.cb58316a.js" />
+	  <None Remove="wwwroot\js\830.cb58316a.js.map" />
+	  <None Remove="wwwroot\js\about.b8ce8b66.js" />
+	  <None Remove="wwwroot\js\about.b8ce8b66.js.map" />
+	  <None Remove="wwwroot\js\app.cbaaa784.js" />
+	  <None Remove="wwwroot\js\app.cbaaa784.js.map" />
+	  <None Remove="wwwroot\js\chunk-vendors.29f57584.js" />
+	  <None Remove="wwwroot\js\chunk-vendors.29f57584.js.map" />
+	  <None Remove="wwwroot\station.png" />
+	  <None Remove="wwwroot\tray.jpg" />
+	  <None Remove="wwwroot\websocket_worker.js" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="wwwroot\agv.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\css\231.43c35b29.css">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\css\402.499beeff.css">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\css\580.b64eaf63.css">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\css\723.f94f3ece.css">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\css\790.1b8375fb.css">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\css\app.cfa5bee9.css">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\css\chunk-vendors.500e05f5.css">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\favicon.ico">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\fonts\bootstrap-icons.02685dab.woff2">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\fonts\bootstrap-icons.8463cb1e.woff">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\agv_controller_bg.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\agv_lift.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\agv_top_view.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\alarm.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\alarm2.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\back_left.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\back_right.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\controller.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\database.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\down-arrow.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\fork-lift.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\forward_left.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\forward_right.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\home.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\io_table.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\lift.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\map.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\move.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\rack.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\rotate-left.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\rotate-right.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\settings.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\signin.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\stk_.jpg">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\tray.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\images\up-arrow.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\img\Battery.1ddc9be9.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\img\Battery_Container.5620afb4.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\img\emo.b3b39af7.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\img\fork_sketch_topview.3b988835.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\index.html">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\231.fb2ef6f0.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\231.fb2ef6f0.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\402.4bd07cba.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\402.4bd07cba.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\580.f0bb4185.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\580.f0bb4185.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\723.41d3e94d.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\723.41d3e94d.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\790.f085410e.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\790.f085410e.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\830.cb58316a.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\830.cb58316a.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\about.b8ce8b66.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\about.b8ce8b66.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\app.cbaaa784.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\app.cbaaa784.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\chunk-vendors.29f57584.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\js\chunk-vendors.29f57584.js.map">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\station.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\tray.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Include="wwwroot\websocket_worker.js">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>

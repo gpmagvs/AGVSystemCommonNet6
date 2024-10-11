@@ -271,5 +271,10 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
         {
             DBhelper.RecoveryWithAlarmTable(AlarmList);
         }
+
+        public static void RemoveOldAlarmFromDB(DateTime timeEarlyTo)
+        {
+            DBhelper.RemoveOldAlarm(timeEarlyTo);
+        }
     }
 }
