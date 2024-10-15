@@ -386,7 +386,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
                 if (taskState != TASK_RUN_STATUS.ACTION_FINISH && string.IsNullOrEmpty(failReason))
                 {
-                    Alarm.clsAlarmCode alarm = AlarmManagerCenter.AlarmCodes[ALARMS.TrafficAbort];
+                    Alarm.clsAlarmCode alarm = AlarmManagerCenter.AlarmCodes[ALARMS.AGV_STATUS_DOWN];
                     return $"[{(int)alarm.AlarmCode}] {alarm.Description}";
                 }
 

@@ -81,7 +81,7 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.CANNOT_DISPATCH_NORMAL_MOVE_TASK_WHEN_DESTINE_IS_WORKSTATION, "當目的地是工作站時無法調度正常移動任務", "Cannot Dispatch Normal Move Task When Destine Is Workstation", "", "", ""),
             new clsAlarmCode(ALARMS.EQ_TAG_NOT_EXIST_IN_CURRENT_MAP, "設備標籤在當前地圖中不存在", "EQ Tag Not Exist In Current Map", "", "", ""),
             new clsAlarmCode(ALARMS.SubTask_Queue_Empty_But_Try_DownloadTask_To_AGV, "子任務隊列為空但嘗試下載任務到 AGV", "SubTask Queue Empty But Try Download Task To AGV", "", "", ""),
-            new clsAlarmCode(ALARMS.AGV_STATUS_DOWN, "AGV 狀態為關閉", "AGV Status Down", "", "", ""),
+            new clsAlarmCode(ALARMS.AGV_STATUS_DOWN, "AGV 狀態異常", "AGV Status Down", "", "", ""),
             new clsAlarmCode(ALARMS.CANNOT_DISPATCH_TASK_WITH_ILLEAGAL_STATUS, "無法調度非法狀態的任務", "Cannot Dispatch Task With Illegal Status", "", "", ""),
             new clsAlarmCode(ALARMS.AGV_BATTERY_LOW_LEVEL, "AGV 電池電量低", "AGV Battery Low Level", "", "", ""),
             new clsAlarmCode(ALARMS.AGV_WORKSTATION_DATA_NOT_SETTING, "AGV 工作站數據未設置", "AGV Workstation Data Not Setting", "", "", ""),
