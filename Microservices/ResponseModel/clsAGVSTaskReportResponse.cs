@@ -12,7 +12,7 @@ namespace AGVSystemCommonNet6.Microservices.ResponseModel
         public clsAGVSTaskReportResponse()
         { }
 
-        public clsAGVSTaskReportResponse(bool confirm, ALARMS AlarmCode, string message) : base(confirm, AlarmCode, message)
+        public clsAGVSTaskReportResponse(bool confirm, ALARMS AlarmCode, string message, string message_en) : base(confirm, AlarmCode, message, message_en)
         { }
     }
 }

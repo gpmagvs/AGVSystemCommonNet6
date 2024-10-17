@@ -79,7 +79,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             }
             public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(string taskID, int tagNumber, ACTION_TYPE action, string agvName = "")
             {
-                clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse(false, ALARMS.SYSTEM_ERROR, "");
+                clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse(false, ALARMS.SYSTEM_ERROR, "", "");
                 var agvs_http = GetAGVSHttpHelper();
                 try
                 {
