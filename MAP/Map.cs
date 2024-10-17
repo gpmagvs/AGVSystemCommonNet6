@@ -49,6 +49,9 @@ namespace AGVSystemCommonNet6.MAP
         public List<int> TagNoStopOfSubmarineAGV { get; set; } = new List<int>();
         public List<int> TagNoStopOfForkAGV { get; set; } = new List<int>();
 
+        public IEnumerable<int> TagForbiddenForSubMarineAGV => TagNoStopOfSubmarineAGV.ToArray();
+        public IEnumerable<int> TagForbiddenForForkAGV => TagNoStopOfForkAGV.ToArray();
+
         public int GetPointIndexByGraphDisplayName(string name)
         {
             var pt = Points.FirstOrDefault(pt => pt.Value.Graph.Display == name);
