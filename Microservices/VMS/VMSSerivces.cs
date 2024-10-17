@@ -82,7 +82,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 IsAlive = true;
                 Stopwatch sw = Stopwatch.StartNew();
                 bool previous_alive_state = true;
-                clsAlarmCode alarm = AlarmManagerCenter.GetAlarmCode(ALARMS.VMSDisconnectwithVehicle);
+                clsAlarmCode alarm = AlarmManagerCenter.GetAlarmCode(ALARMS.AGVS_DISCONNECT_WITH_VMS);
                 clsAlarmDto disconnectAlarm = new clsAlarmDto()
                 {
                     AlarmCode = (int)alarm.AlarmCode,

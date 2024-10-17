@@ -34,7 +34,7 @@ namespace AGVSystemCommonNet6.Alarm
                 }
             }
         }
-        public string Description => $"{Description_En}({Description_Zh})";
+        public string Description => $"{Description_Zh}({Description_En})";
         public string Description_Zh { get; set; } = "";
         public string Description_En { get; set; } = "";
         public string OccurLocation { get; set; } = "";

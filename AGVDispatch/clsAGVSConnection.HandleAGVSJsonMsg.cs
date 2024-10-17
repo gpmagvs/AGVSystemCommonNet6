@@ -121,7 +121,13 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 #endregion
 
                 if (WaitAckResetEvents.TryGetValue(msgType, out ManualResetEvent? manualResetEvent))
+                {
+                    if (msgType == MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK)
+                    {
+
+                    }
                     manualResetEvent.Set();
+                }
             }
             catch (Exception ex)
             {

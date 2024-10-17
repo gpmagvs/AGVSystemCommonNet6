@@ -17,10 +17,12 @@ namespace AGVSystemCommonNet6.Alarm
 {
     public class AlarmManagerCenter
     {
-        public static string ALARM_CODE_FILE_PATH = @".\Resources\AGVS_AlarmCodes.json";
+        //public static string ALARM_CODE_FILE_PATH = @".\Resources\AGVS_AlarmCodes.json";
+        public static string ALARM_CODE_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_AlarmCodes.json");
         public static string TROBLE_SHOOTING_FILE_PATH = Path.Combine(AGVSConfigulator.ConfigsFilesFolder, "AGVS_TrobleShooting.csv");
         public static Dictionary<ALARMS, clsAlarmCode> AlarmCodes = new Dictionary<ALARMS, clsAlarmCode>();
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
+        private static FileSystemWatcher _alarmCodeJsonFileWatcher;
         private static AGVSDatabase database;
         public static bool IsReportAlarmToHostON { get; set; } = false;
         public static List<clsAlarmDto> uncheckedAlarms
@@ -171,7 +173,10 @@ namespace AGVSystemCommonNet6.Alarm
         {
             Task.Run(() =>
             {
-                if (File.Exists(ALARM_CODE_FILE_PATH))
+                bool _IsFileExist = File.Exists(ALARM_CODE_FILE_PATH);
+                bool _IsFileTooOld = !_IsFileExist ? false : _IsAlarmCodeFileTooOld();
+
+                if (_IsFileExist && !_IsFileTooOld)
                 {
                     string strText = File.ReadAllText(ALARM_CODE_FILE_PATH);
                     clsAlarmCode[]? _AlarmCodes = JsonConvert.DeserializeObject<clsAlarmCode[]>(strText);
@@ -189,17 +194,65 @@ namespace AGVSystemCommonNet6.Alarm
                         }
                     }
                     AlarmCodes = _AlarmCodes.ToDictionary(ac => ac.AlarmCode, ac => ac);
-                    // 如果有更新clsAlarmCode項目需要再寫回去檔案要true起來
+                    // 如果有更新clsAlarmCode項目需要再寫回去檔案要true起來=>???
                     if (false)
                     {
                         string strAlarm = JsonConvert.SerializeObject(_AlarmCodes);
                         File.WriteAllText(ALARM_CODE_FILE_PATH, strAlarm);
                     }
+
+                    //Build a file watcher to monitor AlarmCode json file changed and reload it.
+
                 }
                 else
                 {
-                    //TODO
+                    //將預設table寫出為jSON
+                    string defaultAlarmCodeJson = JsonConvert.SerializeObject(AlarmCodeTable.Table, Formatting.Indented);
+                    File.Delete(ALARM_CODE_FILE_PATH);
+                    File.WriteAllText(ALARM_CODE_FILE_PATH, defaultAlarmCodeJson);
+                    LoadAlarmCodes();
+                    return;
                 }
+                InitAlarmCodeJsonFileWatcher();
+            });
+
+        }
+
+        private static bool _IsAlarmCodeFileTooOld()
+        {
+            if (!File.Exists(ALARM_CODE_FILE_PATH))
+                return false;
+
+            FileInfo _info = new FileInfo(ALARM_CODE_FILE_PATH);
+            return _info.LastWriteTime < new DateTime(2024, 10, 9, 14, 2, 0);
+        }
+
+        private static void InitAlarmCodeJsonFileWatcher()
+        {
+            try
+            {
+                if (_alarmCodeJsonFileWatcher != null)
+                    return;
+                _alarmCodeJsonFileWatcher = new FileSystemWatcher(AGVSConfigulator.ConfigsFilesFolder, "AGVS_AlarmCodes.json");
+                _alarmCodeJsonFileWatcher.Changed += _alarmCodeJsonFileWatcher_Changed;
+                _alarmCodeJsonFileWatcher.EnableRaisingEvents = true;
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private static void _alarmCodeJsonFileWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            _alarmCodeJsonFileWatcher.EnableRaisingEvents = false;
+            Task.Factory.StartNew(async () =>
+            {
+                await Task.Delay(1000);
+                LoadAlarmCodes();
+                Console.WriteLine($"Alarm code description file content has changed and system reload it done. => {e.FullPath}");
+                await Task.Delay(500);
+                _alarmCodeJsonFileWatcher.EnableRaisingEvents = true;
+
             });
         }
 
@@ -217,6 +270,7 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static void UadateAGVsTrobleShootings(ref Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             if (File.Exists(TROBLE_SHOOTING_FILE_PATH))
             {
                 string? _AllTrobleShootingDescription = File.ReadAllText(TROBLE_SHOOTING_FILE_PATH, Encoding.GetEncoding("big5"));

@@ -74,6 +74,8 @@
         Fork_Height_Setting_Error = 713,
         Fork_Pose_Change_Too_Large = 714,
         Fork_Pose_Change_Fail_When_Reach_Secondary = 715,
+        Fork_Cannot_Move_To_Up_Pose_When_Unload_Action_Executing = 716,
+        Fork_Cannot_Move_To_Down_Pose_When_Load_Action_Executing = 717,
         Ground_Hole_Sensor_Error = 800,
         Ground_Hole_Sensor_Error_Left_Front = 801,
         Ground_Hole_Sensor_Error_Right_Front = 802,

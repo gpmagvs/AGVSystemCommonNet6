@@ -197,7 +197,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             {
                 List<clsTaskDto> _Tasks = dbhelper._context.Set<clsTaskDto>().Where
                 (Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime &&
-                (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && 
+                (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) &&
                 (Result == "ALL" ? (true) : (Task.State == state_query)) &&
                 (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))).ToList();
                 _Tasks = OrderDataRebuild(_Tasks, setCanceledAsFailure: false);
@@ -245,7 +245,6 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             {
                 if (orderState.State == TASK_RUN_STATUS.CANCEL && setCanceledAsFailure)
                 {
-                    //orderState.State = TASK_RUN_STATUS.CANCEL;
                     orderState.State = TASK_RUN_STATUS.FAILURE;
                 }
                 if (orderState.Carrier_ID == "-1")
@@ -258,6 +257,15 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
                 if (orderState.DispatcherName.ToLower() == "vms_idle")
                     orderState.DispatcherName = "";
+
+                if (orderState.StartTime == DateTime.MinValue)
+                    orderState.StartTime = orderState.RecieveTime;
+
+                if (orderState.FinishTime == DateTime.MinValue)
+                    orderState.FinishTime = orderState.RecieveTime;
+
+                if (!string.IsNullOrEmpty(orderState.FailureReason))
+                    orderState.FailureReason = CheckAndRebuildFailReason(orderState.FailureReason);
 
                 if (_useMap != null)
                 {
@@ -285,7 +293,39 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
             });
             return _Tasks;
+
+
+
         }
+        public static string CheckAndRebuildFailReason(string failureReason)
+        {
+            //[1063] UNLOAD_BUT_AGV_NO_CARGO_MOUNTED(UNLOAD_BUT_AGV_NO_CARGO_MOUNTED)
+            if (!failureReason.Contains("[") && !failureReason.Contains("]"))
+                return failureReason;
+            //[123
+            string strAlcode = failureReason.Split(']')[0].Replace("[", "");
+            string originalAlarmEN = failureReason.Split('(').Last().Replace(")", "");
+
+            string originalAlarmZh = failureReason.Replace($"[{strAlcode}]", "").Replace($"({originalAlarmEN})", "");
+
+            if (originalAlarmEN.Trim() != originalAlarmZh.Trim())
+                return failureReason;
+            //string originalAlarmZh = failureReason.Split(' ').Last().Split("(").First();
+
+            if (!int.TryParse(strAlcode, out int alarmCode))
+                return failureReason;
+
+            if (!AlarmManagerCenter.AlarmCodes.TryGetValue((ALARMS)alarmCode, out var alarmCodeDto))
+                return failureReason;
+
+            if (alarmCodeDto.Description_En.ToUpper() != originalAlarmEN.Replace("_", " ").ToUpper())
+                return failureReason;
+
+            string newFailReason = $"[{alarmCode}] {alarmCodeDto.Description}";
+            Console.WriteLine($"New Fail Reason build {newFailReason} (Origin: {newFailReason})");
+            return newFailReason;
+        }
+
         private static void WirteTaskQueryResultToFile(string FilePath, List<clsTaskDto> Tasks)
         {
             Map _useMap = null;
@@ -320,7 +360,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
             list.AddRange(Tasks.Select(Task =>
             $"{Task.TaskName}," +
-            $"{Task.State}," +
+            $"{Task.StateName}," +
             $"{Task.RecieveTime}," +
             $"{Task.From_Station_Display}," +
             $"{Task.To_Station_Display}," +
@@ -338,11 +378,18 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{_GetStationNameByTag(Task.StartLocationTag)}," +
             $"{(Task.DispatcherName.ToLower() == "vms_idle" ? "" : Task.DispatcherName)}," +
             $"{(Task.State == TASK_RUN_STATUS.CANCEL ? Task.DesignatedAGVName : "")}," +
-            $"{_GetFailReason(Task.FailureReason)}"));
+            $"{_GetFailReason(Task.State, Task.FailureReason)}"));
             File.WriteAllLines(FilePath, list, Encoding.UTF8);
 
-            string _GetFailReason(string failReason)
+            string _GetFailReason(TASK_RUN_STATUS taskState, string failReason)
             {
+
+                if (taskState != TASK_RUN_STATUS.ACTION_FINISH && string.IsNullOrEmpty(failReason))
+                {
+                    Alarm.clsAlarmCode alarm = AlarmManagerCenter.AlarmCodes[ALARMS.AGV_STATUS_DOWN];
+                    return $"[{(int)alarm.AlarmCode}] {alarm.Description}";
+                }
+
                 if (failReason == null || failReason == "")
                     return "";
 

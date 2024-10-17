@@ -132,6 +132,24 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         }
 
+        public static string createExitReqAckMsg(clsExitRequest exitRequest, RETURN_CODE retCode)
+        {
+            clsExitRequestACKMessage msg = new clsExitRequestACKMessage();
+            msg.SID = exitRequest.SID;
+            msg.EQName = exitRequest.EQName;
+            msg.SystemBytes = exitRequest.SystemBytes;
+            msg.Header = new Dictionary<string, SimpleRequestResponseWithTimeStamp>()
+            {
+                { "0312",new SimpleRequestResponseWithTimeStamp
+                {
+                     Message= "",
+                     ReturnCode =retCode ,
+                     TimeStamp = DateTime.Now.ToAGVSTimeFormat()
+                } }
+            };
+            return JsonConvert.SerializeObject(msg);
+
+        }
         public static string createOnlineModeAckData(clsOnlineModeQueryMessage queryDto, REMOTE_MODE remote_mode)
         {
             clsOnlineModeQueryResponseMessage response = new clsOnlineModeQueryResponseMessage();
@@ -305,5 +323,22 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         }
 
+        public static string createExitReq0313(ref clsExitRequest exitReq0311)
+        {
+            clsExitRequest exitReqMsg = new clsExitRequest()
+            {
+                SID = exitReq0311.SID,
+                EQName = exitReq0311.EQName,
+                SystemBytes = System_Byte_Cyclic,
+                Header = new Dictionary<string, ExitRequest>
+                {
+                    {"0313",new ExitRequest{
+                         TimeStamp = DateTime.Now.ToString("yyyyMMdd HH:mm:ss"),
+                          ExitPoint = exitReq0311.Header.First().Value.ExitPoint,
+                    } }
+                }
+            };
+            return JsonConvert.SerializeObject(exitReqMsg);
+        }
     }
 }

@@ -92,8 +92,8 @@ namespace AGVSystemCommonNet6.Alarm
         Download_Task_To_AGV_Fail = 1074,
         EQ_LOAD_REQUEST_ON_BUT_HAS_CARGO = 1075,
         EQ_UNLOAD_REQUEST_ON_BUT_NO_CARGO = 1076,
-        EQ_UNLOAD_REQUEST_ON_BUT_POSE_NOT_UP = 1076,
-        EQ_LOAD_REQUEST_ON_BUT_POSE_NOT_DOWN = 1076,
+        EQ_UNLOAD_REQUEST_ON_BUT_POSE_NOT_UP = 10761,
+        EQ_LOAD_REQUEST_ON_BUT_POSE_NOT_DOWN = 10762,
         EQ_UNLOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 1077,
         EQ_LOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 1078,
         AGV_Type_Is_Not_Allow_To_Execute_Task_At_Source_Equipment = 1079,
@@ -237,6 +237,9 @@ namespace AGVSystemCommonNet6.Alarm
         TaskCancelByHost = 670,
         Vehicle0303JobStatusStartTimeout = 680,
         Vehicle0303JobStatusEndTimeout = 681,
+        Charge_Station_EMO = 10763,
+        Charge_Station_Air_Error = 10764,
+        Charge_Station_Smoke_Detected = 10765,
         #endregion
     }
 

@@ -38,7 +38,8 @@ namespace AGVSystemCommonNet6.Configuration
         }
         public static void Init(string configsFolder)
         {
-            ConfigsFilesFolder = string.IsNullOrEmpty(configsFolder) ? ConfigsFilesFolder : configsFolder;
+
+            ConfigsFilesFolder = string.IsNullOrEmpty(configsFolder) || !Directory.Exists(configsFolder) ? ConfigsFilesFolder : configsFolder;
             _configFilePath = Path.Combine(ConfigsFilesFolder, "SystemConfigs.json");
             SysConfigs = LoadConfig(_configFilePath);
             //WatchSystemConfigs(_configFilePath);
