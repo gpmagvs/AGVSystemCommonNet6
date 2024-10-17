@@ -154,6 +154,7 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.Charge_Station_Air_Error, "充電站氣壓異常", "Charger Air Pressure Abnormal", "", "", ""),
             new clsAlarmCode(ALARMS.Charge_Station_Smoke_Detected, "充電站偵煙異常", "Charger Smoke Detected", "", "", ""),
             new clsAlarmCode(ALARMS.TrafficAbort, "交管異常停止", "Task Failure Because Traffic Error", "", "", ""),
+            new clsAlarmCode(ALARMS.Navigation_Path_Contain_Forbidden_Point, "導航路徑包含被設為禁止通行或抵達的點位", "Navigation Path Contain Forbidden Point", "", "", ""),
         };
     }
 }
