@@ -240,6 +240,7 @@ namespace AGVSystemCommonNet6.Alarm
         Charge_Station_EMO = 10763,
         Charge_Station_Air_Error = 10764,
         Charge_Station_Smoke_Detected = 10765,
+        REPEATED_TAG_SETTING = 10766,
         #endregion
     }
 
