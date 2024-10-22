@@ -75,7 +75,7 @@ namespace AGVSystemCommonNet6.MAP
             {
                 var KGMapFileFullName = KGSSettingsHelper.GetCurrentMapUseFilePath();
                 string mapName = Path.GetFileNameWithoutExtension(KGMapFileFullName);
-                mapFileFullName = AGVSConfigulator.SysConfigs.MapConfigs.MapFolder + "/" + mapName + "-KG.json";
+                mapFileFullName = AGVSConfigulator.SysConfigs.PATHES_STORE[SystemConfigs.PATH_ENUMS.MAP_FOLDER] + "/" + mapName + "-KG.json";
                 if (!File.Exists(mapFileFullName))
                     File.Copy(KGMapFileFullName, mapFileFullName, true);
                 else
