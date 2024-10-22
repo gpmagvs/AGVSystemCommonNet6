@@ -3,6 +3,7 @@ using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.MAP;
+using AGVSystemCommonNet6.ViewModels;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -12,6 +13,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using WebSocketSharp;
+using static SQLite.SQLite3;
 
 namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
@@ -129,60 +132,50 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         }
 
-        public void TaskQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string actionType, string failurereason, out List<clsTaskDto> Task)
+
+        public (int total, List<clsTaskDto> tasksQueryOut, int CompleteNum, int FailNum, int CancelNum) TaskQuery(TaskQueryCondition conditions)
         {
-            TASK_RUN_STATUS state_query = 0;
-            if (Result == "完成" || Result == "Completed")
-                state_query = TASK_RUN_STATUS.ACTION_FINISH;
-            if (Result == "失敗" || Result == "Fail")
-                state_query = TASK_RUN_STATUS.FAILURE;
-            if (Result == "取消" || Result == "Cancel")
-                state_query = TASK_RUN_STATUS.CANCEL;
+            TASK_RUN_STATUS TaskResult = conditions.TaskResult;
+            string AGVName = conditions.AGVName;
+            string TaskName = conditions.TaskName;
+            string FailReason = conditions.Description;
+            DateTime StartTime = conditions.StartTime;
+            DateTime EndTime = conditions.EndTime;
+            ACTION_TYPE ActionType = conditions.ActionType;
+            int Page = conditions.CurrentPage < 1 ? 1 : conditions.CurrentPage;
+            int TotalNum = 0;
+            int FailNum = 0;
+            int CanceledNum = 0;
+            int CompletedNum = 0;
 
-
-            ACTION_TYPE action_type_query = ACTION_TYPE.None;
-            if (actionType == "移動" || actionType == "Move")
-                action_type_query = ACTION_TYPE.None;
-            if (actionType == "放貨" || actionType == "UnLoad")
-                action_type_query = ACTION_TYPE.Load;
-            if (actionType == "取貨" || actionType == "Load")
-                action_type_query = ACTION_TYPE.Unload;
-            if (actionType == "充電" || actionType == "Charge")
-                action_type_query = ACTION_TYPE.Charge;
-            if (actionType == "搬運" || actionType == "Transfer")
-                action_type_query = ACTION_TYPE.Carry;
-            if (actionType == "量測" || actionType == "Measure")
-                action_type_query = ACTION_TYPE.Measure;
-            if (actionType == "交換電池" || actionType == "Exchange Battrey")
-                action_type_query = ACTION_TYPE.ExchangeBattery;
-
-            count = 0;
-            Task = new List<clsTaskDto>();
-            using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            List<clsTaskDto> tasksQueryOut = new();
+            using (DbContextHelper dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
-                var _Task = dbhelper._context.Set<clsTaskDto>().OrderByDescending(TK => TK.RecieveTime).Where(Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime
-                                    && (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) && (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))
-                                    && (Result == "ALL" ? true : Task.State == state_query)
-                                    && (actionType == "ALL" ? true : Task.Action == action_type_query)
-                                    && (failurereason == null ? (true) : (Task.FailureReason.Contains(failurereason)))
-                /*(failurereason == "ALL" ? (true) :(Task.FailureReason.Contains(failurereason)))*/
-                /*(failurereason == "ALL" ? true :Task.FailureReason == failurereason)*/
-                );
-                count = _Task.Count();
-                Task = _Task.Skip((currentpage - 1) * 19).Take(19).ToList();
+                IQueryable<clsTaskDto> _Task = dbhelper._context.Set<clsTaskDto>().OrderByDescending(TK => TK.RecieveTime)
+                                                                                  .Where(Task => Task.RecieveTime >= StartTime &&
+                                                                                                 Task.RecieveTime <= EndTime &&
+                                                                                                 (string.IsNullOrEmpty(AGVName) || (Task.DesignatedAGVName == AGVName)) &&
+                                                                                                 (string.IsNullOrEmpty(TaskName) || Task.TaskName.Contains(TaskName)) &&
+                                                                                                 (TaskResult == TASK_RUN_STATUS.UNKNOWN || Task.State == TaskResult) &&
+                                                                                                 (ActionType == ACTION_TYPE.Unknown || Task.Action == ActionType) &&
+                                                                                                 (string.IsNullOrEmpty(FailReason) || Task.FailureReason.Contains(FailReason))
+                                                                                                 );
+                FailNum = _Task.Count(tk => tk.State == TASK_RUN_STATUS.FAILURE);
+                CanceledNum = _Task.Count(tk => tk.State == TASK_RUN_STATUS.CANCEL);
+                CompletedNum = _Task.Count(tk => tk.State == TASK_RUN_STATUS.ACTION_FINISH);
+
+                TotalNum = _Task.Count();
+                tasksQueryOut = _Task.Skip((Page - 1) * conditions.DataNumberPerPage)
+                                     .Take(conditions.DataNumberPerPage)
+                                     .ToList();
             };
+            return (TotalNum, tasksQueryOut, CompletedNum, FailNum, CanceledNum);
         }
-        public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Result, string fileName = null)
+        public static string SaveTocsv(DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, TASK_RUN_STATUS Result = TASK_RUN_STATUS.UNKNOWN, string fileName = null)
         {
             var folder = Path.Combine(Environment.CurrentDirectory, AGVSConfigulator.SysConfigs.clsAGVS_Print_Data.SavePath + "Task");
             var _fileName = fileName is null ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
-            TASK_RUN_STATUS state_query = 0;
-            if (Result == "完成" || Result == "Completed")
-                state_query = TASK_RUN_STATUS.ACTION_FINISH;
-            if (Result == "失敗" || Result == "Fail")
-                state_query = TASK_RUN_STATUS.FAILURE;
-            if (Result == "取消" || Result == "Cancel")
-                state_query = TASK_RUN_STATUS.CANCEL;
+            TASK_RUN_STATUS state_query = Result;
             try
             {
                 Directory.CreateDirectory(folder);
@@ -197,9 +190,9 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             {
                 List<clsTaskDto> _Tasks = dbhelper._context.Set<clsTaskDto>().Where
                 (Task => Task.RecieveTime >= startTime && Task.RecieveTime <= endTime &&
-                (AGV_Name == "ALL" ? (true) : (Task.DesignatedAGVName == AGV_Name)) &&
-                (Result == "ALL" ? (true) : (Task.State == state_query)) &&
-                (TaskName == null ? (true) : (Task.TaskName.Contains(TaskName)))).ToList();
+                (string.IsNullOrEmpty(AGV_Name) || (Task.DesignatedAGVName == AGV_Name)) &&
+                state_query == TASK_RUN_STATUS.UNKNOWN || Task.State == state_query &&
+                (string.IsNullOrEmpty(TaskName) || (Task.TaskName.Contains(TaskName)))).ToList();
                 _Tasks = OrderDataRebuild(_Tasks, setCanceledAsFailure: false);
                 WirteTaskQueryResultToFile(FilePath, _Tasks);
             };

@@ -109,7 +109,8 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         ACTION_FINISH = 4,
         WAIT,
         FAILURE,
-        CANCEL
+        CANCEL,
+        UNKNOWN = 500
     }
 
     public enum ACTION_TYPE
@@ -131,7 +132,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
         ExchangeBattery,
         Hold,
         Break,
-        Unknown,
+        Unknown = 500,
         NoAction = 999
     }
 
