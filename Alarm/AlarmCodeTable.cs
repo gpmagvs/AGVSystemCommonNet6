@@ -155,6 +155,7 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.Charge_Station_Smoke_Detected, "充電站偵煙異常", "Charger Smoke Detected", "", "", ""),
             new clsAlarmCode(ALARMS.TrafficAbort, "交管異常停止", "Task Failure Because Traffic Error", "", "", ""),
             new clsAlarmCode(ALARMS.Navigation_Path_Contain_Forbidden_Point, "導航路徑包含被設為禁止通行或抵達的點位", "Navigation Path Contain Forbidden Point", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_Temperature_High, "充電樁溫度過高", "Charge Station Temperature Too High", "", "", ""),
         };
     }
 }
