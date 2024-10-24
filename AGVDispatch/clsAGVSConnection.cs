@@ -115,6 +115,9 @@ namespace AGVSystemCommonNet6.AGVDispatch
         }
         public string LocalIP { get; set; }
         public AGV_TYPE AGV_Type { get; }
+
+        public int msgHsDuration { get; private set; } = 200;
+
         public clsAGVSConnection(string IP, int Port, bool AutoPingServerCheck = true) : base(IP, Port, AutoPingServerCheck)
         {
             this.IP = IP;
@@ -122,13 +125,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
             LocalIP = null;
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
         }
-        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_TYPE AGV_TYPE = AGV_TYPE.FORK, ILogger<clsAGVSConnection> logger = null)
+        public clsAGVSConnection(string HostIP, int HostPort, string localIP, AGV_TYPE AGV_TYPE = AGV_TYPE.FORK, ILogger<clsAGVSConnection> logger = null, int msgHsDuration = 200)
         {
             this.logger = logger;
             this.IP = HostIP;
             this.VMSPort = HostPort;
             this.LocalIP = localIP;
             this.AGV_Type = AGV_TYPE;
+            this.msgHsDuration = msgHsDuration;
             InitVMSWebAPIHttpChannels($"http://{IP}:{VMSPort}");
             AGVsWebAPIHttp = new HttpTools.HttpHelper($"http://{IP}:{AGVsPort}");
             AutoPingServerCheck = true;
@@ -194,7 +198,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task Start()
         {
-            int _delay = 200;
             await Task.Delay(1);
             while (true)
             {
@@ -206,6 +209,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     {
                         if (!UseWebAPI)
                         {
+                            await Task.Delay(100);
                             logger.LogWarning($"Try Connect TO AGVS Via TCP/IP({IP}:{VMSPort})");
                             bool Reconnected = await Connect();
                             Connected = Reconnected;
@@ -233,7 +237,10 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
                     await Task.Delay(1000);
                 }
-                await Task.Delay(_delay);
+                finally
+                {
+                    await Task.Delay(msgHsDuration);
+                }
             }
         }
 
@@ -469,7 +476,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
             try
             {
-                if(ack_msg_type== MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK)
+                if (ack_msg_type == MESSAGE_TYPE.ACK_0312_EXIT_REQUEST_ACK)
                 {
 
                 }
