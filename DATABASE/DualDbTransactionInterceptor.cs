@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AGVSystemCommonNet6.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NLog;
 using System;
@@ -19,7 +20,8 @@ namespace AGVSystemCommonNet6.DATABASE
         public DualDbTransactionInterceptor() : base()
         {
             var optionsBuilder = new DbContextOptionsBuilder<AGVSDbContext>();
-            optionsBuilder.UseSqlServer("Server=127.0.0.1;Database=3FSE;User Id=sa;Password=12345678;Encrypt=False;MultipleActiveResultSets=True;Connection Lifetime=1;Min Pool Size=5;Max Pool Size=50;");
+            string _warRoomDBConnectionString = AGVSConfigulator.SysConfigs.WarRoomDBConnection;
+            optionsBuilder.UseSqlServer(_warRoomDBConnectionString);
             _warRoomDbContext = new AGVSDbContext(optionsBuilder.Options, true);
         }
 

@@ -23,6 +23,8 @@ namespace AGVSystemCommonNet6.Configuration
         public bool BaseOnKGSWebAGVSystem { get; set; } = false;
         public string FieldName { get; set; } = "UMTC-AOI-2F";
         public string DBConnection { get; set; } = "Server=127.0.0.1;Database=GPMAGVs;User Id=sa;Password=12345678;Encrypt=False;MultipleActiveResultSets=True;Connection Lifetime=1;Min Pool Size=5;Max Pool Size=50;MultipleActiveResultSets=True;";
+        public string WarRoomDBConnection { get; set; } = "Server=127.0.0.1;Database=3FSE;User Id=sa;Password=12345678;Encrypt=False;MultipleActiveResultSets=True;Connection Lifetime=1;Min Pool Size=5;Max Pool Size=50;";
+
         public string PartsAGVSDBConnection { get; set; } = "Server=127.0.0.1;Database=AGVS_Info;User Id=sa;Password=Tsmc12345678;Encrypt=False;MultipleActiveResultSets=True;Connection Lifetime=1;Min Pool Size=5;Max Pool Size=50;MultipleActiveResultSets=True;";
         public string KGSWebAGVSystemDBConnection { get; set; } = "Server=127.0.0.1;Database=WebAGVSystem;User Id=sa;Password=12345678;Encrypt=False;MultipleActiveResultSets=True;Connection Lifetime=1;Min Pool Size=5;Max Pool Size=50;MultipleActiveResultSets=True;";
         public string VMSHost { get; set; } = "http://localhost:5036";
@@ -71,6 +73,7 @@ namespace AGVSystemCommonNet6.Configuration
                 };
             }
         }
+
     }
     public class clsMapConfigs
     {
