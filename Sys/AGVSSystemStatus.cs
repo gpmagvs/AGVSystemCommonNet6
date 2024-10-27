@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.RunMode;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,6 +12,7 @@ namespace AGVSystemCommonNet6.Sys
     public class AGVSSystemStatus
     {
         [Key]
+        public string FieldName { get; set; } = "";
         public string Version { get; set; } = "1.0.0";
         public RUN_MODE RunMode { get; set; } = RUN_MODE.MAINTAIN;
         public HOST_CONN_MODE HostConnMode { get; set; } = HOST_CONN_MODE.OFFLINE;

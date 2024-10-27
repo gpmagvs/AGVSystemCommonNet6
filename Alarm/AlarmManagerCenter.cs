@@ -36,15 +36,15 @@ namespace AGVSystemCommonNet6.Alarm
         private static bool Initialized = false;
         public AlarmManagerCenter() { }
 
-        public static void Initialize()
+        public static async Task InitializeAsync()
         {
             database = new AGVSDatabase();
             LoadAlarmCodes();
             LoadTrobleShootingDescription();
             Initialized = true;
-            SetAllAlarmChecked();
+            await SetAllAlarmChecked();
         }
-        public static async void SetAllAlarmChecked()
+        public static async Task SetAllAlarmChecked()
         {
             try
             {
@@ -105,7 +105,7 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 await semaphoreSlim.WaitAsync();
                 if (!Initialized)
-                    Initialize();
+                    await InitializeAsync();
                 if (alarmDto.AlarmCode == 0)
                     return;
                 database.tables.SystemAlarms.Add(alarmDto);
@@ -334,7 +334,7 @@ namespace AGVSystemCommonNet6.Alarm
             {
 
                 if (!Initialized)
-                    Initialize();
+                    InitializeAsync().GetAwaiter().GetResult();
                 return AlarmCodes[alarm_enum];
             }
             catch (Exception ex)

@@ -15,6 +15,9 @@ namespace AGVSystemCommonNet6.DATABASE
 {
     public class AGVSDbContext : DbContext
     {
+
+        private static bool _isDualDbTransactionInterceptorInjuected = false;
+
         public DbSet<AGVSSystemStatus> SysStatus { get; set; }
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<clsTaskDto> Tasks { get; set; }
@@ -42,11 +45,28 @@ namespace AGVSystemCommonNet6.DATABASE
 
         public DbSet<EqUnloadState> EqpUnloadStates { get; set; }
 
-        public AGVSDbContext(DbContextOptions<AGVSDbContext> options)
+        private bool _isWarRoomUse = false;
+
+        public AGVSDbContext(DbContextOptions<AGVSDbContext> options, bool isWarRoomUse = false)
             : base(options)
         {
+            _isWarRoomUse = isWarRoomUse;
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!_isWarRoomUse && !_isWarRoomUse)
+            {
+                _isDualDbTransactionInterceptorInjuected = true;
+                optionsBuilder.AddInterceptors(new DualDbTransactionInterceptor());
+            }
+            else
+            {
+
+            }
+            base.OnConfiguring(optionsBuilder);
+
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -1,4 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.RunMode;
+using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.Sys;
 
@@ -13,20 +14,31 @@ namespace AGVSystem.Service
             _agvsDb = agvsDb;
         }
 
-        public async Task SetAppVersion(string appVersion)
+        public async Task InitSysStatusWithAppVersion(string appVersion)
         {
-            if (!_agvsDb.SysStatus.Any())
+            try
             {
-                _agvsDb.SysStatus.Add(new AGVSSystemStatus
+
+                if (_agvsDb.SysStatus.FirstOrDefault() == null)
                 {
-                    Version = appVersion
-                });
+                    AGVSSystemStatus status = new AGVSSystemStatus
+                    {
+                        FieldName = AGVSConfigulator.SysConfigs.FieldName,
+                        Version = appVersion
+                    };
+                    _agvsDb.SysStatus.Add(status);
+                }
+                else
+                {
+                    await ResetModesStore();
+                    _agvsDb.SysStatus.First().Version = appVersion;
+                    _agvsDb.SysStatus.First().FieldName = AGVSConfigulator.SysConfigs.FieldName;
+                }
+                await _agvsDb.SaveChangesAsync();
             }
-            else
+            catch (Exception ex)
             {
-                _agvsDb.SysStatus.First().Version = appVersion;
             }
-            await _agvsDb.SaveChangesAsync();
         }
 
         public async Task ResetModesStore()
@@ -37,6 +49,7 @@ namespace AGVSystem.Service
                 _agvsDb.SysStatus.First().HostOperMode = HOST_OPER_MODE.LOCAL;
                 _agvsDb.SysStatus.First().HostConnMode = HOST_CONN_MODE.OFFLINE;
             }
+            await _agvsDb.SaveChangesAsync();
         }
 
         public async Task ModifyRunModeStored(RUN_MODE mode)
