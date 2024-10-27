@@ -28,7 +28,7 @@ namespace AGVSystemCommonNet6.Availability
         };
         private MAIN_STATUS previousMainState;
         private RTAvailabilityDto currentAvailability = new RTAvailabilityDto();
-        private SemaphoreSlim _DbActSemaphore = new SemaphoreSlim(1, 1);
+        private static SemaphoreSlim _DbActSemaphore = new SemaphoreSlim(1, 1);
         private MAIN_STATUS MainState
         {
             get => previousMainState;
@@ -144,9 +144,9 @@ namespace AGVSystemCommonNet6.Availability
 
         private async Task UpdateRealTimeAvailbilityToDataBase(RTAvailabilityDto currentAvailability)
         {
-            await _DbActSemaphore.WaitAsync();
             try
             {
+                await _DbActSemaphore.WaitAsync();
                 using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     var currentData = aGVSDbContext._context.RealTimeAvailabilitys.FirstOrDefault(data => data.AGVName == currentAvailability.AGVName && data.StartTime == currentAvailability.StartTime);
@@ -172,12 +172,13 @@ namespace AGVSystemCommonNet6.Availability
 
         private async Task SaveRealTimeAvailbilityToDatabase(RTAvailabilityDto currentAvailability)
         {
-            await _DbActSemaphore.WaitAsync();
 
-            using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            try
             {
-                try
+                await _DbActSemaphore.WaitAsync();
+                using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
+
                     var exist_data = aGVSDbContext._context.RealTimeAvailabilitys.FirstOrDefault(ad => ad.AGVName == currentAvailability.AGVName && ad.StartTime == currentAvailability.StartTime);
                     if (exist_data == null)
                     {
@@ -189,15 +190,17 @@ namespace AGVSystemCommonNet6.Availability
                     }
                     var ret = await aGVSDbContext._context.SaveChangesAsync();
                 }
-                catch (Exception ex)
-                {
-
-                }
-                finally
-                {
-                    _DbActSemaphore.Release();
-                }
             }
+            catch (Exception)
+            {
+
+            }
+            finally
+            {
+                _DbActSemaphore.Release();
+            }
+
+
         }
 
         /// <summary>
@@ -205,10 +208,10 @@ namespace AGVSystemCommonNet6.Availability
         /// </summary>
         private async Task SaveDayAvailbilityToDatabase()
         {
-            await _DbActSemaphore.WaitAsync();
 
             try
             {
+                await _DbActSemaphore.WaitAsync();
                 using (DbContextHelper aGVSDbContext = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     var avaExist = aGVSDbContext._context.Availabilitys.FirstOrDefault(av => av.KeyStr == availability.GetKey());
