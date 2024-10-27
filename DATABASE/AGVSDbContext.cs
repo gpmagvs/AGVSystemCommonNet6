@@ -45,6 +45,11 @@ namespace AGVSystemCommonNet6.DATABASE
 
         public DbSet<EqUnloadState> EqpUnloadStates { get; set; }
 
+        public DbSet<AGVStatus> EQStatus_AGV { get; set; }
+
+        public DbSet<MainEQStatus> EQStatus_MainEQ { get; set; }
+        public DbSet<RackStatus> EQStatus_Rack { get; set; }
+
         private bool _isWarRoomUse = false;
 
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options, bool isWarRoomUse = false)
