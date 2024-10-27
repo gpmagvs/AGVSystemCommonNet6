@@ -2,9 +2,11 @@
 using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Availability;
+using AGVSystemCommonNet6.Equipment;
 using AGVSystemCommonNet6.Maintainance;
 using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.StopRegion;
+using AGVSystemCommonNet6.Sys;
 using AGVSystemCommonNet6.User;
 using Microsoft.EntityFrameworkCore;
 using System.Xml;
@@ -13,6 +15,7 @@ namespace AGVSystemCommonNet6.DATABASE
 {
     public class AGVSDbContext : DbContext
     {
+        public DbSet<AGVSSystemStatus> SysStatus { get; set; }
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<clsTaskDto> Tasks { get; set; }
         public DbSet<clsAGVStateDto> AgvStates { get; set; }
@@ -36,6 +39,9 @@ namespace AGVSystemCommonNet6.DATABASE
         public DbSet<clsMaterialInfo> MaterialInfo { get; set; }
 
         public DbSet<clsStationStatus> StationStatus { get; set; }
+
+        public DbSet<EqUnloadState> EqpUnloadStates { get; set; }
+
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options)
             : base(options)
         {

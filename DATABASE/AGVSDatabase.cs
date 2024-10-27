@@ -4,8 +4,10 @@ using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Availability;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
+using AGVSystemCommonNet6.Equipment;
 using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.StopRegion;
+using AGVSystemCommonNet6.Sys;
 using AGVSystemCommonNet6.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,6 +62,7 @@ namespace AGVSystemCommonNet6.DATABASE
         private static async Task<bool> DatabaseColumnCheck(AGVSDatabase database)
         {
             SQLNativ.DatabaseSchemaUpdater schemaUpdater = new SQLNativ.DatabaseSchemaUpdater(AGVSConfigulator.SysConfigs.DBConnection);
+            await schemaUpdater.EnsureFieldExists<AGVSSystemStatus>(nameof(database.tables.SysStatus));
             await schemaUpdater.EnsureFieldExists<UserEntity>(nameof(database.tables.Users));
             await schemaUpdater.EnsureFieldExists<clsTaskDto>(nameof(database.tables.Tasks));
             await schemaUpdater.EnsureFieldExists<clsAGVStateDto>(nameof(database.tables.AgvStates));
@@ -71,6 +74,7 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<clsStopRegionDto>(nameof(database.tables.StopRegionData));
             await schemaUpdater.EnsureFieldExists<clsMaterialInfo>(nameof(database.tables.MaterialInfo));
             await schemaUpdater.EnsureFieldExists<clsStationStatus>(nameof(database.tables.StationStatus));
+            await schemaUpdater.EnsureFieldExists<EqUnloadState>(nameof(database.tables.EqpUnloadStates));
 
             return true;
         }
