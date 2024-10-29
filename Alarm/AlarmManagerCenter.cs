@@ -36,15 +36,15 @@ namespace AGVSystemCommonNet6.Alarm
         private static bool Initialized = false;
         public AlarmManagerCenter() { }
 
-        public static void Initialize()
+        public static async Task InitializeAsync()
         {
             database = new AGVSDatabase();
             LoadAlarmCodes();
             LoadTrobleShootingDescription();
             Initialized = true;
-            SetAllAlarmChecked();
+            await SetAllAlarmChecked();
         }
-        public static async void SetAllAlarmChecked()
+        public static async Task SetAllAlarmChecked()
         {
             try
             {
@@ -105,7 +105,7 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 await semaphoreSlim.WaitAsync();
                 if (!Initialized)
-                    Initialize();
+                    await InitializeAsync();
                 if (alarmDto.AlarmCode == 0)
                     return;
                 database.tables.SystemAlarms.Add(alarmDto);
@@ -224,7 +224,7 @@ namespace AGVSystemCommonNet6.Alarm
                 return false;
 
             FileInfo _info = new FileInfo(ALARM_CODE_FILE_PATH);
-            return _info.LastWriteTime < new DateTime(2024, 10, 9, 14, 2, 0);
+            return _info.LastWriteTime < new DateTime(2024, 10, 24, 0, 0, 0);
         }
 
         private static void InitAlarmCodeJsonFileWatcher()
@@ -334,7 +334,7 @@ namespace AGVSystemCommonNet6.Alarm
             {
 
                 if (!Initialized)
-                    Initialize();
+                    InitializeAsync().GetAwaiter().GetResult();
                 return AlarmCodes[alarm_enum];
             }
             catch (Exception ex)

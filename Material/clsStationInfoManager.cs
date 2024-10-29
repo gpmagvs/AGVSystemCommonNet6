@@ -188,16 +188,16 @@ namespace AGVSystemCommonNet6.Material
                         continue;
 
                     // 在席On、DB有ID  -> 把DB的ID指派給該Port
-                    if (WIPPort.ExistSensorStates.Any(portStatus => portStatus.Value != clsPortOfRack.SENSOR_STATUS.OFF) && string.IsNullOrEmpty(StationInfoInDB.MaterialID) == false)
+                    if (WIPPort.MaterialExistSensorStates.Any(portStatus => portStatus.Value != clsPortOfRack.SENSOR_STATUS.OFF) && string.IsNullOrEmpty(StationInfoInDB.MaterialID) == false)
                         WIPPort.CarrierID = StationInfoInDB.MaterialID;
                     // 在席Off、DB有ID -> 把DB的ID給清除
-                    else if (WIPPort.ExistSensorStates.Any(portStatus => portStatus.Value != clsPortOfRack.SENSOR_STATUS.OFF) == false)
+                    else if (WIPPort.MaterialExistSensorStates.Any(portStatus => portStatus.Value != clsPortOfRack.SENSOR_STATUS.OFF) == false)
                     {
                         StationInfoInDB.MaterialID = "";
                         database.tables.StationStatus.Update(StationInfoInDB);
                     }
                     // 在席On、DB沒有ID -> 記下來統一Alarm
-                    else if (WIPPort.ExistSensorStates.Any(portStatus => portStatus.Value != clsPortOfRack.SENSOR_STATUS.OFF) && string.IsNullOrEmpty(StationInfoInDB.MaterialID) == true)
+                    else if (WIPPort.MaterialExistSensorStates.Any(portStatus => portStatus.Value != clsPortOfRack.SENSOR_STATUS.OFF) && string.IsNullOrEmpty(StationInfoInDB.MaterialID) == true)
                         FailPort.Add(StationInfoInDB.StationName);
                 }
             }

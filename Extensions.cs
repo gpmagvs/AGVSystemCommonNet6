@@ -174,6 +174,13 @@ namespace AGVSystemCommonNet6
             //Console.WriteLine($"Distance from ({map_station.X},{map_station.Y}) (Tag:{map_station.TagNumber}) to ({from_loc_x},{from_loc_y})(Tag:{tag}) is {distance}");
             return distance;
         }
+
+        /// <summary>
+        /// 計算站點距離 (單位:m)
+        /// </summary>
+        /// <param name="map_station"></param>
+        /// <param name="coord"></param>
+        /// <returns></returns>
         public static double CalculateDistance(this MapPoint map_station, clsCoordination coord)
         {
             return map_station.CalculateDistance(coord.X, coord.Y);

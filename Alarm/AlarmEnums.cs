@@ -134,7 +134,7 @@ namespace AGVSystemCommonNet6.Alarm
         WaitTaskBeExecutedTimeout = 3049,
         No_NG_Port_Can_Be_Used = 3050,
         OrderExecuteTimeout = 3051,
-        Destine_Point_Is_Not_Allow_To_Reach = 3052,
+        Navigation_Path_Contain_Forbidden_Point = 3052,
         #region KG
         CreateCommandFail = 210,
         NoActionType = 11,
@@ -240,6 +240,8 @@ namespace AGVSystemCommonNet6.Alarm
         Charge_Station_EMO = 10763,
         Charge_Station_Air_Error = 10764,
         Charge_Station_Smoke_Detected = 10765,
+        REPEATED_TAG_SETTING = 10766,
+        Charge_Station_Temperature_High = 10767,
         #endregion
     }
 

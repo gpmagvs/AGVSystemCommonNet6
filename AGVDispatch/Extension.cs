@@ -46,5 +46,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 Alarm_Level = al.Alarm_Level,
             }).ToArray();
         }
+
+        public static int GetToSlotInt(this clsTaskDto taskDto)
+        {
+            int.TryParse(taskDto.To_Slot, out int slotInt);
+            return slotInt;
+        }
+
+
+        public static int GetFromSlotInt(this clsTaskDto taskDto)
+        {
+            int.TryParse(taskDto.From_Slot, out int slotInt);
+            return slotInt;
+        }
     }
 }
