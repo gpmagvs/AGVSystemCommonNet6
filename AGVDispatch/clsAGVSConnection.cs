@@ -198,50 +198,54 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public async Task Start()
         {
-            await Task.Delay(1);
-            while (true)
+            await Task.Delay(1).ContinueWith(async tk =>
             {
-                try
-                {
-                    if (!UseWebAPI)
-                        CheckAndClearOlderMessageStored();
-                    if (!IsConnected())
-                    {
-                        if (!UseWebAPI)
-                        {
-                            await Task.Delay(100);
-                            logger.LogWarning($"Try Connect TO AGVS Via TCP/IP({IP}:{VMSPort})");
-                            bool Reconnected = await Connect();
-                            Connected = Reconnected;
-                            continue;
-                        }
-                    }
-                    IsGetOnlineModeTrying = false;
 
-                    if (await OnlineModeQueryOut())
+                while (true)
+                {
+                    try
                     {
-                        if (UseWebAPI)
-                            VMS_API_Call_Fail_Flag = false;
-                        await RunningStatusReport();
-                    }
-                    else
-                    {
+                        await Task.Delay(msgHsDuration);
                         if (!UseWebAPI)
-                            Disconnect();
+                            CheckAndClearOlderMessageStored();
+                        if (!IsConnected())
+                        {
+                            if (!UseWebAPI)
+                            {
+                                await Task.Delay(100);
+                                logger.LogWarning($"Try Connect TO AGVS Via TCP/IP({IP}:{VMSPort})");
+                                bool Reconnected = await Connect();
+                                Connected = Reconnected;
+                                continue;
+                            }
+                        }
+                        IsGetOnlineModeTrying = false;
+
+                        if (await OnlineModeQueryOut())
+                        {
+                            if (UseWebAPI)
+                                VMS_API_Call_Fail_Flag = false;
+                            await RunningStatusReport();
+                        }
+                        else
+                        {
+                            if (!UseWebAPI)
+                                Disconnect();
+                            await Task.Delay(1000);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
                         await Task.Delay(1000);
                     }
+                    finally
+                    {
+                    }
+                }
 
-                }
-                catch (Exception ex)
-                {
-                    OnOnlineModeQuery_T1Timeout?.Invoke(this, EventArgs.Empty);
-                    await Task.Delay(1000);
-                }
-                finally
-                {
-                    await Task.Delay(msgHsDuration);
-                }
-            }
+            });
         }
 
         private async Task<bool> OnlineModeQueryOut()
