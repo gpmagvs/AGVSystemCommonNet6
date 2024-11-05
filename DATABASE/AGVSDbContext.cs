@@ -17,7 +17,6 @@ namespace AGVSystemCommonNet6.DATABASE
     {
 
         private static bool _isDualDbTransactionInterceptorInjuected = false;
-
         public DbSet<AGVSSystemStatus> SysStatus { get; set; }
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<clsTaskDto> Tasks { get; set; }

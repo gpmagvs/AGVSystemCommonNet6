@@ -34,6 +34,10 @@ namespace AGVSystemCommonNet6.DATABASE
             try
             {
                 await _semaphore.WaitAsync();
+
+                if (!AGVSConfigulator.SysConfigs.TransactionToWarRoomDatabase)
+                    return;
+
                 var entries = eventData.Context.ChangeTracker.Entries()
                                                              .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted);
                 foreach (var entry in entries)

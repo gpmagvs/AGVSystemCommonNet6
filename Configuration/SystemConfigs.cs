@@ -49,6 +49,10 @@ namespace AGVSystemCommonNet6.Configuration
         public clsMaterialBufferLevelMonitor MaterialBufferLevelMonitor { get; set; } = new clsMaterialBufferLevelMonitor();
 
         public bool LinkPartsAGVSystem { get; set; } = false;
+        /// <summary>
+        /// 是否攔截資料庫變更並同步至戰情室資料庫
+        /// </summary>
+        public bool TransactionToWarRoomDatabase { get; set; } = false;
 
         public clsOrderState OrderState { get; set; } = new clsOrderState();
 
