@@ -96,14 +96,14 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 //NotifyServiceHelper.INFO($"{agvName} {action} Action Finish Report To AGVS.Alarm Code Response={response.AlarmCode}");
                 return response;
             }
-            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(int tagNumber, int slot, ACTION_TYPE action)
+            public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionStartReport(clsTaskDto orderInfo, ACTION_TYPE action)
             {
                 var agvs_http = GetAGVSHttpHelper();
                 try
                 {
-                    var route = $"/api/Task/LoadUnloadTaskStart?tag={tagNumber}&slot={slot}&action={action}";
+                    var route = $"/api/Task/LoadUnloadTaskStart?action={action}";
                     LOG.INFO($"LoadUnloadActionStartReport start");
-                    clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
+                    clsAGVSTaskReportResponse response = await agvs_http.PostAsync<clsAGVSTaskReportResponse, clsTaskDto>(route, orderInfo);
                     //LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                     return response;
                 }
@@ -113,7 +113,7 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                 }
             }
-            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(int from_Station_Tag, int from_station_slot, int to_Station_Tag, int to_Station_Slot, ACTION_TYPE action, bool isSourceAGV = false)
+            public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(clsTaskDto orderInfo, ACTION_TYPE action, bool isSourceAGV = false)
             {
                 clsAGVSTaskReportResponse response = new clsAGVSTaskReportResponse() { confirm = false };
                 int intRetry = 0;
@@ -122,11 +122,11 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 {
                     try
                     {
-                        var route = $"/api/Task/LDULDOrderStart?from={from_Station_Tag}&FromSlot={from_station_slot}&to={to_Station_Tag}&ToSlot={to_Station_Slot}&action={action}&isSourceAGV={isSourceAGV}";
+                        var route = $"/api/Task/LDULDOrderStart?action={action}&isSourceAGV={isSourceAGV}";
                         LOG.INFO($"StartLDULDOrderReport start");
 
                         var agvs_http = GetAGVSHttpHelper();
-                        response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route, timeout: 10);
+                        response = await agvs_http.PostAsync<clsAGVSTaskReportResponse, clsTaskDto>(route, orderInfo, timeout: 10);
 
                         LOG.INFO($"LoadUnload Order Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                         return response;

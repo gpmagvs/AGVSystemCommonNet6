@@ -94,6 +94,7 @@ namespace AGVSystemCommonNet6.Alarm
         EQ_UNLOAD_REQUEST_ON_BUT_NO_CARGO = 1076,
         EQ_UNLOAD_REQUEST_ON_BUT_POSE_NOT_UP = 10761,
         EQ_LOAD_REQUEST_ON_BUT_POSE_NOT_DOWN = 10762,
+        EQ_CstSteeringMechanism_NOT_DOWN = 10763,
         EQ_UNLOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 1077,
         EQ_LOAD_REQ_BUT_RACK_FULL_OR_EMPTY_IS_UNKNOWN = 1078,
         AGV_Type_Is_Not_Allow_To_Execute_Task_At_Source_Equipment = 1079,
