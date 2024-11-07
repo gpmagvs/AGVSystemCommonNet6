@@ -355,8 +355,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{Task.TaskName}," +
             $"{Task.StateName}," +
             $"{Task.RecieveTime}," +
-            $"{Task.From_Station_Display}," +
-            $"{Task.To_Station_Display}," +
+            $"{Task.From_Station_Display.Replace(",", "_")}," +
+            $"{Task.To_Station_Display.Replace(",", "_")}," +
             $"{Task.From_Slot}," +
             $"{Task.To_Slot}," +
             $"{Task.ActionName}," +
@@ -368,7 +368,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{Task.TotalMileage}," +
             $"{(Task.UnloadTime == DateTime.MinValue ? "" : Task.UnloadTime)}," +
             $"{(Task.LoadTime == DateTime.MinValue ? "" : Task.LoadTime)}," +
-            $"{_GetStationNameByTag(Task.StartLocationTag)}," +
+            $"{_GetStationNameByTag(Task.StartLocationTag).Replace(",", "_")}," +
             $"{(Task.DispatcherName.ToLower() == "vms_idle" ? "" : Task.DispatcherName)}," +
             $"{(Task.State == TASK_RUN_STATUS.CANCEL ? Task.DesignatedAGVName : "")}," +
             $"{_GetFailReason(Task.State, Task.FailureReason)}"));
