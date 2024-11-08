@@ -210,6 +210,8 @@ namespace AGVSystemCommonNet6.Alarm
         TrafficDriveVehicleAwaybutVehicleStatusNotIdle = 602,
         TrafficDriveVehicleAwayButCannotFindAvoidPosition = 603,
         TrafficDriveVehicleAwaybutWaitOtherVehicleReleasePointTimeout = 604,
+        TrafficDriveVehicleAwaybutAppendOrderToDatabaseFail = 605,
+        TrafficDriveVehicleAwaybutVehicleNotOnline = 606,
         DownloadTaskbutActionTypeWrong = 620,
         DownloadTaskbutVehicleNotExist = 621,
         TheTaskNeedtoAssignVehicle = 622,
