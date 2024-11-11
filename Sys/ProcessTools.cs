@@ -11,6 +11,7 @@ namespace AGVSystemCommonNet6.Sys
     {
         public static bool IsProcessRunning(string processName, out List<int> PIDList)
         {
+            Console.WriteLine($"Start Check Process '{processName}' is running or not");
             PIDList = new List<int>();
             Process[] processCnt = Process.GetProcessesByName(processName);
 
