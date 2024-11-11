@@ -9,6 +9,12 @@ namespace AGVSystemCommonNet6.Exceptions
         public VMSExceptionAbstract()
         {
         }
+
+        public VMSExceptionAbstract(ALARMS alarmCode)
+        {
+            Alarm_Code = alarmCode;
+        }
+
         public VMSExceptionAbstract(string message)
         {
             Message = message;
@@ -23,6 +29,11 @@ namespace AGVSystemCommonNet6.Exceptions
         {
 
         }
+
+        public VMSException(ALARMS alarm_Code) : base(alarm_Code)
+        {
+        }
+
         public VMSException(string message) : base(message)
         {
 
