@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.User
 {
+    /// <summary>
+    /// 用戶登入請求模型
+    /// </summary>
     public class UserLoginRequest
     {
         public string Username { get; set; }    
