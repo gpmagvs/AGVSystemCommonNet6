@@ -17,7 +17,6 @@ namespace AGVSystemCommonNet6.DATABASE
     {
 
         private static bool _isDualDbTransactionInterceptorInjuected = false;
-
         public DbSet<AGVSSystemStatus> SysStatus { get; set; }
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<clsTaskDto> Tasks { get; set; }
@@ -44,6 +43,11 @@ namespace AGVSystemCommonNet6.DATABASE
         public DbSet<clsStationStatus> StationStatus { get; set; }
 
         public DbSet<EqUnloadState> EqpUnloadStates { get; set; }
+
+        public DbSet<AGVStatus> EQStatus_AGV { get; set; }
+
+        public DbSet<MainEQStatus> EQStatus_MainEQ { get; set; }
+        public DbSet<RackStatus> EQStatus_Rack { get; set; }
 
         private bool _isWarRoomUse = false;
 

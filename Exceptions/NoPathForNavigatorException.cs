@@ -14,4 +14,18 @@ namespace AGVSystemCommonNet6.Exceptions
 
         public override ALARMS Alarm_Code { get; set; } = ALARMS.TRAFFIC_BLOCKED_NO_PATH_FOR_NAVIGATOR;
     }
+
+
+    public class RotatingOnSpinForbidPtException : VMSExceptionAbstract
+    {
+        public RotatingOnSpinForbidPtException() : base()
+        {
+
+        }
+        public RotatingOnSpinForbidPtException(string message) : base(message)
+        {
+        }
+
+        public override ALARMS Alarm_Code { get; set; } = ALARMS.TRAFFIC_BLOCKED_NO_PATH_FOR_NAVIGATOR;
+    }
 }

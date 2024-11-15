@@ -25,7 +25,7 @@ using static System.Collections.Specialized.BitVector32;
 
 namespace AGVSystemCommonNet6.Microservices.AGVS
 {
-    public static class AGVSSerivces
+    public static partial class AGVSSerivces
     {
         public static string AGVSHostUrl => "http://127.0.0.1:5216";
         private static HttpHelper _agvs_http;

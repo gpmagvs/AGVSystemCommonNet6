@@ -75,6 +75,9 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<clsMaterialInfo>(nameof(database.tables.MaterialInfo));
             await schemaUpdater.EnsureFieldExists<clsStationStatus>(nameof(database.tables.StationStatus));
             await schemaUpdater.EnsureFieldExists<EqUnloadState>(nameof(database.tables.EqpUnloadStates));
+            await schemaUpdater.EnsureFieldExists<AGVStatus>(nameof(database.tables.EQStatus_AGV));
+            await schemaUpdater.EnsureFieldExists<MainEQStatus>(nameof(database.tables.EQStatus_MainEQ));
+            await schemaUpdater.EnsureFieldExists<RackStatus>(nameof(database.tables.EQStatus_Rack));
 
             return true;
         }
