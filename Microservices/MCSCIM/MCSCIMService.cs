@@ -1,4 +1,6 @@
 ﻿using AGVSystemCommonNet6.HttpTools;
+using AGVSystemCommonNet6.Material;
+using EquipmentManagment.WIP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -133,7 +135,29 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             }
             return response;
         }
-
+        public static async Task<(bool confirm, string message)> ShelfStatusChange()
+        {
+            (bool confirm, string message) response = new(false, "[MCSCIMService.TaskReporter] System Error.");
+            using (agvs_http)
+            {
+                try
+                {   object data = new object();
+                    
+                    List<clsRack> clsRacks = new List<clsRack>();
+                    data = clsRacks.ToJson();
+                    var route = $"/api/HostMode/ShelfStatusChange";
+                    string strJson = data.ToJson();
+                    (bool success, string json) v = await agvs_http.PostAsync(route, data);
+                    response.confirm = v.success;
+                    response.message = v.json;
+                }
+                catch (Exception ex)
+                {
+                    response.message = $"[MCSCIMService.TaskReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
+                }
+            }
+            return response;
+        }
 
         internal class ResponseObject
         {
