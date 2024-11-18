@@ -244,6 +244,10 @@ namespace AGVSystemCommonNet6.Alarm
         Charge_Station_Smoke_Detected = 10765,
         REPEATED_TAG_SETTING = 10766,
         Charge_Station_Temperature_High = 10767,
+        /// <summary>
+        /// AGV電池電量失真
+        /// </summary>
+        AGV_Battery_SOC_Distortion = 10768,
         #endregion
     }
 
