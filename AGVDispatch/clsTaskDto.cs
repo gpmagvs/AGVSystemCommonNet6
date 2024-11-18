@@ -46,6 +46,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
     [Index(nameof(FinishTime))]
     public class clsTaskDto
     {
+        [Required]
+        public ACTION_TYPE Action { get; set; }
         public DateTime RecieveTime { get; set; }
 
         [NotMapped]
@@ -131,8 +133,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
         [AllowNull]
         public string TransferToDestineAGVName { get; set; } = string.Empty;
 
-        [Required]
-        public ACTION_TYPE Action { get; set; }
         public string ActionName
         {
             get
