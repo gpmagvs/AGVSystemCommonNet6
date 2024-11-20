@@ -50,7 +50,7 @@ namespace AGVSystemCommonNet6.MAP
         public double Direction_Avoid { get; set; }
 
         public bool UseAvoidThetaWhenStopAtWaitingPointOfEntryRegion { get; set; } = false;
-
+        public bool AlwayTurnToAvoidThetaWhenWaitingTrafficControl { get; set; } = false;
         /// <summary>
         /// 
         /// 二次定位點的停車角度
