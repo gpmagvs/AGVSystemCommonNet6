@@ -5,6 +5,7 @@ using AGVSystemCommonNet6.Availability;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Equipment;
+using AGVSystemCommonNet6.Equipment.AGV;
 using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.Sys;
