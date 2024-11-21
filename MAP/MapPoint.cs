@@ -132,6 +132,11 @@ namespace AGVSystemCommonNet6.MAP
         /// </summary>
         public int PriorityOfTask { get; set; } = 1;
 
+        /// <summary>
+        /// 是否為任務需世界高優先執行的站點
+        /// </summary>
+        public bool IsHighestPriorityStation { get; set; } = false;
+
 
         [JsonIgnore]
         public bool IsCharge
