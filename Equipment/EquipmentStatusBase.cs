@@ -19,6 +19,7 @@ namespace AGVSystemCommonNet6.Equipment
 
 
         [Key]
+        [MaxLength(150)]  // 或其他適當的長度限制
         public string Name { get; set; } = "";
 
         public string Description { get; set; } = "";

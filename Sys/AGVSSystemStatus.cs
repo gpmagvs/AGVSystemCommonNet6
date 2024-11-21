@@ -12,6 +12,7 @@ namespace AGVSystemCommonNet6.Sys
     public class AGVSSystemStatus
     {
         [Key]
+        [MaxLength(150)]  // 或其他適當的長度限制
         public string FieldName { get; set; } = "";
         public string Version { get; set; } = "1.0.0";
         public RUN_MODE RunMode { get; set; } = RUN_MODE.MAINTAIN;

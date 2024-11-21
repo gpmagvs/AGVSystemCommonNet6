@@ -8,14 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.Material
-{   
+{
     [Index(nameof(StationTag))]
     [Index(nameof(StationName))]
     [Index(nameof(MaterialID))]
     public class clsStationStatus
     {
         [Key]
-
+        [MaxLength(150)]  // 或其他適當的長度限制
         public string StationName { get; set; } = "";
 
         public int StationCol { get; set; } = -1;
