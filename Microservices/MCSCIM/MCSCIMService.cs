@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Material;
+using EquipmentManagment.WIP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
