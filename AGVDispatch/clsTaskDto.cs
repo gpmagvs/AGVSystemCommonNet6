@@ -222,6 +222,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
         [Required]
         public int Priority { get; set; } = 50;
 
+        /// <summary>
+        /// 訂單是否具有世界高的權限
+        /// </summary>
+        [Required]
+        public bool IsHighestPriorityTask { get; set; } = false;
+
         public bool IsTrafficControlTask { get; set; } = false;
         /// <summary>
         /// by pass 功能:
