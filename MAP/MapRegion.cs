@@ -45,6 +45,11 @@ namespace AGVSystemCommonNet6.MAP
         /// </summary>
         public double ThetaLimitWhenAGVIdling { get; set; } = 0;
 
+        /// <summary>
+        /// 區域內的路徑僅可供那些Tag為終點時使用,若車輛已在該區域內則不限
+        /// </summary>
+        public List<int> PathOnlyUseForTagsWhenVehicleFromOutsideRegion { get; set; } = new List<int>();
+
         [JsonIgnore]
         public List<string> InRegionVehicles = new List<string>();
 

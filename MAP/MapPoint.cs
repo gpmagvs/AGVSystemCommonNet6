@@ -50,7 +50,7 @@ namespace AGVSystemCommonNet6.MAP
         public double Direction_Avoid { get; set; }
 
         public bool UseAvoidThetaWhenStopAtWaitingPointOfEntryRegion { get; set; } = false;
-
+        public bool AlwayTurnToAvoidThetaWhenWaitingTrafficControl { get; set; } = false;
         /// <summary>
         /// 
         /// 二次定位點的停車角度
@@ -131,6 +131,11 @@ namespace AGVSystemCommonNet6.MAP
         /// 任務權重,僅在工作站點有用
         /// </summary>
         public int PriorityOfTask { get; set; } = 1;
+
+        /// <summary>
+        /// 是否為任務需世界高優先執行的站點
+        /// </summary>
+        public bool IsHighestPriorityStation { get; set; } = false;
 
 
         [JsonIgnore]

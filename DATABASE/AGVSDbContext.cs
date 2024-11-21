@@ -3,6 +3,7 @@ using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Availability;
 using AGVSystemCommonNet6.Equipment;
+using AGVSystemCommonNet6.Equipment.AGV;
 using AGVSystemCommonNet6.Maintainance;
 using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.StopRegion;
@@ -48,6 +49,8 @@ namespace AGVSystemCommonNet6.DATABASE
 
         public DbSet<MainEQStatus> EQStatus_MainEQ { get; set; }
         public DbSet<RackStatus> EQStatus_Rack { get; set; }
+
+        public DbSet<DeepChargeRecord> DeepChargeRecords { get; set; }
 
         private bool _isWarRoomUse = false;
 

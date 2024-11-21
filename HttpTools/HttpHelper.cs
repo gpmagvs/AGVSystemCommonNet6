@@ -15,42 +15,23 @@ namespace AGVSystemCommonNet6.HttpTools
         }
         public HttpClient http_client { get; private set; }
         public readonly string baseUrl;
-        private int _timeout_sec = 5;
         private bool disposedValue;
         public string Comment { get; set; } = "";
         private NLog.Logger logger = LogManager.GetLogger("HttpHelperLog");
-        public int timeout_sec
-        {
-            get => _timeout_sec;
-            set
-            {
-                if (_timeout_sec != value)
-                {
-                    logger.Info($"[{Comment}:{baseUrl}] Change timeout_sec from {_timeout_sec} to {value},Dispose Old HttpClinet instance  and New HttpClinet instance created");
-                    _timeout_sec = value;
-                    http_client?.Dispose();
-                    http_client = new HttpClient()
-                    {
-                        Timeout = TimeSpan.FromSeconds(value),
-                        BaseAddress = new Uri(baseUrl)
-                    };
-                }
-            }
-        }
-        public HttpHelper(string baseUrl, int timeout_sec = 3, string comment = "")
+
+        public HttpHelper(string baseUrl, string comment = "")
         {
             this.baseUrl = baseUrl;
-            this.timeout_sec = timeout_sec;
             Comment = comment;
             http_client = new HttpClient()
             {
-                Timeout = TimeSpan.FromSeconds(timeout_sec),
+                Timeout = TimeSpan.FromSeconds(60),
                 BaseAddress = new Uri(baseUrl)
             };
             logger.Info($"[{Comment}:{baseUrl}] HttpClinet instance created");
 
         }
-        public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 3)
+        public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 5)
         {
             string contentDataJson = string.Empty;
             string url = this.baseUrl + api_route;
@@ -59,9 +40,8 @@ namespace AGVSystemCommonNet6.HttpTools
             var content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
             try
             {
-                Stopwatch sw = Stopwatch.StartNew();
-                timeout_sec = timeout;
-                using HttpResponseMessage response = await http_client.PostAsync(api_route, content);
+                using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
+                using HttpResponseMessage response = await http_client.PostAsync(api_route, content, cts.Token);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
@@ -88,7 +68,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 3)
+        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 5)
         {
             string contentDataJson = string.Empty;
             string url = this.baseUrl + (this.baseUrl.Last() == '/' ? "" : "/") + api_route;
@@ -97,8 +77,8 @@ namespace AGVSystemCommonNet6.HttpTools
             StringContent content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
             try
             {
-                timeout_sec = timeout;
-                using HttpResponseMessage response = await http_client.PostAsync(api_route, content);
+                using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
+                using HttpResponseMessage response = await http_client.PostAsync(api_route, content, cts.Token);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
@@ -126,14 +106,14 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 3)
+        public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 5)
         {
             string jsonContent = "";
             try
             {
                 string url = this.baseUrl + $"{api_route}";
-                timeout_sec = timeout;
-                using HttpResponseMessage response = await http_client.GetAsync(api_route);
+                using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
+                using HttpResponseMessage response = await http_client.GetAsync(api_route, cts.Token);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     jsonContent = await response.Content.ReadAsStringAsync();
@@ -154,14 +134,14 @@ namespace AGVSystemCommonNet6.HttpTools
                 throw ex;
             }
         }
-        public async Task<string> GetStringAsync(string api_route, int timeout = 3)
+        public async Task<string> GetStringAsync(string api_route, int timeout = 5)
         {
             string str_result = "";
             try
             {
                 string url = this.baseUrl + $"{api_route}";
-                timeout_sec = timeout;
-                using HttpResponseMessage response = await http_client.GetAsync(api_route);
+                using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
+                using HttpResponseMessage response = await http_client.GetAsync(api_route, cts.Token);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     str_result = await response.Content.ReadAsStringAsync();

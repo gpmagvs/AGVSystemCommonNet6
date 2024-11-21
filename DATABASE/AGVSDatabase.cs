@@ -5,6 +5,7 @@ using AGVSystemCommonNet6.Availability;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Equipment;
+using AGVSystemCommonNet6.Equipment.AGV;
 using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.Sys;
@@ -34,9 +35,11 @@ namespace AGVSystemCommonNet6.DATABASE
                 using (AGVSDatabase database = new AGVSDatabase())
                 {
                     database.dbContext.Database.EnsureCreated();
+                    await database.SaveChanges();
                     try
                     {
                         await DatabaseColumnCheck(database);
+                        await TablePrimaryKeyCheck(database);
                     }
                     catch (Exception ex)
                     {
@@ -59,6 +62,143 @@ namespace AGVSystemCommonNet6.DATABASE
                 throw ex;
             }
         }
+
+        private static async Task TablePrimaryKeyCheck(AGVSDatabase database)
+        {
+            try
+            {
+                var checkPKStatus = @"
+                                    SELECT 
+                                        t.name AS TableName,
+                                        CASE WHEN pk.name IS NULL THEN 'No PK' ELSE 'Has PK' END AS PKStatus,
+                                        pk.name AS PKName
+                                    FROM sys.tables t
+                                    LEFT JOIN sys.key_constraints pk 
+                                        ON t.object_id = pk.parent_object_id 
+                                        AND pk.type = 'PK'
+                                    ORDER BY t.name;
+                                ";
+
+                var tablesNeedingPK = new List<string>();
+
+                using (var command = database.dbContext.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = checkPKStatus;
+
+                    database.dbContext.Database.OpenConnection();
+
+                    using (var result = command.ExecuteReader())
+                    {
+                        while (result.Read())
+                        {
+                            var tableName = result.GetString(0);
+                            var pkStatus = result.GetString(1);
+                            var pkName = result.IsDBNull(2) ? "N/A" : result.GetString(2);
+
+                            Debug.WriteLine($"Table: {tableName}, Status: {pkStatus}, PK Name: {pkName}");
+
+                            if (pkStatus == "No PK")
+                            {
+                                tablesNeedingPK.Add(tableName);
+                            }
+                        }
+                    }
+                }
+
+                // 修復缺少主鍵的表
+                if (tablesNeedingPK.Any())
+                {
+                    foreach (var tableName in tablesNeedingPK)
+                    {
+                        string pkColumnName = GetPrimaryKeyColumnName(tableName); // 根據表名確定主鍵列
+
+                        try
+                        {
+                            if (!string.IsNullOrEmpty(pkColumnName))
+                            {
+                                var alterTableSql = $@"
+                                                IF NOT EXISTS (SELECT * FROM sys.key_constraints WHERE type = 'PK' AND OBJECT_NAME(parent_object_id) = '{tableName}')
+                                                BEGIN
+                                                    ALTER TABLE {tableName}
+                                                    ADD CONSTRAINT PK_{tableName} PRIMARY KEY ({pkColumnName});
+                                                END
+                                            ";
+                                database.dbContext.Database.ExecuteSqlRaw(alterTableSql);
+                                Debug.WriteLine($"Added primary key constraint to table {tableName} on column {pkColumnName}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\n\n");
+                            Console.WriteLine($"錯誤訊息:{ex.Message}");
+                            Console.WriteLine("\n\n");
+                            Console.WriteLine($"Oooooooops! 操作資料表{tableName} 檢查確認主鍵發生錯誤，需使用SSMS或其他資料庫工具將 '{pkColumnName}'欄位設定為[不允許Null]。 \n也可以在資料庫工具中直接將 '{pkColumnName}' 欄位設為 Primary Key.");
+                            Console.WriteLine("\n\n");
+                            Console.WriteLine("按下任意按鍵繼續");
+                            Console.ReadLine();
+                            Environment.Exit(1);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(":" + ex.Message);
+            }
+        }
+
+        // 輔助方法：根據表名確定主鍵列
+        private static string GetPrimaryKeyColumnName(string tableName)
+        {
+            // 這裡定義每個表的主鍵列名
+            switch (tableName)
+            {
+                case "SysStatus":
+                    return "FieldName";
+                case "Users":
+                    return "UserName";
+                case "Tasks":
+                    return "TaskName";
+                case "AgvStates":
+                    return "AGV_Name";
+                case "SystemAlarms":
+                    return "Time";
+                case "Availabilitys":
+                    return "KeyStr";
+                case "RealTimeAvailabilitys":
+                    return "StartTime";
+                case "TaskTrajecotroyStores":
+                    return "TaskName";
+                case "InstrumentMeasureResult":
+                    return "StartTime";
+                case "StopRegionData":
+                    return "StartTime";
+                case "PointPassTime":
+                    return "Time";
+                case "VehicleMaintain":
+                    return "VehicleMaintainId";
+                case "MaterialInfo":
+                    return "RecordTime";
+                case "StationStatus":
+                    return "StationName";
+                case "EqpUnloadStates":
+                    return "StartWaitUnloadTime";
+
+                case "EQStatus_AGV":
+                    return "Name";
+                case "EQStatus_MainEQ":
+                    return "Name";
+                case "EQStatus_Rack":
+                    return "Name";
+                case "DeepChargeRecords":
+                    return "OrderRecievedTime";
+                default:
+                    Debug.WriteLine($"Warning: No primary key mapping defined for table {tableName}");
+                    return null;
+            }
+        }
         private static async Task<bool> DatabaseColumnCheck(AGVSDatabase database)
         {
             SQLNativ.DatabaseSchemaUpdater schemaUpdater = new SQLNativ.DatabaseSchemaUpdater(AGVSConfigulator.SysConfigs.DBConnection);
@@ -78,6 +218,7 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<AGVStatus>(nameof(database.tables.EQStatus_AGV));
             await schemaUpdater.EnsureFieldExists<MainEQStatus>(nameof(database.tables.EQStatus_MainEQ));
             await schemaUpdater.EnsureFieldExists<RackStatus>(nameof(database.tables.EQStatus_Rack));
+            await schemaUpdater.EnsureFieldExists<DeepChargeRecord>(nameof(database.tables.DeepChargeRecords));
 
             return true;
         }
@@ -156,5 +297,6 @@ namespace AGVSystemCommonNet6.DATABASE
                 op_user.WebFunctionPermissionsJson = opPermissionJson;
             }
         }
+
     }
 }

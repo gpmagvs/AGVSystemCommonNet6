@@ -440,9 +440,11 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 return ACTION_TYPE.Unknown;
             }
         }
-        public List<clsTaskDto> GetTasksByTimeInterval(DateTime start, DateTime end)
+        public List<clsTaskDto> GetTasksByTimeInterval(DateTime start, DateTime end, string? taskIDFileter = "")
         {
-            return TaskSet.Where(tk => tk.RecieveTime >= start && tk.FinishTime <= end).ToList();
+            bool taskIDFilterRequired = !string.IsNullOrEmpty(taskIDFileter);
+            string? _idFilterLowwer = taskIDFileter?.ToLower();
+            return TaskSet.Where(tk => tk.RecieveTime >= start && tk.FinishTime <= end && (taskIDFilterRequired ? tk.TaskName.ToLower().Contains(_idFilterLowwer) : true)).ToList();
         }
 
         public void SetRunningTaskWait()

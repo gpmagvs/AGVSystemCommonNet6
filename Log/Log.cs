@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Drawing;
-using WebSocketSharp;
+﻿using System.Diagnostics;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace AGVSystemCommonNet6.Log
@@ -24,7 +20,7 @@ namespace AGVSystemCommonNet6.Log
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             await TRACE(info, caller_class_name, show_console, color);
         }
-        public static async Task INFO(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White,string NewLogFileEndStr="")
+        public static async Task INFO(string info, bool show_console = true, ConsoleColor color = ConsoleColor.White, string NewLogFileEndStr = "")
         {
             var caller_class_name = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name; ;
             await _logger.LogAsync(new LogItem(LogLevel.Information, info, show_console, color, NewLogFileEndStr), caller_class_name);

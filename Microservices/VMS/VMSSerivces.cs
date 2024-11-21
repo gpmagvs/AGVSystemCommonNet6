@@ -93,7 +93,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                     Source = ALARM_SOURCE.AGVS,
 
                 };
-                VMSAliveCheckHttp = new HttpHelper(VMSHostUrl, 4, comment: "VMS Alive Check");
+                VMSAliveCheckHttp = new HttpHelper(VMSHostUrl, comment: "VMS Alive Check");
                 while (true)
                 {
                     await Task.Delay(5000);
