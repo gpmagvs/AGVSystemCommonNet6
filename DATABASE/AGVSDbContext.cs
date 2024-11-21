@@ -50,6 +50,8 @@ namespace AGVSystemCommonNet6.DATABASE
         public DbSet<MainEQStatus> EQStatus_MainEQ { get; set; }
         public DbSet<RackStatus> EQStatus_Rack { get; set; }
 
+        public DbSet<DeepChargeRecord> DeepChargeRecords { get; set; }
+
         private bool _isWarRoomUse = false;
 
         public AGVSDbContext(DbContextOptions<AGVSDbContext> options, bool isWarRoomUse = false)
