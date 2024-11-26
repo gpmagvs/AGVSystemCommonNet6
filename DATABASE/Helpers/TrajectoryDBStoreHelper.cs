@@ -11,6 +11,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
     public class TrajectoryDBStoreHelper
     {
+        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         public TrajectoryDBStoreHelper()
         {
         }
@@ -30,37 +31,50 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         }
         public async Task<(bool success, string error_msg)> StoreTrajectory(string taskID, string agvName, string trajRecordjson)
         {
-
-            using (var db = new AGVSDatabase())
+            try
             {
-                try
+                await semaphoreSlim.WaitAsync();
+                using (var db = new AGVSDatabase())
                 {
-                    clsTaskTrajecotroyStore? existData = db.tables.TaskTrajecotroyStores.FirstOrDefault(t => t.TaskName == taskID);
-
-                    if (existData == null) //新增
+                    try
                     {
-                        db.tables.TaskTrajecotroyStores.Add(new clsTaskTrajecotroyStore
+                        clsTaskTrajecotroyStore? existData = db.tables.TaskTrajecotroyStores.FirstOrDefault(t => t.TaskName == taskID);
+
+                        if (existData == null) //新增
                         {
-                            TaskName = taskID,
-                            AGVName = agvName,
-                            CoordinationsJson = trajRecordjson
-                        });
+                            db.tables.TaskTrajecotroyStores.Add(new clsTaskTrajecotroyStore
+                            {
+                                TaskName = taskID,
+                                AGVName = agvName,
+                                CoordinationsJson = trajRecordjson
+                            });
+                        }
+                        else
+                        {
+                            existData.AGVName = agvName;
+                            existData.CoordinationsJson = trajRecordjson;
+
+                        }
+                        await db.SaveChanges();
+                        return (true, "");
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        existData.AGVName = agvName;
-                        existData.CoordinationsJson = trajRecordjson;
-
+                        return (false, ex.Message);
                     }
-                    await db.SaveChanges();
-                    return (true, "");
-                }
-                catch (Exception ex)
-                {
-                    return (false, ex.Message);
-                }
 
+                }
             }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+
         }
 
         public async Task<(bool success, string error_msg)> StoreTrajectory(string taskID, string agvName, double x, double y, double theta)
