@@ -7,83 +7,72 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.Microservices.MCS
 {
-    public class MCSCIMService
+    public partial class MCSCIMService
     {
-        public static string MCSCIMUrl => "http://127.0.0.1:7107";
-        private static HttpHelper agvs_http => new HttpHelper(MCSCIMUrl);
+        public static string MCSCIMUrl => "http://localhost:7107";
+
+        private static HttpHelper _http = new HttpHelper(MCSCIMUrl);
         public static async Task<(bool confirm, string message)> Online()
         {
             (bool confirm, string message) response = new(false, "[Online] Fail:");
-            using (agvs_http)
+            try
             {
-                try
-                {
-                    var route = $"/api/HostMode/OnlineLocal";
-                    ResponseObject v = await agvs_http.GetAsync<ResponseObject>(route);
-                    response.confirm = v.confirm;
-                    response.message = v.message;
-                }
-                catch (Exception ex)
-                {
-                    response.message = $"[MCSCIMService.Online] {agvs_http.http_client.BaseAddress} {ex.Message}";
-                }
+                var route = $"/api/HostMode/OnlineLocal";
+                ResponseObject v = await _http.GetAsync<ResponseObject>(route);
+                response.confirm = v.confirm;
+                response.message = v.message;
+            }
+            catch (Exception ex)
+            {
+                response.message = $"[MCSCIMService.Online] {_http.http_client.BaseAddress} {ex.Message}";
             }
             return response;
         }
         public static async Task<(bool confirm, string message)> Offline()
         {
             (bool confirm, string message) response = new(false, "[Offline] Fail:");
-            using (agvs_http)
+            try
             {
-                try
-                {
-                    var route = $"/api/HostMode/OFFline";
-                    ResponseObject v = await agvs_http.GetAsync<ResponseObject>(route);
-                    response.confirm = v.confirm;
-                    response.message = v.message;
-                }
-                catch (Exception ex)
-                {
-                    response.message += ex.Message.ToString();
-                }
+                var route = $"/api/HostMode/OFFline";
+                ResponseObject v = await _http.GetAsync<ResponseObject>(route);
+                response.confirm = v.confirm;
+                response.message = v.message;
+            }
+            catch (Exception ex)
+            {
+                response.message += ex.Message.ToString();
             }
             return response;
         }
         public static async Task<(bool confirm, string message)> OnlineLocalToOnlineRemote()
         {
             (bool confirm, string message) response = new(false, "[OnlineLocalToOnlineRemote] Fail");
-            using (agvs_http)
+            try
             {
-                try
-                {
-                    var route = $"/api/HostMode/OnlineLoacl2OnlineRemote";
-                    ResponseObject v = await agvs_http.GetAsync<ResponseObject>(route);
-                    response.confirm = v.confirm;
-                    response.message = v.message;
-                }
-                catch (Exception ex)
-                {
-                    response.message += ex.ToString();
-                }
+                var route = $"/api/HostMode/OnlineLoacl2OnlineRemote";
+                ResponseObject v = await _http.GetAsync<ResponseObject>(route);
+                response.confirm = v.confirm;
+                response.message = v.message;
+            }
+            catch (Exception ex)
+            {
+                response.message += ex.ToString();
             }
             return response;
         }
         public static async Task<(bool confirm, string message)> OnlineRemote2OnlineLocal()
         {
             (bool confirm, string message) response = new(false, "[OnlineRemote2OnlineLocal] Fail");
-            using (agvs_http)
+            try
             {
-                try
-                {
-                    var route = $"/api/HostMode/OnlineRemote2OnlineLocal";
-                    ResponseObject v = await agvs_http.GetAsync<ResponseObject>(route);
-                    response.confirm = v.confirm;
-                    response.message = v.message;
-                }
-                catch (Exception ex)
-                {
-                    response.message += ex.ToString();
-                }
+                var route = $"/api/HostMode/OnlineRemote2OnlineLocal";
+                ResponseObject v = await _http.GetAsync<ResponseObject>(route);
+                response.confirm = v.confirm;
+                response.message = v.message;
+            }
+            catch (Exception ex)
+            {
+                response.message += ex.ToString();
             }
             return response;
         }
@@ -96,40 +85,34 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         public static async Task<(bool confirm, string message)> TaskReporter(object data)
         {
             (bool confirm, string message) response = new(false, "[MCSCIMService.TaskReporter] System Error.");
-            using (agvs_http)
+            try
             {
-                try
-                {
-                    var route = $"/api/HostMode/TaskCollecter";
-                    string strJson = data.ToJson();
-                    (bool success, string json) v = await agvs_http.PostAsync(route, data);
-                    response.confirm = v.success;
-                    response.message = v.json;
-                }
-                catch (Exception ex)
-                {
-                    response.message = $"[MCSCIMService.TaskReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
-                }
+                var route = $"/api/HostMode/TaskCollecter";
+                string strJson = data.ToJson();
+                (bool success, string json) v = await _http.PostAsync(route, data);
+                response.confirm = v.success;
+                response.message = v.json;
+            }
+            catch (Exception ex)
+            {
+                response.message = $"[MCSCIMService.TaskReporter] Report to: {_http.http_client.BaseAddress} with exmessage: {ex.Message}";
             }
             return response;
         }
         public static async Task<(bool confirm, string message)> AlarmReporter(object data)
         {
             (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
-            using (agvs_http)
+            try
             {
-                try
-                {
-                    var route = $"/api/HostMode/AlarmReporter";
-                    string strJson = data.ToJson();
-                    (bool success, string json) v = await agvs_http.PostAsync(route, data);
-                    response.confirm = v.success;
-                    response.message = v.json;
-                }
-                catch (Exception ex)
-                {
-                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
-                }
+                var route = $"/api/HostMode/AlarmReporter";
+                string strJson = data.ToJson();
+                (bool success, string json) v = await _http.PostAsync(route, data);
+                response.confirm = v.success;
+                response.message = v.json;
+            }
+            catch (Exception ex)
+            {
+                response.message = $"[MCSCIMService.AlarmReporter] Report to: {_http.http_client.BaseAddress} with exmessage: {ex.Message}";
             }
             return response;
         }
