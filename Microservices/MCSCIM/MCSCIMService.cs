@@ -1,4 +1,6 @@
 ﻿using AGVSystemCommonNet6.HttpTools;
+using AGVSystemCommonNet6.Material;
+using EquipmentManagment.WIP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,7 +119,44 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             return response;
         }
 
-
+        public static async Task<(bool confirm, string message)> ShelfStatusChange(object wipData)
+        {
+            (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
+            using (agvs_http)
+            {
+                try
+                {
+                    var route = $"/api/HostMode/ShelfStatusChange";
+                    (bool success, string json) v = await agvs_http.PostAsync(route, wipData);
+                    response.confirm = v.success;
+                    response.message = v.json;
+                }
+                catch (Exception ex)
+                {
+                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
+                }
+            }
+            return response;
+        }
+        public static async Task<(bool confirm, string message)> ZoneCapacityChange(object wipData)
+        {
+            (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
+            using (agvs_http)
+            {
+                try
+                {
+                    var route = $"/api/HostMode/ZoneCapacityChange";
+                    (bool success, string json) v = await agvs_http.PostAsync(route, wipData);
+                    response.confirm = v.success;
+                    response.message = v.json;
+                }
+                catch (Exception ex)
+                {
+                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
+                }
+            }
+            return response;
+        }
         internal class ResponseObject
         {
             public bool confirm { get; set; } = false;
