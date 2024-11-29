@@ -21,6 +21,7 @@ namespace AGVSystemCommonNet6
     {
         [Key]
         public string AGV_Name { get; set; }
+        public string AGV_ID { get; set; } = "";
         public bool Enabled { get; set; }
         public string AGV_Description { get; set; } = "";
         /// <summary>
