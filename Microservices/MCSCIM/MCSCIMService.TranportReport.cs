@@ -52,19 +52,19 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         }
         public static async Task TransferAbortInitiatedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferAbortInitiated?CommandID={commandDto.CommandID} &CarrierID= {commandDto.CarrierID} &CarrierLoc= {commandDto.CarrierLoc} &CarrierZoneName= {commandDto.CarrierZoneName} &Dest= {commandDto.Dest}", null);
+            await _http.PostAsync($"/api/TransportEventReport/TransferAbortInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
         }
         public static async Task TransferCancelInitiatedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferCancelInitiated?CommandID={commandDto.CommandID} &CarrierID= {commandDto.CarrierID} &CarrierLoc= {commandDto.CarrierLoc} &CarrierZoneName= {commandDto.CarrierZoneName} &Dest= {commandDto.Dest}", null);
+            await _http.PostAsync($"/api/TransportEventReport/TransferCancelInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
         }
         public static async Task TransferAbortFailedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferAbortFailed?CommandID={commandDto.CommandID}  &CarrierID=  {commandDto.CarrierID}  &CarrierLoc=  {commandDto.CarrierLoc}  &CarrierZoneName=  {commandDto.CarrierZoneName}  &Dest=  {commandDto.Dest}", null);
+            await _http.PostAsync($"/api/TransportEventReport/TransferAbortFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
         }
         public static async Task TransferCancelFailedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferCancelFailed?CommandID={commandDto.CommandID}  &CarrierID=  {commandDto.CarrierID}  &CarrierLoc=  {commandDto.CarrierLoc}  &CarrierZoneName=  {commandDto.CarrierZoneName}  &Dest=  {commandDto.Dest}", null);
+            await _http.PostAsync($"/api/TransportEventReport/TransferCancelFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName=  {commandDto.CarrierZoneName}  &Dest=  {commandDto.Dest}", null);
         }
     }
 }
