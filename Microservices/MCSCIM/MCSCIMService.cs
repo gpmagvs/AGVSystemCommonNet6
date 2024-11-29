@@ -122,18 +122,18 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         public static async Task<(bool confirm, string message)> ShelfStatusChange(object wipData)
         {
             (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
-            using (agvs_http)
+            using (_http)
             {
                 try
                 {
                     var route = $"/api/HostMode/ShelfStatusChange";
-                    (bool success, string json) v = await agvs_http.PostAsync(route, wipData);
+                    (bool success, string json) v = await _http.PostAsync(route, wipData);
                     response.confirm = v.success;
                     response.message = v.json;
                 }
                 catch (Exception ex)
                 {
-                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
+                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {_http.http_client.BaseAddress} with exmessage: {ex.Message}";
                 }
             }
             return response;
@@ -141,18 +141,37 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         public static async Task<(bool confirm, string message)> ZoneCapacityChange(object wipData)
         {
             (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
-            using (agvs_http)
+            using (_http)
             {
                 try
                 {
                     var route = $"/api/HostMode/ZoneCapacityChange";
-                    (bool success, string json) v = await agvs_http.PostAsync(route, wipData);
+                    (bool success, string json) v = await _http.PostAsync(route, wipData);
                     response.confirm = v.success;
                     response.message = v.json;
                 }
                 catch (Exception ex)
                 {
-                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {agvs_http.http_client.BaseAddress} with exmessage: {ex.Message}";
+                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {_http.http_client.BaseAddress} with exmessage: {ex.Message}";
+                }
+            }
+            return response;
+        }
+        public static async Task<(bool confirm, string message)> GetRackData(object wipData)
+        {
+            (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
+            using (_http)
+            {
+                try
+                {
+                    var route = $"/api/HostMode/GetRackData";
+                    (bool success, string json) v = await _http.PostAsync(route, wipData);
+                    response.confirm = v.success;
+                    response.message = v.json;
+                }
+                catch (Exception ex)
+                {
+                    response.message = $"[MCSCIMService.AlarmReporter] Report to: {_http.http_client.BaseAddress} with exmessage: {ex.Message}";
                 }
             }
             return response;
