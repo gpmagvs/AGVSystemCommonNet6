@@ -246,6 +246,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// </summary>
         public int transfer_task_stage { get; set; } = 0;
 
+
+        public string soucePortID { get; set; } = "";
+        public string sourceZoneID { get; set; } = "";
+        public string destinePortID { get; set; } = "";
+        public string destineZoneID { get; set; } = "";
+
         public void Update(clsTaskDto dto)
         {
             if (dto.RecieveTime != default)
