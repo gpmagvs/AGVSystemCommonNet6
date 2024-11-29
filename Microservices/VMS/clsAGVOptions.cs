@@ -35,6 +35,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         public List<int> List_ChargeStation { get; set; } = new List<int>();
 
         public clsBatteryOptions BatteryOptions { get; set; } = new clsBatteryOptions();
+
+        public string AgvID { get; set; } = "";
     }
 
     public class clsBatteryOptions
