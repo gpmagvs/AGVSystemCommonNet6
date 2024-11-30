@@ -11,5 +11,8 @@ namespace AGVSystemCommonNet6.Microservices.MCSCIM
         public string DeviceID { get; set; } = "2F_AGVC02";
         public string CarrierLOCPrefixName { get; set; } = "ABFRACK005";
         public string SystemID { get; set; } = "022";
+
+        public int UnknowTrayIDFlowNoUsed { get; set; } = 0;
+        public int UnknowRackIDFlowNoUsed { get; set; } = 0;
     }
 }
