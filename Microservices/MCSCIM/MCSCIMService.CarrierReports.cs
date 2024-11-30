@@ -57,7 +57,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task CarrierInstallCompletedReport(string CarrierID, string CarrierLoc, string CarrierZoneName, ushort HandoffType)
         {
-            await _http.PostAsync<object, object>($"/api/Carrier/CarrierInstallCompleted?CarrierID=${CarrierID}&CarrierLoc=${CarrierLoc}&CarrierZoneName=${CarrierZoneName}&HandoffType=${HandoffType}",null);
+            await _http.PostAsync<object, object>($"/api/Carrier/CarrierInstallCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}",null,8);
         }
         /// <summary>
         /// [CEID=152]
@@ -69,7 +69,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task CarrierRemoveCompletedReport(string CarrierID, string CarrierLoc, string CarrierZoneName, ushort HandoffType)
         {
-            await _http.PostAsync<object, object>($"/api/Carrier/CarrierRemoveCompleted?CarrierID=${CarrierID}&CarrierLoc=${CarrierLoc}&CarrierZoneName=${CarrierZoneName}&HandoffType=${HandoffType}",null);
+            await _http.PostAsync<object, object>($"/api/Carrier/CarrierRemoveCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}",null,8);
         }
     }
 }
