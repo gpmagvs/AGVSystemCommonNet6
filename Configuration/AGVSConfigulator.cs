@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using NLog;
 
 namespace AGVSystemCommonNet6.Configuration
 {
@@ -14,6 +15,10 @@ namespace AGVSystemCommonNet6.Configuration
         public static SystemConfigs SysConfigs { get; set; }
 
         private static FileSystemWatcher SysConfigFileWatcher;
+
+        private static SemaphoreSlim SysConfigFIleSemaphoreSlim = new SemaphoreSlim(1, 1);
+
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public static void LoadConfig()
         {
@@ -68,6 +73,47 @@ namespace AGVSystemCommonNet6.Configuration
         {
             File.WriteAllText(_configFilePath, JsonConvert.SerializeObject(config, Formatting.Indented));
         }
+
+        public static async Task<int> GetTrayUnknowFlowNumber()
+        {
+            try
+            {
+                await SysConfigFIleSemaphoreSlim.WaitAsync();
+                SysConfigs.SECSGem.UnknowTrayIDFlowNumberUsed += 1;
+                Save(SysConfigs);
+                return SysConfigs.SECSGem.UnknowTrayIDFlowNumberUsed;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                return 0;
+            }
+            finally
+            {
+                SysConfigFIleSemaphoreSlim.Release();
+            }
+        }
+
+        public static async Task<int> GetRackUnknowFlowNumber()
+        {
+            try
+            {
+                await SysConfigFIleSemaphoreSlim.WaitAsync();
+                SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed += 1;
+                Save(SysConfigs);
+                return SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                return 0;
+            }
+            finally
+            {
+                SysConfigFIleSemaphoreSlim.Release();
+            }
+        }
+
     }
 }
 
