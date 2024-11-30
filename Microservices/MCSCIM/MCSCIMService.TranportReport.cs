@@ -66,5 +66,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             await _http.PostAsync($"/api/TransportEventReport/TransferCancelFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName=  {commandDto.CarrierZoneName}  &Dest=  {commandDto.Dest}", null);
         }
+
+
     }
 }
