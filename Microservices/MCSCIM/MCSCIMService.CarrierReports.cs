@@ -46,12 +46,12 @@ namespace AGVSystemCommonNet6.Microservices.MCS
 
         }
 
-        public static async Task<(bool confirm, string message)> ShelfStatusChange(List<ZoneData> zoneData)
+        public static async Task<(bool confirm, string message)> ShelfStatusChange(ZoneData zoneData)
         {
             (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
             try
             {
-                var route = $"/api/HostMode/ShelfStatusChange";
+                var route = $"/api/Carrier/ShelfStatusChange";
                 (bool success, string json) v = await _http.PostAsync(route, zoneData);
                 response.confirm = v.success;
                 response.message = v.json;
@@ -62,13 +62,13 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             }
             return response;
         }
-        public static async Task<(bool confirm, string message)> ZoneCapacityChange(object wipData)
+        public static async Task<(bool confirm, string message)> ZoneCapacityChange(ZoneData zoneData)
         {
             (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
             try
             {
-                var route = $"/api/HostMode/ZoneCapacityChange";
-                (bool success, string json) v = await _http.PostAsync(route, wipData);
+                var route = $"/api/Carrier/ZoneCapacityChange";
+                (bool success, string json) v = await _http.PostAsync(route, zoneData);
                 response.confirm = v.success;
                 response.message = v.json;
             }
