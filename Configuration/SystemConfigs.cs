@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AGVSystemCommonNet6.Microservices.MCSCIM;
+using Newtonsoft.Json;
 using Nini.Config;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,8 @@ namespace AGVSystemCommonNet6.Configuration
         public bool TransactionToWarRoomDatabase { get; set; } = false;
 
         public clsOrderState OrderState { get; set; } = new clsOrderState();
+
+        public SECSConfiguration SECSGem { get; set; } = new SECSConfiguration();
 
         [JsonIgnore]
         public Dictionary<PATH_ENUMS, string> PATHES_STORE
