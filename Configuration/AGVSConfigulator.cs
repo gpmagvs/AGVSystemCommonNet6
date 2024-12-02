@@ -74,7 +74,19 @@ namespace AGVSystemCommonNet6.Configuration
             File.WriteAllText(_configFilePath, JsonConvert.SerializeObject(config, Formatting.Indented));
         }
 
-        public static async Task<int> GetTrayUnknowFlowNumber()
+        public static async Task<string> GetTrayUnknownFlowID()
+        {
+            int flowNumber = await AGVSConfigulator.GetTrayUnknowFlowNumber();
+            string unknowCargoID = $"TUN{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            return unknowCargoID;
+        }
+        public static async Task<string> GetRackUnknownFlowID()
+        {
+            int flowNumber = await AGVSConfigulator.GetRackUnknowFlowNumber();
+            string unknowCargoID = $"UN{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            return unknowCargoID;
+        }
+        private static async Task<int> GetTrayUnknowFlowNumber()
         {
             try
             {
@@ -94,7 +106,7 @@ namespace AGVSystemCommonNet6.Configuration
             }
         }
 
-        public static async Task<int> GetRackUnknowFlowNumber()
+        private static async Task<int> GetRackUnknowFlowNumber()
         {
             try
             {
