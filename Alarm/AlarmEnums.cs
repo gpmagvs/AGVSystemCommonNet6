@@ -248,6 +248,7 @@ namespace AGVSystemCommonNet6.Alarm
         /// AGV電池電量失真
         /// </summary>
         AGV_Battery_SOC_Distortion = 10768,
+        UNLOAD_BUT_CARGO_ID_READ_FAIL = 10769,
         #endregion
     }
 
