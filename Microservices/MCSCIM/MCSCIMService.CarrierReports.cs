@@ -18,7 +18,11 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         public class ZoneData
         {
             public string ZoneName { get; set; } = string.Empty;
-            public int ZoneCapacity => LocationStatusList.Count(p => p.DisabledStatus == 0 && !p.IsCargoExist);
+
+            /// <summary>
+            /// 可用容量
+            /// </summary>
+            public int ZoneCapacity => LocationStatusList.Count(p => p.DisabledStatus == 0 && !p.IsCargoExist && string.IsNullOrEmpty( p.CarrierID));
             public int ZoneTotalSize => LocationStatusList.Count;
 
             /// <summary>
