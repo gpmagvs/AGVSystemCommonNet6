@@ -86,6 +86,13 @@ namespace AGVSystemCommonNet6.Configuration
             string unknowCargoID = $"UN{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
             return unknowCargoID;
         }
+        public static async Task<string> GetDoubleUnknownFlowID()
+        {
+            int flowNumber = await AGVSConfigulator.GetRackDoubleUnknowFlowNumber();
+            string unknowCargoID = $"DU{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            return unknowCargoID;
+        }
+
         private static async Task<int> GetTrayUnknowFlowNumber()
         {
             try
@@ -114,6 +121,26 @@ namespace AGVSystemCommonNet6.Configuration
                 SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed += 1;
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                return 0;
+            }
+            finally
+            {
+                SysConfigFIleSemaphoreSlim.Release();
+            }
+        }
+
+        private static async Task<int> GetRackDoubleUnknowFlowNumber()
+        {
+            try
+            {
+                await SysConfigFIleSemaphoreSlim.WaitAsync();
+                SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed += 1;
+                Save(SysConfigs);
+                return SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed;
             }
             catch (Exception ex)
             {
