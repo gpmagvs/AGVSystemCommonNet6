@@ -251,6 +251,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public string sourceZoneID { get; set; } = "";
         public string destinePortID { get; set; } = "";
         public string destineZoneID { get; set; } = "";
+        public bool isFromMCS { get; set; } = false;
 
         public void Update(clsTaskDto dto)
         {
