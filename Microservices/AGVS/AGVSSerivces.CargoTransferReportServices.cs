@@ -8,16 +8,16 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
 {
     public static partial class AGVSSerivces
     {
-        public static async Task CargoUnloadFromPortDoneReport(int tag, int slot)
+        public static async Task CargoUnloadFromPortDoneReport(string agvName, int tag, int slot)
         {
             HttpTools.HttpHelper agvs_http = GetAGVSHttpHelper();
-            await agvs_http.PostAsync($"/api/AGVCargoTransfer/UnloadCargoFromPort?tagNumber={tag}&slot={slot}", new { }, 10);
+            await agvs_http.PostAsync($"/api/AGVCargoTransfer/UnloadCargoFromPort?agvName={agvName}&tagNumber={tag}&slot={slot}", new { }, 10);
         }
 
-        public static async Task CargoLoadToPortDoneReport(int tag, int slot, string cargoID)
+        public static async Task CargoLoadToPortDoneReport(string agvName, int tag, int slot, string cargoID)
         {
             HttpTools.HttpHelper agvs_http = GetAGVSHttpHelper();
-            await agvs_http.PostAsync($"/api/AGVCargoTransfer/LoadCargoToPort?tagNumber={tag}&slot={slot}&cargoID={cargoID}", new { }, 10);
+            await agvs_http.PostAsync($"/api/AGVCargoTransfer/LoadCargoToPort?agvName={agvName}&tagNumber={tag}&slot={slot}&cargoID={cargoID}", new { }, 10);
         }
     }
 }
