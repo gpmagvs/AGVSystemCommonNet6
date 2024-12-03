@@ -6,6 +6,7 @@ using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Microservices.AGVS;
 using AGVSystemCommonNet6.Microservices.MCS;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -25,6 +26,7 @@ namespace AGVSystemCommonNet6.Alarm
         private static FileSystemWatcher _alarmCodeJsonFileWatcher;
         private static AGVSDatabase database;
         public static bool IsReportAlarmToHostON { get; set; } = false;
+        private static IMapper mapper;
         public static List<clsAlarmDto> uncheckedAlarms
         {
             get
@@ -34,7 +36,11 @@ namespace AGVSystemCommonNet6.Alarm
         }
 
         private static bool Initialized = false;
-        public AlarmManagerCenter() { }
+        static AlarmManagerCenter()
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<clsAlarmDto, clsAlarmDto>());
+            mapper = config.CreateMapper();
+        }
 
         public static async Task InitializeAsync()
         {
@@ -63,28 +69,45 @@ namespace AGVSystemCommonNet6.Alarm
             }
 
         }
+
+        public static async Task UpdateAlarmDuration(clsAlarmDto alarmDto)
+        {
+            try
+            {
+                await semaphoreSlim.WaitAsync();
+                using (var db = new AGVSDatabase())
+                {
+                    clsAlarmDto alarmInDatabase = db.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
+                    if (alarmInDatabase == null || alarmDto.Duration == alarmInDatabase.Duration)
+                        return;
+
+                    mapper.Map(alarmDto, alarmInDatabase);
+                    db.tables.Entry(alarmInDatabase).State = EntityState.Modified;
+                    await db.SaveChanges();
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+
         public static async Task UpdateAlarmAsync(clsAlarmDto alarmDto)
         {
             try
             {
+                await semaphoreSlim.WaitAsync();
                 var dbhelper = new AGVSDatabase();
-                var alarmExist = dbhelper.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time || alarm.AlarmCode == alarmDto.AlarmCode);
+                var alarmExist = dbhelper.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
                 if (alarmExist != null)
                 {
-                    await semaphoreSlim.WaitAsync();
-                    foreach (var prop in alarmDto.GetType().GetProperties())
-                    {
-                        var val = prop.GetValue(alarmDto);
-                        var val_old = prop.GetValue(alarmExist);
-                        if (val_old.ToString() != val.ToString() && prop.PropertyType != typeof(DateTime))
-                        {
-
-                            alarmExist.GetType().GetProperty(prop.Name).SetValue(alarmExist, val);
-                        }
-                    }
-                    //dbhelper._context.SystemAlarms.Update(alarmDto);
+                    mapper.Map(alarmDto, alarmExist);
+                    dbhelper.tables.Entry(alarmExist).State = EntityState.Modified;
                     await dbhelper.SaveChanges();
-                    semaphoreSlim.Release();
                 }
                 else
                     await AddAlarmAsync(alarmDto);
@@ -95,7 +118,7 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-
+                semaphoreSlim.Release();
             }
         }
         private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
@@ -110,6 +133,7 @@ namespace AGVSystemCommonNet6.Alarm
                     return;
                 database.tables.SystemAlarms.Add(alarmDto);
                 await database.SaveChanges();
+                MCSCIMService.AlarmReport((ushort)alarmDto.AlarmCode, alarmDto.Description);
             }
             catch (Exception ex)
             {
@@ -397,11 +421,14 @@ namespace AGVSystemCommonNet6.Alarm
             try
             {
                 await semaphoreSlim.WaitAsync();
+                int changedNum = 0;
                 using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     dbhelper._context.Set<clsAlarmDto>().Remove(alarmDto);
-                    return dbhelper._context.SaveChanges();
+                    changedNum= dbhelper._context.SaveChanges();
                 }
+                MCSCIMService.AlarmClear((ushort)alarmDto.AlarmCode, alarmDto.Description);
+                return changedNum;
             }
             catch (Exception ex)
             {
@@ -510,9 +537,12 @@ namespace AGVSystemCommonNet6.Alarm
                     foreach (var item in alarms)
                     {
                         item.Checked = true;
+                        MCSCIMService.AlarmClear((ushort)item.AlarmCode, item.Description);
                     }
                     await dbhelper.SaveChanges();
                 }
+
+
             }
             catch (Exception ex)
             {
@@ -551,10 +581,13 @@ namespace AGVSystemCommonNet6.Alarm
                     foreach (var _alarm in dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name))
                     {
                         _alarm.Checked = true;
+
+                        MCSCIMService.AlarmClear((ushort)_alarm.AlarmCode, _alarm.Description);
                     }
 
                     dbhelper._context.SaveChanges();
                 }
+
             }
             catch (Exception ex)
             {
