@@ -86,10 +86,10 @@ namespace AGVSystemCommonNet6.Configuration
             string unknowCargoID = $"UN{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
             return unknowCargoID;
         }
-        public static async Task<string> GetDoubleUnknownFlowID()
+        public static async Task<string> GetDoubleTrayUnknownFlowID()
         {
             int flowNumber = await AGVSConfigulator.GetRackDoubleUnknowFlowNumber();
-            string unknowCargoID = $"DU{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            string unknowCargoID = $"TDU{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
             return unknowCargoID;
         }
 
