@@ -109,6 +109,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                                 sw.Restart();
                                 disconnectAlarm.Checked = false;
                                 disconnectAlarm.Time = DateTime.Now;
+                                disconnectAlarm.Duration =0;
                                 AlarmManagerCenter.AddAlarmAsync(ALARMS.AGVS_DISCONNECT_WITH_VMS, ALARM_SOURCE.AGVS, Equipment_Name: "VMS");
                             }
                             else
@@ -122,7 +123,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                         else if (!response.alive)
                         {
                             disconnectAlarm.Duration = (int)(sw.ElapsedMilliseconds / 1000);
-                            AlarmManagerCenter.UpdateAlarmAsync(disconnectAlarm);
+                            await AlarmManagerCenter.UpdateAlarmDuration(disconnectAlarm);
                             continue;
                         }
 
@@ -162,7 +163,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             }
         }
 
-        public static async Task TaskCancel(string taskName, string reason,string hostAction="cancel")
+        public static async Task TaskCancel(string taskName, string reason, string hostAction = "cancel")
         {
             if (!IsAlive)
             {

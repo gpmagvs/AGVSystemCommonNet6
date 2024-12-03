@@ -101,6 +101,16 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             }
             return response;
         }
+
+        public static async Task AlarmReport(ushort alarmID, string alarmText)
+        {
+            await _http.PostAsync($"/api/Alarm/AlarmReport?alarmID={alarmID}&alarmText={alarmText}", null, 3);
+        }
+        public static async Task AlarmClear(ushort alarmID, string alarmText)
+        {
+            await _http.PostAsync($"/api/Alarm/AlarmClear?alarmID={alarmID}&alarmText={alarmText}", null, 3);
+        }
+
         public static async Task<(bool confirm, string message)> AlarmReporter(object data)
         {
             (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
