@@ -145,7 +145,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleDepositCompletedReport(string vehicleId, string carrierId, string transferPort)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/depositCompleted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/depositCompleted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
