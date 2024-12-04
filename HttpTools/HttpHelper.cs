@@ -32,7 +32,7 @@ namespace AGVSystemCommonNet6.HttpTools
             logger.Info($"[{Comment}:{baseUrl}] HttpClinet instance created");
 
         }
-        public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 1)
+        public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 5)
         {
             string contentDataJson = string.Empty;
             string url = this.baseUrl + api_route;
@@ -57,19 +57,17 @@ namespace AGVSystemCommonNet6.HttpTools
             }
             catch (TaskCanceledException ex)
             {
-                Console.WriteLine(ex.Message);
                 logger.Error(ex);
                 return (false, "{}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 logger.Error(ex);
-                throw;
+                return (false, "{}");
             }
 
         }
-        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 1)
+        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 5)
         {
             string contentDataJson = string.Empty;
             string url = this.baseUrl + (this.baseUrl.Last() == '/' ? "" : "/") + api_route;
@@ -102,8 +100,7 @@ namespace AGVSystemCommonNet6.HttpTools
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                logger.Error(ex);
-                throw;
+                return JsonConvert.DeserializeObject<Tin>("{}");
             }
 
         }
@@ -133,10 +130,10 @@ namespace AGVSystemCommonNet6.HttpTools
             catch (Exception ex)
             {
                 logger.Error(ex);
-                throw ex;
+                return JsonConvert.DeserializeObject<Tin>("{}");
             }
         }
-        public async Task<string> GetStringAsync(string api_route, int timeout = 1)
+        public async Task<string> GetStringAsync(string api_route, int timeout = 5)
         {
             string str_result = "";
             try
@@ -160,7 +157,7 @@ namespace AGVSystemCommonNet6.HttpTools
             catch (Exception ex)
             {
                 logger.Error(ex);
-                throw ex;
+                return "{}";
             }
         }
 
