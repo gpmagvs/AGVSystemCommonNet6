@@ -84,6 +84,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
         }
         [Key]
+        [MaxLength(50)]
         public string TaskName { get; set; } = string.Empty;
 
         [Required]
