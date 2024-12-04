@@ -207,54 +207,6 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
             }
         }
-        /// <summary>
-        /// TaskStatus:MCSCIMService.TaskStatus
-        /// </summary>
-        /// <param name="data">(clsTaskDto, clsTask.TaskStatus)</param>
-        /// <returns></returns>
-        public static async Task<(bool confirm, string message)> TaskReporter(object data)
-        {
-            (bool confirm, string message) response = new(false, "[AGVSSerivces.TaskReporter] System Error");
-            GetAGVSHttpHelper();
-            try
-            {
-                var route = $"/api/MCSCIM/TaskReporter";
-                (bool success, string json) v = await _agvs_http.PostAsync(route, data, timeout: 7);
-                clsAGVSTaskReportResponse responsedata = JsonConvert.DeserializeObject<clsAGVSTaskReportResponse>(v.json);
-                if (v.success == true && responsedata.confirm == true)
-                    response.confirm = true;
-                else
-                    response.confirm = false;
-                response.message = responsedata.message;
-            }
-            catch (Exception ex)
-            {
-                response.message = $"[AGVSSerivces.TaskReporter] {ex.Message}";
-            }
-            return response;
-        }
-        public static async Task<(bool confirm, string message)> AlarmReporterSwitch(bool truetoenable)
-        {
-            (bool confirm, string message) response = new(false, "[AGVSSerivces.AlarmReporterSwitch] System Error");
-            GetAGVSHttpHelper();
-            try
-            {
-                var route = $"/api/MCSCIM/AlarmReporterSwitch";
-                (bool success, string json) v = await _agvs_http.PostAsync(route, truetoenable, timeout: 7);
-                clsAGVSTaskReportResponse responsedata = JsonConvert.DeserializeObject<clsAGVSTaskReportResponse>(v.json);
-                if (v.success == true && responsedata.confirm == true)
-                    response.confirm = true;
-                else
-                    response.confirm = false;
-                response.message = responsedata.message;
-            }
-            catch (Exception ex)
-            {
-                response.message = $"[AGVSSerivces.AlarmReporterSwitch] {ex.Message}";
-            }
-            return response;
-        }
-
         public static async Task<(bool confirm, string message, object obj)> GetNGPort()
         {
             (bool confirm, string message, object obj) response = new(false, "", null);

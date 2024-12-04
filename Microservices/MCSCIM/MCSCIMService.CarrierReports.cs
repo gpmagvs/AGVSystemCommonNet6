@@ -22,7 +22,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             /// <summary>
             /// 可用容量
             /// </summary>
-            public int ZoneCapacity => LocationStatusList.Count(p => p.DisabledStatus == 0 && !p.IsCargoExist && string.IsNullOrEmpty( p.CarrierID));
+            public int ZoneCapacity => LocationStatusList.Count(p => p.DisabledStatus == 0 && !p.IsCargoExist && string.IsNullOrEmpty(p.CarrierID));
             public int ZoneTotalSize => LocationStatusList.Count;
 
             /// <summary>
@@ -72,7 +72,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             try
             {
                 var route = $"/api/Carrier/ZoneCapacityChange";
-                (bool success, string json) v = await _http.PostAsync(route, zoneData);
+                (bool success, string json) v = await _http.PostAsync(route, zoneData, 3);
                 response.confirm = v.success;
                 response.message = v.json;
             }
@@ -93,7 +93,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task CarrierInstallCompletedReport(string CarrierID, string CarrierLoc, string CarrierZoneName, ushort HandoffType)
         {
-            await _http.PostAsync<object, object>($"/api/Carrier/CarrierInstallCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null, 8);
+            try
+            {
+                await _http.PostAsync<object, object>($"/api/Carrier/CarrierInstallCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         /// <summary>
         /// [CEID=152]
@@ -105,7 +112,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task CarrierRemoveCompletedReport(string CarrierID, string CarrierLoc, string CarrierZoneName, ushort HandoffType)
         {
-            await _http.PostAsync<object, object>($"/api/Carrier/CarrierRemoveCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null, 8);
+            try
+            {
+                await _http.PostAsync<object, object>($"/api/Carrier/CarrierRemoveCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
     }
 }

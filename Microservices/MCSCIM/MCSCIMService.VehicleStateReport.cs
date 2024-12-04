@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleActiveReport(string commandId, string vehicleId, string carrierId)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/active?commandId={commandId}&vehicleId={vehicleId}&carrierId={carrierId}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/active?commandId={commandId}&vehicleId={vehicleId}&carrierId={carrierId}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -30,7 +38,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleIdleReport(string commandId, string vehicleId, string carrierId)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/idle?commandId={commandId}&vehicleId={vehicleId}&carrierId={carrierId}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/idle?commandId={commandId}&vehicleId={vehicleId}&carrierId={carrierId}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         /// <summary>
         /// [CEID=205] AGV當機時上報
@@ -39,7 +54,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleOutOfServiceReport(string vehicleId)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/outOfService?vehicleId={vehicleId}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/outOfService?vehicleId={vehicleId}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         /// <summary>
         /// [CEID=206] 
@@ -48,7 +70,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleInServiceReport(string vehicleId)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/inService?vehicleId={vehicleId}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/inService?vehicleId={vehicleId}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -60,7 +89,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleAcquireStartedReport(string vehicleId, string carrierId, string transferPort)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/acquireStarted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/acquireStarted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -72,7 +108,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleAcquireCompletedReport(string vehicleId, string carrierId, string transferPort)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/acquireCompleted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/acquireCompleted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -84,7 +127,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleDepositStartedReport(string vehicleId, string carrierId, string transferPort)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/depositStarted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/depositStarted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         /// <summary>
         /// [CEID=213] 完成Load(車子放料到設備)
@@ -106,7 +156,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleAssignedReport(string vehicleId, string commandId)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/assigned?vehicleId={vehicleId}&commandId={commandId}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/assigned?vehicleId={vehicleId}&commandId={commandId}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         /// <summary>
         /// [CEID=221] 
@@ -116,7 +173,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleUnassignedReport(string vehicleId, string commandId)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/unassigned?vehicleId={vehicleId}&commandId={commandId}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/unassigned?vehicleId={vehicleId}&commandId={commandId}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -127,7 +191,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleDepartedReport(string vehicleId, string transferPort)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/departed?vehicleId={vehicleId}&transferPort={transferPort}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/departed?vehicleId={vehicleId}&transferPort={transferPort}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -138,7 +209,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleArrivedReport(string vehicleId, string transferPort)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/arrived?vehicleId={vehicleId}&transferPort={transferPort}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/arrived?vehicleId={vehicleId}&transferPort={transferPort}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -149,7 +227,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleChargeStartedReport(string vehicleId, string chargerId)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/chargeStarted?vehicleId={vehicleId}&chargerId={chargerId}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/chargeStarted?vehicleId={vehicleId}&chargerId={chargerId}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -160,7 +245,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleChargeEndReport(string vehicleId, string chargerId)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/chargeEnd?vehicleId={vehicleId}&chargerId={chargerId}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/chargeEnd?vehicleId={vehicleId}&chargerId={chargerId}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         /// <summary>
@@ -172,7 +264,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task VehicleCoordinateChangedReport(string vehicleId, string x, string y)
         {
-            await _http.PostAsync($"/api/VehicleStateReport/coordinateChanged?vehicleId={vehicleId}&x={x}&y={y}", null);
+            try
+            {
+                await _http.PostAsync($"/api/VehicleStateReport/coordinateChanged?vehicleId={vehicleId}&x={x}&y={y}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
     }
 }

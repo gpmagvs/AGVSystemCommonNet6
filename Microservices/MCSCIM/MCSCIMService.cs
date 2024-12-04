@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Material;
 using EquipmentManagment.WIP;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         public static string MCSCIMUrl => "http://localhost:7107";
 
         private static HttpHelper _http = new HttpHelper(MCSCIMUrl);
+        protected static Logger logger = LogManager.GetCurrentClassLogger();
         public static async Task<(bool confirm, string message)> Online()
         {
             (bool confirm, string message) response = new(false, "[Online] Fail:");

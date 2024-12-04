@@ -1,10 +1,12 @@
 ﻿using AGVSystemCommonNet6.HttpTools;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static AGVSystemCommonNet6.DATABASE.DatabaseCaches;
 
 namespace AGVSystemCommonNet6.Microservices.MCS
 {
@@ -35,16 +37,30 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         /// <returns></returns>
         public static async Task TransferInitiatedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferInitiated?" +
-                $"CommandID={commandDto.CommandID}&" +
-                $"CarrierID={commandDto.CarrierID}&" +
-                $"CarrierLoc={commandDto.CarrierLoc}&" +
-                $"CarrierZoneName={commandDto.CarrierZoneName}&" +
-                $"Dest={commandDto.Dest}", null);
+            try
+            {
+                await _http.PostAsync($"/api/TransportEventReport/TransferInitiated?" +
+                    $"CommandID={commandDto.CommandID}&" +
+                    $"CarrierID={commandDto.CarrierID}&" +
+                    $"CarrierLoc={commandDto.CarrierLoc}&" +
+                    $"CarrierZoneName={commandDto.CarrierZoneName}&" +
+                    $"Dest={commandDto.Dest}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         public static async Task TransferringReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/Transferring?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            try
+            {
+                await _http.PostAsync($"/api/TransportEventReport/Transferring?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         public static async Task TransferCompletedReport(TransportCommandDto commandDto)
         {
@@ -53,15 +69,36 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         #region Transfer Abort sen.
         public static async Task TransferAbortInitiatedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferAbortInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            try
+            {
+                await _http.PostAsync($"/api/TransportEventReport/TransferAbortInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         public static async Task TransferAbortCompletedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferAbortComplete?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            try
+            {
+                await _http.PostAsync($"/api/TransportEventReport/TransferAbortComplete?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         public static async Task TransferAbortFailedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferAbortFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            try
+            {
+                await _http.PostAsync($"/api/TransportEventReport/TransferAbortFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         #endregion
@@ -69,15 +106,36 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         #region Transfer Cancel sen.
         public static async Task TransferCancelInitiatedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferCancelInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            try
+            {
+                await _http.PostAsync($"/api/TransportEventReport/TransferCancelInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         public static async Task TransferCancelCompletedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferCancelCompleted?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            try
+            {
+                await _http.PostAsync($"/api/TransportEventReport/TransferCancelCompleted?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         public static async Task TransferCancelFailedReport(TransportCommandDto commandDto)
         {
-            await _http.PostAsync($"/api/TransportEventReport/TransferCancelFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName=  {commandDto.CarrierZoneName}  &Dest=  {commandDto.Dest}", null);
+            try
+            {
+                await _http.PostAsync($"/api/TransportEventReport/TransferCancelFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName=  {commandDto.CarrierZoneName}  &Dest=  {commandDto.Dest}", null);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
 
         #endregion

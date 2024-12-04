@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using NLog;
 using System.Diagnostics;
+using static SQLite.SQLite3;
 
 namespace AGVSystemCommonNet6.HttpTools
 {
@@ -31,7 +32,7 @@ namespace AGVSystemCommonNet6.HttpTools
             logger.Info($"[{Comment}:{baseUrl}] HttpClinet instance created");
 
         }
-        public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 5)
+        public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 1)
         {
             string contentDataJson = string.Empty;
             string url = this.baseUrl + api_route;
@@ -58,7 +59,7 @@ namespace AGVSystemCommonNet6.HttpTools
             {
                 Console.WriteLine(ex.Message);
                 logger.Error(ex);
-                throw;
+                return (false, "{}");
             }
             catch (Exception ex)
             {
@@ -68,7 +69,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 5)
+        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 1)
         {
             string contentDataJson = string.Empty;
             string url = this.baseUrl + (this.baseUrl.Last() == '/' ? "" : "/") + api_route;
@@ -96,7 +97,7 @@ namespace AGVSystemCommonNet6.HttpTools
             {
                 Console.WriteLine(ex.Message);
                 logger.Error(ex);
-                throw;
+                return JsonConvert.DeserializeObject<Tin>("{}");
             }
             catch (Exception ex)
             {
@@ -106,7 +107,7 @@ namespace AGVSystemCommonNet6.HttpTools
             }
 
         }
-        public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 5)
+        public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 1)
         {
             string jsonContent = "";
             try
@@ -126,7 +127,8 @@ namespace AGVSystemCommonNet6.HttpTools
             catch (TaskCanceledException ex)
             {
                 logger.Error(ex);
-                throw ex;
+                return JsonConvert.DeserializeObject<Tin>("{}");
+
             }
             catch (Exception ex)
             {
@@ -134,7 +136,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 throw ex;
             }
         }
-        public async Task<string> GetStringAsync(string api_route, int timeout = 5)
+        public async Task<string> GetStringAsync(string api_route, int timeout = 1)
         {
             string str_result = "";
             try
@@ -153,7 +155,7 @@ namespace AGVSystemCommonNet6.HttpTools
             catch (TaskCanceledException ex)
             {
                 logger.Error(ex);
-                throw ex;
+                return "{}";
             }
             catch (Exception ex)
             {
