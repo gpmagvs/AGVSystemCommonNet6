@@ -46,8 +46,6 @@ namespace AGVSystem.Service
             if (_agvsDb.SysStatus.Any())
             {
                 _agvsDb.SysStatus.First().RunMode = RUN_MODE.MAINTAIN;
-                _agvsDb.SysStatus.First().HostOperMode = HOST_OPER_MODE.LOCAL;
-                _agvsDb.SysStatus.First().HostConnMode = HOST_CONN_MODE.OFFLINE;
             }
             await _agvsDb.SaveChangesAsync();
         }
@@ -61,22 +59,5 @@ namespace AGVSystem.Service
             await _agvsDb.SaveChangesAsync();
         }
 
-        public async Task ModifyHostOperMode(HOST_OPER_MODE mode)
-        {
-            if (_agvsDb.SysStatus.Any())
-            {
-                _agvsDb.SysStatus.First().HostOperMode = mode;
-            }
-            await _agvsDb.SaveChangesAsync();
-        }
-
-        public async Task ModifyHostConnMode(HOST_CONN_MODE mode)
-        {
-            if (_agvsDb.SysStatus.Any())
-            {
-                _agvsDb.SysStatus.First().HostConnMode = mode;
-            }
-            await _agvsDb.SaveChangesAsync();
-        }
     }
 }
