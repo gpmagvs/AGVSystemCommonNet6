@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using NLog;
 using System.Diagnostics;
+using System.Net.Http.Json;
 using static SQLite.SQLite3;
 
 namespace AGVSystemCommonNet6.HttpTools
@@ -34,6 +35,8 @@ namespace AGVSystemCommonNet6.HttpTools
         }
         public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 5)
         {
+            logger.Trace($"Post Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
+
             string contentDataJson = string.Empty;
             string url = this.baseUrl + api_route;
             if (data != null)
@@ -46,6 +49,8 @@ namespace AGVSystemCommonNet6.HttpTools
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
+                    logger.Trace($"PostAsync Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}. Response:{responseJson}");
+
                     return (true, responseJson);
                 }
                 else
@@ -55,20 +60,17 @@ namespace AGVSystemCommonNet6.HttpTools
                     throw new HttpRequestException(errmsg);
                 }
             }
-            catch (TaskCanceledException ex)
-            {
-                logger.Error(ex);
-                return (false, "{}");
-            }
             catch (Exception ex)
             {
-                logger.Error(ex);
-                return (false, "{}");
+                logger.Warn($"Post Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
+                throw ex;
             }
 
         }
         public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 5)
         {
+            logger.Trace($"Post Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
+
             string contentDataJson = string.Empty;
             string url = this.baseUrl + (this.baseUrl.Last() == '/' ? "" : "/") + api_route;
             if (data != null)
@@ -81,6 +83,7 @@ namespace AGVSystemCommonNet6.HttpTools
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
+                    logger.Trace($"PostAsync Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}. Response:{responseJson}");
                     var result = JsonConvert.DeserializeObject<Tin>(responseJson);
                     return result;
                 }
@@ -91,21 +94,17 @@ namespace AGVSystemCommonNet6.HttpTools
                     throw new HttpRequestException(errmsg);
                 }
             }
-            catch (TaskCanceledException ex)
-            {
-                Console.WriteLine(ex.Message);
-                logger.Error(ex);
-                return JsonConvert.DeserializeObject<Tin>("{}");
-            }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return JsonConvert.DeserializeObject<Tin>("{}");
+                logger.Warn($"Post Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
+                throw ex;
             }
 
         }
-        public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 1)
+        public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 5)
         {
+            logger.Trace($"Get Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
+
             string jsonContent = "";
             try
             {
@@ -115,26 +114,23 @@ namespace AGVSystemCommonNet6.HttpTools
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     jsonContent = await response.Content.ReadAsStringAsync();
+                    logger.Trace($"Get Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}-. Response:{jsonContent}");
                     var result = JsonConvert.DeserializeObject<Tin>(jsonContent);
                     return result;
                 }
                 else
                     throw new HttpRequestException($"Failed to GET to {url}({response.StatusCode})");
             }
-            catch (TaskCanceledException ex)
-            {
-                logger.Error(ex);
-                return JsonConvert.DeserializeObject<Tin>("{}");
-
-            }
             catch (Exception ex)
             {
-                logger.Error(ex);
-                return JsonConvert.DeserializeObject<Tin>("{}");
+                logger.Warn($"GetStringAsync Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
+                throw ex;
             }
         }
         public async Task<string> GetStringAsync(string api_route, int timeout = 5)
         {
+            logger.Trace($"Get Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
+
             string str_result = "";
             try
             {
@@ -144,20 +140,16 @@ namespace AGVSystemCommonNet6.HttpTools
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     str_result = await response.Content.ReadAsStringAsync();
+                    logger.Trace($"Get Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}. Response:{str_result}");
                     return str_result;
                 }
                 else
                     throw new HttpRequestException($"Failed to GET to {url}({response.StatusCode})");
             }
-            catch (TaskCanceledException ex)
-            {
-                logger.Error(ex);
-                return "{}";
-            }
             catch (Exception ex)
             {
-                logger.Error(ex);
-                return "{}";
+                logger.Warn($"GetStringAsync Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
+                throw ex;
             }
         }
 
