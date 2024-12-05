@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Material;
 using EquipmentManagment.WIP;
+using Newtonsoft.Json;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -18,35 +19,33 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         protected static Logger logger = LogManager.GetCurrentClassLogger();
         public static async Task<(bool confirm, string message)> Online()
         {
-            (bool confirm, string message) response = new(false, "[Online] Fail:");
             try
             {
                 var route = $"/api/HostMode/OnlineLocal";
-                ResponseObject v = await _http.GetAsync<ResponseObject>(route);
-                response.confirm = v.confirm;
-                response.message = v.message;
+                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, 5);
+                return (_response.confirm, _response.message);
+            }
+            catch (JsonSerializationException ex)
+            {
+                return (false, $"系統錯誤");
             }
             catch (Exception ex)
             {
-                response.message = $"[MCSCIMService.Online] {_http.http_client.BaseAddress} {ex.Message}";
+                return (false, ex.Message);
             }
-            return response;
         }
         public static async Task<(bool confirm, string message)> Offline()
         {
-            (bool confirm, string message) response = new(false, "[Offline] Fail:");
             try
             {
                 var route = $"/api/HostMode/OFFline";
-                ResponseObject v = await _http.GetAsync<ResponseObject>(route);
-                response.confirm = v.confirm;
-                response.message = v.message;
+                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, 5);
+                return (_response.confirm, _response.message);
             }
             catch (Exception ex)
             {
-                response.message += ex.Message.ToString();
+                return (false, ex.Message);
             }
-            return response;
         }
         public static async Task<(bool confirm, string message)> OnlineLocalToOnlineRemote()
         {

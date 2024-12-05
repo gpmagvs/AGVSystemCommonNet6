@@ -95,7 +95,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync<object, object>($"/api/Carrier/CarrierInstallCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null);
+                await _http.PostAsync<object, object>($"/api/Carrier/CarrierInstallCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null, 1);
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync<object, object>($"/api/Carrier/CarrierRemoveCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null);
+                await _http.PostAsync<object, object>($"/api/Carrier/CarrierRemoveCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null, 1);
             }
             catch (Exception ex)
             {
