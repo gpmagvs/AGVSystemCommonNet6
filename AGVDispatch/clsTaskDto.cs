@@ -250,10 +250,24 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
         public string soucePortID { get; set; } = "";
         public string sourceZoneID { get; set; } = "";
-        public string destinePortID { get; set; } = "";
-        public string destineZoneID { get; set; } = "";
-        public bool isFromMCS { get; set; } = false;
 
+        /// <summary>
+        /// 目的地Port ID
+        /// </summary>
+        /// <value></value>
+        public string destinePortID { get; set; } = "";
+
+        /// <summary>
+        /// 目的區域ID
+        /// </summary>
+        /// <value></value>
+        public string destineZoneID { get; set; } = "";
+
+        /// <summary>
+        /// 是否從MCS派車
+        /// </summary>
+        /// <value></value>
+        public bool isFromMCS { get; set; } = false;
         public void Update(clsTaskDto dto)
         {
             if (dto.RecieveTime != default)
