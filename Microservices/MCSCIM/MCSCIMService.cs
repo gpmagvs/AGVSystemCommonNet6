@@ -14,7 +14,6 @@ namespace AGVSystemCommonNet6.Microservices.MCS
     public partial class MCSCIMService
     {
         public static string MCSCIMUrl => "http://localhost:7107";
-
         private static HttpHelper _http = new HttpHelper(MCSCIMUrl);
         protected static Logger logger = LogManager.GetCurrentClassLogger();
         public static async Task<(bool confirm, string message)> Online()
@@ -105,29 +104,26 @@ namespace AGVSystemCommonNet6.Microservices.MCS
 
         public static async Task AlarmReport(ushort alarmID, string alarmText)
         {
-            await _http.PostAsync($"/api/Alarm/AlarmReport?alarmID={alarmID}&alarmText={alarmText}", null, 3);
-        }
-        public static async Task AlarmClear(ushort alarmID, string alarmText)
-        {
-            await _http.PostAsync($"/api/Alarm/AlarmClear?alarmID={alarmID}&alarmText={alarmText}", null, 3);
-        }
-
-        public static async Task<(bool confirm, string message)> AlarmReporter(object data)
-        {
-            (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
             try
             {
-                var route = $"/api/HostMode/AlarmReporter";
-                string strJson = data.ToJson();
-                (bool success, string json) v = await _http.PostAsync(route, data);
-                response.confirm = v.success;
-                response.message = v.json;
+                await _http.PostAsync($"/api/Alarm/AlarmReport?alarmID={alarmID}&alarmText={alarmText}", null, 3);
             }
             catch (Exception ex)
             {
-                response.message = $"[MCSCIMService.AlarmReporter] Report to: {_http.http_client.BaseAddress} with exmessage: {ex.Message}";
+                logger.Error(ex);
             }
-            return response;
+        }
+        public static async Task AlarmClear(ushort alarmID, string alarmText)
+        {
+            try
+            {
+                await _http.PostAsync($"/api/Alarm/AlarmClear?alarmID={alarmID}&alarmText={alarmText}", null, 3);
+
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
         }
         internal class ResponseObject
         {

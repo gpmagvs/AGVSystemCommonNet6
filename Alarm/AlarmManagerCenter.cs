@@ -25,7 +25,6 @@ namespace AGVSystemCommonNet6.Alarm
         public static Dictionary<string, clsAGVsTrobleShooting> AGVsTrobleShootings = new Dictionary<string, clsAGVsTrobleShooting>();
         private static FileSystemWatcher _alarmCodeJsonFileWatcher;
         private static AGVSDatabase database;
-        public static bool IsReportAlarmToHostON { get; set; } = false;
         private static IMapper mapper;
         public static List<clsAlarmDto> uncheckedAlarms
         {
@@ -179,8 +178,6 @@ namespace AGVSystemCommonNet6.Alarm
                 alarmDto.Time = DateTime.Now;
                 await AddAlarmAsync(alarmDto);
                 LOG.WARN($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
-                if (IsReportAlarmToHostON == true)
-                    await MCSCIMService.AlarmReporter(alarmDto);
                 return alarmDto;
             }
             catch (Exception ex)
@@ -425,7 +422,7 @@ namespace AGVSystemCommonNet6.Alarm
                 using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     dbhelper._context.Set<clsAlarmDto>().Remove(alarmDto);
-                    changedNum= dbhelper._context.SaveChanges();
+                    changedNum = dbhelper._context.SaveChanges();
                 }
                 MCSCIMService.AlarmClear((ushort)alarmDto.AlarmCode, alarmDto.Description);
                 return changedNum;
