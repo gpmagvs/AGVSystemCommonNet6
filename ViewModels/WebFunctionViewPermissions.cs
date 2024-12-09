@@ -14,6 +14,9 @@ namespace AGVSystemCommonNet6.ViewModels
         public Menu menu { get; set; } = new Menu();
         public DataQuerySubMenu dataQuerySubMenu { get; set; } = new DataQuerySubMenu();
         public SystemConfigurationSubMenu systemConfigurationSubMenu { get; set; } = new SystemConfigurationSubMenu();
+
+        public SystemModesOperationPermission systemModesOperations { get; set; } = new SystemModesOperationPermission();
+
         public WebFunctionViewPermissions()
         {
         }
@@ -88,6 +91,15 @@ namespace AGVSystemCommonNet6.ViewModels
             public int UserManagnment { get; set; } = 1;
             public int ChargerManagnment { get; set; } = 1;
 
+        }
+
+        public class SystemModesOperationPermission
+        {
+            public int RunModeSwitch { get; set; } = 1;
+            public int AutoTransferModeSwitch { get; set; } = 1;
+            public int HostOnlineSwitch { get; set; } = 1;
+
+            public int HostRemoteSwitch { get; set; } = 1;
         }
     }
 }
