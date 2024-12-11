@@ -93,6 +93,13 @@ namespace AGVSystemCommonNet6.Configuration
             return unknowCargoID;
         }
 
+        public static async Task<string> GetTrayMissMatchFlowID()
+        {
+            int flowNumber = await AGVSConfigulator.GetTrayMissMatchFlowNumber();
+            string unknowCargoID = $"TMI{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            return unknowCargoID;
+        }
+
         private static async Task<int> GetTrayUnknowFlowNumber()
         {
             try
@@ -141,6 +148,28 @@ namespace AGVSystemCommonNet6.Configuration
                 SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed += 1;
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                return 0;
+            }
+            finally
+            {
+                SysConfigFIleSemaphoreSlim.Release();
+            }
+        }
+
+
+
+        private static async Task<int> GetTrayMissMatchFlowNumber()
+        {
+            try
+            {
+                await SysConfigFIleSemaphoreSlim.WaitAsync();
+                SysConfigs.SECSGem.MissMatchTrayIDFlowNumberUsed += 1;
+                Save(SysConfigs);
+                return SysConfigs.SECSGem.MissMatchTrayIDFlowNumberUsed;
             }
             catch (Exception ex)
             {
