@@ -268,60 +268,16 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// </summary>
         /// <value></value>
         public bool isFromMCS { get; set; } = false;
-        public void Update(clsTaskDto dto)
-        {
-            if (dto.RecieveTime != default)
-                RecieveTime = dto.RecieveTime;
 
-            if (dto.StartTime != default)
-                StartTime = dto.StartTime;
+        /// <summary>
+        /// 是不是換過車(去來源的途中發現有更優的車的那種)
+        /// </summary>
+        public bool isVehicleAssignedChanged { get; set; } = false;
 
-            if (dto.FinishTime != default)
-                FinishTime = dto.FinishTime;
-
-            if (!string.IsNullOrWhiteSpace(dto.TaskName))
-                TaskName = dto.TaskName;
-            // State是一个枚举，你可能总是想更新它，即使它是默认值。
-            State = dto.State;
-
-            if (!string.IsNullOrWhiteSpace(dto.DispatcherName))
-                DispatcherName = dto.DispatcherName;
-
-            if (!string.IsNullOrWhiteSpace(dto.FailureReason))
-                FailureReason = dto.FailureReason;
-
-            if (dto.DesignatedAGVName != null)
-                DesignatedAGVName = dto.DesignatedAGVName;
-
-            Action = dto.Action;
-
-            if (!string.IsNullOrWhiteSpace(dto.From_Station))
-                From_Station = dto.From_Station;
-
-            if (!string.IsNullOrWhiteSpace(dto.From_Slot))
-                From_Slot = dto.From_Slot;
-
-            if (!string.IsNullOrWhiteSpace(dto.To_Station))
-                To_Station = dto.To_Station;
-
-            if (!string.IsNullOrWhiteSpace(dto.To_Slot))
-                To_Slot = dto.To_Slot;
-
-            if (!string.IsNullOrWhiteSpace(dto.Carrier_ID))
-                Carrier_ID = dto.Carrier_ID;
-            Priority = dto.Priority;
-            IsTrafficControlTask = dto.IsTrafficControlTask;
-            bypass_eq_status_check = dto.bypass_eq_status_check;
-
-            CST_TYPE = dto.CST_TYPE;
-            need_change_agv = dto.need_change_agv;
-            transfer_task_stage = dto.transfer_task_stage;
-            UnloadTime = dto.UnloadTime;
-            LoadTime = dto.LoadTime;
-            TotalMileage = dto.TotalMileage;
-            StartLocationTag = dto.StartLocationTag;
-            Actual_Carrier_ID = dto.Actual_Carrier_ID;
-        }
+        /// <summary>
+        /// AGV目前進度(任務訂單進度)
+        /// </summary>
+        public VehicleMovementStage currentProgress { get; set; } = VehicleMovementStage.Not_Start_Yet;
 
     }
 }
