@@ -18,12 +18,12 @@ namespace AGVSystemCommonNet6.Microservices.AudioPlay
         public const string RemoveAudioFromQueueRoute = "/api/Audio/RemoveAudioFromQueue?audioFilePath=";
         public const string StopAllRoute = "/api/Audio/StopAll";
 
-        public static async Task PlaySpecficAudio(string audioName)
+        public static async Task PlaySpecficAudio(string audioName, double duration = 1)
         {
             try
             {
                 HttpHelper http = new HttpHelper(AudioPlayHostUrl);
-                (bool success, string json) = await http.PostAsync(PlayAudioRoute + audioName, null);
+                (bool success, string json) = await http.PostAsync(PlayAudioRoute + audioName + $"&duration={duration}", null);
             }
             catch (Exception ex)
             {
