@@ -36,7 +36,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
 
         public clsBatteryOptions BatteryOptions { get; set; } = new clsBatteryOptions();
 
-        public string AgvID { get; set; } = "";
+        public string AGV_ID { get; set; } = "";
     }
 
     public class clsBatteryOptions
