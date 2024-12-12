@@ -1,12 +1,13 @@
-﻿using AGVSystemCommonNet6.Log;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using NLog;
 using System.Text;
 
 namespace AGVSystemCommonNet6.Notify
 {
     public class NotifyServiceHelper
     {
+        static Logger logger = LogManager.GetCurrentClassLogger();
         public static async Task WebsocketNotification(HttpContext context)
         {
             var tcs = new TaskCompletionSource<object>();
@@ -85,7 +86,7 @@ namespace AGVSystemCommonNet6.Notify
 
         public static async Task NotifyAsync(NotifyMessage.NOTIFY_TYPE type, string message, bool show)
         {
-            LOG.TRACE($"[Notify]-[{type}] {message}");
+            logger.Trace($"[Notify]-[{type}] {message}");
             var handler = OnMessage;
             if (handler != null)
             {
