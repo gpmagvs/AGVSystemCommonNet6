@@ -19,4 +19,17 @@ namespace AGVSystemCommonNet6.Microservices.MCSCIM
         public int MissMatchTrayIDFlowNumberUsed { get; set; } = 0;
 
     }
+
+    public class SECSAlarmConfiguration
+    {
+        public enum ALARM_TABLE_VERSION
+        {
+            GPM = 0,
+            KGS = 1,
+        }
+
+        public ALARM_TABLE_VERSION Version { get; set; }
+
+
+    }
 }
