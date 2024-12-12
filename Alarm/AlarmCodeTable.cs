@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.Alarm
 {
+    /// <summary>
+    /// [Dev Note] 若有修改 Table 內容，必須更新 VERSION
+    /// </summary>
     public class AlarmCodeTable
     {
-        public static clsAlarmCode[] Table { get; set; } = new clsAlarmCode[]
+        public const string VERSION = "1.2.0";
+        public string FileVersion { get; set; } = "1.0.0";
+        public clsAlarmCode[] Table { get; set; } = new clsAlarmCode[]
         {
             new clsAlarmCode(ALARMS.CreateCommandFail, "派車系統發生程式上的Crash造成", "CreateCommandFail", "", "", ""),
             new clsAlarmCode(ALARMS.NoActionType, "沒有選擇或是無法辨識任務命令類別", "NoActionType", "", "", ""),

@@ -197,46 +197,9 @@ namespace AGVSystemCommonNet6.Alarm
         {
             Task.Run(() =>
             {
-                bool _IsFileExist = File.Exists(ALARM_CODE_FILE_PATH);
-                bool _IsFileTooOld = !_IsFileExist ? false : _IsAlarmCodeFileTooOld();
-
-                if (_IsFileExist && !_IsFileTooOld)
-                {
-                    string strText = File.ReadAllText(ALARM_CODE_FILE_PATH);
-                    clsAlarmCode[]? _AlarmCodes = JsonConvert.DeserializeObject<clsAlarmCode[]>(strText);
-
-                    foreach (var alarm in _AlarmCodes)
-                    {
-                        if (Enum.IsDefined(typeof(ALARMS), alarm.AlarmCode))
-                        {
-                            //Console.WriteLine($"AlarmCode {alarm.AlarmCode} is defined in ALARMS.");
-                        }
-                        else
-                        {
-                            LOG.WARN($"AlarmCode {alarm.AlarmCode} is NOT defined in ALARMS.", show_console: true);
-                            //Console.WriteLine($"AlarmCode {alarm.AlarmCode} is NOT defined in ALARMS.");
-                        }
-                    }
-                    AlarmCodes = _AlarmCodes.ToDictionary(ac => ac.AlarmCode, ac => ac);
-                    // 如果有更新clsAlarmCode項目需要再寫回去檔案要true起來=>???
-                    if (false)
-                    {
-                        string strAlarm = JsonConvert.SerializeObject(_AlarmCodes);
-                        File.WriteAllText(ALARM_CODE_FILE_PATH, strAlarm);
-                    }
-
-                    //Build a file watcher to monitor AlarmCode json file changed and reload it.
-
-                }
-                else
-                {
-                    //將預設table寫出為jSON
-                    string defaultAlarmCodeJson = JsonConvert.SerializeObject(AlarmCodeTable.Table, Formatting.Indented);
-                    File.Delete(ALARM_CODE_FILE_PATH);
-                    File.WriteAllText(ALARM_CODE_FILE_PATH, defaultAlarmCodeJson);
-                    LoadAlarmCodes();
-                    return;
-                }
+                AlarmCodeTableLoder alarmCodeTableHelper = new AlarmCodeTableLoder();
+                clsAlarmCode[] alarmCodesReadIn = alarmCodeTableHelper.ReadAlarmCodeTable();
+                AlarmCodes = alarmCodesReadIn.ToDictionary(ac => ac.AlarmCode, ac => ac);
                 InitAlarmCodeJsonFileWatcher();
             });
 
