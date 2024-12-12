@@ -91,6 +91,10 @@ namespace AGVSystemCommonNet6.DATABASE.SQLNativ
 
         private object GetDefaultValue(Type type)
         {
+            if (type.BaseType?.Name == "Enum")
+            {
+                return 0;
+            }
             // 为基本的数值类型设置默认值
             if (type.IsValueType)
             {
