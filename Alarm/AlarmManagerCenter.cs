@@ -53,7 +53,7 @@ namespace AGVSystemCommonNet6.Alarm
         {
             try
             {
-
+                await WaitAlarmTableUnLocked();
                 using var db = new AGVSDatabase();
                 foreach (var alarm in db.tables.SystemAlarms.Where(al => !al.Checked))
                 {
@@ -74,6 +74,7 @@ namespace AGVSystemCommonNet6.Alarm
             try
             {
                 await semaphoreSlim.WaitAsync();
+                await WaitAlarmTableUnLocked();
                 using (var db = new AGVSDatabase())
                 {
                     clsAlarmDto alarmInDatabase = db.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
@@ -104,6 +105,7 @@ namespace AGVSystemCommonNet6.Alarm
                 var alarmExist = dbhelper.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
                 if (alarmExist != null)
                 {
+                    await WaitAlarmTableUnLocked();
                     mapper.Map(alarmDto, alarmExist);
                     dbhelper.tables.Entry(alarmExist).State = EntityState.Modified;
                     await dbhelper.SaveChanges();
@@ -130,6 +132,7 @@ namespace AGVSystemCommonNet6.Alarm
                     await InitializeAsync();
                 if (alarmDto.AlarmCode == 0)
                     return;
+                await WaitAlarmTableUnLocked();
                 database.tables.SystemAlarms.Add(alarmDto);
                 await database.SaveChanges();
                 MCSCIMService.AlarmReport((ushort)alarmDto.AlarmCode, alarmDto.Description);
@@ -418,6 +421,7 @@ namespace AGVSystemCommonNet6.Alarm
             try
             {
                 await semaphoreSlim.WaitAsync();
+                await WaitAlarmTableUnLocked();
                 int changedNum = 0;
                 using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
@@ -634,6 +638,20 @@ namespace AGVSystemCommonNet6.Alarm
                 semaphoreSlim.Release();
             }
 
+        }
+
+        private static async Task WaitAlarmTableUnLocked()
+        {
+            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+            while (database.tables.IsAlarmTableLocking())
+            {
+                await Task.Delay(100);
+                if (cts.Token.IsCancellationRequested)
+                {
+                    Console.WriteLine("Alarm Table is locking, wait for 1 second and TIMEOUT.");
+                    break;
+                }
+            }
         }
     }
 
