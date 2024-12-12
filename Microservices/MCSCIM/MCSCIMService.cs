@@ -78,30 +78,6 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             }
             return response;
         }
-        /// <summary>
-        /// data[0]:clsTaskDto 
-        /// data[1]:task status, ref to AGVSCIM.TaskManager.clsTask.TaskStatus
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static async Task<(bool confirm, string message)> TaskReporter(object data)
-        {
-            (bool confirm, string message) response = new(false, "[MCSCIMService.TaskReporter] System Error.");
-            try
-            {
-                var route = $"/api/HostMode/TaskCollecter";
-                string strJson = data.ToJson();
-                (bool success, string json) v = await _http.PostAsync(route, data);
-                response.confirm = v.success;
-                response.message = v.json;
-            }
-            catch (Exception ex)
-            {
-                response.message = $"[MCSCIMService.TaskReporter] Report to: {_http.http_client.BaseAddress} with exmessage: {ex.Message}";
-            }
-            return response;
-        }
-
         public static async Task AlarmReport(ushort alarmID, string alarmText)
         {
             try
