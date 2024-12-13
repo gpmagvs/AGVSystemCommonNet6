@@ -52,8 +52,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                      {
                          { "AGV_001", new clsAGVOptions(){
                              Enabled = true,
-                             HostIP="127.0.0.1",
-                             HostPort=7025 ,
+                             IP="127.0.0.1",
+                             Port=7025 ,
                              InitTag=50,
                              Protocol = clsAGVOptions.PROTOCOL.RESTFulAPI,
                              Simulation=false

@@ -14,8 +14,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
             RESTFulAPI = 1,
         }
 
-        public string HostIP { get; set; }
-        public int HostPort { get; set; }
+        public string IP { get; set; } = "127.0.0.1";
+        public int Port { get; set; } = 5036;
         public PROTOCOL Protocol { get; set; }
 
         public bool Simulation { get; set; }
