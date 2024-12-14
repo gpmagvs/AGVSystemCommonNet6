@@ -147,14 +147,21 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
 
             try
             {
-
-                if (alarm_type.ToLower() == "all")
-                    return db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).Count();
-                else if (alarm_type.ToLower() == "alarm")
-                    return db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).Where(al => al.ELevel == clsAlarmCode.LEVEL.Alarm).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).Count();
+                TableQuery<clsAlarmCode> query = db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to);
+                // 處理 Code 條件
+                if (code == 0)
+                    query = query.Where(al => al.Code > 0);
                 else
-                    return db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).Where(al => al.ELevel == clsAlarmCode.LEVEL.Warning).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).Count();
+                    query = query.Where(al => al.Code == code);
 
+                // 處理 alarm_type 條件
+                if (alarm_type.ToLower() != "all")
+                {
+                    clsAlarmCode.LEVEL filterLevel = alarm_type.ToLower() == "alarm" ? clsAlarmCode.LEVEL.Alarm : clsAlarmCode.LEVEL.Warning;
+                    query = query.Where(al => al.ELevel == filterLevel);
+                }
+
+                return query.Count();
             }
             catch (Exception ex)
             {
@@ -371,33 +378,46 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCSDatabase
             {
                 try
                 {
-                    return db.Table<clsAlarmCode>().ToList().DistinctBy(al => al.EAlarmCode).OrderBy(al => al.Code).ToList();
+                    return db.Table<clsAlarmCode>().DistinctBy(al => al.EAlarmCode).OrderBy(al => al.Code).ToList();
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
             }
-
             public static List<clsAlarmCode> QueryAlarm(DateTime from, DateTime to, int page, int page_size = 16, string alarm_type = "All", int code = 0)
             {
                 try
                 {
-                    var query = new List<clsAlarmCode>();
-                    if (alarm_type.ToLower() == "all")
-                    {
-                        query = db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).OrderByDescending(f => f.Time).Skip(page_size * (page - 1)).Take(page_size).ToList();
-                    }
+                    // 如果表是空的，直接返回空列表
+                    if (!db.Table<clsAlarmCode>().Any())
+                        return new List<clsAlarmCode>();
+
+                    // 建立基礎查詢
+                    TableQuery<clsAlarmCode> query = db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to);
+
+                    // 處理 Code 條件
+                    if (code == 0)
+                        query = query.Where(al => al.Code > 0);
                     else
+                        query = query.Where(al => al.Code == code);
+
+                    // 處理 alarm_type 條件
+                    if (alarm_type.ToLower() != "all")
                     {
                         clsAlarmCode.LEVEL filterLevel = alarm_type.ToLower() == "alarm" ? clsAlarmCode.LEVEL.Alarm : clsAlarmCode.LEVEL.Warning;
-                        query = db.Table<clsAlarmCode>().Where(al => al.Time >= from && al.Time <= to).ToList().Where(al => code == 0 ? al.Code > 0 : al.Code == code).OrderByDescending(f => f.Time).Where(al => al.ELevel == filterLevel).Skip(page_size * (page - 1)).Take(page_size).ToList();
+                        query = query.Where(al => al.ELevel == filterLevel);
                     }
-                    return query;
+
+                    // 排序、分頁並返回結果
+                    return query.OrderByDescending(f => f.Time)
+                                .Skip(page_size * (page - 1))
+                                .Take(page_size)
+                                .ToList();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw ex;
+                    throw; // 直接 throw 即可
                 }
             }
             public static UserEntity QueryUserByName(string userName)
