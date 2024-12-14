@@ -28,6 +28,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
         {
             _services = services;
             _logger = logger;
+            DatabaseCaches.logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -168,7 +169,7 @@ namespace AGVSystemCommonNet6.DATABASE.BackgroundServices
                             DatabaseCaches.TaskCaches.RunningTasks = _TasksForQuery.Where(task => task.State == AGVDispatch.Messages.TASK_RUN_STATUS.NAVIGATING).ToList();
                         }
 
-                        DatabaseCaches.Alarms.UnCheckedAlarms = (await GetAlarmsInSpeficTimeRange()).Where(alarm => !alarm.Checked).ToList();
+                        await DatabaseCaches.Alarms.UpdateUnCheckdAlarms((await GetAlarmsInSpeficTimeRange()).Where(alarm => !alarm.Checked).ToList());
 
                         DatabaseCaches.Vehicle.VehicleStates = dbContext.AgvStates.AsNoTracking().ToList();
 
