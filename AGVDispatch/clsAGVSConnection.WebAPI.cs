@@ -16,6 +16,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
     public partial class clsAGVSConnection
     {
 
+        public class clsLeavePortReqResponse
+        {
+            public bool confirm { get; set; } = false;
+            public string message { get; set; } = "";
+        }
+
         public enum VMS_HTTP_CHANNEL
         {
             ONLINE_MODE_GET,
@@ -267,12 +273,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
 
                 var api_route = $"/api/AGV/LeaveWorkStationRequest?AGVName={vehicleName}&EQTag={currentEQTag}";
                 logger?.LogTrace($"(POST){api_route},body json =");
-                (bool success, string json) response = await http.PostAsync(api_route, null, timeout: 3);
-                if (!response.success)
-                    return false;
-
-                var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.json);
-                return (bool)dict["confirm"];
+                clsLeavePortReqResponse response = await http.PostAsync<clsLeavePortReqResponse, object>(api_route, null, timeout: 3);
+                return response.confirm;
             }
             catch (Exception ex)
             {
