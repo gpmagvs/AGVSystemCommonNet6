@@ -321,6 +321,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
         private static void WirteTaskQueryResultToFile(string FilePath, List<clsTaskDto> Tasks)
         {
+            Tasks = Tasks.OrderByDescending(tk => tk.RecieveTime).ToList();
             Map _useMap = null;
             try
             {
@@ -347,6 +348,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 "取料時間," +
                 "放料時間," +
                 "起始位置," +
+                "Tag歷史," +
                 "使用者ID," +
                 "取消任務使用者ID," +
                 "失敗原因" };
@@ -366,9 +368,10 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{Task.FinishTime}," +
             $"{TimeSpan.FromSeconds((Task.FinishTime - Task.StartTime).TotalSeconds).ToString()}," +
             $"{Task.TotalMileage}," +
-            $"{(Task.UnloadTime == DateTime.MinValue ? "" : Task.UnloadTime)}," +
-            $"{(Task.LoadTime == DateTime.MinValue ? "" : Task.LoadTime)}," +
-            $"{_GetStationNameByTag(Task.StartLocationTag).Replace(",", "_")}," +
+            $"{(Task.UnloadTime == DateTime.MinValue ? "" : Task.UnloadTime)}," + //取料時間
+            $"{(Task.LoadTime == DateTime.MinValue ? "" : Task.LoadTime)}," +//放料時間
+            $"{_GetStationNameByTag(Task.StartLocationTag).Replace(",", "_")}," +//起始位置
+            $"{Task.TagsTracking}," +//Tag歷史
             $"{(Task.DispatcherName.ToLower() == "vms_idle" ? "" : Task.DispatcherName)}," +
             $"{(Task.State == TASK_RUN_STATUS.CANCEL ? Task.DesignatedAGVName : "")}," +
             $"{_GetFailReason(Task.State, Task.FailureReason)}"));

@@ -278,6 +278,6 @@ namespace AGVSystemCommonNet6.AGVDispatch
         /// AGV目前進度(任務訂單進度)
         /// </summary>
         public VehicleMovementStage currentProgress { get; set; } = VehicleMovementStage.Not_Start_Yet;
-
+        public string TagsTracking { get; set; } = string.Empty;
     }
 }
