@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.Alarm
     /// </summary>
     public class AlarmCodeTable
     {
-        public const string VERSION = "1.3.0";
+        public const string VERSION = "1.3.1";
         public string FileVersion { get; set; } = "1.0.0";
         public clsAlarmCode[] Table { get; set; } = new clsAlarmCode[]
         {
@@ -163,6 +163,10 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.Charge_Station_Temperature_High, "充電樁溫度過高", "Charge Station Temperature Too High", "", "", ""),
             new clsAlarmCode(ALARMS.UNLOAD_BUT_CARGO_ID_READ_FAIL, "AGV取貨完成後貨物ID讀取失敗", "Cargo ID Read Fail When Unload", "", "", ""),
             new clsAlarmCode(ALARMS.AGVCargoStatusNotMatchWithTask, "AGV貨物狀態與目前任務不符", "AGV Cargo Status Not Match With Current Task", "", "", ""),
+            new clsAlarmCode(ALARMS.TrafficDriveVehicleAwayButCannotFindAvoidPosition, "交管請求車輛避讓但找不到避讓點", "No available avoid point for traffic control request", "", "", ""),
+            new clsAlarmCode(ALARMS.TrafficDriveVehicleAwaybutWaitOtherVehicleReleasePointTimeout, "等待其他車輛釋放取放貨Port位逾時", "Wait Other Vehicle Release Port TIMOUT", "", "", ""),
+            new clsAlarmCode(ALARMS.TrafficDriveVehicleAwaybutAppendOrderToDatabaseFail, "產生避讓任務時發生寫入資料庫異常", "Add Avoid Task To Database ERROR", "", "", ""),
+            new clsAlarmCode(ALARMS.TrafficDriveVehicleAwaybutVehicleNotOnline, "交管請求車輛釋放取放貨Port位但該車未上線", "Cannot Release Port When Vehicle Not ONLINE", "", "", ""),
         };
     }
 }
