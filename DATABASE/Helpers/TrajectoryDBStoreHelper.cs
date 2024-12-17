@@ -16,6 +16,19 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
         }
 
+        public List<List<clsTrajCoordination>> GetTrajectorys(string taskID)
+        {
+            using (var db = new AGVSDatabase())
+            {
+                IQueryable<clsTaskTrajecotroyStore> trajDatas = db.tables.TaskTrajecotroyStores.AsNoTracking().Where(t => t.TaskName.Contains(taskID));
+                if (trajDatas.Any())
+                {
+                    return trajDatas.Select(traj => traj.Coordinations).ToList();
+                }
+                else
+                    return new List<List<clsTrajCoordination>>();
+            }
+        }
         public List<clsTrajCoordination> GetTrajectory(string taskID)
         {
             using (var db = new AGVSDatabase())
@@ -51,8 +64,12 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                         }
                         else
                         {
-                            existData.AGVName = agvName;
-                            existData.CoordinationsJson = trajRecordjson;
+                            db.tables.TaskTrajecotroyStores.Add(new clsTaskTrajecotroyStore
+                            {
+                                TaskName = taskID + "_2",
+                                AGVName = agvName,
+                                CoordinationsJson = trajRecordjson
+                            });
 
                         }
                         await db.SaveChanges();
