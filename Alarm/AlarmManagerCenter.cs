@@ -53,7 +53,9 @@ namespace AGVSystemCommonNet6.Alarm
         {
             try
             {
-                await WaitAlarmTableUnLocked();
+
+                if (!await WaitAlarmTableUnLocked())
+                    return;
                 using var db = new AGVSDatabase();
                 foreach (var alarm in db.tables.SystemAlarms.Where(al => !al.Checked))
                 {
@@ -71,10 +73,14 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static async Task UpdateAlarmDuration(clsAlarmDto alarmDto)
         {
+            bool waitAddTimeout = true;
             try
             {
-                await semaphoreSlim.WaitAsync();
-                await WaitAlarmTableUnLocked();
+                waitAddTimeout = !await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(2));
+                if (waitAddTimeout)
+                    return;
+                if (!await WaitAlarmTableUnLocked())
+                    return;
                 using (var db = new AGVSDatabase())
                 {
                     clsAlarmDto alarmInDatabase = db.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
@@ -92,20 +98,25 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-                semaphoreSlim.Release();
+                if (!waitAddTimeout)
+                    semaphoreSlim.Release();
             }
         }
 
         public static async Task UpdateAlarmAsync(clsAlarmDto alarmDto)
         {
+            bool waitAddTimeout = true;
             try
             {
-                await semaphoreSlim.WaitAsync();
+                waitAddTimeout = !await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(2));
+                if (waitAddTimeout)
+                    return;
                 var dbhelper = new AGVSDatabase();
                 var alarmExist = dbhelper.tables.SystemAlarms.FirstOrDefault(alarm => alarm.Time == alarmDto.Time);
                 if (alarmExist != null)
                 {
-                    await WaitAlarmTableUnLocked();
+                    if (!await WaitAlarmTableUnLocked())
+                        return;
                     mapper.Map(alarmDto, alarmExist);
                     dbhelper.tables.Entry(alarmExist).State = EntityState.Modified;
                     await dbhelper.SaveChanges();
@@ -119,20 +130,25 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-                semaphoreSlim.Release();
+                if (!waitAddTimeout)
+                    semaphoreSlim.Release();
             }
         }
         private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         public static async Task AddAlarmAsync(clsAlarmDto alarmDto)
         {
+            bool waitAddTimeout = true;
             try
             {
-                await semaphoreSlim.WaitAsync();
+                waitAddTimeout = !await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(2));
+                if (waitAddTimeout)
+                    return;
                 if (!Initialized)
                     await InitializeAsync();
                 if (alarmDto.AlarmCode == 0)
                     return;
-                await WaitAlarmTableUnLocked();
+                if (!await WaitAlarmTableUnLocked())
+                    return;
                 database.tables.SystemAlarms.Add(alarmDto);
                 await database.SaveChanges();
                 MCSCIMService.AlarmReport((ushort)alarmDto.AlarmCode, alarmDto.Description);
@@ -141,7 +157,11 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 Console.WriteLine(ex.Message);
             }
-            finally { semaphoreSlim.Release(); }
+            finally
+            {
+                if (!waitAddTimeout)
+                    semaphoreSlim.Release();
+            }
         }
         static object AlarmLockObject = new object();
 
@@ -338,9 +358,12 @@ namespace AGVSystemCommonNet6.Alarm
         public static async Task ResetAlarmAsync(clsAlarmDto alarm, bool resetAllSameCode = false)
         {
 
+            bool waitAddTimeout = true;
             try
             {
-                await semaphoreSlim.WaitAsync();
+                waitAddTimeout = !await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(2));
+                if (waitAddTimeout)
+                    return;
                 using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     if (resetAllSameCode)
@@ -370,7 +393,8 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-                semaphoreSlim.Release();
+                if (!waitAddTimeout)
+                    semaphoreSlim.Release();
             }
 
 
@@ -381,10 +405,14 @@ namespace AGVSystemCommonNet6.Alarm
         public static async Task<int> RemoveAlarm(clsAlarmDto alarmDto)
         {
 
+            bool waitAddTimeout = true;
             try
             {
-                await semaphoreSlim.WaitAsync();
-                await WaitAlarmTableUnLocked();
+                waitAddTimeout = !await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(2));
+                if (waitAddTimeout)
+                    return 0;
+                if (!await WaitAlarmTableUnLocked())
+                    return 0;
                 int changedNum = 0;
                 using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
@@ -401,7 +429,8 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-                semaphoreSlim.Release();
+                if (!waitAddTimeout)
+                    semaphoreSlim.Release();
             }
         }
         public static void SqlSelect(clsAlarmDto alarmquery)
@@ -492,9 +521,12 @@ namespace AGVSystemCommonNet6.Alarm
         }
         public static async Task SetAlarmCheckedAsync(string eQName, int alarm_code, string checker_name = "", string location = null)
         {
+            bool waitAddTimeout = true;
             try
             {
-                await semaphoreSlim.WaitAsync();
+                waitAddTimeout = !await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(2));
+                if (waitAddTimeout)
+                    return;
                 using (var dbhelper = new AGVSDatabase())
                 {
                     var alarms = dbhelper.tables.SystemAlarms.Where(alarm => !alarm.Checked && alarm.Equipment_Name == eQName && alarm.AlarmCode == (int)alarm_code && (location == null ? true : alarm.OccurLocation == location)).ToArray();
@@ -514,7 +546,8 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-                semaphoreSlim.Release();
+                if (!waitAddTimeout)
+                    semaphoreSlim.Release();
             }
         }
         public static async Task SetAlarmCheckedAsync(string eQName, ALARMS alarm_code, string checker_name = "")
@@ -536,9 +569,12 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static async Task SetAlarmsAllCheckedByEquipmentName(string name)
         {
+            bool waitAddTimeout = true;
             try
             {
-                await semaphoreSlim.WaitAsync();
+                waitAddTimeout = !await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(2));
+                if (waitAddTimeout)
+                    return;
                 using var agvsDb = new AGVSDatabase();
                 using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
@@ -559,7 +595,8 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-                semaphoreSlim.Release();
+                if (!waitAddTimeout)
+                    semaphoreSlim.Release();
             }
 
         }
@@ -582,9 +619,12 @@ namespace AGVSystemCommonNet6.Alarm
 
         public static async Task UpdateAlarmDuration(string name, int alarm_ID)
         {
+            bool waitAddTimeout = true;
             try
             {
-                await semaphoreSlim.WaitAsync();
+                waitAddTimeout = !await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(2));
+                if (waitAddTimeout)
+                    return;
                 using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
                 {
                     var alarms = dbhelper._context.SystemAlarms.Where(alarm => alarm.Equipment_Name == name && alarm.AlarmCode == alarm_ID).ToArray();
@@ -598,12 +638,13 @@ namespace AGVSystemCommonNet6.Alarm
             }
             finally
             {
-                semaphoreSlim.Release();
+                if (!waitAddTimeout)
+                    semaphoreSlim.Release();
             }
 
         }
 
-        private static async Task WaitAlarmTableUnLocked()
+        private static async Task<bool> WaitAlarmTableUnLocked()
         {
             CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             while (database.tables.IsAlarmTableLocking())
@@ -612,9 +653,10 @@ namespace AGVSystemCommonNet6.Alarm
                 if (cts.Token.IsCancellationRequested)
                 {
                     Console.WriteLine("Alarm Table is locking, wait for 1 second and TIMEOUT.");
-                    break;
+                    return false;
                 }
             }
+            return true;
         }
     }
 
