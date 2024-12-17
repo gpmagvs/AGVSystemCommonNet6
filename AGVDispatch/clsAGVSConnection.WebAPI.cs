@@ -216,6 +216,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 var api_route = $"/api/AGV/CarrierVirtualID?AGVName={EQName}&Model={AGV_Type}";
                 logger?.LogTrace($"(GET){api_route},body json =");
                 clsCarrierVirtualIDResponseWebAPI response = await http.GetAsync<clsCarrierVirtualIDResponseWebAPI>(api_route, timeout: 8);
+                logger?.LogTrace($"(GET){api_route},Response={response.ToJson(Formatting.None)}");
                 return response;
             }
             catch (Exception ex)
@@ -239,6 +240,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 logger?.LogTrace($"(GET){api_route},body json =");
                 //(new { Tag = option.TagID, EqName = option.Name, AGVModbusGatewayPort = option.ConnOptions.AGVModbusGatewayPort }
                 clsEQOptions response = await AGVsWebAPIHttp.GetAsync<clsEQOptions>(api_route);
+                logger?.LogTrace($"(GET){api_route},Response={response.ToJson(Formatting.None)}");
                 return response;
             }
             catch (Exception ex)
@@ -256,6 +258,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 logger?.LogTrace($"(POST){api_route},body json =");
                 //(new { Tag = option.TagID, EqName = option.Name, AGVModbusGatewayPort = option.ConnOptions.AGVModbusGatewayPort }
                 List<clsEQOptions> response = await AGVsWebAPIHttp.PostAsync<List<clsEQOptions>, int[]>(api_route, eQTags);
+                logger?.LogTrace($"(POST){api_route},Response={response.ToJson(Formatting.None)}");
                 return response;
             }
             catch (Exception ex)
@@ -274,6 +277,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 var api_route = $"/api/AGV/LeaveWorkStationRequest?AGVName={vehicleName}&EQTag={currentEQTag}";
                 logger?.LogTrace($"(POST){api_route},body json =");
                 clsLeavePortReqResponse response = await http.PostAsync<clsLeavePortReqResponse, object>(api_route, null, timeout: 3);
+                logger?.LogTrace($"(POST) {api_route},Response={response.ToJson(Formatting.None)}");
                 return response.confirm;
             }
             catch (Exception ex)
