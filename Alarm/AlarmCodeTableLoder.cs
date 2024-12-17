@@ -30,7 +30,7 @@ namespace AGVSystemCommonNet6.Alarm
 
                 if (runningVersionInt < devVersionInt)
                     throw new Exception("FILE VERSION TOO OLD");
-                else
+                else if (runningVersionInt > devVersionInt)
                     Console.WriteLine("[Notice] 現場的 Alarm Code Table版本高於開發中版本!");
                 return jsonFile.Table;
             }
