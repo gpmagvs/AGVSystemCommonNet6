@@ -19,6 +19,12 @@ namespace AGVSystemCommonNet6.Sys
                 string value = Environment.GetEnvironmentVariable(variableName, EnvironmentVariableTarget.User);
                 if (string.IsNullOrEmpty(value))
                     Environment.SetEnvironmentVariable(variableName, variableValue, EnvironmentVariableTarget.User);
+                else
+                {
+                    //remove the variable first
+                    Environment.SetEnvironmentVariable(variableName, null, EnvironmentVariableTarget.User);
+                    Environment.SetEnvironmentVariable(variableName, variableValue, EnvironmentVariableTarget.User);
+                }
                 //// 讀取並驗證環境變數是否添加成功
                 //string value = Environment.GetEnvironmentVariable(variableName, EnvironmentVariableTarget.User);
                 //Console.WriteLine($"Environment variable '{variableName}' is set to: {value}");
@@ -28,6 +34,8 @@ namespace AGVSystemCommonNet6.Sys
                 Console.WriteLine($"Set Environment variable '{variableName}' as {variableValue} fail. {ex.Message}");
             }
         }
+
+
 
         public static string GetUserVariable(string variableName)
         {
