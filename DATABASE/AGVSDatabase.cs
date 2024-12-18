@@ -7,6 +7,7 @@ using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.Equipment;
 using AGVSystemCommonNet6.Equipment.AGV;
 using AGVSystemCommonNet6.Material;
+using AGVSystemCommonNet6.Microservices.MCSCIM;
 using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.Sys;
 using AGVSystemCommonNet6.User;
@@ -185,7 +186,6 @@ namespace AGVSystemCommonNet6.DATABASE
                     return "StationName";
                 case "EqpUnloadStates":
                     return "StartWaitUnloadTime";
-
                 case "EQStatus_AGV":
                     return "Name";
                 case "EQStatus_MainEQ":
@@ -194,6 +194,8 @@ namespace AGVSystemCommonNet6.DATABASE
                     return "Name";
                 case "DeepChargeRecords":
                     return "OrderRecievedTime";
+                case "SecsLog":
+                    return "LogTime";
                 default:
                     Debug.WriteLine($"Warning: No primary key mapping defined for table {tableName}");
                     return null;
@@ -219,6 +221,7 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<MainEQStatus>(nameof(database.tables.EQStatus_MainEQ));
             await schemaUpdater.EnsureFieldExists<RackStatus>(nameof(database.tables.EQStatus_Rack));
             await schemaUpdater.EnsureFieldExists<DeepChargeRecord>(nameof(database.tables.DeepChargeRecords));
+            await schemaUpdater.EnsureFieldExists<SecsMessageLog>(nameof(database.tables.SecsLog));
 
             return true;
         }

@@ -6,6 +6,7 @@ using AGVSystemCommonNet6.Equipment;
 using AGVSystemCommonNet6.Equipment.AGV;
 using AGVSystemCommonNet6.Maintainance;
 using AGVSystemCommonNet6.Material;
+using AGVSystemCommonNet6.Microservices.MCSCIM;
 using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.Sys;
 using AGVSystemCommonNet6.User;
@@ -51,6 +52,8 @@ namespace AGVSystemCommonNet6.DATABASE
         public DbSet<RackStatus> EQStatus_Rack { get; set; }
 
         public DbSet<DeepChargeRecord> DeepChargeRecords { get; set; }
+
+        public DbSet<SecsMessageLog> SecsLog { get; set; }
 
         private bool _isWarRoomUse = false;
 
