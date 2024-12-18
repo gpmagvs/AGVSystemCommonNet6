@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -137,6 +138,48 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
 
             }
 
+        }
+
+        public async Task<List<clsTaskTrajecotroyViewModel>> GetTrajectorysWithTimeRange(DateTime from, DateTime to)
+        {
+            using (var db = new AGVSDatabase())
+            {
+                try
+                {
+
+                    IQueryable<AGVDispatch.clsTaskDto> allTasksInRange = db.tables.Tasks.AsNoTracking().Where(order => order.RecieveTime >= from && order.FinishTime <= to);
+                    IQueryable<clsTaskTrajecotroyStore> trajectoryStores = db.tables.TaskTrajecotroyStores.AsNoTracking();
+                    IQueryable<string> allTaskNames = allTasksInRange.Select(order => order.TaskName);
+                    IQueryable<clsTaskTrajecotroyStore> allTrajRecords = trajectoryStores.Where(trajRecord => allTaskNames.Contains(trajRecord.TaskName));
+
+                    return allTrajRecords.Select(record => new clsTaskTrajecotroyViewModel(record.TaskName, record.AGVName, record.CoordinationsJson)).ToList();
+                }
+                catch (Exception ex)
+                {
+                    return new List<clsTaskTrajecotroyViewModel>();
+                }
+
+            }
+        }
+
+
+        public class clsTaskTrajecotroyViewModel : clsTaskTrajecotroyStore
+        {
+
+            public clsTaskTrajecotroyViewModel(string taskName, string agvName, string coordinationsJson)
+            {
+                base.TaskName = taskName;
+                base.AGVName = agvName;
+                CoordinationsJson = coordinationsJson;
+            }
+            internal new string CoordinationsJson { get; set; } = "";
+            public new List<clsTrajCoordination> Coordinations
+            {
+                get
+                {
+                    return JsonConvert.DeserializeObject<List<clsTrajCoordination>>(CoordinationsJson);
+                }
+            }
         }
     }
 }
