@@ -177,7 +177,7 @@ namespace AGVSystemCommonNet6.DATABASE
                 case "StopRegionData":
                     return "StartTime";
                 case "PointPassTime":
-                    return "Time";
+                    return "DataKey";
                 case "VehicleMaintain":
                     return "VehicleMaintainId";
                 case "MaterialInfo":
@@ -212,6 +212,7 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<AvailabilityDto>(nameof(database.tables.Availabilitys));
             await schemaUpdater.EnsureFieldExists<RTAvailabilityDto>(nameof(database.tables.RealTimeAvailabilitys));
             await schemaUpdater.EnsureFieldExists<clsTaskTrajecotroyStore>(nameof(database.tables.TaskTrajecotroyStores));
+            await schemaUpdater.EnsureFieldExists<clsPointPassInfo>(nameof(database.tables.PointPassTime));
             await schemaUpdater.EnsureFieldExists<clsMeasureResult>(nameof(database.tables.InstrumentMeasureResult));
             await schemaUpdater.EnsureFieldExists<clsStopRegionDto>(nameof(database.tables.StopRegionData));
             await schemaUpdater.EnsureFieldExists<clsMaterialInfo>(nameof(database.tables.MaterialInfo));

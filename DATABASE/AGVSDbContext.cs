@@ -142,6 +142,11 @@ namespace AGVSystemCommonNet6.DATABASE
             return result.Where(ret => ret.Objname == tableName).Any();
         }
 
+        public bool isPointPassInfoTableLocking()
+        {
+            throw new NotImplementedException();
+        }
+
         // 首先需要定義一個對應的模型類
         public class LockInfo
         {
