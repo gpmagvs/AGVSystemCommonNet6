@@ -76,30 +76,36 @@ namespace AGVSystemCommonNet6.Configuration
 
         public static async Task<string> GetTrayUnknownFlowID()
         {
-            int flowNumber = await AGVSConfigulator.GetTrayUnknowFlowNumber();
-            string unknowCargoID = $"TUN{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            int flowNumber = await GetTrayUnknowFlowNumber();
+            string unknowCargoID = $"TUN{SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
             return unknowCargoID;
         }
         public static async Task<string> GetRackUnknownFlowID()
         {
-            int flowNumber = await AGVSConfigulator.GetRackUnknowFlowNumber();
-            string unknowCargoID = $"UN{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            int flowNumber = await GetRackUnknowFlowNumber();
+            string unknowCargoID = $"UN{SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
             return unknowCargoID;
         }
         public static async Task<string> GetDoubleTrayUnknownFlowID()
         {
-            int flowNumber = await AGVSConfigulator.GetRackDoubleUnknowFlowNumber();
-            string unknowCargoID = $"TDU{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            int flowNumber = await GetRackDoubleUnknowFlowNumber();
+            string unknowCargoID = $"TDU{SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
             return unknowCargoID;
         }
 
         public static async Task<string> GetTrayMissMatchFlowID()
         {
-            int flowNumber = await AGVSConfigulator.GetTrayMissMatchFlowNumber();
-            string unknowCargoID = $"TMI{AGVSConfigulator.SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            int flowNumber = await GetTrayMissMatchFlowNumber();
+            string unknowCargoID = $"TMI{SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
             return unknowCargoID;
         }
 
+        public static async Task<string> GetRackMissMatchFlowID()
+        {
+            int flowNumber = await GetRackMissMatchFlowNumber();
+            string unknowCargoID = $"MI{SysConfigs.SECSGem.SystemID}{flowNumber.ToString("D5")}";
+            return unknowCargoID;
+        }
         private static async Task<int> GetTrayUnknowFlowNumber()
         {
             try
@@ -182,6 +188,26 @@ namespace AGVSystemCommonNet6.Configuration
             }
         }
 
+
+        private static async Task<int> GetRackMissMatchFlowNumber()
+        {
+            try
+            {
+                await SysConfigFIleSemaphoreSlim.WaitAsync();
+                SysConfigs.SECSGem.MissMatchRackIDFlowNumberUsed += 1;
+                Save(SysConfigs);
+                return SysConfigs.SECSGem.MissMatchRackIDFlowNumberUsed;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                return 0;
+            }
+            finally
+            {
+                SysConfigFIleSemaphoreSlim.Release();
+            }
+        }
     }
 }
 

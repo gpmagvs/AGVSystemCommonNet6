@@ -15,8 +15,8 @@ namespace AGVSystemCommonNet6.Microservices.MCSCIM
         public int UnknowTrayIDFlowNumberUsed { get; set; } = 0;
         public int UnknowRackIDFlowNumberUsed { get; set; } = 0;
         public int DoubleUnknowDFlowNumberUsed { get; set; } = 0;
-
         public int MissMatchTrayIDFlowNumberUsed { get; set; } = 0;
+        public int MissMatchRackIDFlowNumberUsed { get; set; } = 0;
 
     }
 
