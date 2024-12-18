@@ -30,6 +30,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Model
     }
     public class clsTrajCoordination
     {
+        public DateTime Time { get; set; } = DateTime.MinValue;
         public double X { get; set; }
         public double Y { get; set; }
         public double Theta { get; set; }
