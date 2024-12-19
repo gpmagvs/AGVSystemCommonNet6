@@ -10,14 +10,15 @@ namespace AGVSystemCommonNet6.Alarm.SECS_Alarm_Code.Enums
     public enum HCACK_RETURN_CODE_GPM : byte
     {
         Success = 0x00,
-        OtherErrors = 0x01,
-        ZoneIsFull = 0x02,
-        DuplicateID = 0x03,
-        IDMissmatch = 0x04,
-        IDReadFail = 0x05,
-        InterlockError = 0x64,
-
-
+        CommandName_Does_Not_Exist = 0x01,
+        Cannot_Perform_Now = 0x02,
+        At_least_one_parameter_is_invalid = 0x03,
+        Acknowledge_command_will_be_perform_with_completion_signaled_later_by_an_event = 0x04,
+        Rejected_Already_in_desired_condition = 0x05,
+        Not_such_object_exists = 0x06,
+        CPNAME_and_CPVAL_Is_Insufficient = 64,
+        System_Error = 65,
+        Cannot_Find_Seat_For_The_Carrier_In_Rack = 0x2E,
     }
 
     public enum HCACK_RETURN_CODE_YELLOW : byte

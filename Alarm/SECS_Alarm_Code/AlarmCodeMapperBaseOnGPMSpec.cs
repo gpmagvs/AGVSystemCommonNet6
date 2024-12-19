@@ -5,8 +5,6 @@ namespace AGVSystemCommonNet6.Alarm.SECS_Alarm_Code
     public class AlarmCodeMapperBaseOnGPMSpec : AlarmCodeMapperBaseOnKGSSpec
     {
 
-        public override Dictionary<ALARMS, byte> MappingTable { get; set; } = new Dictionary<ALARMS, byte>();
-
         public override MapResult GetHCACKReturnCode(ALARMS alarmCode)
         {
 
@@ -17,7 +15,7 @@ namespace AGVSystemCommonNet6.Alarm.SECS_Alarm_Code
                 return new MapResult((byte)codeEnum, codeEnum.ToString());
             }
 
-            return new MapResult((byte)HCACK_RETURN_CODE_GPM.OtherErrors, HCACK_RETURN_CODE_GPM.OtherErrors.ToString());
+            return new MapResult((byte)HCACK_RETURN_CODE_GPM.System_Error, HCACK_RETURN_CODE_GPM.System_Error.ToString());
         }
     }
 }
