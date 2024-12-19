@@ -71,7 +71,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync($"/api/TransportEventReport/TransferAbortInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+                await _http.PostAsync($"/api/TransportEventReport/TransferAbortInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
             }
             catch (Exception ex)
             {
@@ -82,7 +82,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync($"/api/TransportEventReport/TransferAbortComplete?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+                await _http.PostAsync($"/api/TransportEventReport/TransferAbortComplete?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
             }
             catch (Exception ex)
             {
@@ -108,7 +108,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync($"/api/TransportEventReport/TransferCancelInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+                await _http.PostAsync($"/api/TransportEventReport/TransferCancelInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
             }
             catch (Exception ex)
             {
@@ -119,7 +119,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync($"/api/TransportEventReport/TransferCancelCompleted?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc} &CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
+                await _http.PostAsync($"/api/TransportEventReport/TransferCancelCompleted?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
             }
             catch (Exception ex)
             {
@@ -130,7 +130,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync($"/api/TransportEventReport/TransferCancelFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName=  {commandDto.CarrierZoneName}  &Dest=  {commandDto.Dest}", null);
+                await _http.PostAsync($"/api/TransportEventReport/TransferCancelFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
             }
             catch (Exception ex)
             {
