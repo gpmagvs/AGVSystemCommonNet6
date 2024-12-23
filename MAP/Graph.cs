@@ -23,5 +23,13 @@ namespace AGVSystemCommonNet6.MAP
         public double textOffsetX { get; set; } = 0;
         public double textOffsetY { get; set; } = -22;
 
+        public RackDisplay rackDisplay { get; set; } = new RackDisplay();
+    }
+
+    public class RackDisplay
+    {
+        public double Rotation { get; set; } = 0;
+        public int OffsetX { get; set; } = 20;
+        public int OffsetY { get; set; } = 0;
     }
 }
