@@ -147,7 +147,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 try
                 {
 
-                    IQueryable<AGVDispatch.clsTaskDto> allTasksInRange = db.tables.Tasks.AsNoTracking().Where(order => order.RecieveTime >= from && order.FinishTime <= to);
+                    IQueryable<AGVDispatch.clsTaskDto> allTasksInRange = db.tables.Tasks.AsNoTracking().Where(order => order.RecieveTime >= from && order.FinishTime <= to)
+                                                                                                       .OrderBy(order => order.RecieveTime);
                     IQueryable<clsTaskTrajecotroyStore> trajectoryStores = db.tables.TaskTrajecotroyStores.AsNoTracking();
                     IQueryable<string> allTaskNames = allTasksInRange.Select(order => order.TaskName);
                     IQueryable<clsTaskTrajecotroyStore> allTrajRecords = trajectoryStores.Where(trajRecord => allTaskNames.Contains(trajRecord.TaskName));
