@@ -141,6 +141,7 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
     {
         None = 0,
         Tray = 200,
-        Rack = 201
+        Rack = 201,
+        Unknown = 500
     }
 }
