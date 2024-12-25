@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AGVSystemCommonNet6.Alarm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,15 +41,66 @@ namespace AGVSystemCommonNet6.Microservices.MCSCIM
 
         public clsResultCodes ResultCodes { get; set; } = new clsResultCodes();
 
+        public byte GetResultCode(ALARMS agvsInnerAlarm)
+        {
+            if (agvsInnerAlarm == ALARMS.UNLOAD_BUT_CARGO_ID_READ_FAIL)
+                return ResultCodes.UnloadButCargoIDReadFailResultCode;
+            else if (agvsInnerAlarm == ALARMS.UNLOAD_BUT_CARGO_ID_NOT_MATCHED)
+                return ResultCodes.UnloadButCargoIDReadNotMatchedResultCode;
+            else if (agvsInnerAlarm == ALARMS.EQ_UNLOAD_REQUEST_ON_BUT_NO_CARGO)
+                return ResultCodes.EqUnloadButNoCargoResultCode;
+            else if (agvsInnerAlarm == ALARMS.EQ_UNLOAD_REQUEST_IS_NOT_ON)
+                return ResultCodes.SourceEqUnloadReqeustOff;
+            else if (agvsInnerAlarm == ALARMS.EQ_UNLOAD_REQUEST_ON_BUT_POSE_NOT_UP)
+                return ResultCodes.SourceEqMachechStateErrorResultCode;
+            else if (agvsInnerAlarm == ALARMS.Source_Eq_Status_Down)
+                return ResultCodes.SourceEqDownResultCode;
+
+            else if (agvsInnerAlarm == ALARMS.EQ_LOAD_REQUEST_ON_BUT_HAS_CARGO)
+                return ResultCodes.DestineEqHasCargoResultCode;
+            else if (agvsInnerAlarm == ALARMS.EQ_LOAD_REQUEST_IS_NOT_ON)
+                return ResultCodes.DestineEqLoadReqeustOff;
+            else if (agvsInnerAlarm == ALARMS.EQ_LOAD_REQUEST_ON_BUT_POSE_NOT_DOWN)
+                return ResultCodes.DestineEqMachechStateErrorResultCode;
+            else if (agvsInnerAlarm == ALARMS.Destine_Eq_Status_Down)
+                return ResultCodes.DestineEqDownResultCode;
+
+            else if (agvsInnerAlarm == ALARMS.SourceRackPortNoCargo)
+                return ResultCodes.SourceRackPortNotHasCargoResultCode;
+            else if (agvsInnerAlarm == ALARMS.DestineRackPortHasCargo)
+                return ResultCodes.DestineRackPortHasCargoResultCode;
+
+            else
+                return ResultCodes.OtherErrorsResultCode;
+        }
+
         public class clsResultCodes
         {
+            public byte OtherErrorsResultCode { get; set; } = 1;
+            public byte ZoneIsFullResultCode { get; set; } = 2;
             public byte UnloadButCargoIDReadNotMatchedResultCode { get; set; } = 4;
             public byte UnloadButCargoIDReadFailResultCode { get; set; } = 5;
-            public int EqUnloadButNoCargoResultCode { get; set; } = 100;
+            public byte InterlockErrorResultCode { get; set; } = 64;
+            public byte EqUnloadButNoCargoResultCode { get; set; } = 100;
             public byte AGVDownWhenLDULDWithCargoResultCode { get; set; } = 101;
             public byte AGVDownWhenLDWithoutCargoResultCode { get; set; } = 102;
             public byte AGVDownWhenULDWithoutCargoResultCode { get; set; } = 144;
             public byte AGVDownWhenMovingToDestineResultCode { get; set; } = 145;
+
+            public byte DestineEqLoadReqeustOff { get; set; } = 10;
+            public byte DestineEqHasCargoResultCode { get; set; } = 11;
+            public byte DestineEqMachechStateErrorResultCode { get; set; } = 12;
+            public byte DestineEqDownResultCode { get; set; } = 13;
+
+
+            public byte SourceEqUnloadReqeustOff { get; set; } = 14;
+            public byte SourceEqNotHasCargoResultCode { get; set; } = 15;
+            public byte SourceEqMachechStateErrorResultCode { get; set; } = 16;
+            public byte SourceEqDownResultCode { get; set; } = 17;
+
+            public byte DestineRackPortHasCargoResultCode { get; set; } = 30;
+            public byte SourceRackPortNotHasCargoResultCode { get; set; } = 31;
+
         }
     }
 
