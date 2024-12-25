@@ -37,6 +37,8 @@ namespace AGVSystemCommonNet6.Configuration
             CreateDirectory();
             alarmConfiguration = LoadAlarmConfig();
             transferReportConfiguration = LoadTransferReportConfig();
+            UpdateCofigurationFile(alarmConfiguration, alarmConfigFilePath);
+            UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
         }
 
         private TransferReportConfiguration LoadTransferReportConfig()
@@ -48,7 +50,7 @@ namespace AGVSystemCommonNet6.Configuration
             catch
             {
                 TransferReportConfiguration defaultConfig = new();
-                CreateNewConfig(defaultConfig, transferReportConfigFilePath);
+                UpdateCofigurationFile(defaultConfig, transferReportConfigFilePath);
                 return defaultConfig;
             }
         }
@@ -62,7 +64,7 @@ namespace AGVSystemCommonNet6.Configuration
             catch
             {
                 SECSAlarmConfiguration defaultConfig = new SECSAlarmConfiguration();
-                CreateNewConfig(defaultConfig, alarmConfigFilePath);
+                UpdateCofigurationFile(defaultConfig, alarmConfigFilePath);
                 return defaultConfig;
             }
         }
@@ -87,7 +89,7 @@ namespace AGVSystemCommonNet6.Configuration
             }
         }
 
-        private void CreateNewConfig(object defaultObj, string filePath)
+        private void UpdateCofigurationFile(object defaultObj, string filePath)
         {
             CreateDirectory();
             File.WriteAllText(filePath, JsonConvert.SerializeObject(defaultObj, Formatting.Indented));
@@ -101,7 +103,7 @@ namespace AGVSystemCommonNet6.Configuration
         public void UpdateReturnCodes(TransferReportConfiguration.clsResultCodes transferCompletedResultCodes)
         {
             this.transferReportConfiguration.ResultCodes = transferCompletedResultCodes;
-            CreateNewConfig(transferReportConfiguration, transferReportConfigFilePath);
+            UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
         }
     }
 }
