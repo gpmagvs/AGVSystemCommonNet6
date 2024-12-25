@@ -68,7 +68,22 @@ namespace AGVSystemCommonNet6.DATABASE
         {
             try
             {
-                var checkPKStatus = @"
+                bool confirmOk = CheckPrimaryKeys(database, out List<string> tablesNeedingPK);
+                // 修復缺少主鍵的表
+                if (!confirmOk)
+                {
+                    RestorePrimaryKeys(database, tablesNeedingPK);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(":" + ex.Message);
+            }
+        }
+
+        public static bool CheckPrimaryKeys(AGVSDatabase database, out List<string> primaryKeyErrorTables)
+        {
+            var checkPKStatus = @"
                                     SELECT 
                                         t.name AS TableName,
                                         CASE WHEN pk.name IS NULL THEN 'No PK' ELSE 'Has PK' END AS PKStatus,
@@ -80,73 +95,71 @@ namespace AGVSystemCommonNet6.DATABASE
                                     ORDER BY t.name;
                                 ";
 
-                var tablesNeedingPK = new List<string>();
+            primaryKeyErrorTables = new List<string>();
 
-                using (var command = database.dbContext.Database.GetDbConnection().CreateCommand())
+            using (var command = database.dbContext.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = checkPKStatus;
+
+                database.dbContext.Database.OpenConnection();
+
+                using (var result = command.ExecuteReader())
                 {
-                    command.CommandText = checkPKStatus;
-
-                    database.dbContext.Database.OpenConnection();
-
-                    using (var result = command.ExecuteReader())
+                    while (result.Read())
                     {
-                        while (result.Read())
+                        var tableName = result.GetString(0);
+                        var pkStatus = result.GetString(1);
+                        var pkName = result.IsDBNull(2) ? "N/A" : result.GetString(2);
+
+                        Debug.WriteLine($"Table: {tableName}, Status: {pkStatus}, PK Name: {pkName}");
+
+                        if (pkStatus == "No PK")
                         {
-                            var tableName = result.GetString(0);
-                            var pkStatus = result.GetString(1);
-                            var pkName = result.IsDBNull(2) ? "N/A" : result.GetString(2);
-
-                            Debug.WriteLine($"Table: {tableName}, Status: {pkStatus}, PK Name: {pkName}");
-
-                            if (pkStatus == "No PK")
-                            {
-                                tablesNeedingPK.Add(tableName);
-                            }
+                            primaryKeyErrorTables.Add(tableName);
                         }
                     }
                 }
+            }
 
-                // 修復缺少主鍵的表
-                if (tablesNeedingPK.Any())
+            return !primaryKeyErrorTables.Any();
+        }
+
+        public static void RestorePrimaryKeys(AGVSDatabase database, List<string> tablesNeedingPK)
+        {
+            foreach (var tableName in tablesNeedingPK)
+            {
+                string pkColumnName = GetPrimaryKeyColumnName(tableName); // 根據表名確定主鍵列
+
+                try
                 {
-                    foreach (var tableName in tablesNeedingPK)
+                    if (!string.IsNullOrEmpty(pkColumnName))
                     {
-                        string pkColumnName = GetPrimaryKeyColumnName(tableName); // 根據表名確定主鍵列
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(pkColumnName))
-                            {
-                                var alterTableSql = $@"
+                        var alterTableSql = $@"
                                                 IF NOT EXISTS (SELECT * FROM sys.key_constraints WHERE type = 'PK' AND OBJECT_NAME(parent_object_id) = '{tableName}')
                                                 BEGIN
                                                     ALTER TABLE {tableName}
                                                     ADD CONSTRAINT PK_{tableName} PRIMARY KEY ({pkColumnName});
                                                 END
                                             ";
-                                database.dbContext.Database.ExecuteSqlRaw(alterTableSql);
-                                Debug.WriteLine($"Added primary key constraint to table {tableName} on column {pkColumnName}");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine("\n\n");
-                            Console.WriteLine($"錯誤訊息:{ex.Message}");
-                            Console.WriteLine("\n\n");
-                            Console.WriteLine($"Oooooooops! 操作資料表{tableName} 檢查確認主鍵發生錯誤，需使用SSMS或其他資料庫工具將 '{pkColumnName}'欄位設定為[不允許Null]。 \n也可以在資料庫工具中直接將 '{pkColumnName}' 欄位設為 Primary Key.");
-                            Console.WriteLine("\n\n");
-                            Console.WriteLine("按下任意按鍵繼續");
-                            Console.ReadLine();
-                            Environment.Exit(1);
-                        }
+                        database.dbContext.Database.ExecuteSqlRaw(alterTableSql);
+                        Debug.WriteLine($"Added primary key constraint to table {tableName} on column {pkColumnName}");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(":" + ex.Message);
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine($"錯誤訊息:{ex.Message}");
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine($"Oooooooops! 操作資料表{tableName} 檢查確認主鍵發生錯誤，需使用SSMS或其他資料庫工具將 '{pkColumnName}'欄位設定為[不允許Null]。 \n也可以在資料庫工具中直接將 '{pkColumnName}' 欄位設為 Primary Key.");
+                    Console.WriteLine("\n\n");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    //Console.WriteLine("按下任意按鍵繼續");
+                    //Console.ReadLine();
+                    //Environment.Exit(1);
+                }
             }
         }
 
@@ -225,37 +238,6 @@ namespace AGVSystemCommonNet6.DATABASE
             await schemaUpdater.EnsureFieldExists<SecsMessageLog>(nameof(database.tables.SecsLog));
 
             return true;
-        }
-        private static void DataBaseMirgration()
-        {
-
-            var ori_database_name = AGVSConfigulator.SysConfigs.DBConnection.Split(';');
-            AGVSConfigulator.SysConfigs.DBConnection = AGVSConfigulator.SysConfigs.DBConnection.Replace(ori_database_name[1], $"Database=GPMAGVs_V{DateTime.Now.ToString("yyMMddHHmmssff")}");
-            AGVSConfigulator.Save(AGVSConfigulator.SysConfigs);
-        }
-
-        private static void DatabaseVersionCheck(AGVSDatabase databse)
-        {
-            try
-            {
-                var nulls = databse.tables.Tasks.Where(t => t.TransferToDestineAGVName == null);
-                databse.tables.Tasks.FirstOrDefault();
-                databse.tables.Users.FirstOrDefault();
-                databse.tables.AgvStates.FirstOrDefault();
-                databse.tables.SystemAlarms.FirstOrDefault();
-                databse.tables.Availabilitys.FirstOrDefault();
-                databse.tables.RealTimeAvailabilitys.FirstOrDefault();
-                databse.tables.TaskTrajecotroyStores.FirstOrDefault();
-                databse.tables.InstrumentMeasureResult.FirstOrDefault();
-                databse.tables.StopRegionData.FirstOrDefault();
-                databse.tables.MaterialInfo.FirstOrDefault();
-                databse.tables.StationStatus.FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                // 如果出現 Data is Null的例外, 可能是資料庫規劃有改版造成的, 直接把DB刪掉就好  
-                throw ex;
-            }
         }
 
         private static void _UnCheckedAlarmsSetAsCheckes(DbSet<clsAlarmDto> systemAlarms)
