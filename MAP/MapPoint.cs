@@ -97,6 +97,11 @@ namespace AGVSystemCommonNet6.MAP
         /// </summary>
         public bool IsTrafficCheckPoint { get; set; }
 
+        /// <summary>
+        /// 是否為轉換站
+        /// </summary>
+        public bool IsTransferStation { get; set; }
+
         public bool IsNarrowPath { get; set; }
         /// <summary>
         /// 註冊點(,逗點分隔)
