@@ -33,4 +33,23 @@ namespace AGVSystemCommonNet6.Microservices.MCSCIM
 
 
     }
+
+
+    public class TransferReportConfiguration
+    {
+
+        public clsResultCodes ResultCodes { get; set; } = new clsResultCodes();
+
+        public class clsResultCodes
+        {
+            public byte UnloadButCargoIDReadNotMatchedResultCode { get; set; } = 4;
+            public byte UnloadButCargoIDReadFailResultCode { get; set; } = 5;
+            public int EqUnloadButNoCargoResultCode { get; set; } = 100;
+            public byte AGVDownWhenLDULDWithCargoResultCode { get; set; } = 101;
+            public byte AGVDownWhenLDWithoutCargoResultCode { get; set; } = 102;
+            public byte AGVDownWhenULDWithoutCargoResultCode { get; set; } = 144;
+            public byte AGVDownWhenMovingToDestineResultCode { get; set; } = 145;
+        }
+    }
+
 }

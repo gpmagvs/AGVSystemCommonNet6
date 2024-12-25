@@ -13,9 +13,12 @@ namespace AGVSystemCommonNet6.Configuration
         public SECSConfiguration baseConfiguration => AGVSConfigulator.SysConfigs.SECSGem;
         public SECSAlarmConfiguration alarmConfiguration { get; private set; } = new SECSAlarmConfiguration();
 
+        public TransferReportConfiguration transferReportConfiguration { get; private set; } = new TransferReportConfiguration();
+
         public readonly string configsSaveFolder = @"C:\AGVS\SECSConfigs";
 
         public string alarmConfigFilePath => Path.Combine(configsSaveFolder, "SECS_Alarm_Settings.json");
+        public string transferReportConfigFilePath => Path.Combine(configsSaveFolder, "SECS_Transfer_Report.json");
 
         public SECSConfigsService(string configsSaveFolder)
         {
@@ -24,13 +27,30 @@ namespace AGVSystemCommonNet6.Configuration
         }
         public SECSConfigsService()
         {
+        }
+        public void Reload()
+        {
             Initialize();
         }
-
         private void Initialize()
         {
             CreateDirectory();
             alarmConfiguration = LoadAlarmConfig();
+            transferReportConfiguration = LoadTransferReportConfig();
+        }
+
+        private TransferReportConfiguration LoadTransferReportConfig()
+        {
+            try
+            {
+                return LoadConfig<TransferReportConfiguration>(transferReportConfigFilePath);
+            }
+            catch
+            {
+                TransferReportConfiguration defaultConfig = new();
+                CreateNewConfig(defaultConfig, transferReportConfigFilePath);
+                return defaultConfig;
+            }
         }
 
         private SECSAlarmConfiguration LoadAlarmConfig()
@@ -53,7 +73,7 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 try
                 {
-                    string jsonString = File.ReadAllText(alarmConfigFilePath);
+                    string jsonString = File.ReadAllText(filePath);
                     return JsonConvert.DeserializeObject<T>(jsonString);
                 }
                 catch (Exception ex)
@@ -76,6 +96,12 @@ namespace AGVSystemCommonNet6.Configuration
         private void CreateDirectory()
         {
             Directory.CreateDirectory(configsSaveFolder);
+        }
+
+        public void UpdateReturnCodes(TransferReportConfiguration.clsResultCodes transferCompletedResultCodes)
+        {
+            this.transferReportConfiguration.ResultCodes = transferCompletedResultCodes;
+            CreateNewConfig(transferReportConfiguration, transferReportConfigFilePath);
         }
     }
 }
