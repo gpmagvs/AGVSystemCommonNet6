@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.Alarm
     /// </summary>
     public class AlarmCodeTable
     {
-        public const string VERSION = "1.3.1";
+        public const string VERSION = "1.3.2";
         public string FileVersion { get; set; } = "1.0.0";
         public clsAlarmCode[] Table { get; set; } = new clsAlarmCode[]
         {
@@ -167,6 +167,8 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.TrafficDriveVehicleAwaybutWaitOtherVehicleReleasePointTimeout, "等待其他車輛釋放取放貨Port位逾時", "Wait Other Vehicle Release Port TIMOUT", "", "", ""),
             new clsAlarmCode(ALARMS.TrafficDriveVehicleAwaybutAppendOrderToDatabaseFail, "產生避讓任務時發生寫入資料庫異常", "Add Avoid Task To Database ERROR", "", "", ""),
             new clsAlarmCode(ALARMS.TrafficDriveVehicleAwaybutVehicleNotOnline, "交管請求車輛釋放取放貨Port位但該車未上線", "Cannot Release Port When Vehicle Not ONLINE", "", "", ""),
+            new clsAlarmCode(ALARMS.SourceRackPortNoCargo, "來源Rack儲位沒有貨物", "Source Rack Port Not Has Cargo", "", "", ""),
+            new clsAlarmCode(ALARMS.DestineRackPortHasCargo, "目標Rack儲位有貨物", "Destine Rack Port Has Cargo", "", "", ""),
         };
     }
 }

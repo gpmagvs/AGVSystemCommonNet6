@@ -249,6 +249,14 @@ namespace AGVSystemCommonNet6.Alarm
         /// </summary>
         AGV_Battery_SOC_Distortion = 10768,
         UNLOAD_BUT_CARGO_ID_READ_FAIL = 10769,
+
+        #region 2000- Rack
+
+        SourceRackPortNoCargo = 2000,
+        DestineRackPortHasCargo = 2001
+
+        #endregion
+
         #endregion
     }
 
