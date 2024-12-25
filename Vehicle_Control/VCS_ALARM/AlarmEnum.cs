@@ -187,6 +187,7 @@
         Cst_ID_Not_Match = 1860,
         Cst_Type_Not_Match_Tray_But_Get_Rack = 1861,
         Cst_Type_Not_Match_Rack_But_Get_Tray = 1862,
+        Read_Cst_ID_Interupted = 1863,
         Instrument_Error = 1900,
         Instrument_IO_Error_ = 1901,
         Instrument_Module_Error_ = 1902,
@@ -468,6 +469,6 @@
         Battery_Over_Voltage_When_Charging = 10054,
         Reject_AGVS_Task = 10055,
         Fork_Cannot_Go_Home_At_Non_Normal_Point = 10056,
-        Unknown = 40400,
+        Unknown = 40400
     }
 }
