@@ -281,7 +281,8 @@ namespace AGVSystemCommonNet6.Material
                 foreach (var port in rack.PortsStatus)
                 {
                     string _stationName = $"{rack.EQName}_{port.Properties.ID}";
-                    if (stationStatus.Any(status => status.StationName == _stationName) == false)
+                    clsStationStatus? _stationStatus = stationStatus.FirstOrDefault(status => status.StationName == _stationName);
+                    if (_stationStatus == null)
                     {
                         try
                         {
@@ -300,6 +301,13 @@ namespace AGVSystemCommonNet6.Material
                         {
                         }
                     }
+                    else if (_stationStatus.StationTag != port.TagNumbers[0].ToString())
+                    {
+                        //Tag有變化或是錯了
+                        _stationStatus.StationTag = port.TagNumbers[0].ToString();
+                        await database.SaveChanges();
+
+                    }
                 }
             }
         }
@@ -314,7 +322,9 @@ namespace AGVSystemCommonNet6.Material
             foreach (var EQ in StaEQPManagager.MainEQList)
             {
                 string _stationName = $"{EQ.EQName}";
-                if (stationStatus.Any(status => status.StationName == _stationName) == false)
+
+                clsStationStatus? _stationStatus = stationStatus.FirstOrDefault(status => status.StationName == _stationName);
+                if (_stationStatus == null)
                 {
                     try
                     {
@@ -332,6 +342,11 @@ namespace AGVSystemCommonNet6.Material
                     catch (Exception exp)
                     {
                     }
+                }
+                else
+                {
+                    _stationStatus.StationTag = EQ.EndPointOptions.TagID.ToString();
+                    await database.SaveChanges();
                 }
             }
         }
