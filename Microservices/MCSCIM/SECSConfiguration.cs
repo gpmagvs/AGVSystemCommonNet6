@@ -66,7 +66,7 @@ namespace AGVSystemCommonNet6.Microservices.MCSCIM
                 return ResultCodes.DestineEqDownResultCode;
 
             else if (agvsInnerAlarm == ALARMS.SourceRackPortNoCargo)
-                return ResultCodes.SourceRackPortNotHasCargoResultCode;
+                return ResultCodes.EqUnloadButNoCargoResultCode;
             else if (agvsInnerAlarm == ALARMS.DestineRackPortHasCargo)
                 return ResultCodes.DestineRackPortHasCargoResultCode;
 

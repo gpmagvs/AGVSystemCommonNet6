@@ -14,6 +14,14 @@ namespace AGVSystemCommonNet6.Microservices.MCS
     /// </summary>
     public partial class MCSCIMService
     {
+        public enum ID_READ_STATE : ushort
+        {
+            SUCCESS = 0,
+            Failure = 1,
+            Duplicate = 2,
+            Mismatch = 3,
+            NoCarrier = 4
+        }
 
         public class ZoneData
         {
@@ -121,5 +129,18 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 logger.Error(ex);
             }
         }
+
+        public static async Task CarrierIDReadReport(string CarrierID, string CarrierLoc, ID_READ_STATE readState)
+        {
+            try
+            {
+                await _http.PostAsync<object, object>($"/api/Carrier/CarrierIDReadReport?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&IDReadState={(ushort)readState}", null, 1);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
+        }
+
     }
 }
