@@ -275,6 +275,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
         public bool isVehicleAssignedChanged { get; set; } = false;
 
         /// <summary>
+        /// 車輛指派方式是不是從 '指定優先執行' 的設定中挑選
+        /// </summary>
+        public bool isSpeficVehicleAssigned { get; set; } = false;
+
+        /// <summary>
         /// AGV目前進度(任務訂單進度)
         /// </summary>
         public VehicleMovementStage currentProgress { get; set; } = VehicleMovementStage.Not_Start_Yet;
