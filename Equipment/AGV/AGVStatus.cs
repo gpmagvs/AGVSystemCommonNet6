@@ -30,6 +30,11 @@ namespace AGVSystemCommonNet6.Equipment.AGV
         public int MotorLeftAlarmCode { get; set; } = 0;
         #endregion
 
+        public double CoordinateX { get; set; } = 0;
+        public double CoordinateY { get; set; } = 0;
+
+        public string CurrentPathTag { get; set; } = "";
+
 
     }
 }
