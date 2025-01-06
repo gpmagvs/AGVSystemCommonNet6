@@ -381,10 +381,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             {
 
                 if (taskState != TASK_RUN_STATUS.ACTION_FINISH && string.IsNullOrEmpty(failReason))
-                {
-                    Alarm.clsAlarmCode alarm = AlarmManagerCenter.AlarmCodes[ALARMS.AGV_STATUS_DOWN];
-                    return $"[{(int)alarm.AlarmCode}] {alarm.Description}";
-                }
+                    return $"[{(int)ALARMS.SYSTEM_ERROR}] {ALARMS.SYSTEM_ERROR.ToString()}(Fail Reason Empty)";
 
                 if (failReason == null || failReason == "")
                     return "";
