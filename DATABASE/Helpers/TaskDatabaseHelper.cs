@@ -343,8 +343,10 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 "CSTID," +
                 "開始時間," +
                 "結束時間," +
+                "任務駐留時間(sec)," +
                 "花費時間," +
                 "任務距離," +
+                "任務距離(m)," +
                 "取料時間," +
                 "放料時間," +
                 "起始位置," +
@@ -363,11 +365,13 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{Task.To_Slot}," +
             $"{Task.ActionName}," +
             $"{Task.DesignatedAGVName}," +
-            $"{Task.Carrier_ID}," +
-            $"{Task.StartTime}," +
-            $"{Task.FinishTime}," +
-            $"{TimeSpan.FromSeconds((Task.FinishTime - Task.StartTime).TotalSeconds).ToString()}," +
+            $"{Task.Carrier_ID}," + //CSTID
+            $"{Task.StartTime}," +  //開始時間
+            $"{Task.FinishTime}," + //結束時間
+            $"{GetTaskQueuedDurationInSeconds(Task).ToString()}," + //任務駐留時間
+            $"{TimeSpan.FromSeconds((Task.FinishTime - Task.StartTime).TotalSeconds).ToString()}," +//花費時間
             $"{Task.TotalMileage}," +
+            $"{Task.TotalMileage * 1000.0}," +
             $"{(Task.UnloadTime == DateTime.MinValue ? "" : Task.UnloadTime)}," + //取料時間
             $"{(Task.LoadTime == DateTime.MinValue ? "" : Task.LoadTime)}," +//放料時間
             $"{_GetStationNameByTag(Task.StartLocationTag).Replace(",", "_")}," +//起始位置
@@ -402,6 +406,13 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 if (mapPt == null)
                     return tag.ToString();
                 return mapPt.Graph.Display;
+            }
+
+            static double GetTaskQueuedDurationInSeconds(clsTaskDto Task)
+            {
+                if (Task.currentProgress == VehicleMovementStage.Not_Start_Yet)
+                    return (Task.FinishTime - Task.RecieveTime).TotalSeconds;
+                return (Task.StartTime - Task.RecieveTime).TotalSeconds;
             }
         }
 
