@@ -69,7 +69,7 @@ namespace AGVSystemCommonNet6.Configuration
             SysConfigFileWatcher.EnableRaisingEvents = true;
         }
 
-        internal static void Save(SystemConfigs config)
+        public static void Save(SystemConfigs config)
         {
             File.WriteAllText(_configFilePath, JsonConvert.SerializeObject(config, Formatting.Indented));
         }
