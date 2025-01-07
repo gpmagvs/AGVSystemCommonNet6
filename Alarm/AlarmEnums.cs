@@ -239,11 +239,15 @@ namespace AGVSystemCommonNet6.Alarm
         TaskCancelByHost = 670,
         Vehicle0303JobStatusStartTimeout = 680,
         Vehicle0303JobStatusEndTimeout = 681,
-        Charge_Station_EMO = 10763,
-        Charge_Station_Air_Error = 10764,
-        Charge_Station_Smoke_Detected = 10765,
+
+        #region Charger Station Status
+        Charge_Station_Status_EMO = 7000,
+        Charge_Station_Status_Air_Error = 7001,
+        Charge_Station_Status_Smoke_Detected = 7002,
+        Charge_Station_Status_Temperature_High = 7003,
+        Charge_Station_Status_IO_Module_Disconnected = 7010,
+        #endregion
         REPEATED_TAG_SETTING = 10766,
-        Charge_Station_Temperature_High = 10767,
         /// <summary>
         /// AGV電池電量失真
         /// </summary>

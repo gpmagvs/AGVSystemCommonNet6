@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.Alarm
     /// </summary>
     public class AlarmCodeTable
     {
-        public const string VERSION = "1.3.2";
+        public const string VERSION = "1.3.3";
         public string FileVersion { get; set; } = "1.0.0";
         public clsAlarmCode[] Table { get; set; } = new clsAlarmCode[]
         {
@@ -155,12 +155,13 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.Task_Aborted, "任務中止", "Task Aborted", "", "", ""),
             new clsAlarmCode(ALARMS.VEHICLES_TRAJECTORY_CONFLIC, "車輛軌跡衝突", "Vehicles Trajectory Conflict", "", "", ""),
             new clsAlarmCode(ALARMS.VMSDisconnectwithVehicle, "AGV與VMS斷線", "AGV Disconnect", "", "", ""),
-            new clsAlarmCode(ALARMS.Charge_Station_EMO, "充電站EMO", "Charger EMO", "", "", ""),
-            new clsAlarmCode(ALARMS.Charge_Station_Air_Error, "充電站氣壓異常", "Charger Air Pressure Abnormal", "", "", ""),
-            new clsAlarmCode(ALARMS.Charge_Station_Smoke_Detected, "充電站偵煙異常", "Charger Smoke Detected", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_Status_EMO, "充電站EMO", "Charger EMO", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_Status_Air_Error, "充電站氣壓異常", "Charger Air Pressure Abnormal", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_Status_Smoke_Detected, "充電站偵煙異常", "Charger Smoke Detected", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_Status_IO_Module_Disconnected, "充電站IO模組連線異常", "Charger IO Moduble Connection Error", "", "", ""),
             new clsAlarmCode(ALARMS.TrafficAbort, "交管異常停止", "Task Failure Because Traffic Error", "", "", ""),
             new clsAlarmCode(ALARMS.Navigation_Path_Contain_Forbidden_Point, "導航路徑包含被設為禁止通行或抵達的點位", "Navigation Path Contain Forbidden Point", "", "", ""),
-            new clsAlarmCode(ALARMS.Charge_Station_Temperature_High, "充電樁溫度過高", "Charge Station Temperature Too High", "", "", ""),
+            new clsAlarmCode(ALARMS.Charge_Station_Status_Temperature_High, "充電樁溫度過高", "Charge Station Temperature Too High", "", "", ""),
             new clsAlarmCode(ALARMS.UNLOAD_BUT_CARGO_ID_READ_FAIL, "AGV取貨完成後貨物ID讀取失敗", "Cargo ID Read Fail When Unload", "", "", ""),
             new clsAlarmCode(ALARMS.AGVCargoStatusNotMatchWithTask, "AGV貨物狀態與目前任務不符", "AGV Cargo Status Not Match With Current Task", "", "", ""),
             new clsAlarmCode(ALARMS.TrafficDriveVehicleAwayButCannotFindAvoidPosition, "交管請求車輛避讓但找不到避讓點", "No available avoid point for traffic control request", "", "", ""),
