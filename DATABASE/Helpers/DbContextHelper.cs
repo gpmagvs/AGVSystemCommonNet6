@@ -20,7 +20,11 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
         {
             var optionsBuilder = new DbContextOptionsBuilder<AGVSDbContext>();
             //optionsBuilder.UseSqlite(_connectionString);
-            optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.UseSqlServer(_connectionString, opt =>
+            {
+                opt.CommandTimeout(10);
+                opt.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            });
             _context = new AGVSDbContext(optionsBuilder.Options);
             //_context.Database.EnsureCreated();
         }
