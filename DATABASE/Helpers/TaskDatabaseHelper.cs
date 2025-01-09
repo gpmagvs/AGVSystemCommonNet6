@@ -343,17 +343,17 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 "CSTID," +
                 "開始時間," +
                 "結束時間," +
-                "任務駐留時間(sec)," +
                 "花費時間," +
                 "任務距離," +
-                "任務距離(m)," +
                 "取料時間," +
                 "放料時間," +
                 "起始位置," +
                 "Tag歷史," +
                 "使用者ID," +
                 "取消任務使用者ID," +
-                "失敗原因" };
+                "失敗原因,"+
+                "任務駐留時間(sec),"+
+                "任務距離(m)"};
 
             list.AddRange(Tasks.Select(Task =>
             $"{Task.TaskName}," +
@@ -368,17 +368,19 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{Task.Carrier_ID}," + //CSTID
             $"{Task.StartTime}," +  //開始時間
             $"{Task.FinishTime}," + //結束時間
-            $"{GetTaskQueuedDurationInSeconds(Task).ToString()}," + //任務駐留時間
             $"{TimeSpan.FromSeconds((Task.FinishTime - Task.StartTime).TotalSeconds).ToString()}," +//花費時間
             $"{Task.TotalMileage}," +
-            $"{Task.TotalMileage * 1000.0}," +
             $"{(Task.UnloadTime == DateTime.MinValue ? "" : Task.UnloadTime)}," + //取料時間
             $"{(Task.LoadTime == DateTime.MinValue ? "" : Task.LoadTime)}," +//放料時間
             $"{_GetStationNameByTag(Task.StartLocationTag).Replace(",", "_")}," +//起始位置
             $"{Task.TagsTracking}," +//Tag歷史
             $"{(Task.DispatcherName.ToLower() == "vms_idle" ? "" : Task.DispatcherName)}," +
             $"{(Task.State == TASK_RUN_STATUS.CANCEL ? Task.DesignatedAGVName : "")}," +
-            $"{_GetFailReason(Task.State, Task.FailureReason)}"));
+            $"{_GetFailReason(Task.State, Task.FailureReason)}," +
+            $"{GetTaskQueuedDurationInSeconds(Task).ToString()}," + //任務駐留時間
+            $"{Task.TotalMileage * 1000.0}"//TotalMileage_meter
+            ));
+
             File.WriteAllLines(FilePath, list, Encoding.UTF8);
 
             string _GetFailReason(TASK_RUN_STATUS taskState, string failReason)
