@@ -11,6 +11,7 @@ using AGVSystemCommonNet6.StopRegion;
 using AGVSystemCommonNet6.Sys;
 using AGVSystemCommonNet6.User;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 using System.Xml;
 
 namespace AGVSystemCommonNet6.DATABASE
@@ -101,46 +102,65 @@ namespace AGVSystemCommonNet6.DATABASE
         {
             var result = new List<LockInfo>();
             string sql = @"
-                            SELECT request_session_id AS spid,
-                                resource_type AS rt,
-                                resource_databASe_id AS rdb,
-                                (CASE resource_type 
-                                WHEN 'OBJECT' then object_name(resource_ASsociated_entity_id) 
-                                ELSE 
-                                (SELECT object_name(object_id) FROM sys.partitions 
-                                    WHERE hobt_id = resource_ASsociated_entity_id) END) AS objname,
-                                resource_description AS rd,
-                                request_mode AS rm,
-                                request_status AS rs
-                            FROM sys.dm_tran_locks
-                            WHERE request_mode = 'X' OR request_mode = 'IX'";
+                    SELECT request_session_id AS spid,
+                         resource_type AS rt,
+                         resource_databASe_id AS rdb,
+                         (CASE resource_type 
+                         WHEN 'OBJECT' then object_name(resource_ASsociated_entity_id) 
+                         ELSE 
+                         (SELECT object_name(object_id) FROM sys.partitions 
+                             WHERE hobt_id = resource_ASsociated_entity_id) END) AS objname,
+                         resource_description AS rd,
+                         request_mode AS rm,
+                         request_status AS rs
+                     FROM sys.dm_tran_locks
+                     WHERE request_mode = 'X' OR request_mode = 'IX'";
 
-            using (var command = this.Database.GetDbConnection().CreateCommand())
+            DbConnection connection = this.Database.GetDbConnection();
+            try
             {
-                command.CommandText = sql;
-
-                if (command.Connection.State != System.Data.ConnectionState.Open)
-                    command.Connection.Open();
-
-                using (var reader = command.ExecuteReader())
+                using (var command = connection.CreateCommand())
                 {
-                    while (reader.Read())
+                    command.CommandText = sql;
+
+                    if (connection.State != System.Data.ConnectionState.Open)
+                        connection.Open();
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        result.Add(new LockInfo
+                        while (reader.Read())
                         {
-                            Spid = reader.GetInt32(0),
-                            Rt = reader.GetString(1),
-                            Rdb = reader.GetInt32(2),
-                            Objname = reader.IsDBNull(3) ? null : reader.GetString(3),
-                            Rd = reader.IsDBNull(4) ? null : reader.GetString(4),
-                            Rm = reader.GetString(5),
-                            Rs = reader.GetString(6)
-                        });
+                            result.Add(new LockInfo
+                            {
+                                Spid = reader.GetInt32(0),
+                                Rt = reader.GetString(1),
+                                Rdb = reader.GetInt32(2),
+                                Objname = reader.IsDBNull(3) ? null : reader.GetString(3),
+                                Rd = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                Rm = reader.GetString(5),
+                                Rs = reader.GetString(6)
+                            });
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                return false;
+            }
+            finally
+            {
+                // Ensure connection is closed
+                if (connection.State == System.Data.ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+
             return result.Where(ret => ret.Objname == tableName).Any();
         }
+
 
         public bool isPointPassInfoTableLocking()
         {

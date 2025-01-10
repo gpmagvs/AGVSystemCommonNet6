@@ -181,7 +181,6 @@ namespace AGVSystemCommonNet6.DATABASE
             key = "";
             existEntity = keyVal = null;
 
-            var _taskDbsetType = _dbContext.Tasks.GetType();
             if (entityTypeName == _dbContext.Tasks.GetType().GenericTypeArguments.FirstOrDefault().Name)
             {
                 key = "TaskName";
@@ -191,6 +190,14 @@ namespace AGVSystemCommonNet6.DATABASE
                 return existEntity != null;
             }
 
+            if (entityTypeName == _dbContext.DeepChargeRecords.GetType().GenericTypeArguments.FirstOrDefault().Name)
+            {
+                key = "OrderRecievedTime";
+                existEntity = _dbContext.DeepChargeRecords.FirstOrDefault(_entity => _entity.OrderRecievedTime == (DateTime)entity.GetType().GetProperty("OrderRecievedTime").GetValue(entity));
+                if (existEntity != null)
+                    keyVal = existEntity.GetType().GetProperty(key).GetValue(existEntity);
+                return existEntity != null;
+            }
             return false;
         }
     }

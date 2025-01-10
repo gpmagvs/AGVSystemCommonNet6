@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.RunMode;
 using AGVSystemCommonNet6.Alarm;
+using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Log;
@@ -36,6 +37,30 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             return _agvs_http;
         }
 
+        public struct DATABASE
+        {
+            public static async Task<DBDataService.OperationResult> AddTaskDto(clsTaskDto taskDto)
+            {
+                var agvs_http = GetAGVSHttpHelper();
+                DBDataService.OperationResult response = await agvs_http.PostAsync<DBDataService.OperationResult, clsTaskDto>($"/api/Database/AddTaskDto", taskDto);
+                return response;
+            }
+            public static async Task<DBDataService.OperationResult> ModifyTaskDto(clsTaskDto taskDto)
+            {
+                var agvs_http = GetAGVSHttpHelper();
+                DBDataService.OperationResult response = await agvs_http.PostAsync<DBDataService.OperationResult, clsTaskDto>($"/api/Database/ModifyTaskDto", taskDto);
+                return response;
+            }
+
+            public static async Task<DBDataService.OperationResult> DeleteTaskDto(clsTaskDto taskDto)
+            {
+                var agvs_http = GetAGVSHttpHelper();
+                DBDataService.OperationResult response = await agvs_http.PostAsync<DBDataService.OperationResult, clsTaskDto>($"/api/Database/DeleteTaskDto", taskDto);
+                return response;
+            }
+
+
+        }
 
         public struct TRAFFICS
         {
