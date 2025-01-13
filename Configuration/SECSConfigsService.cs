@@ -1,5 +1,6 @@
 ﻿using AGVSystemCommonNet6.Microservices.MCSCIM;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,14 @@ namespace AGVSystemCommonNet6.Configuration
 
         public TransferReportConfiguration transferReportConfiguration { get; private set; } = new TransferReportConfiguration();
 
+        public SECSConfiguration SECSConfigs { get;  set; } = new SECSConfiguration();
+        public readonly string SECSConfigsSaveFolder = @"C:\AGVS";
+        
         public readonly string configsSaveFolder = @"C:\AGVS\SECSConfigs";
+        public string SECSConfigsFilePath => Path.Combine(SECSConfigsSaveFolder, "SystemConfigs.json");
+
+
+        
 
         public string alarmConfigFilePath => Path.Combine(configsSaveFolder, "SECS_Alarm_Settings.json");
         public string transferReportConfigFilePath => Path.Combine(configsSaveFolder, "SECS_Transfer_Report.json");
@@ -94,7 +102,34 @@ namespace AGVSystemCommonNet6.Configuration
             CreateDirectory();
             File.WriteAllText(filePath, JsonConvert.SerializeObject(defaultObj, Formatting.Indented));
         }
+        private void CheckSECSCofigurationFile(object defaultObj, string filePath)
+        {
+             // 確保目錄存在
+        // CreateDirectory(filePath);
 
+        // 如果文件存在，讀取內容
+        JObject config = new JObject();
+        if (File.Exists(filePath))
+        {
+            string existingContent = File.ReadAllText(filePath);
+            config = JObject.Parse(existingContent);
+        }
+
+        // 檢查 SECSGem 節點是否存在，並更新內容
+        if (config["SECSGem"] == null || !JToken.DeepEquals(config["SECSGem"], JToken.FromObject(defaultObj)))
+        {
+            config["SECSGem"] = JToken.FromObject(defaultObj);
+            string newContent = JsonConvert.SerializeObject(config, Formatting.Indented);
+
+            // 寫入更新後的內容
+            File.WriteAllText(filePath, newContent);
+            Console.WriteLine("SECSGem 配置已更新！");
+        }
+        else
+        {
+            Console.WriteLine("SECSGem 配置相同，無需更新。");
+        }
+        }
         private void CreateDirectory()
         {
             Directory.CreateDirectory(configsSaveFolder);
@@ -104,6 +139,18 @@ namespace AGVSystemCommonNet6.Configuration
         {
             this.transferReportConfiguration.ResultCodes = transferCompletedResultCodes;
             UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
+            //CheckCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
         }
+        public void UpdateSECSGemConfigs(SECSConfiguration SECSConfig)
+        {
+            //this.SECSConfigs = SECSGemConfigSetting;
+            this.SECSConfigs = SECSConfig;
+            
+            CheckSECSCofigurationFile(SECSConfig, SECSConfigsFilePath);
+            //this.baseConfiguration.SECSGemConfigSetting = SECSGemConfigSetting;
+            //UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
+            //CheckCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
+        }
+
     }
 }
