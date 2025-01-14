@@ -166,6 +166,10 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 await SysConfigFIleSemaphoreSlim.WaitAsync();
                 SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed += 1;
+                if (SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed > 99999)
+                {
+                    SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed = 1;
+                }
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed;
             }
@@ -187,6 +191,10 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 await SysConfigFIleSemaphoreSlim.WaitAsync();
                 SysConfigs.SECSGem.DoubleUnknowRackIDFlowNumberUsed += 1;
+                if (SysConfigs.SECSGem.DoubleUnknowRackIDFlowNumberUsed > 99999)
+                {
+                    SysConfigs.SECSGem.DoubleUnknowRackIDFlowNumberUsed = 1;
+                }
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.DoubleUnknowRackIDFlowNumberUsed;
             }
@@ -208,10 +216,6 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 await SysConfigFIleSemaphoreSlim.WaitAsync();
                 SysConfigs.SECSGem.MissMatchTrayIDFlowNumberUsed += 1;
-                if (SysConfigs.SECSGem.MissMatchTrayIDFlowNumberUsed > 99999)
-                {
-                    SysConfigs.SECSGem.MissMatchTrayIDFlowNumberUsed = 1;
-                }
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.MissMatchTrayIDFlowNumberUsed;
             }
@@ -233,10 +237,6 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 await SysConfigFIleSemaphoreSlim.WaitAsync();
                 SysConfigs.SECSGem.MissMatchRackIDFlowNumberUsed += 1;
-                if (SysConfigs.SECSGem.MissMatchRackIDFlowNumberUsed > 99999)
-                {
-                    SysConfigs.SECSGem.MissMatchRackIDFlowNumberUsed = 1;
-                }
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.MissMatchRackIDFlowNumberUsed;
             }
