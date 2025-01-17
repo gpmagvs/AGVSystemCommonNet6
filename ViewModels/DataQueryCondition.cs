@@ -13,6 +13,9 @@ namespace AGVSystemCommonNet6.ViewModels
         public string AGVName { get; set; } = "";
         public string TaskName { get; set; } = "";
         public string Description { get; set; } = "";
+        public string Source { get; set; } = "";
+        public string Destine { get; set; }= "";
+
     }
 
 
