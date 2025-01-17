@@ -188,11 +188,20 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 List<clsTaskDto> _TaskList = _TaskQuery.ToList();
 
                 tasksQueryOut = _TaskList.Where(Task =>
-            (string.IsNullOrEmpty(Source) ||
-             _GetDisplayNameOfTagStr(Task.From_Station_Tag.ToString()).Contains(Source) ||
-             _GetDisplayNameOfTagStr(Task.To_Station_Tag.ToString()).Contains(Source)) &&
-            (string.IsNullOrEmpty(FailReason) || Task.FailureReason.Contains(FailReason))
-                ).ToList();
+                {
+                    // 將 Source 分割為多個關鍵字
+                    var sourceKeywords = string.IsNullOrEmpty(Source) ? new string[0] : Source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    // 模糊搜尋條件
+                    bool matchesSource = sourceKeywords.Length == 0 ||
+                                         sourceKeywords.Any(keyword =>
+                                             _GetDisplayNameOfTagStr(Task.From_Station_Tag.ToString()).Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                                             _GetDisplayNameOfTagStr(Task.To_Station_Tag.ToString()).Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+                    // 回傳結果
+                    return matchesSource &&
+                           (string.IsNullOrEmpty(FailReason) || Task.FailureReason.Contains(FailReason));
+                }).ToList();
 
                 // Step 3: Calculate counts
                 FailNum = tasksQueryOut.Count(tk => tk.State == TASK_RUN_STATUS.FAILURE);
