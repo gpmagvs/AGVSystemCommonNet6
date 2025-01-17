@@ -9,7 +9,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
 {
     public class GPMCIMService
     {
-        public static string HostUrl => "http://localhost:5400";
+        public static string HostUrl => "http://127.0.0.1:5400";
         private static HttpHelper _CIMhttp;
 
         private static HttpHelper CIMhttp
