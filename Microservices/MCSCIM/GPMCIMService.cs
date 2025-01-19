@@ -28,6 +28,18 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             clsCIMResponse response = await CIMhttp.PostAsync<clsCIMResponse, object>($"/api/porttype_change?eqTag={tagID}&portType={portType}", null, timeout: 20);
             return response;
         }
+
+        /// <summary>
+        /// 向CIM通知當前Host連現狀態
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public static async Task<clsCIMResponse> HostModeState(int mode)
+        {
+            clsCIMResponse response = await CIMhttp.PostAsync<clsCIMResponse, object>($"/api/host_mode", new { mode = mode }, timeout: 5);
+            return response;
+        }
+
         public class clsCIMResponse
         {
             public int code { get; set; } = 0;
