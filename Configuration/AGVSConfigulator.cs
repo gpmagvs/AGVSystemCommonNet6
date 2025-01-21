@@ -118,6 +118,10 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 await SysConfigFIleSemaphoreSlim.WaitAsync();
                 SysConfigs.SECSGem.UnknowTrayIDFlowNumberUsed += 1;
+                if (SysConfigs.SECSGem.UnknowTrayIDFlowNumberUsed > 99999)
+                {
+                    SysConfigs.SECSGem.UnknowTrayIDFlowNumberUsed = 1;
+                }
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.UnknowTrayIDFlowNumberUsed;
             }
@@ -138,6 +142,10 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 await SysConfigFIleSemaphoreSlim.WaitAsync();
                 SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed += 1;
+                if (SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed > 99999)
+                {
+                    SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed = 1;
+                }
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed;
             }
@@ -158,6 +166,10 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 await SysConfigFIleSemaphoreSlim.WaitAsync();
                 SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed += 1;
+                if (SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed > 99999)
+                {
+                    SysConfigs.SECSGem.UnknowRackIDFlowNumberUsed = 1;
+                }
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.DoubleUnknowDFlowNumberUsed;
             }
@@ -179,6 +191,10 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 await SysConfigFIleSemaphoreSlim.WaitAsync();
                 SysConfigs.SECSGem.DoubleUnknowRackIDFlowNumberUsed += 1;
+                if (SysConfigs.SECSGem.DoubleUnknowRackIDFlowNumberUsed > 99999)
+                {
+                    SysConfigs.SECSGem.DoubleUnknowRackIDFlowNumberUsed = 1;
+                }
                 Save(SysConfigs);
                 return SysConfigs.SECSGem.DoubleUnknowRackIDFlowNumberUsed;
             }

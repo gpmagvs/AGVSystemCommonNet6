@@ -6,9 +6,11 @@ using AGVSystemCommonNet6.MAP;
 using AGVSystemCommonNet6.ViewModels;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -131,10 +133,16 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
 
         }
-
-
         public (int total, List<clsTaskDto> tasksQueryOut, int CompleteNum, int FailNum, int CancelNum) TaskQuery(TaskQueryCondition conditions)
         {
+            Map _useMap = null;
+            try
+            {
+                _useMap = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.PATHES_STORE[SystemConfigs.PATH_ENUMS.CURRENT_MAP_FILE_PATH], out _, false, false);
+            }
+            catch (Exception ex)
+            {
+            }
             TASK_RUN_STATUS TaskResult = conditions.TaskResult;
             string AGVName = conditions.AGVName;
             string TaskName = conditions.TaskName;
@@ -147,7 +155,109 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             int FailNum = 0;
             int CanceledNum = 0;
             int CompletedNum = 0;
+            string Source = conditions.Source;
+            string Destine = conditions.Destine;
+            string _GetDisplayNameOfTagStr(string tagStr)
+            {
+                if (int.TryParse(tagStr, out int tag))
+                {
+                    MapPoint _pt = _useMap.Points.Values.FirstOrDefault(pt => pt.TagNumber == tag);
+                    if (_pt == null)
+                        return tagStr;
 
+                    return _pt.Graph.Display;
+                }
+                else
+                {
+                    return tagStr;
+                }
+            }
+            List<clsTaskDto> tasksQueryOut = new();
+            using (DbContextHelper dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
+            {
+                IQueryable<clsTaskDto> _TaskQuery = dbhelper._context.Set<clsTaskDto>()
+            .OrderByDescending(TK => TK.RecieveTime)
+            .Where(Task => Task.RecieveTime >= StartTime &&
+                           Task.RecieveTime <= EndTime &&
+                           (string.IsNullOrEmpty(AGVName) || Task.DesignatedAGVName == AGVName) &&
+                           (string.IsNullOrEmpty(TaskName) || Task.TaskName.Contains(TaskName)) &&
+                           (TaskResult == TASK_RUN_STATUS.UNKNOWN || Task.State == TaskResult) &&
+                           (ActionType == ACTION_TYPE.Unknown || Task.Action == ActionType));
+
+                // Step 2: Load tasks into memory and apply advanced filtering
+                List<clsTaskDto> _TaskList = _TaskQuery.ToList();
+
+                tasksQueryOut = _TaskList.Where(Task =>
+                {
+                    // 將 Source 分割為多個關鍵字
+                    var sourceKeywords = string.IsNullOrEmpty(Source) ? new string[0] : Source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    // 模糊搜尋條件
+                    bool matchesSource = sourceKeywords.Length == 0 ||
+                                         sourceKeywords.Any(keyword =>
+                                             _GetDisplayNameOfTagStr(Task.From_Station_Tag.ToString()).Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                                             _GetDisplayNameOfTagStr(Task.To_Station_Tag.ToString()).Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+                    // 回傳結果
+                    return matchesSource &&
+                           (string.IsNullOrEmpty(FailReason) || Task.FailureReason.Contains(FailReason));
+                }).ToList();
+
+                // Step 3: Calculate counts
+                FailNum = tasksQueryOut.Count(tk => tk.State == TASK_RUN_STATUS.FAILURE);
+                CanceledNum = tasksQueryOut.Count(tk => tk.State == TASK_RUN_STATUS.CANCEL);
+                CompletedNum = tasksQueryOut.Count(tk => tk.State == TASK_RUN_STATUS.ACTION_FINISH);
+                TotalNum = tasksQueryOut.Count;
+
+                // Step 4: Apply pagination
+                tasksQueryOut = tasksQueryOut.Skip((Page - 1) * conditions.DataNumberPerPage)
+                                             .Take(conditions.DataNumberPerPage)
+                                             .ToList();
+            };
+            return (TotalNum, tasksQueryOut, CompletedNum, FailNum, CanceledNum);
+        }
+
+
+        public (int total, List<clsTaskDto> tasksQueryOut, int CompleteNum, int FailNum, int CancelNum) TaskQueryORIGIN(TaskQueryCondition conditions)
+        {
+            Map _useMap = null;
+            try
+            {
+                _useMap = MapManager.LoadMapFromFile(AGVSConfigulator.SysConfigs.PATHES_STORE[SystemConfigs.PATH_ENUMS.CURRENT_MAP_FILE_PATH], out _, false, false);
+            }
+            catch (Exception ex)
+            {
+            }
+            TASK_RUN_STATUS TaskResult = conditions.TaskResult;
+            string AGVName = conditions.AGVName;
+            string TaskName = conditions.TaskName;
+            string FailReason = conditions.Description;
+            DateTime StartTime = conditions.StartTime;
+            DateTime EndTime = conditions.EndTime;
+            ACTION_TYPE ActionType = conditions.ActionType;
+            int Page = conditions.CurrentPage < 1 ? 1 : conditions.CurrentPage;
+            int TotalNum = 0;
+            int FailNum = 0;
+
+            int CanceledNum = 0;
+            int CompletedNum = 0;
+            string Source = conditions.Source;
+            string Destine = conditions.Destine;
+            string _GetDisplayNameOfTagStr(string tagStr)
+            {
+                if (int.TryParse(tagStr, out int tag))
+                {
+                    MapPoint _pt = _useMap.Points.Values.FirstOrDefault(pt => pt.TagNumber == tag);
+                    if (_pt == null)
+                        return tagStr;
+
+                    return _pt.Graph.Display;
+                }
+                else
+                {
+                    return tagStr;
+                }
+            }
             List<clsTaskDto> tasksQueryOut = new();
             using (DbContextHelper dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
@@ -158,6 +268,8 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                                                                                                  (string.IsNullOrEmpty(TaskName) || Task.TaskName.Contains(TaskName)) &&
                                                                                                  (TaskResult == TASK_RUN_STATUS.UNKNOWN || Task.State == TaskResult) &&
                                                                                                  (ActionType == ACTION_TYPE.Unknown || Task.Action == ActionType) &&
+                                                                                                 (string.IsNullOrEmpty(Source) || Task.From_Station_Display.Contains(Source)) &&
+                                                                                                 (string.IsNullOrEmpty(Destine) || Task.From_Station_Display.Contains(FailReason)) &&
                                                                                                  (string.IsNullOrEmpty(FailReason) || Task.FailureReason.Contains(FailReason))
                                                                                                  );
                 FailNum = _Task.Count(tk => tk.State == TASK_RUN_STATUS.FAILURE);
