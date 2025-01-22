@@ -460,10 +460,10 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
                 "取料時間," +
                 "放料時間," +
                 "起始位置," +
-                "Tag歷史," +
                 "使用者ID," +
                 "取消任務使用者ID," +
                 "失敗原因,"+
+                "Tag歷史," +
                 "任務駐留時間(sec),"+
                 "任務距離(m)"};
 
@@ -485,10 +485,10 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             $"{(Task.UnloadTime == DateTime.MinValue ? "" : Task.UnloadTime)}," + //取料時間
             $"{(Task.LoadTime == DateTime.MinValue ? "" : Task.LoadTime)}," +//放料時間
             $"{_GetStationNameByTag(Task.StartLocationTag).Replace(",", "_")}," +//起始位置
-            $"{Task.TagsTracking}," +//Tag歷史
             $"{(Task.DispatcherName.ToLower() == "vms_idle" ? "" : Task.DispatcherName)}," +
             $"{(Task.State == TASK_RUN_STATUS.CANCEL ? Task.DesignatedAGVName : "")}," +
             $"{_GetFailReason(Task.State, Task.FailureReason)}," +
+            $"{Task.TagsTracking}," +//Tag歷史
             $"{GetTaskQueuedDurationInSeconds(Task).ToString()}," + //任務駐留時間
             $"{Task.TotalMileage * 1000.0}"//TotalMileage_meter
             ));
