@@ -84,6 +84,27 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 List<int> response = await agvs_http.GetAsync<List<int>>($"/api/Traffic/GetTagsOfEQPartsReplacing");
                 return response;
             }
+
+            /// <summary>
+            /// 暫時關閉指定的 rack colum ports
+            /// </summary>
+            /// <param name="tag"></param>
+            /// <returns></returns>
+            public static async Task DisableRackColumnTemptory(int tag, int timeout = 1)
+            {
+                var agvs_http = GetAGVSHttpHelper();
+                await agvs_http.PostAsync($"api/WIP/DisablePortsColumnTempotary?tag={tag}", null, timeout);
+            }
+            /// <summary>
+            /// 恢復被暫時關閉指定的 rack colum ports
+            /// </summary>
+            /// <param name="tag"></param>
+            /// <returns></returns>
+            public static async Task RestoreRackColumnByDisabledTemptory(int tag, int timeout = 1)
+            {
+                var agvs_http = GetAGVSHttpHelper();
+                await agvs_http.PostAsync($"api/WIP/EnablePortsColumnByDisableTempotary?tag={tag}", null, timeout);
+            }
         }
 
         public struct TRANSFER_TASK
