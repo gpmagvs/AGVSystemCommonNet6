@@ -212,6 +212,7 @@ namespace AGVSystemCommonNet6.Alarm
         TrafficDriveVehicleAwaybutWaitOtherVehicleReleasePointTimeout = 604,
         TrafficDriveVehicleAwaybutAppendOrderToDatabaseFail = 605,
         TrafficDriveVehicleAwaybutVehicleNotOnline = 606,
+        TrafficDriveVehicleAwaybutVehicleCannotLeaveNow = 607,
         DownloadTaskbutActionTypeWrong = 620,
         DownloadTaskbutVehicleNotExist = 621,
         TheTaskNeedtoAssignVehicle = 622,
