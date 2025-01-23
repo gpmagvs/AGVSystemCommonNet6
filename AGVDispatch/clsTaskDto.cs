@@ -38,6 +38,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
         AvoidPath,
         AvoidPath_Park,
         Traveling_To_Region_Wait_Point,
+        WaitingOtherVehicleLeaveAwayPort,
         Completed = 500,
     }
 
