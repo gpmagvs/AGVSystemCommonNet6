@@ -16,13 +16,21 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         public static string MCSCIMUrl => "http://localhost:7107";
         private static HttpHelper _http = new HttpHelper(MCSCIMUrl);
         protected static Logger logger = LogManager.GetCurrentClassLogger();
-        public static async Task<(bool confirm, string message)> Online()
+        public static async Task<(bool confirm, string message)> Online(int Timeout = 8)
         {
             try
             {
                 var route = $"/api/HostMode/OnlineLocal";
-                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, 5);
+                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, Timeout);
                 return (_response.confirm, _response.message);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Secs Platform Communication Error {ex.Message}");
+            }
+            catch (TaskCanceledException ex)
+            {
+                return (false, $"Switch Online Timeout, Check Communication With Host({ex.Message})");
             }
             catch (JsonSerializationException ex)
             {
@@ -33,28 +41,44 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 return (false, ex.Message);
             }
         }
-        public static async Task<(bool confirm, string message)> Offline()
+        public static async Task<(bool confirm, string message)> Offline(int Timeout = 8)
         {
             try
             {
                 var route = $"/api/HostMode/OFFline";
-                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, 5);
+                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, Timeout);
                 return (_response.confirm, _response.message);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Secs Platform Communication Error ({ex.Message})");
+            }
+            catch (TaskCanceledException ex)
+            {
+                return (false, $"Switch Offline Timeout, Check Communication With Host({ex.Message})");
             }
             catch (Exception ex)
             {
                 return (false, ex.Message);
             }
         }
-        public static async Task<(bool confirm, string message)> OnlineLocalToOnlineRemote()
+        public static async Task<(bool confirm, string message)> OnlineLocalToOnlineRemote(int Timeout = 8)
         {
             (bool confirm, string message) response = new(false, "[OnlineLocalToOnlineRemote] Fail");
             try
             {
                 var route = $"/api/HostMode/OnlineLoacl2OnlineRemote";
-                ResponseObject v = await _http.GetAsync<ResponseObject>(route);
+                ResponseObject v = await _http.GetAsync<ResponseObject>(route, Timeout);
                 response.confirm = v.confirm;
                 response.message = v.message;
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Secs Platform Communication Error ({ex.Message})");
+            }
+            catch (TaskCanceledException ex)
+            {
+                return (false, $"Switch Remote Timeout, Check Communication With Host({ex.Message})");
             }
             catch (Exception ex)
             {
@@ -62,15 +86,23 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             }
             return response;
         }
-        public static async Task<(bool confirm, string message)> OnlineRemote2OnlineLocal()
+        public static async Task<(bool confirm, string message)> OnlineRemote2OnlineLocal(int Timeout = 8)
         {
             (bool confirm, string message) response = new(false, "[OnlineRemote2OnlineLocal] Fail");
             try
             {
                 var route = $"/api/HostMode/OnlineRemote2OnlineLocal";
-                ResponseObject v = await _http.GetAsync<ResponseObject>(route);
+                ResponseObject v = await _http.GetAsync<ResponseObject>(route, Timeout);
                 response.confirm = v.confirm;
                 response.message = v.message;
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Secs Platform Communication Error ({ex.Message})");
+            }
+            catch (TaskCanceledException ex)
+            {
+                return (false, $"Switch Local Timeout, Check Communication With Host({ex.Message})");
             }
             catch (Exception ex)
             {

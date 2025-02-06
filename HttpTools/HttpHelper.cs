@@ -121,6 +121,14 @@ namespace AGVSystemCommonNet6.HttpTools
                 else
                     throw new HttpRequestException($"Failed to GET to {url}({response.StatusCode})");
             }
+            catch (HttpRequestException ex)
+            {
+                throw ex;
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw ex;
+            }
             catch (Exception ex)
             {
                 logger.Warn($"GetStringAsync Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
