@@ -205,6 +205,9 @@ namespace AGVSystemCommonNet6.Alarm
         ReportCompletedTaskTimeoutByCheckJobStatus = 169,
         CannotOnlineVehicleBecauseWrongRunStatus = 170,
         CannotOnlineVehicleBecauseAtVirtualPoint = 171,
+
+        HostCommunicationError = 500,
+
         TrafficCross = 600,
         TrafficDriveVehicleAwaybutGetTaskFail = 601,
         TrafficDriveVehicleAwaybutVehicleStatusNotIdle = 602,
@@ -241,7 +244,6 @@ namespace AGVSystemCommonNet6.Alarm
         TaskCancelByHost = 670,
         Vehicle0303JobStatusStartTimeout = 680,
         Vehicle0303JobStatusEndTimeout = 681,
-
         #region Charger Station Status
         Charge_Station_Status_EMO = 7000,
         Charge_Station_Status_Air_Error = 7001,
