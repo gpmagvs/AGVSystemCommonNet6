@@ -38,7 +38,6 @@ namespace AGVSystemCommonNet6.HttpTools
             logger.Trace($"Post Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
 
             string contentDataJson = string.Empty;
-            string url = this.baseUrl + api_route;
             if (data != null)
                 contentDataJson = JsonConvert.SerializeObject(data);
             var content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
@@ -50,13 +49,12 @@ namespace AGVSystemCommonNet6.HttpTools
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
                     logger.Trace($"PostAsync Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}. Response:{responseJson}");
-
                     return (true, responseJson);
                 }
                 else
                 {
-                    var errmsg = $"Failed to POST to {url}. Response status code: {response.StatusCode}";
-                    Console.WriteLine(errmsg);
+                    var errmsg = $"Post Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:Response status code: {response.StatusCode}";
+                    logger.Error(errmsg);
                     throw new HttpRequestException(errmsg);
                 }
             }
@@ -70,9 +68,7 @@ namespace AGVSystemCommonNet6.HttpTools
         public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 5)
         {
             logger.Trace($"Post Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
-
             string contentDataJson = string.Empty;
-            string url = this.baseUrl + (this.baseUrl.Last() == '/' ? "" : "/") + api_route;
             if (data != null)
                 contentDataJson = JsonConvert.SerializeObject(data);
             StringContent content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
@@ -89,8 +85,8 @@ namespace AGVSystemCommonNet6.HttpTools
                 }
                 else
                 {
-                    var errmsg = $"Failed to POST to {url}. Response status code: {response.StatusCode}";
-                    Console.WriteLine(errmsg);
+                    var errmsg = $"Post Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:Response status code: {response.StatusCode}";
+                    logger.Error(errmsg);
                     throw new HttpRequestException(errmsg);
                 }
             }
@@ -108,7 +104,6 @@ namespace AGVSystemCommonNet6.HttpTools
             string jsonContent = "";
             try
             {
-                string url = this.baseUrl + $"{api_route}";
                 using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
                 using HttpResponseMessage response = await http_client.GetAsync(api_route, cts.Token);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -119,7 +114,11 @@ namespace AGVSystemCommonNet6.HttpTools
                     return result;
                 }
                 else
-                    throw new HttpRequestException($"Failed to GET to {url}({response.StatusCode})");
+                {
+                    var errmsg = $"Get Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:Response status code: {response.StatusCode}";
+                    logger.Error(errmsg);
+                    throw new HttpRequestException(errmsg);
+                }
             }
             catch (HttpRequestException ex)
             {
@@ -152,7 +151,11 @@ namespace AGVSystemCommonNet6.HttpTools
                     return str_result;
                 }
                 else
-                    throw new HttpRequestException($"Failed to GET to {url}({response.StatusCode})");
+                {
+                    var errmsg = $"Get Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:Response status code: {response.StatusCode}";
+                    logger.Error(errmsg);
+                    throw new HttpRequestException(errmsg);
+                }
             }
             catch (Exception ex)
             {
