@@ -498,8 +498,12 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             string _GetFailReason(TASK_RUN_STATUS taskState, string failReason)
             {
 
-                if (taskState != TASK_RUN_STATUS.ACTION_FINISH && string.IsNullOrEmpty(failReason))
-                    return $"[{(int)ALARMS.SYSTEM_ERROR}] {ALARMS.SYSTEM_ERROR.ToString()}(Fail Reason Empty)";
+                if (taskState == TASK_RUN_STATUS.CANCEL && string.IsNullOrEmpty(failReason))
+                    return $"Cancel Reason is Empty";
+
+                if (taskState == TASK_RUN_STATUS.FAILURE && string.IsNullOrEmpty(failReason))
+                    return $"[{(int)ALARMS.SYSTEM_ERROR}] {ALARMS.SYSTEM_ERROR.ToString()}(Fail Reason is Empty)";
+
 
                 if (failReason == null || failReason == "")
                     return "";
