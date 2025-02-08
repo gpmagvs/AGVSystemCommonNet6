@@ -11,7 +11,7 @@ namespace AGVSystemCommonNet6.Alarm
     /// </summary>
     public class AlarmCodeTable
     {
-        public const string VERSION = "1.3.7";
+        public const string VERSION = "1.3.8";
         public string FileVersion { get; set; } = "1.0.0";
         public clsAlarmCode[] Table { get; set; } = new clsAlarmCode[]
         {
@@ -175,6 +175,7 @@ namespace AGVSystemCommonNet6.Alarm
             new clsAlarmCode(ALARMS.HostCommunicationError, "Host連線異常", "Host Communication Error", "", "", ""),
             new clsAlarmCode(ALARMS.VMSOrderActionStatusReportToAGVSFail, "VMS向AGVS上報搬運任務狀態失敗", "VMS Report Order Status Fail", "", "", ""),
             new clsAlarmCode(ALARMS.VMSOrderActionStatusReportToAGVSTimeout, "VMS向AGVS上報搬運任務狀態Timeout", "VMS Report Order Status Timeout", "", "", ""),
+            new clsAlarmCode(ALARMS.VMSOrderActionStatusReportToAGVSButAGVSGetException, "VMS向AGVS上報搬運任務狀態但AGVS發生錯誤例外", "VMS Report Order Status But AGVS Has Exception", "", "", ""),
         };
     }
 }
