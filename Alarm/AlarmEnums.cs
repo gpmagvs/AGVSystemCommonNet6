@@ -261,7 +261,10 @@ namespace AGVSystemCommonNet6.Alarm
         #region 2000- Rack
 
         SourceRackPortNoCargo = 2000,
-        DestineRackPortHasCargo = 2001
+        DestineRackPortHasCargo = 2001,
+
+        VMSOrderActionStatusReportToAGVSTimeout = 1200,
+        VMSOrderActionStatusReportToAGVSFail = 1201
 
         #endregion
 
