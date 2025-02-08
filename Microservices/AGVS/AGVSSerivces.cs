@@ -1,28 +1,12 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
-using AGVSystemCommonNet6.AGVDispatch.RunMode;
 using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.DATABASE;
-using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.HttpTools;
-using AGVSystemCommonNet6.Log;
-using AGVSystemCommonNet6.MAP;
 using AGVSystemCommonNet6.Material;
 using AGVSystemCommonNet6.Microservices.ResponseModel;
-using AGVSystemCommonNet6.Notify;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using RosSharp.RosBridgeClient;
-using RosSharp.RosBridgeClient.MessageTypes.Std;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using static AGVSystemCommonNet6.clsEnums;
-using static System.Collections.Specialized.BitVector32;
 
 namespace AGVSystemCommonNet6.Microservices.AGVS
 {
@@ -120,7 +104,6 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
             {
                 var agvs_http = GetAGVSHttpHelper();
                 clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>($"/api/Task/StartTransferCargoReport?AGVName={AGVName}&SourceTag={SourceTag}&DestineTag={DestineTag}&SourceSlot={SoureSlot}&DestineSlot={DestineSlot}&IsSourceAGV={IsSourceAGV}");
-                LOG.INFO($"Cargo start Transfer to destine({DestineTag}) from source({SourceTag}) Report to AGVS, AGVS Response = {response.ToJson()}");
                 return response;
             }
             public static async Task<clsAGVSTaskReportResponse> LoadUnloadActionFinishReport(string taskID, int tagNumber, ACTION_TYPE action, bool normalDone, string agvName = "")
@@ -130,14 +113,20 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 try
                 {
                     var route = $"/api/Task/LoadUnloadTaskFinish?taskID={taskID}&tag={tagNumber}&action={action}&normalDone={normalDone}";
-                    LOG.INFO($"LoadUnloadActionFinishReport start");
                     response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
-                    LOG.INFO($"LoadUnload Task Finish Feedback to AGVS, AGVS Response = {response.ToJson()}");
+                }
+                catch (HttpRequestException ex)
+                {
+                    return new clsAGVSTaskReportResponse() { confirm = false, AlarmCode = ALARMS.VMSOrderActionStatusReportToAGVSFail, message = ex.Message };
+
+                }
+                catch (TaskCanceledException ex)
+                {
+                    return new clsAGVSTaskReportResponse() { confirm = false, AlarmCode = ALARMS.VMSOrderActionStatusReportToAGVSTimeout, message = ex.Message };
                 }
                 catch (Exception ex)
                 {
-                    LOG.Critical($"LoadUnload Task Finish Feedback to AGVS FAIL,{ex.Message}", ex);
-                    response = new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
+                    response = new clsAGVSTaskReportResponse() { confirm = false, AlarmCode = ALARMS.VMSOrderActionStatusReportToAGVSFail, message = ex.Message };
                 }
                 //NotifyServiceHelper.INFO($"{agvName} {action} Action Finish Report To AGVS.Alarm Code Response={response.AlarmCode}");
                 return response;
@@ -148,15 +137,22 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 try
                 {
                     var route = $"/api/Task/LoadUnloadTaskStart?taskID={taskID}&tag={tagNumber}&slot={slot}&action={action}";
-                    LOG.INFO($"LoadUnloadActionStartReport start");
                     clsAGVSTaskReportResponse response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route);
                     //LOG.INFO($"LoadUnload Task Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                     return response;
                 }
+                catch (HttpRequestException ex)
+                {
+                    return new clsAGVSTaskReportResponse() { confirm = false, AlarmCode = ALARMS.VMSOrderActionStatusReportToAGVSFail, message = ex.Message };
+
+                }
+                catch (TaskCanceledException ex)
+                {
+                    return new clsAGVSTaskReportResponse() { confirm = false, AlarmCode = ALARMS.VMSOrderActionStatusReportToAGVSTimeout, message = ex.Message };
+                }
                 catch (Exception ex)
                 {
-                    LOG.Critical($"LoadUnload Task Start Feedback to AGVS FAIL,{ex.Message}", ex);
-                    return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
+                    return new clsAGVSTaskReportResponse() { confirm = false, AlarmCode = ALARMS.VMSOrderActionStatusReportToAGVSFail, message = ex.Message };
                 }
             }
             public static async Task<clsAGVSTaskReportResponse> StartLDULDOrderReport(string taskID, int from_Station_Tag, int from_station_slot, int to_Station_Tag, int to_Station_Slot, ACTION_TYPE action, bool isSourceAGV = false)
@@ -169,17 +165,14 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                     try
                     {
                         var route = $"/api/Task/LDULDOrderStart?taskID={taskID}&from={from_Station_Tag}&FromSlot={from_station_slot}&to={to_Station_Tag}&ToSlot={to_Station_Slot}&action={action}&isSourceAGV={isSourceAGV}";
-                        LOG.INFO($"StartLDULDOrderReport start");
 
                         var agvs_http = GetAGVSHttpHelper();
                         response = await agvs_http.GetAsync<clsAGVSTaskReportResponse>(route, timeout: 10);
 
-                        LOG.INFO($"LoadUnload Order Start Feedback to AGVS, AGVS Response = {response.ToJson()}");
                         return response;
                     }
                     catch (Exception ex)
                     {
-                        LOG.Critical($"LoadUnload Order Start Feedback to AGVS FAIL (try:{intRetry + 1}times),{ex.Message}", ex);
                         response = new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                     }
                     intRetry++;
@@ -213,7 +206,6 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
                 catch (Exception ex)
                 {
-                    LOG.Critical($"GetEQAcceptAGVTypeInfo from AGVS FAIL,{ex.Message}", ex);
                     //return new clsAGVSTaskReportResponse() { confirm = false, message = ex.Message };
                     return new Dictionary<int, int>();
                 }
@@ -232,7 +224,6 @@ namespace AGVSystemCommonNet6.Microservices.AGVS
                 }
                 catch (Exception ex)
                 {
-                    LOG.Critical($"GetEQAcceptAGVTypeInfo from AGVS FAIL,{ex.Message}", ex);
                     return new List<int>();
                 }
             }

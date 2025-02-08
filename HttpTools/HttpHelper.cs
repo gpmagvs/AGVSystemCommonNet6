@@ -1,193 +1,138 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NLog;
-using System.Diagnostics;
 using System.Net.Http.Json;
-using static SQLite.SQLite3;
+using System.Text;
+using Polly;
+using Polly.Retry;
+using System.Net;
 
 namespace AGVSystemCommonNet6.HttpTools
 {
     public class HttpHelper : IDisposable
     {
+        public readonly HttpClient http_client;
 
-        public class clsInternalError
-        {
-            public string ErrorCode { get; set; }
-            public string ErrorMessage { get; set; } = string.Empty;
-        }
-        public HttpClient http_client { get; private set; }
-        public readonly string baseUrl;
-        private bool disposedValue;
-        public string Comment { get; set; } = "";
-        private NLog.Logger logger = LogManager.GetLogger("HttpHelperLog");
+        private readonly Logger _logger;
+        private bool _disposedValue;
+        public string Comment { get; }
+        public string? baseUrl => http_client?.BaseAddress?.ToString();
 
-        public HttpHelper(string baseUrl, string comment = "")
+        public HttpHelper(string baseUrl, string comment = "", int maxRetries = 3)
         {
-            this.baseUrl = baseUrl;
             Comment = comment;
-            http_client = new HttpClient()
+            http_client = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(60),
                 BaseAddress = new Uri(baseUrl)
             };
-            logger.Info($"[{Comment}:{baseUrl}] HttpClinet instance created");
+            _logger = LogManager.GetLogger("HttpHelperLog");
+            _logger.Info($"[{Comment}:{baseUrl}] HttpClient instance created");
+
 
         }
-        public async Task<(bool success, string json)> PostAsync(string api_route, object data, int timeout = 5)
+
+        public async Task<(bool success, string json)> PostAsync(string apiRoute, object data, int timeout = 5, int retryCount = 3)
         {
-            logger.Trace($"Post Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
-
-            string contentDataJson = string.Empty;
-            if (data != null)
-                contentDataJson = JsonConvert.SerializeObject(data);
-            var content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
-            try
-            {
-                using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
-                using HttpResponseMessage response = await http_client.PostAsync(api_route, content, cts.Token);
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseJson = await response.Content.ReadAsStringAsync();
-                    logger.Trace($"PostAsync Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}. Response:{responseJson}");
-                    return (true, responseJson);
-                }
-                else
-                {
-                    var errmsg = $"Post Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:Response status code: {response.StatusCode}";
-                    logger.Error(errmsg);
-                    throw new HttpRequestException(errmsg);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Warn($"Post Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
-                throw ex;
-            }
-
+            var response = await SendRequestAsync(HttpMethod.Post, apiRoute, data, timeout, retryCount);
+            var responseJson = await response.Content.ReadAsStringAsync();
+            return (true, responseJson);
         }
-        public async Task<Tin> PostAsync<Tin, Tout>(string api_route, Tout data, int timeout = 5)
+
+        public async Task<TResponse> PostAsync<TResponse, TRequest>(string apiRoute, TRequest data, int timeout = 5, int retryCount = 3)
         {
-            logger.Trace($"Post Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
-            string contentDataJson = string.Empty;
-            if (data != null)
-                contentDataJson = JsonConvert.SerializeObject(data);
-            StringContent content = new StringContent(contentDataJson, System.Text.Encoding.UTF8, "application/json");
-            try
-            {
-                using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
-                using HttpResponseMessage response = await http_client.PostAsync(api_route, content, cts.Token);
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseJson = await response.Content.ReadAsStringAsync();
-                    logger.Trace($"PostAsync Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}. Response:{responseJson}");
-                    var result = JsonConvert.DeserializeObject<Tin>(responseJson);
-                    return result;
-                }
-                else
-                {
-                    var errmsg = $"Post Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:Response status code: {response.StatusCode}";
-                    logger.Error(errmsg);
-                    throw new HttpRequestException(errmsg);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Warn($"Post Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
-                throw ex;
-            }
-
+            var response = await SendRequestAsync(HttpMethod.Post, apiRoute, data, timeout, retryCount);
+            var responseJson = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<TResponse>(responseJson);
         }
-        public async Task<Tin> GetAsync<Tin>(string api_route, int timeout = 5)
+
+        public async Task<T> GetAsync<T>(string apiRoute, int timeout = 5, int retryCount = 3)
         {
-            logger.Trace($"Get Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
-
-            string jsonContent = "";
-            try
-            {
-                using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
-                using HttpResponseMessage response = await http_client.GetAsync(api_route, cts.Token);
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    jsonContent = await response.Content.ReadAsStringAsync();
-                    logger.Trace($"Get Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}-. Response:{jsonContent}");
-                    var result = JsonConvert.DeserializeObject<Tin>(jsonContent);
-                    return result;
-                }
-                else
-                {
-                    var errmsg = $"Get Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:Response status code: {response.StatusCode}";
-                    logger.Error(errmsg);
-                    throw new HttpRequestException(errmsg);
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                throw ex;
-            }
-            catch (TaskCanceledException ex)
-            {
-                throw ex;
-            }
-            catch (Exception ex)
-            {
-                logger.Warn($"GetStringAsync Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
-                throw ex;
-            }
+            var response = await SendRequestAsync(HttpMethod.Get, apiRoute, null, timeout, retryCount);
+            var responseJson = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(responseJson);
         }
-        public async Task<string> GetStringAsync(string api_route, int timeout = 5)
+
+        public async Task<string> GetStringAsync(string apiRoute, int timeout = 5, int retryCount = 3)
         {
-            logger.Trace($"Get Start-{http_client.BaseAddress.ToString()}, Path: {api_route}");
-
-            string str_result = "";
-            try
-            {
-                string url = this.baseUrl + $"{api_route}";
-                using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));// 使用 CancellationTokenSource 設置特定請求的超時
-                using HttpResponseMessage response = await http_client.GetAsync(api_route, cts.Token);
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    str_result = await response.Content.ReadAsStringAsync();
-                    logger.Trace($"Get Sucess-{http_client.BaseAddress.ToString()}, Path: {api_route}. Response:{str_result}");
-                    return str_result;
-                }
-                else
-                {
-                    var errmsg = $"Get Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:Response status code: {response.StatusCode}";
-                    logger.Error(errmsg);
-                    throw new HttpRequestException(errmsg);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Warn($"GetStringAsync Fail:{http_client.BaseAddress.ToString()}, Path: {api_route}:{ex.Message}");
-                throw ex;
-            }
+            var response = await SendRequestAsync(HttpMethod.Get, apiRoute, null, timeout, retryCount);
+            return await response.Content.ReadAsStringAsync();
         }
 
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, string apiRoute, object data = null, int timeout = 5, int retryCount = 3)
+        {
+            _logger.Trace($"{method} Start-{http_client.BaseAddress}, Path: {apiRoute}");
+
+            var _retryPolicy = Policy<HttpResponseMessage>
+             .Handle<HttpRequestException>()
+             .Or<TaskCanceledException>()
+             .OrResult(response => !response.IsSuccessStatusCode)
+             .WaitAndRetryAsync(
+                 retryCount,
+                 retryAttempt => TimeSpan.FromSeconds(1),
+                 onRetry: (exception, timeSpan, retryCount, context) =>
+                 {
+                     var error = exception.Exception?.Message ?? $"Status code: {exception.Result?.StatusCode}";
+                     _logger.Warn($"Retry {retryCount} after {timeSpan.TotalSeconds} seconds. Error: {error}");
+                 }
+             );
+
+            return await _retryPolicy.ExecuteAsync(async () =>
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));
+
+                try
+                {
+                    HttpResponseMessage response;
+                    if (method == HttpMethod.Get)
+                    {
+                        response = await http_client.GetAsync(apiRoute, cts.Token);
+                    }
+                    else
+                    {
+                        var content = CreateJsonContent(data);
+                        response = await http_client.PostAsync(apiRoute, content, cts.Token);
+                    }
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseContent = await response.Content.ReadAsStringAsync();
+                        _logger.Trace($"{method} Success-{http_client.BaseAddress}, Path: {apiRoute}. Response:{responseContent}");
+                        return response;
+                    }
+                    else
+                    {
+                        var errorMessage = $"{method} Fail:{http_client.BaseAddress}, Path: {apiRoute}:Response status code: {response.StatusCode}";
+                        _logger.Error(errorMessage);
+                        throw new HttpRequestException(errorMessage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn($"{method} Fail:{http_client.BaseAddress}, Path: {apiRoute}:{ex.Message}");
+                    throw;
+                }
+            });
+        }
+        private static StringContent CreateJsonContent(object data)
+        {
+            var json = data != null ? JsonConvert.SerializeObject(data) : "";
+            return new StringContent(json, Encoding.UTF8, "application/json");
+        }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
-                    // TODO: 處置受控狀態 (受控物件)
+                    http_client?.Dispose();
                 }
-                http_client?.Dispose();
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
-        // // TODO: 僅有當 'Dispose(bool disposing)' 具有會釋出非受控資源的程式碼時，才覆寫完成項
-        // ~HttpHelper()
-        // {
-        //     // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
-        //     Dispose(disposing: false);
-        // }
-
         public void Dispose()
         {
-            // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
