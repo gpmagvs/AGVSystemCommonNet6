@@ -1,6 +1,7 @@
 ﻿using AGVSystemCommonNet6.Microservices.MCSCIM;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,37 +17,46 @@ namespace AGVSystemCommonNet6.Configuration
 
         public TransferReportConfiguration transferReportConfiguration { get; private set; } = new TransferReportConfiguration();
 
-        public SECSConfiguration SECSConfigs { get;  set; } = new SECSConfiguration();
+        public SECSConfiguration SECSConfigs { get; set; } = new SECSConfiguration();
         public readonly string SECSConfigsSaveFolder = @"C:\AGVS";
-        
+
         public readonly string configsSaveFolder = @"C:\AGVS\SECSConfigs";
         public string SECSConfigsFilePath => Path.Combine(SECSConfigsSaveFolder, "SystemConfigs.json");
-
-
-        
 
         public string alarmConfigFilePath => Path.Combine(configsSaveFolder, "SECS_Alarm_Settings.json");
         public string transferReportConfigFilePath => Path.Combine(configsSaveFolder, "SECS_Transfer_Report.json");
 
-        public SECSConfigsService(string configsSaveFolder)
+        private static SemaphoreSlim _initializeSemaphoreSlim = new SemaphoreSlim(1, 1);
+
+        public static Logger logger = LogManager.GetCurrentClassLogger();
+
+        public SECSConfigsService(string configsSaveFolder) : this()
         {
             this.configsSaveFolder = configsSaveFolder;
-            Initialize();
         }
         public SECSConfigsService()
         {
         }
-        public void Reload()
+
+        public async Task InitializeAsync()
         {
-            Initialize();
-        }
-        private void Initialize()
-        {
-            CreateDirectory();
-            alarmConfiguration = LoadAlarmConfig();
-            transferReportConfiguration = LoadTransferReportConfig();
-            UpdateCofigurationFile(alarmConfiguration, alarmConfigFilePath);
-            UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
+            try
+            {
+                await _initializeSemaphoreSlim.WaitAsync();
+                CreateDirectory();
+                alarmConfiguration = LoadAlarmConfig();
+                transferReportConfiguration = LoadTransferReportConfig();
+                UpdateCofigurationFile(alarmConfiguration, alarmConfigFilePath);
+                UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "SECSConfigsService InitializeAsync Error");
+            }
+            finally
+            {
+                _initializeSemaphoreSlim.Release();
+            }
         }
 
         private TransferReportConfiguration LoadTransferReportConfig()
@@ -55,11 +65,15 @@ namespace AGVSystemCommonNet6.Configuration
             {
                 return LoadConfig<TransferReportConfiguration>(transferReportConfigFilePath);
             }
-            catch
+            catch (FileNotFoundException ex)
             {
                 TransferReportConfiguration defaultConfig = new();
                 UpdateCofigurationFile(defaultConfig, transferReportConfigFilePath);
                 return defaultConfig;
+            }
+            catch
+            {
+                return transferReportConfiguration;
             }
         }
 
@@ -104,31 +118,31 @@ namespace AGVSystemCommonNet6.Configuration
         }
         private void CheckSECSCofigurationFile(object defaultObj, string filePath)
         {
-             // 確保目錄存在
-        // CreateDirectory(filePath);
+            // 確保目錄存在
+            // CreateDirectory(filePath);
 
-        // 如果文件存在，讀取內容
-        JObject config = new JObject();
-        if (File.Exists(filePath))
-        {
-            string existingContent = File.ReadAllText(filePath);
-            config = JObject.Parse(existingContent);
-        }
+            // 如果文件存在，讀取內容
+            JObject config = new JObject();
+            if (File.Exists(filePath))
+            {
+                string existingContent = File.ReadAllText(filePath);
+                config = JObject.Parse(existingContent);
+            }
 
-        // 檢查 SECSGem 節點是否存在，並更新內容
-        if (config["SECSGem"] == null || !JToken.DeepEquals(config["SECSGem"], JToken.FromObject(defaultObj)))
-        {
-            config["SECSGem"] = JToken.FromObject(defaultObj);
-            string newContent = JsonConvert.SerializeObject(config, Formatting.Indented);
+            // 檢查 SECSGem 節點是否存在，並更新內容
+            if (config["SECSGem"] == null || !JToken.DeepEquals(config["SECSGem"], JToken.FromObject(defaultObj)))
+            {
+                config["SECSGem"] = JToken.FromObject(defaultObj);
+                string newContent = JsonConvert.SerializeObject(config, Formatting.Indented);
 
-            // 寫入更新後的內容
-            File.WriteAllText(filePath, newContent);
-            Console.WriteLine("SECSGem 配置已更新！");
-        }
-        else
-        {
-            Console.WriteLine("SECSGem 配置相同，無需更新。");
-        }
+                // 寫入更新後的內容
+                File.WriteAllText(filePath, newContent);
+                Console.WriteLine("SECSGem 配置已更新！");
+            }
+            else
+            {
+                Console.WriteLine("SECSGem 配置相同，無需更新。");
+            }
         }
         private void CreateDirectory()
         {
@@ -145,7 +159,7 @@ namespace AGVSystemCommonNet6.Configuration
         {
             //this.SECSConfigs = SECSGemConfigSetting;
             this.SECSConfigs = SECSConfig;
-            
+
             CheckSECSCofigurationFile(SECSConfig, SECSConfigsFilePath);
             //this.baseConfiguration.SECSGemConfigSetting = SECSGemConfigSetting;
             //UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);

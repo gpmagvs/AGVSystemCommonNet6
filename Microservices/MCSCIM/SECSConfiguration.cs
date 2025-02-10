@@ -9,7 +9,7 @@ namespace AGVSystemCommonNet6.Microservices.MCSCIM
 {
     public class SECSConfiguration
     {
-        
+
         public string DeviceID { get; set; } = "2F_AGVC02";
         public string CarrierLOCPrefixName { get; set; } = "ABFRACK005";
         public string SystemID { get; set; } = "022";
@@ -88,19 +88,19 @@ namespace AGVSystemCommonNet6.Microservices.MCSCIM
             public byte AGVDownWhenULDWithoutCargoResultCode { get; set; } = 144;
             public byte AGVDownWhenMovingToDestineResultCode { get; set; } = 145;
 
-            public byte DestineEqLoadReqeustOff { get; set; } = 10;
-            public byte DestineEqHasCargoResultCode { get; set; } = 11;
-            public byte DestineEqMachechStateErrorResultCode { get; set; } = 12;
-            public byte DestineEqDownResultCode { get; set; } = 13;
+            public byte DestineEqLoadReqeustOff { get; set; } = 110;
+            public byte DestineEqHasCargoResultCode { get; set; } = 111;
+            public byte DestineEqMachechStateErrorResultCode { get; set; } = 112;
+            public byte DestineEqDownResultCode { get; set; } = 113;
 
 
-            public byte SourceEqUnloadReqeustOff { get; set; } = 14;
-            public byte SourceEqNotHasCargoResultCode { get; set; } = 15;
-            public byte SourceEqMachechStateErrorResultCode { get; set; } = 16;
-            public byte SourceEqDownResultCode { get; set; } = 17;
+            public byte SourceEqUnloadReqeustOff { get; set; } = 114;
+            public byte SourceEqNotHasCargoResultCode { get; set; } = 115;
+            public byte SourceEqMachechStateErrorResultCode { get; set; } = 116;
+            public byte SourceEqDownResultCode { get; set; } = 117;
 
-            public byte DestineRackPortHasCargoResultCode { get; set; } = 30;
-            public byte SourceRackPortNotHasCargoResultCode { get; set; } = 31;
+            public byte DestineRackPortHasCargoResultCode { get; set; } = 130;
+            public byte SourceRackPortNotHasCargoResultCode { get; set; } = 131;
 
         }
     }
