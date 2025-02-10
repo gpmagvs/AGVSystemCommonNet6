@@ -17,6 +17,8 @@ namespace AGVSystemCommonNet6.ViewModels
 
         public SystemModesOperationPermission systemModesOperations { get; set; } = new SystemModesOperationPermission();
 
+        public ChargeActions chargeActionsPermission { get; set; } = new ChargeActions();
+
         public WebFunctionViewPermissions()
         {
         }
@@ -55,6 +57,7 @@ namespace AGVSystemCommonNet6.ViewModels
             menu.DataQuery =
             menu.HotRun =
             menu.SystemConfiguration = 0;
+            chargeActionsPermission.DeepCharge = chargeActionsPermission.StopDeepCharge = 0;
         }
         private void SetAsOperatorPermission()
         {
@@ -98,8 +101,14 @@ namespace AGVSystemCommonNet6.ViewModels
             public int RunModeSwitch { get; set; } = 1;
             public int AutoTransferModeSwitch { get; set; } = 1;
             public int HostOnlineSwitch { get; set; } = 1;
-
             public int HostRemoteSwitch { get; set; } = 1;
+        }
+
+        public class ChargeActions
+        {
+            public int NormalCharge { get; set; } = 1;
+            public int DeepCharge { get; set; } = 1;
+            public int StopDeepCharge { get; set; } = 1;
         }
     }
 }
