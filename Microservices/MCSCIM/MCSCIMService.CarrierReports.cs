@@ -60,6 +60,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
 
         public static async Task<(bool confirm, string message)> ShelfStatusChange(ZoneData zoneData)
         {
+            if (!IsHostOnline)
+                return (true, "Not Online");
+
             (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
             try
             {
@@ -76,6 +79,8 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         }
         public static async Task<(bool confirm, string message)> ZoneCapacityChange(ZoneData zoneData)
         {
+            if (!IsHostOnline)
+                return (true, "Not Online");
             (bool confirm, string message) response = new(false, "[MCSCIMService.AlarmReporter] System Error.");
             try
             {
@@ -103,6 +108,8 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
                 await _http.PostAsync<object, object>($"/api/Carrier/CarrierInstallCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null, 1);
             }
             catch (Exception ex)
@@ -122,6 +129,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync<object, object>($"/api/Carrier/CarrierRemoveCompleted?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&CarrierZoneName={CarrierZoneName}&HandoffType={HandoffType}", null, 1);
             }
             catch (Exception ex)
@@ -134,6 +144,8 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
                 await _http.PostAsync<object, object>($"/api/Carrier/CarrierIDReadReport?CarrierID={CarrierID}&CarrierLoc={CarrierLoc}&IDReadState={(ushort)readState}", null, 1);
             }
             catch (Exception ex)

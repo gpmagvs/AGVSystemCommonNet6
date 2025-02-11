@@ -1,6 +1,8 @@
-﻿using AGVSystemCommonNet6.HttpTools;
+﻿using AGVSystemCommonNet6.DATABASE;
+using AGVSystemCommonNet6.HttpTools;
 using AGVSystemCommonNet6.Material;
 using EquipmentManagment.WIP;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NLog;
 using System;
@@ -16,6 +18,19 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         public static string MCSCIMUrl => "http://localhost:7107";
         private static HttpHelper _http = new HttpHelper(MCSCIMUrl);
         protected static Logger logger = LogManager.GetCurrentClassLogger();
+        public static bool IsHostOnline
+        {
+            get
+            {
+                using (AGVSDatabase db = new())
+                {
+                    Sys.AGVSSystemStatus? states = db.tables.SysStatus.AsNoTracking().FirstOrDefault();
+                    if (states == null)
+                        return false;
+                    return states.HostConnMode == AGVDispatch.RunMode.HOST_CONN_MODE.ONLINE;
+                }
+            }
+        }
         public static async Task<(bool confirm, string message)> Online(int Timeout = 8)
         {
             try

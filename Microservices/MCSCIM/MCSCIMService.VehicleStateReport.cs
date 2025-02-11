@@ -91,6 +91,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/acquireStarted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
             }
             catch (Exception ex)
@@ -110,6 +113,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/acquireCompleted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
             }
             catch (Exception ex)
@@ -129,6 +135,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/depositStarted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
             }
             catch (Exception ex)
@@ -147,6 +156,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/depositCompleted?vehicleId={vehicleId}&carrierId={carrierId}&transferPort={transferPort}", null);
             }
             catch (Exception ex)
@@ -165,6 +177,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/assigned?vehicleId={vehicleId}&commandId={commandId}", null);
             }
             catch (Exception ex)
@@ -182,6 +197,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/unassigned?vehicleId={vehicleId}&commandId={commandId}", null);
             }
             catch (Exception ex)
@@ -200,6 +218,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/departed?vehicleId={vehicleId}&transferPort={transferPort}", null);
             }
             catch (Exception ex)
@@ -218,6 +239,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/arrived?vehicleId={vehicleId}&transferPort={transferPort}", null);
             }
             catch (Exception ex)
@@ -236,6 +260,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/chargeStarted?vehicleId={vehicleId}&chargerId={chargerId}", null);
             }
             catch (Exception ex)
@@ -254,6 +281,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/chargeEnd?vehicleId={vehicleId}&chargerId={chargerId}", null);
             }
             catch (Exception ex)
@@ -273,6 +303,9 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
+                if (!IsHostOnline)
+                    return;
+
                 await _http.PostAsync($"/api/VehicleStateReport/coordinateChanged?vehicleId={vehicleId}&x={x}&y={y}", null);
             }
             catch (Exception ex)
