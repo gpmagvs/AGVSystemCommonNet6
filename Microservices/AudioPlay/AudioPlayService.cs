@@ -23,7 +23,7 @@ namespace AGVSystemCommonNet6.Microservices.AudioPlay
             try
             {
                 HttpHelper http = new HttpHelper(AudioPlayHostUrl);
-                (bool success, string json) = await http.PostAsync(PlayAudioRoute + audioName + $"&duration={duration}", null);
+                (bool success, string json) = await http.PostAsync(PlayAudioRoute + audioName + $"&duration={duration}", null,1,1);
             }
             catch (Exception ex)
             {
