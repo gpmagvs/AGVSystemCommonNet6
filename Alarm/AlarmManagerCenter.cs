@@ -449,6 +449,7 @@ namespace AGVSystemCommonNet6.Alarm
             {
                 var _alarms = agvsDatabse.tables.SystemAlarms.AsNoTracking()
                                                .Where(alarm => alarm.Time>=startTime && alarm.Time<=endTime)
+                                               .OrderByDescending(alarm=>alarm.Time)
                                                .ToList()
                                                .Where(alarm => KeywordSearch(alarm, keyword))
                                                .ToList();

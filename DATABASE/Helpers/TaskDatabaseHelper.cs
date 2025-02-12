@@ -176,13 +176,14 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             using (DbContextHelper dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {
                 IQueryable<clsTaskDto> _TaskQuery = dbhelper._context.Set<clsTaskDto>()
-            .OrderByDescending(TK => TK.RecieveTime)
-            .Where(Task => Task.RecieveTime >= StartTime &&
-                           Task.RecieveTime <= EndTime &&
-                           (string.IsNullOrEmpty(AGVName) || Task.DesignatedAGVName == AGVName) &&
-                           (string.IsNullOrEmpty(TaskName) || Task.TaskName.Contains(TaskName)) &&
-                           (TaskResult == TASK_RUN_STATUS.UNKNOWN || Task.State == TaskResult) &&
-                           (ActionType == ACTION_TYPE.Unknown || Task.Action == ActionType));
+                                                                     .AsNoTracking()
+                                                                     .OrderByDescending(TK => TK.RecieveTime)
+                                                                     .Where(Task => Task.RecieveTime >= StartTime &&
+                                                                                    Task.RecieveTime <= EndTime &&
+                                                                                    (string.IsNullOrEmpty(AGVName) || Task.DesignatedAGVName == AGVName) &&
+                                                                                    (string.IsNullOrEmpty(TaskName) || Task.TaskName.Contains(TaskName)) &&
+                                                                                    (TaskResult == TASK_RUN_STATUS.UNKNOWN || Task.State == TaskResult) &&
+                                                                                    (ActionType == ACTION_TYPE.Unknown || Task.Action == ActionType));
 
                 // Step 2: Load tasks into memory and apply advanced filtering
                 List<clsTaskDto> _TaskList = _TaskQuery.ToList();
