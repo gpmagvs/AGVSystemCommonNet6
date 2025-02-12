@@ -440,7 +440,23 @@ namespace AGVSystemCommonNet6.Alarm
                 dbhelper._context.Set<clsAlarmDto>().ToList();
             }
         }
+        public static void QueryAlarmWithKeyword(int currentpage, DateTime startTime, DateTime endTime, string? keyword, out int count, out List<clsAlarmDto> alarms)
+        {
+            count = 0;
+            alarms = new();
 
+            using (AGVSDatabase agvsDatabse = new())
+            {
+                var _alarms = agvsDatabse.tables.SystemAlarms.AsNoTracking()
+                                               .Where(alarm => alarm.Time>=startTime && alarm.Time<=endTime)
+                                               .ToList()
+                                               .Where(alarm => KeywordSearch(alarm, keyword))
+                                               .ToList();
+
+                count =  _alarms.Count();
+                alarms = _alarms.Skip((currentpage - 1) * 19).Take(19).ToList();
+            }
+        }
         public static void AlarmQuery(out int count, int currentpage, DateTime startTime, DateTime endTime, string AGV_Name, string TaskName, string Alarm_description, out List<clsAlarmDto> alarms, string AlarmType = "ALL")
         {
             count = 0;
@@ -465,6 +481,15 @@ namespace AGVSystemCommonNet6.Alarm
                 //    alarm.TrobleShootingReference = AGVsTrobleShootings[((Alarm.ALARMS)alarm.AlarmCode).ToString()].TrobleShootingFilePath;
                 //}
             };
+        }
+
+        private static bool KeywordSearch(clsAlarmDto alarm, string? alarm_description)
+        {
+            if (string.IsNullOrEmpty(alarm_description))
+                return true;
+            string description = (alarm.Description+alarm.AlarmCode+alarm.OccurLocation+alarm.Task_Name+alarm.Time.ToString("yyyy/MM/dd HH:mm:ss")+alarm.Time.ToString("yyyy-MM-dd HH:mm:ss")+alarm.Level+alarm.Equipment_Name+alarm.TrobleShootingMethod+alarm.TrobleShootingReference).ToLower();
+            return description.Contains(alarm_description.ToLower());
+            //&& (Alarm_description == null || Alarm_description == "ALL" ? (true) : (alarm.Description_Zh.Contains(Alarm_description)))
         }
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string fileName)
         {
