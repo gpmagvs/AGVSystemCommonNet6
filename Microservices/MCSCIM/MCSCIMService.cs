@@ -31,12 +31,12 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 }
             }
         }
-        public static async Task<(bool confirm, string message)> Online(int Timeout = 8)
+        public static async Task<(bool confirm, string message)> Online(int Timeout = 3)
         {
             try
             {
                 var route = $"/api/HostMode/OnlineLocal";
-                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, Timeout);
+                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, Timeout, 2);
                 return (_response.confirm, _response.message);
             }
             catch (HttpRequestException ex)
@@ -56,12 +56,12 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 return (false, ex.Message);
             }
         }
-        public static async Task<(bool confirm, string message)> Offline(int Timeout = 8)
+        public static async Task<(bool confirm, string message)> Offline(int Timeout = 3)
         {
             try
             {
                 var route = $"/api/HostMode/OFFline";
-                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, Timeout);
+                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, Timeout, 2);
                 return (_response.confirm, _response.message);
             }
             catch (HttpRequestException ex)
@@ -77,13 +77,13 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 return (false, ex.Message);
             }
         }
-        public static async Task<(bool confirm, string message)> OnlineLocalToOnlineRemote(int Timeout = 8)
+        public static async Task<(bool confirm, string message)> OnlineLocalToOnlineRemote(int Timeout = 3)
         {
             (bool confirm, string message) response = new(false, "[OnlineLocalToOnlineRemote] Fail");
             try
             {
                 var route = $"/api/HostMode/OnlineLoacl2OnlineRemote";
-                ResponseObject v = await _http.GetAsync<ResponseObject>(route, Timeout);
+                ResponseObject v = await _http.GetAsync<ResponseObject>(route, Timeout, 2);
                 response.confirm = v.confirm;
                 response.message = v.message;
             }
@@ -101,13 +101,13 @@ namespace AGVSystemCommonNet6.Microservices.MCS
             }
             return response;
         }
-        public static async Task<(bool confirm, string message)> OnlineRemote2OnlineLocal(int Timeout = 8)
+        public static async Task<(bool confirm, string message)> OnlineRemote2OnlineLocal(int Timeout = 3)
         {
             (bool confirm, string message) response = new(false, "[OnlineRemote2OnlineLocal] Fail");
             try
             {
                 var route = $"/api/HostMode/OnlineRemote2OnlineLocal";
-                ResponseObject v = await _http.GetAsync<ResponseObject>(route, Timeout);
+                ResponseObject v = await _http.GetAsync<ResponseObject>(route, Timeout, 2);
                 response.confirm = v.confirm;
                 response.message = v.message;
             }
@@ -129,7 +129,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync($"/api/Alarm/AlarmReport?alarmID={alarmID}&alarmText={alarmText}", null, 3);
+                await _http.PostAsync($"/api/Alarm/AlarmReport?alarmID={alarmID}&alarmText={alarmText}", null, 2, 2);
             }
             catch (Exception ex)
             {
@@ -140,7 +140,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                await _http.PostAsync($"/api/Alarm/AlarmClear?alarmID={alarmID}&alarmText={alarmText}", null, 3);
+                await _http.PostAsync($"/api/Alarm/AlarmClear?alarmID={alarmID}&alarmText={alarmText}", null, 2, 2);
 
             }
             catch (Exception ex)
