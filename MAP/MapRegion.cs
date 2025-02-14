@@ -43,6 +43,10 @@ namespace AGVSystemCommonNet6.MAP
         /// 出口Tag
         /// </summary>
         public List<int> LeavingTags { get; set; } = new List<int>();
+
+
+        public Dictionary<int, double> EnteryTagsWaitForwardAngles { get; set; } = new Dictionary<int, double>();
+
         /// <summary>
         /// 車輛閒置時應該朝向的角度
         /// </summary>
