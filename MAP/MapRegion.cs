@@ -24,6 +24,9 @@ namespace AGVSystemCommonNet6.MAP
         public List<double[]> PolygonCoordinations { get; set; } = new List<double[]>();
         public bool IsOpend { get; set; } = false;
         public bool IsNarrowPath { get; set; } = true;
+
+        public bool IsPathCanUseWhenAgvNoPathToUse { get; set; } = false;
+
         /// <summary>
         /// 最多可容納車輛數
         /// </summary>
