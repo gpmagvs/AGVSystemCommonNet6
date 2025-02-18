@@ -19,6 +19,8 @@ namespace AGVSystemCommonNet6.ViewModels
 
         public ChargeActions chargeActionsPermission { get; set; } = new ChargeActions();
 
+        public TaskDispatchPermission taskDispatchPermission { get; set; } = new();
+
         public WebFunctionViewPermissions()
         {
         }
@@ -109,6 +111,11 @@ namespace AGVSystemCommonNet6.ViewModels
             public int NormalCharge { get; set; } = 1;
             public int DeepCharge { get; set; } = 1;
             public int StopDeepCharge { get; set; } = 1;
+        }
+
+        public class TaskDispatchPermission
+        {
+            public int LocalOrderDispatchWhenHostRemote { get; set; } = 0;
         }
     }
 }
