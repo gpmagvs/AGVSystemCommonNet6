@@ -1,23 +1,16 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static AGVSystemCommonNet6.clsEnums;
-using AGVSystemCommonNet6.Configuration;
-using SQLite;
+﻿using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE.Helpers;
-using AGVSystemCommonNet6.Log;
 using Microsoft.EntityFrameworkCore;
+using NLog;
+using System.Diagnostics;
+using static AGVSystemCommonNet6.clsEnums;
 
 namespace AGVSystemCommonNet6.Availability
 {
     public class AvailabilityHelper
     {
         public AvailabilityDto availability = new AvailabilityDto();
-
+        Logger logger = LogManager.GetCurrentClassLogger();
         private Dictionary<MAIN_STATUS, Stopwatch> StateWatchers = new Dictionary<MAIN_STATUS, Stopwatch>()
         {
             { MAIN_STATUS.IDLE,new Stopwatch() },
@@ -238,7 +231,7 @@ namespace AGVSystemCommonNet6.Availability
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                logger.Error(ex);
             }
             finally
             {

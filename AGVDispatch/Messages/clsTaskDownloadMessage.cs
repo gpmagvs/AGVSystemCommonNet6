@@ -1,6 +1,5 @@
 ﻿using AGVSystemCommonNet6.GPMRosMessageNet.Actions;
 using AGVSystemCommonNet6.GPMRosMessageNet.Messages;
-using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Vehicle_Control.Models;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient.Actionlib;
@@ -153,7 +152,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
             }
             catch (Exception ec)
             {
-                LOG.ERROR("RosTaskCommandGoal_取得ROS任務Goal物件時發生錯誤", ec);
                 return null;
             }
         }
@@ -214,7 +212,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 if (_IsActionFinishReported != value)
                 {
                     _IsActionFinishReported = value;
-                    LOG.INFO($"{Task_Name} Action Finish 上報狀態:{(value ? "已上報派車完成" : "未上報派車完成")}", false);
                 }
             }
         }
@@ -235,7 +232,6 @@ namespace AGVSystemCommonNet6.AGVDispatch.Messages
                 }
                 catch (Exception ex)
                 {
-                    LOG.WARN($" IsSegmentTask get fail:{ex.Message}");
                     return false;
                 }
             }

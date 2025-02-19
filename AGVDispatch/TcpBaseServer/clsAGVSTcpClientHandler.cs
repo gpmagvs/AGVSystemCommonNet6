@@ -1,11 +1,8 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.Alarm;
-using AGVSystemCommonNet6.Log;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
+using NLog;
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
@@ -40,6 +37,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             public event EventHandler<clsTaskFeedbackMessage> OnClientTaskFeedback;
             public event EventHandler<clsExitRequest> OnClientExitRequesting;
             public event EventHandler OnTcpSocketDisconnect;
+            Logger logger = LogManager.GetCurrentClassLogger();
             public class clsSocketState
             {
                 public Socket socket;
@@ -85,7 +83,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                     {
                         OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
                         AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
-                        LOG.ERROR($"{ClientIP} {ex.Message}", ex);
+                        logger.Error($"{ClientIP} {ex.Message}", ex);
                         _SocketClient?.Dispose();
                     }
                 }
@@ -108,7 +106,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             {
                                 OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
                                 AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
-                                LOG.ERROR($"{ClientIP} {ex.Message}", ex);
+                                logger.Error($"{ClientIP} {ex.Message}", ex);
                             }
                         }
                     }
@@ -188,7 +186,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         {
                             OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
                             AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
-                            LOG.ERROR($"{ClientIP} {ex.Message}", ex);
+                            logger.Error($"{ClientIP} {ex.Message}", ex);
                             _SocketClient?.Dispose();
                         }
                     });
@@ -197,7 +195,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     OnTcpSocketDisconnect?.Invoke(this, EventArgs.Empty);
                     AlarmManagerCenter.AddAlarmAsync(ALARMS.AGV_TCPIP_DISCONNECT);
-                    LOG.ERROR($"{ClientIP} {ex.Message}", ex);
+                    logger.Error($"{ClientIP} {ex.Message}", ex);
                     _SocketClient?.Dispose();
                 }
 
@@ -245,7 +243,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         if (TaskDownloadMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
                         {
                             var response = taskDownloadFeedback.Header.First().Value;
-                            LOG.INFO($"Task Download To {AGV_Name}, AGV Response={response.ToJson()}");
+                            logger.Info($"Task Download To {AGV_Name}, AGV Response={response.ToJson()}");
                             taskDownload_AGV_ReturnCode = response.ReturnCode;
                             TaskDownloadWaitMRE.Set();
                         }
@@ -258,7 +256,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         if (TaskCancelMsg.SystemBytes == taskDownloadFeedback.SystemBytes)
                         {
                             var response = taskDownloadFeedback.Header.First().Value;
-                            LOG.INFO($"Task Cancel To {AGV_Name}, AGV Response={response.ToJson()}");
+                            logger.Info($"Task Cancel To {AGV_Name}, AGV Response={response.ToJson()}");
                             taskCancel_AGV_ReturnCode = response.ReturnCode;
                             TaskCancelWaitMRE.Set();
                         }
@@ -307,7 +305,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 bool timeout = !TaskCancelWaitMRE.WaitOne(TimeSpan.FromSeconds(3));
                 if (timeout)
                 {
-                    LOG.WARN($"Task Cancel To {AGV_Name}, Timeout!");
+                    logger.Warn($"Task Cancel To {AGV_Name}, Timeout!");
                 }
                 else
                 {
@@ -329,11 +327,11 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 };
                 TaskDownloadWaitMRE.Reset();
                 SendJsonReply(JsonConvert.SerializeObject(TaskDownloadMsg));
-                LOG.INFO($"Task Download To {AGV_Name}, Wait Response...");
+                logger.Info($"Task Download To {AGV_Name}, Wait Response...");
                 bool timeout = !TaskDownloadWaitMRE.WaitOne(TimeSpan.FromSeconds(3));
                 if (timeout)
                 {
-                    LOG.WARN($"Task Download To {AGV_Name}, Timeout!");
+                    logger.Warn($"Task Download To {AGV_Name}, Timeout!");
                     return new TaskDownloadRequestResponse
                     {
                         ReturnCode = TASK_DOWNLOAD_RETURN_CODES.TASK_DOWN_LOAD_TIMEOUT
@@ -343,12 +341,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                 {
                     if (taskDownload_AGV_ReturnCode == RETURN_CODE.OK)
                     {
-                        LOG.INFO($"Task Download To {AGV_Name}, AGV Accept!");
+                        logger.Info($"Task Download To {AGV_Name}, AGV Accept!");
                         return new TaskDownloadRequestResponse { ReturnCode = TASK_DOWNLOAD_RETURN_CODES.OK };
                     }
                     else
                     {
-                        LOG.WARN($"Task Download To {AGV_Name}, AGV Return Code == {taskDownload_AGV_ReturnCode}");
+                        logger.Warn($"Task Download To {AGV_Name}, AGV Return Code == {taskDownload_AGV_ReturnCode}");
                         return new TaskDownloadRequestResponse
                         {
                             ReturnCode = TASK_DOWNLOAD_RETURN_CODES.TASK_CANCEL

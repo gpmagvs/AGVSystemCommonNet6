@@ -1,5 +1,4 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
-using AGVSystemCommonNet6.Log;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -31,7 +30,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             {
                 if (msgType == MESSAGE_TYPE.UNKNOWN)
                 {
-                    LOG.ERROR($"Recieve undefined Msg {_json}");
+                    logger.LogError($"Recieve undefined Msg {_json}");
                     return;
                 }
                 MessageHandlerFactory factory = new MessageHandlerFactory(this);
@@ -131,7 +130,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                LOG.ERROR("HandleAGVSJsonMsg_Code Error", ex);
+                logger.LogError("HandleAGVSJsonMsg_Code Error", ex);
             }
         }
     }

@@ -2,13 +2,13 @@
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
 using AGVSystemCommonNet6.GPMRosMessageNet.Messages;
-using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Microservices.AGVS;
 using AGVSystemCommonNet6.Microservices.MCS;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using NLog;
 using System;
 using System.Data;
 using System.Text;
@@ -26,6 +26,7 @@ namespace AGVSystemCommonNet6.Alarm
         private static FileSystemWatcher _alarmCodeJsonFileWatcher;
         private static AGVSDatabase database;
         private static IMapper mapper;
+        static Logger logger = LogManager.GetCurrentClassLogger();
         public static List<clsAlarmDto> uncheckedAlarms
         {
             get
@@ -62,11 +63,11 @@ namespace AGVSystemCommonNet6.Alarm
                     alarm.Checked = true;
                 }
                 int num = await db.SaveChanges();
-                LOG.TRACE($"{num} alarms set as checked");
+                logger.Trace($"{num} alarms set as checked");
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                logger.Error(ex);
             }
 
         }
@@ -200,12 +201,12 @@ namespace AGVSystemCommonNet6.Alarm
                 };
                 alarmDto.Time = DateTime.Now;
                 await AddAlarmAsync(alarmDto);
-                LOG.WARN($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
+                logger.Warn($"AGVS Alarm Add : {alarmDto.ToJson(Formatting.None)}");
                 return alarmDto;
             }
             catch (Exception ex)
             {
-                LOG.ERROR("AddAlarmAsync", ex);
+                logger.Error("AddAlarmAsync", ex);
                 return null;
             }
             finally
@@ -320,7 +321,7 @@ namespace AGVSystemCommonNet6.Alarm
                     ZH_TrobleShootingDescription = "請洽GPM"
                 });
 
-                LOG.WARN($"有未記載的Alarm Code : {item.ToString()}");
+                logger.Warn($"有未記載的Alarm Code : {item.ToString()}");
             }
 
             FileStream fs = new FileStream(TROBLE_SHOOTING_FILE_PATH, FileMode.Create);
@@ -424,7 +425,7 @@ namespace AGVSystemCommonNet6.Alarm
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                logger.Error(ex);
                 return -1;
             }
             finally
@@ -568,7 +569,7 @@ namespace AGVSystemCommonNet6.Alarm
             }
             catch (Exception ex)
             {
-                LOG.ERROR(ex);
+                logger.Error(ex);
             }
             finally
             {

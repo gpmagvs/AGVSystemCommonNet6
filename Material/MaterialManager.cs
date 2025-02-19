@@ -1,30 +1,20 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch;
-using AGVSystemCommonNet6.Alarm;
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.DATABASE.Helpers;
-using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Microservices.AGVS;
-using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
-using EquipmentManagment.MainEquipment;
 using EquipmentManagment.Manager;
 using EquipmentManagment.WIP;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using NLog;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using WebSocketSharp;
-using static AGVSystemCommonNet6.DATABASE.DatabaseCaches;
 
 namespace AGVSystemCommonNet6.Material
 {
     public class MaterialManager
     {
         private static AGVSDatabase database;
-
+        static Logger logger = LogManager.GetCurrentClassLogger();
         private static bool Initialized = false;
         public MaterialManager() { }
 
@@ -98,7 +88,7 @@ namespace AGVSystemCommonNet6.Material
                 };
                 materialDto.RecordTime = DateTime.Now;
                 await AddMaterialInfo(materialDto);
-                LOG.INFO($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
+                logger.Info($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
 
                 //await AGVSSerivces.UpdateStationInfo(materialDto);
 
@@ -106,7 +96,7 @@ namespace AGVSystemCommonNet6.Material
             }
             catch (Exception ex)
             {
-                LOG.ERROR("AddMaterialAsync", ex);
+                logger.Error("AddMaterialAsync", ex);
                 return null;
             }
             finally
@@ -139,12 +129,12 @@ namespace AGVSystemCommonNet6.Material
                 };
                 materialDto.RecordTime = DateTime.Now;
                 await AddMaterialInfo(materialDto);
-                LOG.INFO($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
+                logger.Info($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
                 return materialDto;
             }
             catch (Exception ex)
             {
-                LOG.ERROR("AddMaterialAsync", ex);
+                logger.Error("AddMaterialAsync", ex);
                 return null;
             }
             finally
@@ -176,12 +166,12 @@ namespace AGVSystemCommonNet6.Material
                 };
                 materialDto.RecordTime = DateTime.Now;
                 await AddMaterialInfo(materialDto);
-                LOG.INFO($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
+                logger.Info($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
                 return materialDto;
             }
             catch (Exception ex)
             {
-                LOG.ERROR("AddMaterialAsync", ex);
+                logger.Error("AddMaterialAsync", ex);
                 return null;
             }
             finally
@@ -215,12 +205,12 @@ namespace AGVSystemCommonNet6.Material
                 };
                 materialDto.RecordTime = DateTime.Now;
                 await AddMaterialInfo(materialDto);
-                LOG.INFO($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
+                logger.Info($"Material Status Update : {materialDto.ToJson(Formatting.None)}");
                 return materialDto;
             }
             catch (Exception ex)
             {
-                LOG.ERROR("AddMaterialAsync", ex);
+                logger.Error("AddMaterialAsync", ex);
                 return null;
             }
             finally
@@ -365,7 +355,7 @@ namespace AGVSystemCommonNet6.Material
         public static string SaveTocsv(DateTime startTime, DateTime endTime, string MaterialID = "", MaterialCondition materialCondition = MaterialCondition.Done, string fileName = null)
         {
             var folder = Path.Combine(Environment.CurrentDirectory, "Material History");
-            var _fileName = fileName.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
+            var _fileName = string.IsNullOrEmpty(fileName)? DateTime.Now.ToString("yyyy-MM-dd-HH") + ".csv" : fileName;
             Directory.CreateDirectory(folder);
             using (var dbhelper = new DbContextHelper(AGVSConfigulator.SysConfigs.DBConnection))
             {

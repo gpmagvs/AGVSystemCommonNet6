@@ -1,5 +1,4 @@
-﻿using AGVSystemCommonNet6.Log;
-using AGVSystemCommonNet6.MAP;
+﻿using AGVSystemCommonNet6.MAP;
 using System;
 using System.Collections.Generic;
 using System.Linq;

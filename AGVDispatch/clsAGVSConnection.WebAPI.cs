@@ -1,7 +1,6 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
 using AGVSystemCommonNet6.HttpTools;
-using AGVSystemCommonNet6.Log;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;

@@ -1,6 +1,5 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
-using AGVSystemCommonNet6.Log;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -22,8 +21,8 @@ namespace AGVSystemCommonNet6.AGVDispatch
         {
             if (AGVSMessageStoreDictionary.TryRemove(system_byte, out MessageBase _retMsg))
             {
-                byte[] data = AGVSMessageFactory.CreateExitResponseAckData(EQName, SID,  system_byte, out clsExitRequestACKMessage ackMsg);
-                _ = LOG.INFO($"0314 Ack : {ackMsg.ToJson()}");
+                byte[] data = AGVSMessageFactory.CreateExitResponseAckData(EQName, SID, system_byte, out clsExitRequestACKMessage ackMsg);
+                logger.LogInformation($"0314 Ack : {ackMsg.ToJson()}");
                 _retMsg.Dispose();
                 ackMsg.Dispose();
                 return WriteDataOut(data);
@@ -36,7 +35,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             if (AGVSMessageStoreDictionary.TryRemove(system_byte, out MessageBase _retMsg))
             {
                 byte[] data = AGVSMessageFactory.CreateTaskDownloadReqAckData(EQName, SID, accept_task, system_byte, out clsSimpleReturnMessage ackMsg);
-                _ = LOG.INFO($"TaskDownload Ack : {ackMsg.ToJson()}");
+                logger.LogInformation($"TaskDownload Ack : {ackMsg.ToJson()}");
                 _retMsg.Dispose();
                 ackMsg.Dispose();
                 return WriteDataOut(data);
@@ -54,14 +53,14 @@ namespace AGVSystemCommonNet6.AGVDispatch
             bool _IsActionFinishFeedback = task_status == TASK_RUN_STATUS.ACTION_FINISH;
             if (_IsActionFinishFeedback)
             {
-                _ = LOG.WARN("Action Finish Feedback, Wait Main Status should not equal 'RUN' start");
+                logger.LogWarning("Action Finish Feedback, Wait Main Status should not equal 'RUN' start");
                 (bool confirmed, string message) _main_status_not_run_now = await WaitMainStatusNotRUNRepoted();
                 if (!_main_status_not_run_now.confirmed)
                 {
-                    _ = LOG.Critical(_main_status_not_run_now.message);
+                    logger.LogError(_main_status_not_run_now.message);
                     return false;
                 }
-                _ = LOG.INFO("Action Finish Feedback, Confirmed Main Status is not 'RUN'!");
+                logger.LogInformation("Action Finish Feedback, Confirmed Main Status is not 'RUN'!");
 
             }
             CancellationTokenSource _T1TimeoutCancelToskSource = new CancellationTokenSource(TimeSpan.FromSeconds(8));
@@ -97,12 +96,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                             if (UseWebAPI)
                             {
                                 SimpleRequestResponse response = await PostTaskFeedback(new clsFeedbackData(_FeedbackData));
-                                _ = LOG.INFO($" Task Feedback to AGVS RESULT(Task:{TaskName}_{TaskSimplex},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
+                                logger.LogInformation($" Task Feedback to AGVS RESULT(Task:{TaskName}_{TaskSimplex},{(isTaskCancel ? "[Raise Because Task Cancel_0305]" : "")}| Point Index : {point_index}(Tag:{currentTAg}) | Status : {task_status.ToString()}) ===> {response.ReturnCode}");
                                 _success = response.ReturnCode == RETURN_CODE.OK;
                             }
                             else
                             {
-                                _ = LOG.TRACE($"Task Feedback: {msg.ToJson()}");
+                                logger.LogTrace($"Task Feedback: {msg.ToJson()}");
                                 bool _sendMsgToAGVsSuccess = await SendMsgToAGVSAndWaitReply(data, msg.SystemBytes, MESSAGE_TYPE.ACK_0304_TASK_FEEDBACK_REPORT_ACK, 2);
                                 MessageBase _retMsg = null;
                                 while (!AGVSMessageStoreDictionary.TryRemove(msg.SystemBytes, out _retMsg))
@@ -114,12 +113,12 @@ namespace AGVSystemCommonNet6.AGVDispatch
                                     await Task.Delay(1);
                                 }
                                 clsSimpleReturnMessage msg_return = (clsSimpleReturnMessage)_retMsg;
-                                _ = LOG.INFO($"Task Feedback to AGVS RESULT" +
+                                logger.LogInformation($"Task Feedback to AGVS RESULT" +
                                     $"(\r\nTaskName   :{TaskName}" +
                                     $"\r\nTaskSimplex :{TaskSimplex}" +
                                     $"\r\nPoint Index :{point_index}(Tag:{currentTAg})" +
                                     $"\r\nStatus      :{task_status.ToString()})" +
-                                    $"\r\nResult      :{msg_return.ReturnData.ReturnCode}", color: msg_return.ReturnData.ReturnCode == RETURN_CODE.OK ? ConsoleColor.White : ConsoleColor.Yellow);
+                                    $"\r\nResult      :{msg_return.ReturnData.ReturnCode}");
                                 _retMsg.Dispose();
                                 msg.Dispose();
                                 _success = true;
@@ -127,7 +126,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
                         }
                         catch (Exception ex)
                         {
-                            _ = LOG.ERROR($"TryTaskFeedBackAsync FAIL>.>>{ex.Message}", ex);
+                            logger.LogError($"TryTaskFeedBackAsync FAIL>.>>{ex.Message}", ex);
                             _success = false;
                         }
                     }
@@ -136,18 +135,18 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (TaskCanceledException ex)
             {
-                _ = LOG.ERROR($"Task Feedback ({task_status}) to AGVS Process Cancel.({ex.Message})");
+                logger.LogError($"Task Feedback ({task_status}) to AGVS Process Cancel.({ex.Message})");
                 return false;
             }
             catch (OperationCanceledException ex)
             {
-                _ = LOG.ERROR($"Task Feedback to AGVS .T1 Timeout!");
+                logger.LogError($"Task Feedback to AGVS .T1 Timeout!");
                 OnTaskFeedBack_T1Timeout?.Invoke(this, _FeedbackData);
                 return false;
             }
             catch (Exception ex)
             {
-                _ = LOG.ERROR($"Task Feedback to AGVS Exception Happend:{ex.Message}\r\n{ex.StackTrace}");
+                logger.LogError($"Task Feedback to AGVS Exception Happend:{ex.Message}\r\n{ex.StackTrace}");
                 return false;
             }
         }
@@ -300,7 +299,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                _ = LOG.WARN($"[AGVS] OnlineModeChangeRequest Fail...Code Error:{ex.Message}");
+                logger.LogWarning($"[AGVS] OnlineModeChangeRequest Fail...Code Error:{ex.Message}");
                 return (false, RETURN_CODE.System_Error);
             }
         }
@@ -373,7 +372,7 @@ namespace AGVSystemCommonNet6.AGVDispatch
             }
             catch (Exception ex)
             {
-                _ = LOG.ERROR($"Try Get OnlineMode Fail{ex.Message}");
+                logger.LogError($"Try Get OnlineMode Fail{ex.Message}");
                 VMS_API_Call_Fail_Flag = true;
                 await Task.Delay(3000);
                 return (false, null);

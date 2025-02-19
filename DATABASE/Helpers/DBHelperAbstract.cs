@@ -1,15 +1,11 @@
 ﻿using AGVSystemCommonNet6.Configuration;
-using AGVSystemCommonNet6.Log;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NLog;
 
 namespace AGVSystemCommonNet6.DATABASE.Helpers
 {
     public abstract class DBHelperAbstract : IDisposable
     {
+        Logger logger = LogManager.GetCurrentClassLogger();
         private static SemaphoreSlim saveChangeSemaphoreSlim = new SemaphoreSlim(1, 1);
         protected readonly string connection_str;
         protected DbContextHelper dbhelper;
@@ -41,7 +37,7 @@ namespace AGVSystemCommonNet6.DATABASE.Helpers
             }
             catch (Exception ex)
             {
-                LOG.Critical(ex.InnerException.Message, ex);
+                logger.Error(ex.InnerException.Message, ex);
                 return 0;
             }
             finally

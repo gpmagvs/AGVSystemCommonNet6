@@ -1,6 +1,4 @@
-﻿using AGVSystemCommonNet6.Log;
-
-namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
+﻿namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
 {
     public abstract class AGVAlarmReportable
     {
@@ -44,7 +42,6 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                     if (value != AlarmCodes.None)
                     {
                         AlarmManager.AddWarning(value);
-                        LOG.WARN($"{alarm_locate_in_name} Warning: {value}");
                     }
                     else
                     {
@@ -65,7 +62,6 @@ namespace AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM
                     if (value != AlarmCodes.None)
                     {
                         AlarmManager.AddAlarm(value, false);
-                        LOG.ERROR($"{alarm_locate_in_name} Alarm: {value}");
                     }
 
                     _current_alarm_code = value;

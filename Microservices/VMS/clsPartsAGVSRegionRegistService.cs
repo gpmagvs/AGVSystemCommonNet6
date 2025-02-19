@@ -1,12 +1,7 @@
-﻿using AGVSystemCommonNet6.Log;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Newtonsoft.Json;
+using NLog;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace AGVSystemCommonNet6.Microservices.VMS
 {
@@ -33,6 +28,8 @@ namespace AGVSystemCommonNet6.Microservices.VMS
         public int Port { get; set; } = 5000;
         private Encoding encoding = Encoding.GetEncoding("big5");
         public clsPartsAGVSRegionRegistService() { }
+        Logger logger = LogManager.GetCurrentClassLogger();
+
         public clsPartsAGVSRegionRegistService(string serivceIP, int serivcePort)
         {
             this.IP = serivceIP;
@@ -57,7 +54,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 List_AreaName = AreaNames,
                 RegistEventEnum = RegistEventObject.REGIST_ACTION.Unregist
             };
-            LOG.WARN($"Unregist request send to Parts System : {obj.ToJson()}");
+            logger.Warn($"Unregist request send to Parts System : {obj.ToJson()}");
             return await SendToPartsAGVS(obj);
         }
         public async Task<(bool accept, Dictionary<string, string>)> Query()
@@ -72,7 +69,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                 return (false, new Dictionary<string, string>());
 
             Dictionary<string, string> OutputData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(result.responseJsonMsg);
-            LOG.TRACE($"Regist information from Parts System:{OutputData.ToJson()}");
+            logger.Trace($"Regist information from Parts System:{OutputData.ToJson()}");
             return (true, OutputData);
         }
         private Socket _socketClient;
@@ -122,7 +119,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                     byte[] buffer = new byte[ClientSocket.Available];
                     ClientSocket.Receive(buffer);
                     var _revStr = encoding.GetString(buffer);
-                    LOG.TRACE($"[{data_obj.RegistEventEnum}]:{_revStr}");
+                    logger.Trace($"[{data_obj.RegistEventEnum}]:{_revStr}");
                     ReceiveDataString += _revStr;
                     if (data_obj.RegistEventEnum != RegistEventObject.REGIST_ACTION.Query)
                     {
@@ -138,7 +135,7 @@ namespace AGVSystemCommonNet6.Microservices.VMS
                         }
                         catch (Exception ex)
                         {
-                            LOG.WARN(ex.Message);
+                            logger.Warn(ex.Message);
                             continue;
                         }
                     }

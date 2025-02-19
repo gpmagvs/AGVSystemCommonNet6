@@ -1,19 +1,12 @@
 ﻿using AGVSystemCommonNet6.AGVDispatch;
 using AGVSystemCommonNet6.AGVDispatch.Messages;
 using AGVSystemCommonNet6.AGVDispatch.Model;
-using AGVSystemCommonNet6.Configuration;
-using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.MAP;
 using KGSWebAGVSystemAPI.Sys;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient.MessageTypes.Geometry;
 using RosSharp.RosBridgeClient.MessageTypes.Std;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using static AGVSystemCommonNet6.clsEnums;
 using static AGVSystemCommonNet6.MAP.MapPoint;
 
 namespace AGVSystemCommonNet6

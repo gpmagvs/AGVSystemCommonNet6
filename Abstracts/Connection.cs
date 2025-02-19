@@ -1,6 +1,5 @@
 ﻿//#define ping_debug
 
-using AGVSystemCommonNet6.Log;
 using AGVSystemCommonNet6.Vehicle_Control.VCS_ALARM;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
@@ -63,7 +62,6 @@ namespace AGVSystemCommonNet6.Abstracts
                 }
                 catch (Exception ex)
                 {
-                    LOG.ERROR($"Ping-{IP} 的過程中發生例外-{ex.Message}", ex, false);
                     ping_success = false;
                     await Task.Delay(1000);
                 }
