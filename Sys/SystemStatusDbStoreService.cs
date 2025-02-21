@@ -43,13 +43,8 @@ namespace AGVSystem.Service
 
         public async Task ResetModesStore()
         {
-            if (_agvsDb.SysStatus.Any())
-            {
-                AGVSSystemStatus statusStore = _agvsDb.SysStatus.First();
-                statusStore.RunMode = RUN_MODE.MAINTAIN;
-                statusStore.HostConnMode = HOST_CONN_MODE.OFFLINE;
-                statusStore.HostOperMode = HOST_OPER_MODE.LOCAL;
-            }
+            await ModifyRunModeStored(RUN_MODE.MAINTAIN);
+            await ModifyHostModeStored(HOST_CONN_MODE.OFFLINE, HOST_OPER_MODE.LOCAL);
             await _agvsDb.SaveChangesAsync();
         }
 
@@ -62,5 +57,15 @@ namespace AGVSystem.Service
             await _agvsDb.SaveChangesAsync();
         }
 
+        public async Task ModifyHostModeStored(HOST_CONN_MODE connectMode, HOST_OPER_MODE operMode)
+        {
+            if (_agvsDb.SysStatus.Any())
+            {
+                AGVSSystemStatus statusStore = _agvsDb.SysStatus.First();
+                statusStore.HostConnMode = connectMode;
+                statusStore.HostOperMode = operMode;
+            }
+            await _agvsDb.SaveChangesAsync();
+        }
     }
 }
