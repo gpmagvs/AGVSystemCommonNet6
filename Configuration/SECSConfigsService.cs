@@ -16,6 +16,7 @@ namespace AGVSystemCommonNet6.Configuration
         public SECSAlarmConfiguration alarmConfiguration { get; private set; } = new SECSAlarmConfiguration();
 
         public TransferReportConfiguration transferReportConfiguration { get; private set; } = new TransferReportConfiguration();
+        public clsReturnCodes taskreplyReturnCodes { get; set; } = new clsReturnCodes();
 
         public SECSConfiguration SECSConfigs { get; set; } = new SECSConfiguration();
         public readonly string SECSConfigsSaveFolder = @"C:\AGVS";
@@ -148,8 +149,14 @@ namespace AGVSystemCommonNet6.Configuration
         {
             Directory.CreateDirectory(configsSaveFolder);
         }
+        public void UpdateReturnCodes(clsReturnCodes taskreplyreturncode)
+        {
+            this.taskreplyReturnCodes = taskreplyreturncode;
+            UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
+            //CheckCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
+        }
 
-        public void UpdateReturnCodes(TransferReportConfiguration.clsResultCodes transferCompletedResultCodes)
+        public void UpdateResultCodes(TransferReportConfiguration.clsResultCodes transferCompletedResultCodes)
         {
             this.transferReportConfiguration.ResultCodes = transferCompletedResultCodes;
             UpdateCofigurationFile(transferReportConfiguration, transferReportConfigFilePath);
