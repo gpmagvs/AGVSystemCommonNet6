@@ -13,7 +13,7 @@ namespace AGVSystemCommonNet6.HttpTools.ApiMiddlewares
         public VmsApiLoggingMiddleware(RequestDelegate next) : base(next)
         {
         }
-        public override Logger CreateLogger(HttpContext context)
+        protected override Logger CreateLogger(HttpContext context)
         {
             if (context.Request.Path.ToString().ToLower().Contains("api/agv/"))
             {
