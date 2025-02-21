@@ -45,7 +45,10 @@ namespace AGVSystem.Service
         {
             if (_agvsDb.SysStatus.Any())
             {
-                _agvsDb.SysStatus.First().RunMode = RUN_MODE.MAINTAIN;
+                AGVSSystemStatus statusStore = _agvsDb.SysStatus.First();
+                statusStore.RunMode = RUN_MODE.MAINTAIN;
+                statusStore.HostConnMode = HOST_CONN_MODE.OFFLINE;
+                statusStore.HostOperMode = HOST_OPER_MODE.LOCAL;
             }
             await _agvsDb.SaveChangesAsync();
         }
