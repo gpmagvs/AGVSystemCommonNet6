@@ -2,6 +2,7 @@
 using AGVSystemCommonNet6.Configuration;
 using AGVSystemCommonNet6.DATABASE;
 using AGVSystemCommonNet6.Sys;
+using Microsoft.EntityFrameworkCore;
 
 namespace AGVSystem.Service
 {
@@ -9,6 +10,9 @@ namespace AGVSystem.Service
 
     {
         private AGVSDbContext _agvsDb;
+
+        private bool _isSysstatusDataExist => _agvsDb.SysStatus.AsNoTracking().Any();
+
         public SystemStatusDbStoreService(AGVSDbContext agvsDb)
         {
             _agvsDb = agvsDb;
@@ -50,7 +54,7 @@ namespace AGVSystem.Service
 
         public async Task ModifyRunModeStored(RUN_MODE mode)
         {
-            if (_agvsDb.SysStatus.Any())
+            if (_isSysstatusDataExist)
             {
                 _agvsDb.SysStatus.First().RunMode = mode;
             }
@@ -59,13 +63,21 @@ namespace AGVSystem.Service
 
         public async Task ModifyHostModeStored(HOST_CONN_MODE connectMode, HOST_OPER_MODE operMode)
         {
-            if (_agvsDb.SysStatus.Any())
+            try
             {
-                AGVSSystemStatus statusStore = _agvsDb.SysStatus.First();
-                statusStore.HostConnMode = connectMode;
-                statusStore.HostOperMode = operMode;
+
+                if (_isSysstatusDataExist)
+                {
+                    AGVSSystemStatus statusStore = _agvsDb.SysStatus.First();
+                    statusStore.HostConnMode = connectMode;
+                    statusStore.HostOperMode = operMode;
+                }
+                await _agvsDb.SaveChangesAsync();
             }
-            await _agvsDb.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }

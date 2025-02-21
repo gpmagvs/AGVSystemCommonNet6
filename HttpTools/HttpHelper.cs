@@ -31,48 +31,48 @@ namespace AGVSystemCommonNet6.HttpTools
 
         }
 
-        public async Task<(bool success, string json)> PostAsync(string apiRoute, object data, int timeout = 5, int retryCount = 3)
+        public async Task<(bool success, string json)> PostAsync(string apiRoute, object data, double timeout = 5, int retryCount = 3)
         {
             var response = await SendRequestAsync(HttpMethod.Post, apiRoute, data, timeout, retryCount);
             var responseJson = await response.Content.ReadAsStringAsync();
             return (true, responseJson);
         }
 
-        public async Task<TResponse> PostAsync<TResponse, TRequest>(string apiRoute, TRequest data, int timeout = 5, int retryCount = 3)
+        public async Task<TResponse> PostAsync<TResponse, TRequest>(string apiRoute, TRequest data, double timeout = 5, int retryCount = 3)
         {
             var response = await SendRequestAsync(HttpMethod.Post, apiRoute, data, timeout, retryCount);
             var responseJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<TResponse>(responseJson);
         }
 
-        public async Task<T> GetAsync<T>(string apiRoute, int timeout = 5, int retryCount = 3)
+        public async Task<T> GetAsync<T>(string apiRoute, double timeout = 5, int retryCount = 3)
         {
             var response = await SendRequestAsync(HttpMethod.Get, apiRoute, null, timeout, retryCount);
             var responseJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(responseJson);
         }
 
-        public async Task<string> GetStringAsync(string apiRoute, int timeout = 5, int retryCount = 3)
+        public async Task<string> GetStringAsync(string apiRoute, double timeout = 5, int retryCount = 3)
         {
             var response = await SendRequestAsync(HttpMethod.Get, apiRoute, null, timeout, retryCount);
             return await response.Content.ReadAsStringAsync();
         }
 
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, string apiRoute, object data = null, int timeout = 5, int retryCount = 3)
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, string apiRoute, object data = null, double timeout = 5, int retryCount = 3)
         {
             _logger.Trace($"{method} Start-{http_client.BaseAddress}, Path: {apiRoute}");
 
-            var _retryPolicy = Policy<HttpResponseMessage>
+            AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = Policy<HttpResponseMessage>
              .Handle<HttpRequestException>()
              .Or<TaskCanceledException>()
              .OrResult(response => !response.IsSuccessStatusCode)
              .WaitAndRetryAsync(
                  retryCount,
-                 retryAttempt => TimeSpan.FromSeconds(1),
+                 retryAttempt => TimeSpan.FromMilliseconds(500),
                  onRetry: (exception, timeSpan, retryCount, context) =>
                  {
                      var error = exception.Exception?.Message ?? $"Status code: {exception.Result?.StatusCode}";
-                     _logger.Warn($"Retry {retryCount} after {timeSpan.TotalSeconds} seconds. Error: {error}");
+                     _logger.Warn($"Retry {method} to {http_client.BaseAddress}..{apiRoute} {retryCount} after {timeSpan.TotalSeconds} seconds. Error: {error}");
                  }
              );
 

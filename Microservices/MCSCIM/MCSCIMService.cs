@@ -31,7 +31,27 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 }
             }
         }
-        public static async Task<(bool confirm, string message)> Online(int Timeout = 3)
+
+        public static async Task<(bool confirm, string message)> IsPlatformAlive()
+        {
+            return await AliveCheck();
+        }
+
+        private static async Task<(bool confirm, string message)> AliveCheck()
+        {
+            try
+            {
+                var route = $"/api/AliveCheck";
+                ResponseObject _response = await _http.GetAsync<ResponseObject>(route, 0.500, 1);
+                return (true, "");
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public static async Task<(bool confirm, string message)> Online(double Timeout = 3)
         {
             try
             {
@@ -56,7 +76,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
                 return (false, ex.Message);
             }
         }
-        public static async Task<(bool confirm, string message)> Offline(int Timeout = 3)
+        public static async Task<(bool confirm, string message)> Offline(double Timeout = 3)
         {
             try
             {

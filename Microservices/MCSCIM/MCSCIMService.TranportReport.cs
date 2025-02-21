@@ -39,7 +39,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                if (!IsHostOnline)
+                if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                     return;
 
                 await _http.PostAsync($"/api/TransportEventReport/TransferInitiated?" +
@@ -58,7 +58,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                if (!IsHostOnline)
+                if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                     return;
 
                 await _http.PostAsync($"/api/TransportEventReport/Transferring?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
@@ -70,7 +70,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         }
         public static async Task TransferCompletedReport(TransportCommandDto commandDto)
         {
-            if (!IsHostOnline)
+            if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                 return;
 
             await _http.PostAsync($"/api/TransportEventReport/TransferCompleted?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}&ResultCode={commandDto.ResultCode}", null);
@@ -80,7 +80,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                if (!IsHostOnline)
+                if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                     return;
 
                 await _http.PostAsync($"/api/TransportEventReport/TransferAbortInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
@@ -94,7 +94,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                if (!IsHostOnline)
+                if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                     return;
 
                 await _http.PostAsync($"/api/TransportEventReport/TransferAbortComplete?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
@@ -108,7 +108,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                if (!IsHostOnline)
+                if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                     return;
 
                 await _http.PostAsync($"/api/TransportEventReport/TransferAbortFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
@@ -126,7 +126,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                if (!IsHostOnline)
+                if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                     return;
 
                 await _http.PostAsync($"/api/TransportEventReport/TransferCancelInitiated?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
@@ -140,7 +140,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                if (!IsHostOnline)
+                if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                     return;
 
                 await _http.PostAsync($"/api/TransportEventReport/TransferCancelCompleted?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);
@@ -154,7 +154,7 @@ namespace AGVSystemCommonNet6.Microservices.MCS
         {
             try
             {
-                if (!IsHostOnline)
+                if (!IsHostOnline || !(await IsPlatformAlive()).confirm)
                     return;
 
                 await _http.PostAsync($"/api/TransportEventReport/TransferCancelFailed?CommandID={commandDto.CommandID}&CarrierID={commandDto.CarrierID}&CarrierLoc={commandDto.CarrierLoc}&CarrierZoneName={commandDto.CarrierZoneName}&Dest={commandDto.Dest}", null);

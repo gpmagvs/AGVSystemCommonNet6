@@ -265,7 +265,9 @@ namespace AGVSystemCommonNet6.Alarm
 
         VMSOrderActionStatusReportToAGVSTimeout = 1200,
         VMSOrderActionStatusReportToAGVSFail = 1201,
-        VMSOrderActionStatusReportToAGVSButAGVSGetException = 1202
+        VMSOrderActionStatusReportToAGVSButAGVSGetException = 1202,
+
+        SecsPlatformNotRun = 9000
 
         #endregion
 
